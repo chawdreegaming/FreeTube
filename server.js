@@ -10,7 +10,6 @@ const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
 app.disable("x-powered-by");
-
 app.use(helmet());
 
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
@@ -21,7 +20,6 @@ const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow requests without an Origin header, such as server health checks.
       if (!origin || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
@@ -35,18 +33,29 @@ app.use(
 
 app.use(express.json({ limit: "100kb" }));
 
-// PostgreSQL connection is enabled after DATABASE_URL is configured.
-const pool = process.env.DATABASE_URL
+// PostgreSQL connection
+const databaseUrl = process.env.DATABASE_URL;
+
+const pool = databaseUrl
   ? new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: process.env.DATABASE_SSL === "false"
-        ? false
-        : { rejectUnauthorized: true },
+      connectionString: databaseUrl,
       max: 5,
-      connectionTimeoutMillis: 5000,
+      connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 30000,
     })
   : null;
+
+// Log unexpected database connection errors without exposing credentials.
+if (pool) {
+  pool.on("error", (error) => {
+    console.error("Unexpected database pool error:", {
+      code: error.code,
+      message: error.message,
+      syscall: error.syscall,
+      hostname: error.hostname,
+    });
+  });
+}
 
 // Basic API information
 app.get("/", (req, res) => {
@@ -57,7 +66,7 @@ app.get("/", (req, res) => {
   });
 });
 
-// Health check for Render
+// API health check
 app.get("/api/health", (req, res) => {
   res.json({
     status: "ok",
@@ -83,7 +92,7 @@ app.get("/api/health/database", async (req, res, next) => {
   }
 });
 
-// Example API endpoint
+// API information
 app.get("/api", (req, res) => {
   res.json({
     message: "Welcome to FreeTube API",
@@ -113,22 +122,31 @@ app.use((error, req, res, next) => {
     });
   }
 
-  console.error("Request failed:", error.message);
+  // Detailed diagnostics belong in server logs, not the API response.
+  console.error("Request failed:", {
+    code: error.code,
+    message: error.message,
+    syscall: error.syscall,
+    hostname: error.hostname,
+  });
 
   return res.status(500).json({
     error: "Internal server error",
   });
 });
 
+// Start server
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`FreeTube API listening on port ${PORT}`);
 });
 
+// Graceful shutdown
 async function shutdown() {
   server.close(async () => {
     if (pool) {
       await pool.end().catch(() => {});
     }
+
     process.exit(0);
   });
 }
