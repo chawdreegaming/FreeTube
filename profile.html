@@ -10,228 +10,83 @@
 <style>
 :root {
   --green:#00ff88;
-  --red:#ff5e62;
   --border:rgba(255,255,255,.17);
   --panel:rgba(255,255,255,.08);
   --muted:rgba(255,255,255,.65);
 }
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
-  -webkit-tap-highlight-color:transparent;
-}
-body {
-  min-height:100vh;
-  background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);
-  background-attachment:fixed;
-  color:white;
-}
-button,input,textarea {font:inherit}
-button {cursor:pointer}
-.app {
-  max-width:480px;
-  margin:auto;
-  min-height:100dvh;
-  padding-bottom:85px;
-  background:rgba(13,59,34,.25);
-}
-.header {
-  height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  background:rgba(13,59,34,.94);
-  position:sticky;
-  top:0;
-  z-index:20;
-  border-bottom:1px solid var(--border);
-  backdrop-filter:blur(15px);
-}
-.header-left {display:flex;align-items:center;gap:12px}
-h1 {font-size:19px}
-.icon-btn {
-  width:38px;height:38px;border-radius:50%;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.1);
-  color:white;
-}
-.cover-container {
-  height:180px;
-  position:relative;
-  background:#24382e;
-}
-.cover-photo {width:100%;height:100%;object-fit:cover}
-.cover-upload-btn {
-  position:absolute;right:12px;bottom:12px;
-  background:#111b;color:white;
-  padding:9px 12px;border-radius:9px;
-  font-size:12px;cursor:pointer;
-}
-.profile-header-section {
-  text-align:center;
-  padding:0 16px 18px;
-  border-bottom:1px solid var(--border);
-}
-.avatar-container {
-  width:100px;height:100px;
-  margin:-50px auto 10px;position:relative;
-}
-.avatar {
-  width:100%;height:100%;object-fit:cover;
-  border-radius:50%;border:4px solid #133a26;
-  background:#111;
-}
-.avatar-upload-btn {
-  position:absolute;bottom:1px;right:0;
-  width:31px;height:31px;border-radius:50%;
-  display:grid;place-items:center;
-  background:#15291e;border:2px solid #133a26;
-  cursor:pointer;
-}
-.profile-name {
-  font-size:21px;font-weight:800;
-  display:flex;align-items:center;
-  justify-content:center;gap:7px;
-}
-.verified-badge {color:var(--green);font-size:14px}
-.handle-text {font-size:12px;color:var(--muted);margin-top:5px}
-.follow-stats {font-size:12px;font-weight:bold;margin:10px 0}
-.bio-text {font-size:13px;line-height:1.5;margin:10px 0;overflow-wrap:anywhere}
-.action-row {display:flex;gap:8px;margin-top:14px}
-.btn {
-  flex:1;border:1px solid var(--border);
-  border-radius:10px;padding:11px 7px;color:white;
-  font-size:12px;font-weight:bold;
-  background:rgba(255,255,255,.1);
-  display:flex;align-items:center;justify-content:center;gap:6px;
-}
-.btn-primary {
-  background:linear-gradient(135deg,#00b074,#008253);
-  border:0;
-}
-.btn-icon {flex:0 0 42px}
-.panel {
-  background:var(--panel);
-  backdrop-filter:blur(14px);
-  border:1px solid var(--border);
-  border-radius:15px;padding:15px;
-  margin:13px 14px 0;
-  box-shadow:0 8px 25px #0002;
-}
-.panel-title {
-  font-size:15px;font-weight:bold;
-  display:flex;align-items:center;
-  justify-content:space-between;margin-bottom:12px;
-}
-.detail-item {
-  display:flex;gap:12px;align-items:flex-start;
-  margin:13px 0;font-size:13px;line-height:1.5;
-  overflow-wrap:anywhere;
-}
-.detail-item i {width:20px;text-align:center;color:var(--muted);margin-top:2px}
-.muted {font-size:12px;color:var(--muted);line-height:1.5}
-.inline-edit {background:none;border:0;color:white;padding:4px}
-.bottom-nav {
-  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:480px;min-height:60px;
-  padding:7px 4px calc(7px + env(safe-area-inset-bottom));
-  display:flex;align-items:center;justify-content:space-around;
-  background:rgba(13,59,34,.97);
-  border-top:1px solid var(--border);
-  backdrop-filter:blur(15px);z-index:25;
-}
-.nav-item {
-  min-width:48px;background:none;border:0;
-  color:#ffffffa6;display:flex;flex-direction:column;
-  align-items:center;gap:4px;font-size:10px;
-}
-.nav-item i {font-size:18px}
-.nav-item.active {color:var(--green)}
-input[type=file] {display:none}
-.modal {
-  display:none;position:fixed;inset:0;z-index:100;
-  background:#101713;overflow-y:auto;padding-bottom:30px;
-}
-.modal.open {display:block}
-.modal-header {
-  height:58px;display:flex;align-items:center;
-  justify-content:space-between;padding:0 16px;
-  border-bottom:1px solid var(--border);
-  position:sticky;top:0;background:#101713;z-index:2;
-}
-.modal-header h2 {font-size:17px}
-.close-btn {background:none;border:0;color:white;font-size:23px}
-.modal-content {max-width:480px;margin:auto;padding:18px}
-.field {display:block;margin:15px 0;font-size:13px;color:#ddd}
-.field input,.field textarea {
-  display:block;width:100%;margin-top:7px;
-  border:1px solid var(--border);
-  background:#ffffff0d;border-radius:10px;
-  padding:12px;color:white;outline:none;
-}
-.field textarea {min-height:90px;resize:vertical}
-.field input:focus,.field textarea:focus {border-color:var(--green)}
-.primary-button {
-  width:100%;padding:13px;border:0;border-radius:10px;
-  background:linear-gradient(135deg,#00b074,#008253);
-  color:white;font-weight:bold;margin-top:10px;
-}
-.media-box {
-  border:1px dashed #ffffff55;border-radius:12px;
-  min-height:100px;display:grid;place-items:center;
-  margin-top:15px;overflow:hidden;text-align:center;
-}
-.media-box img {width:100%;max-height:240px;object-fit:contain}
-.media-picker {padding:25px;color:#ddd;cursor:pointer}
-.toast {
-  position:fixed;z-index:200;bottom:80px;left:50%;
-  transform:translateX(-50%);background:#151d18;
-  border:1px solid var(--border);padding:12px 16px;
-  border-radius:10px;font-size:12px;display:none;
-  width:max-content;max-width:90%;text-align:center;
-}
-.status {font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
-.status.error {color:#ffb3b3}
-.status.success {color:var(--green)}
-.settings-option {
-  width:100%;padding:15px;margin-bottom:10px;
-  border:1px solid var(--border);border-radius:12px;
-  background:rgba(255,255,255,.07);color:white;
-  display:flex;align-items:center;gap:13px;text-align:left;
-  font-size:14px;
-}
-.settings-option i {width:22px;text-align:center;color:var(--green);font-size:17px}
-.settings-option.logout-option i {color:var(--red)}
-@media(max-width:350px) {
-  .btn {font-size:11px}
-  .nav-item {min-width:42px}
-  .nav-item span {font-size:9px}
-}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+.app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:85px}
+.menu-row{display:flex;justify-content:flex-start;padding:12px 16px}
+.menu-button{width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#ffffff12;font-size:20px}
+.cover-container{height:180px;position:relative;background:#24382e}
+.cover-photo{width:100%;height:100%;object-fit:cover}
+.cover-upload-btn{position:absolute;right:12px;bottom:12px;background:#111b;padding:10px 12px;border-radius:9px;font-size:13px;cursor:pointer}
+.profile-header-section{text-align:center;padding:0 16px 20px;border-bottom:1px solid var(--border)}
+.avatar-container{width:104px;height:104px;margin:-50px auto 12px;position:relative}
+.avatar{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid #133a26;background:#111}
+.avatar-upload-btn{position:absolute;bottom:0;right:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#15291e;border:2px solid #133a26;cursor:pointer}
+.profile-name{font-size:25px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.verified-badge{color:var(--green);font-size:16px}
+.handle-text{font-size:14px;color:var(--muted);margin-top:6px}
+.follow-stats{font-size:14px;font-weight:bold;margin:12px 0}
+.bio-text{font-size:15px;line-height:1.6;margin:12px 0;overflow-wrap:anywhere}
+.action-row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;border:1px solid var(--border);border-radius:12px;padding:12px 7px;color:#fff;font-size:13px;font-weight:bold;background:#ffffff12;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,#00b074,#008253);border:0}
+.btn-icon{flex:0 0 48px}
+.panel{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;padding:18px;margin:14px 14px 0;box-shadow:0 8px 25px #0002}
+.panel-title{font-size:17px;font-weight:bold;display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.detail-item{display:flex;gap:13px;align-items:flex-start;margin:17px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.detail-item i{width:22px;text-align:center;color:var(--muted);margin-top:2px}
+.muted{font-size:13px;color:var(--muted);line-height:1.5}
+.inline-edit{background:none;border:0;color:white;padding:4px;font-size:17px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;min-height:64px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:rgba(13,59,34,.97);border-top:1px solid var(--border);backdrop-filter:blur(15px);z-index:25}
+.nav-item{min-width:48px;background:none;border:0;color:#ffffffa6;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}
+.nav-item i{font-size:19px}
+.nav-item.active{color:var(--green)}
+input[type=file]{display:none}
+.modal{display:none;position:fixed;inset:0;z-index:100;background:#101713;overflow-y:auto;padding-bottom:30px}
+.modal.open{display:block}
+.modal-header{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#101713;z-index:2}
+.modal-header h2{font-size:18px}
+.close-btn{background:none;border:0;color:white;font-size:23px}
+.modal-content{max-width:480px;margin:auto;padding:18px}
+.field{display:block;margin:16px 0;font-size:14px;color:#ddd}
+.field input,.field textarea{display:block;width:100%;margin-top:8px;border:1px solid var(--border);background:#ffffff0d;border-radius:10px;padding:13px;color:white;outline:none}
+.field textarea{min-height:100px;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--green)}
+.primary-button{width:100%;padding:14px;border:0;border-radius:10px;background:linear-gradient(135deg,#00b074,#008253);color:white;font-weight:bold;margin-top:10px}
+.settings-option{width:100%;padding:16px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:#ffffff0d;color:white;display:flex;align-items:center;gap:13px;text-align:left;font-size:14px}
+.settings-option i{width:24px;text-align:center;color:var(--green);font-size:18px}
+.toast{position:fixed;z-index:200;bottom:82px;left:50%;transform:translateX(-50%);background:#151d18;border:1px solid var(--border);padding:12px 16px;border-radius:10px;font-size:13px;display:none;width:max-content;max-width:90%;text-align:center}
+.status{font-size:13px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+.status.error{color:#ffb3b3}
+.status.success{color:var(--green)}
+#retrySessionButton{display:none;width:100%;margin-top:10px}
+.post-card{padding:14px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.post-card img,.post-card video{width:100%;max-height:360px;object-fit:contain;margin-top:10px;border-radius:10px}
+@media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
 </style>
 </head>
 
 <body>
 <div class="app">
 
-<header class="header">
-  <div class="header-left">
-    <button class="icon-btn" onclick="goHome()" aria-label="Back to home">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-    <h1>Profile</h1>
-  </div>
-  <button class="icon-btn" onclick="openSettings()" aria-label="Settings">
-    <i class="fa-solid fa-gear"></i>
+<!-- Facebook-style three-line menu; no top Profile header -->
+<div class="menu-row">
+  <button class="menu-button" onclick="openSettings()" aria-label="Open menu">
+    <i class="fa-solid fa-bars"></i>
   </button>
-</header>
+</div>
 
 <section class="cover-container">
-  <img id="coverPhoto" class="cover-photo"
-    src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
-    alt="Cover photo">
+  <img id="coverPhoto"
+       class="cover-photo"
+       src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
+       alt="Cover photo">
   <label for="coverInput" class="cover-upload-btn">
     <i class="fa-solid fa-camera"></i> Edit cover
   </label>
@@ -240,10 +95,11 @@ input[type=file] {display:none}
 
 <section class="profile-header-section">
   <div class="avatar-container">
-    <img id="profileAvatar" class="avatar"
-      src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250"
-      alt="Profile photo">
-    <label for="avatarInput" class="avatar-upload-btn" title="Change profile photo">
+    <img id="profileAvatar"
+         class="avatar"
+         src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250"
+         alt="Profile photo">
+    <label for="avatarInput" class="avatar-upload-btn" aria-label="Change profile photo">
       <i class="fa-solid fa-camera"></i>
     </label>
     <input type="file" id="avatarInput" accept="image/*">
@@ -253,6 +109,7 @@ input[type=file] {display:none}
     <span id="username">User</span>
     <i class="fa-solid fa-circle-check verified-badge"></i>
   </div>
+
   <div id="handle" class="handle-text">@username</div>
 
   <div class="follow-stats">
@@ -266,23 +123,22 @@ input[type=file] {display:none}
     <button class="btn btn-primary" onclick="showDashboard()">
       <i class="fa-solid fa-chart-line"></i> Dashboard
     </button>
-    <button class="btn" onclick="openPostModal()">
-      <i class="fa-solid fa-plus"></i> Create
+    <button class="btn" onclick="goHome()">
+      <i class="fa-solid fa-house"></i> Home
     </button>
     <button class="btn btn-icon" onclick="openEditModal()" aria-label="Edit profile">
       <i class="fa-solid fa-pen"></i>
     </button>
   </div>
 
-  <p class="status" id="sessionStatus" aria-live="polite">Checking login status...</p>
-  <button class="btn" id="retrySessionButton" onclick="loadProfile()"
-    style="display:none;width:100%;margin-top:10px">Retry</button>
+  <p class="status" id="sessionStatus">Checking login status...</p>
+  <button class="btn" id="retrySessionButton" onclick="loadProfile()">Retry connection</button>
 </section>
 
 <section class="panel">
   <div class="panel-title">
     Personal details
-    <button class="inline-edit" onclick="openEditModal()" aria-label="Edit details">
+    <button class="inline-edit" onclick="openEditModal()" aria-label="Edit personal details">
       <i class="fa-solid fa-pen"></i>
     </button>
   </div>
@@ -293,24 +149,13 @@ input[type=file] {display:none}
 
 <section class="panel">
   <div class="panel-title">
-    Work & Education
+    Work &amp; Education
     <button class="inline-edit" onclick="openEditModal()" aria-label="Edit work and education">
       <i class="fa-solid fa-pen"></i>
     </button>
   </div>
   <div class="detail-item"><i class="fa-solid fa-briefcase"></i><span><strong id="workText">Not added</strong><br><span class="muted">Work</span></span></div>
   <div class="detail-item"><i class="fa-solid fa-graduation-cap"></i><span><strong id="educationText">Not added</strong><br><span class="muted">Education</span></span></div>
-</section>
-
-<section class="panel">
-  <div class="panel-title">Creator Wallet</div>
-  <div style="font-size:25px;font-weight:800;color:var(--green)">$0.00</div>
-  <p class="muted" style="margin-top:5px">Demo balance — not withdrawable</p>
-  <div class="action-row">
-    <button class="btn btn-primary" onclick="notify('Withdrawals are not enabled yet.')">Withdraw</button>
-    <button class="btn" id="logoutButton" onclick="logout()" style="display:none">Logout</button>
-    <a class="btn" id="authLink" href="auth.html" style="text-decoration:none">Login / Register</a>
-  </div>
 </section>
 
 <section class="panel">
@@ -323,39 +168,41 @@ input[type=file] {display:none}
 <nav class="bottom-nav">
   <button class="nav-item" onclick="goHome()"><i class="fa-solid fa-house"></i><span>Home</span></button>
   <button class="nav-item" onclick="goDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-  <button class="nav-item" onclick="openPostModal()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
-  <button class="nav-item" onclick="location.href='home.html#notifications'"><i class="fa-solid fa-bell"></i><span>Notifications</span></button>
+  <button class="nav-item" onclick="goCreate()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
+  <button class="nav-item" onclick="goNotifications()"><i class="fa-solid fa-bell"></i><span>Notifications</span></button>
   <button class="nav-item active" onclick="location.href='profile.html'"><i class="fa-regular fa-user"></i><span>Profile</span></button>
 </nav>
 
+<!-- Settings menu -->
 <div class="modal" id="settingsModal">
   <header class="modal-header">
-    <button class="close-btn" onclick="closeModal('settingsModal')"><i class="fa-solid fa-xmark"></i></button>
+    <button class="close-btn" onclick="closeModal('settingsModal')" aria-label="Close menu">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
     <h2>Settings</h2><span></span>
   </header>
   <div class="modal-content">
-    <button class="settings-option" onclick="openEditFromSettings()">
+    <button class="settings-option" onclick="closeModal('settingsModal');openEditModal()">
       <i class="fa-solid fa-user-pen"></i>
-      <span>Edit Profile<br><small class="muted">Change your name and profile information</small></span>
+      <span>Edit Profile<br><small class="muted">Name, bio and personal details</small></span>
     </button>
-    <button class="settings-option" onclick="notify('Account settings are coming soon.')">
+    <button class="settings-option" onclick="closeModal('settingsModal');notify('Account settings are coming soon.')">
       <i class="fa-solid fa-user-shield"></i>
       <span>Account Settings<br><small class="muted">Manage your account</small></span>
     </button>
-    <button class="settings-option" onclick="notify('Privacy settings are coming soon.')">
+    <button class="settings-option" onclick="closeModal('settingsModal');notify('Privacy settings are coming soon.')">
       <i class="fa-solid fa-lock"></i>
       <span>Privacy<br><small class="muted">Privacy options</small></span>
-    </button>
-    <button class="settings-option logout-option" onclick="logout()">
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span>Logout<br><small class="muted">Sign out of your account</small></span>
     </button>
   </div>
 </div>
 
+<!-- Edit profile -->
 <div class="modal" id="editModal">
   <header class="modal-header">
-    <button class="close-btn" onclick="closeModal('editModal')"><i class="fa-solid fa-xmark"></i></button>
+    <button class="close-btn" onclick="closeModal('editModal')" aria-label="Close edit profile">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
     <h2>Edit profile</h2><span></span>
   </header>
   <div class="modal-content">
@@ -382,20 +229,8 @@ input[type=file] {display:none}
         <input id="editEducation" maxlength="120">
       </label>
       <button class="primary-button" id="saveProfileButton" type="submit">Save profile</button>
-      <p class="status">Name and bio are saved to the server. Other personal details are saved on this device.</p>
       <p class="status" id="editStatus"></p>
     </form>
-  </div>
-</div>
-
-<div class="modal" id="postModal">
-  <header class="modal-header">
-    <button class="close-btn" onclick="closeModal('postModal')"><i class="fa-solid fa-xmark"></i></button>
-    <h2>Create post</h2><span></span>
-  </header>
-  <div class="modal-content">
-    <p class="muted">Posts are created from the main feed. Open Home to publish a post.</p>
-    <button class="primary-button" onclick="goHome()">Go to Home</button>
   </div>
 </div>
 
@@ -407,13 +242,12 @@ input[type=file] {display:none}
 const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY = "freetube_access_token";
 const PROFILE_KEY = "freetube_profile_data";
-const AVATAR_KEY = "freetube_custom_avatar";
-const COVER_KEY = "freetube_custom_cover";
 
 let toastTimer;
-let sessionValid = false;
 let currentUser = null;
 let serverProfile = {};
+let sessionValid = false;
+let loadingProfile = false;
 
 const defaultProfile = {
   name:"",
@@ -445,18 +279,19 @@ function getProfile() {
 function saveLocalProfile(profile) {
   try {
     localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
-  } catch {
-    notify("Could not save local profile details.");
+  } catch (error) {
+    console.warn("Local profile could not be saved:",error);
   }
 }
 
-function getDisplayName(p) {
-  return String(p.name || p.handle || "User").replace(/^@/,"");
+function displayName(profile) {
+  return String(profile.name || profile.handle || "User").replace(/^@/,"");
 }
 
 function renderProfile() {
   const p = getProfile();
-  document.getElementById("username").textContent = getDisplayName(p);
+
+  document.getElementById("username").textContent = displayName(p);
   document.getElementById("handle").textContent =
     p.handle ? "@" + String(p.handle).replace(/^@/,"") : "@username";
   document.getElementById("bioText").textContent = p.bio || "No bio added yet.";
@@ -469,23 +304,19 @@ function renderProfile() {
   document.getElementById("followingCount").textContent = Number(p.following) || 0;
 }
 
-function setSessionStatus(message,type="") {
+function setStatus(message,type="") {
   const el = document.getElementById("sessionStatus");
   el.textContent = message;
   el.className = "status" + (type ? " " + type : "");
 }
 
-function setAuthButtons(loggedIn) {
-  document.getElementById("logoutButton").style.display = loggedIn ? "flex" : "none";
-  document.getElementById("authLink").style.display = loggedIn ? "none" : "flex";
-}
-
 async function apiRequest(path,options={}) {
-  const token = getToken();
   const headers = {...(options.headers || {})};
+  const token = getToken();
 
   if (token) headers.Authorization = "Bearer " + token;
-  if (!(options.body instanceof FormData) && options.body !== undefined) {
+
+  if (options.body !== undefined && !(options.body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
   }
 
@@ -499,9 +330,6 @@ async function apiRequest(path,options={}) {
   try { data = await response.json(); } catch {}
 
   if (!response.ok) {
-    if (response.status === 401) {
-      throw new Error("Session expired. Please log in again.");
-    }
     throw new Error(data.error || data.message || ("Server error: " + response.status));
   }
 
@@ -521,20 +349,20 @@ function applyServerProfile(profile,user) {
     user?.display_name ||
     user?.full_name ||
     user?.fullName ||
-    user?.name ||
-    "";
+    user?.name;
 
   const handle =
     user?.username ||
     user?.handle ||
-    serverProfile.username ||
-    "";
+    serverProfile.username;
 
   if (name) p.name = name;
   if (handle) p.handle = String(handle).replace(/^@/,"");
-
   if (typeof serverProfile.bio === "string") p.bio = serverProfile.bio;
 
+  saveLocalProfile(p);
+
+  // Load saved images from the server.
   if (serverProfile.avatar_url) {
     document.getElementById("profileAvatar").src = serverProfile.avatar_url;
   }
@@ -542,38 +370,26 @@ function applyServerProfile(profile,user) {
     document.getElementById("coverPhoto").src = serverProfile.cover_url;
   }
 
-  saveLocalProfile(p);
   renderProfile();
 }
 
 async function loadProfile() {
-  const retry = document.getElementById("retrySessionButton");
-  retry.style.display = "none";
-  setSessionStatus("Connecting to FreeTube...", "");
+  if (loadingProfile) return;
+  loadingProfile = true;
 
-  const token = getToken();
-
-  if (!token) {
-    sessionValid = false;
-    setAuthButtons(false);
-    setSessionStatus("You are not logged in. Please log in first.","error");
-    retry.style.display = "block";
-    return;
-  }
+  document.getElementById("retrySessionButton").style.display = "none";
+  setStatus("Connecting to FreeTube...");
 
   try {
+    if (!getToken()) {
+      throw new Error("Please log in first.");
+    }
+
     const meData = await apiRequest("/auth/me");
     currentUser = extractUser(meData);
-    sessionValid = true;
-    setAuthButtons(true);
 
     let profile = currentUser.profile || currentUser.profiles || {};
-
-    const username =
-      currentUser.username ||
-      currentUser.handle ||
-      profile.username ||
-      "";
+    const username = currentUser.username || currentUser.handle || profile.username;
 
     if (username) {
       try {
@@ -582,24 +398,22 @@ async function loadProfile() {
         );
         profile = profileData.profile || profileData.data?.profile || profileData;
       } catch (error) {
-        console.warn("Could not load public profile route:",error.message);
+        console.warn("Public profile fetch failed:",error.message);
       }
     }
 
     applyServerProfile(profile,currentUser);
-    setSessionStatus("Profile connected to server.","success");
+    sessionValid = true;
+    setStatus("Profile connected to server.","success");
+
     await loadMyPosts();
 
   } catch (error) {
-    console.error("Profile load failed:",error);
     sessionValid = false;
-    setSessionStatus(error.message || "Could not connect to the server.","error");
-    setAuthButtons(false);
-    retry.style.display = "block";
-
-    if (/session expired/i.test(error.message)) {
-      localStorage.removeItem(TOKEN_KEY);
-    }
+    setStatus(error.message || "Could not connect to server.","error");
+    document.getElementById("retrySessionButton").style.display = "flex";
+  } finally {
+    loadingProfile = false;
   }
 }
 
@@ -607,13 +421,9 @@ function openSettings() {
   document.getElementById("settingsModal").classList.add("open");
 }
 
-function openEditFromSettings() {
-  closeModal("settingsModal");
-  openEditModal();
-}
-
 function openEditModal() {
   const p = getProfile();
+
   document.getElementById("editName").value = p.name || "";
   document.getElementById("editBio").value = p.bio || "";
   document.getElementById("editCity").value = p.city || "";
@@ -622,6 +432,7 @@ function openEditModal() {
   document.getElementById("editWork").value = p.work || "";
   document.getElementById("editEducation").value = p.education || "";
   document.getElementById("editStatus").textContent = "";
+
   document.getElementById("editModal").classList.add("open");
 }
 
@@ -640,6 +451,7 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
   const button = document.getElementById("saveProfileButton");
   const status = document.getElementById("editStatus");
   const oldText = button.textContent;
+
   button.disabled = true;
   button.textContent = "Saving...";
   status.textContent = "";
@@ -656,7 +468,8 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
   };
 
   if (!p.name) {
-    notify("Please enter your full name.");
+    status.textContent = "Please enter your name.";
+    status.className = "status error";
     button.disabled = false;
     button.textContent = oldText;
     return;
@@ -677,15 +490,15 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
     saveLocalProfile(p);
     renderProfile();
 
-    status.textContent = "Profile saved to server.";
+    status.textContent = "Profile saved successfully.";
     status.className = "status success";
-    notify("Profile updated successfully.");
     closeModal("editModal");
+    notify("Profile updated.");
 
   } catch (error) {
     status.textContent = error.message;
     status.className = "status error";
-    notify("Could not save profile: " + error.message);
+    notify("Could not save: " + error.message);
   } finally {
     button.disabled = false;
     button.textContent = oldText;
@@ -693,29 +506,32 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
 });
 
 async function uploadProfileImage(file) {
-  if (!file) return null;
+  if (!file) throw new Error("Please choose an image.");
 
   if (!file.type.startsWith("image/")) {
-    throw new Error("Please select an image.");
+    throw new Error("Please select an image file.");
   }
+
   if (file.size > 5 * 1024 * 1024) {
     throw new Error("Image must be smaller than 5 MB.");
   }
 
-  const formData = new FormData();
-  formData.append("file",file);
+  const form = new FormData();
+  form.append("file",file);
 
   const result = await apiRequest("/media/upload",{
     method:"POST",
-    body:formData
+    body:form
   });
 
   const media = result.media || result.data?.media;
-  if (!media || !media.url) {
-    throw new Error("Upload finished but the server did not return an image URL.");
+  const url = media?.url || media?.secure_url;
+
+  if (!url || !url.startsWith("https://")) {
+    throw new Error("Server did not return a valid image URL.");
   }
 
-  return media.url;
+  return url;
 }
 
 async function changeProfileImage(file,type) {
@@ -726,39 +542,42 @@ async function changeProfileImage(file,type) {
     return;
   }
 
-  setSessionStatus("Uploading image...", "");
+  setStatus("Uploading image...");
+
   try {
     const url = await uploadProfileImage(file);
+
+    // Save the new URL to the server before showing success.
     const p = getProfile();
 
-    if (type === "avatar") {
-      serverProfile.avatar_url = url;
-      document.getElementById("profileAvatar").src = url;
-      try { localStorage.removeItem(AVATAR_KEY); } catch {}
-    } else {
-      serverProfile.cover_url = url;
-      document.getElementById("coverPhoto").src = url;
-      try { localStorage.removeItem(COVER_KEY); } catch {}
-    }
+    const payload = {
+      display_name:p.name || currentUser?.username || "",
+      bio:p.bio || "",
+      avatar_url:type === "avatar" ? url : (serverProfile.avatar_url || null),
+      cover_url:type === "cover" ? url : (serverProfile.cover_url || null)
+    };
 
     const result = await apiRequest("/profile",{
       method:"PUT",
-      body:JSON.stringify({
-        display_name:p.name || currentUser?.username || "",
-        bio:p.bio || "",
-        avatar_url:serverProfile.avatar_url || null,
-        cover_url:serverProfile.cover_url || null
-      })
+      body:JSON.stringify(payload)
     });
 
-    serverProfile = result.profile || serverProfile;
-    setSessionStatus("Profile image saved to server.","success");
-    notify(type === "avatar" ? "Profile photo updated." : "Cover photo updated.");
+    serverProfile = result.profile || {...serverProfile,...payload};
+
+    // Update the displayed image only after the server saves it.
+    if (type === "avatar") {
+      document.getElementById("profileAvatar").src = url;
+    } else {
+      document.getElementById("coverPhoto").src = url;
+    }
+
+    setStatus("Profile connected to server.","success");
+    notify(type === "avatar" ? "Profile photo saved." : "Cover photo saved.");
 
   } catch (error) {
-    console.error("Image update failed:",error);
-    setSessionStatus(error.message,"error");
-    notify("Image update failed: " + error.message);
+    console.error("Image upload error:",error);
+    setStatus(error.message,"error");
+    notify("Image save failed: " + error.message);
   }
 }
 
@@ -781,20 +600,17 @@ async function loadMyPosts() {
   try {
     const data = await apiRequest("/posts?limit=30");
     const posts = data.posts || data.data?.posts || [];
+
     const myId = String(currentUser?.id ?? currentUser?.user_id ?? "");
     const myUsername = String(currentUser?.username || currentUser?.handle || "").toLowerCase();
 
     const mine = posts.filter(post => {
       const author = post.user || post.author || post.owner || {};
-      const postUserId = String(
-        post.user_id ?? post.author_id ?? author.id ?? author.user_id ?? ""
-      );
-      const postUsername = String(
-        post.username ?? post.author_username ?? author.username ?? author.handle ?? ""
-      ).toLowerCase();
+      const postId = String(post.user_id ?? post.author_id ?? author.id ?? author.user_id ?? "");
+      const postName = String(post.username ?? post.author_username ?? author.username ?? author.handle ?? "").toLowerCase();
 
-      return (myId && postUserId && myId === postUserId) ||
-             (myUsername && postUsername && myUsername === postUsername);
+      return (myId && postId && myId === postId) ||
+             (myUsername && postName && myUsername === postName);
     });
 
     document.getElementById("postCount").textContent =
@@ -809,52 +625,35 @@ async function loadMyPosts() {
 
     mine.forEach(post => {
       const card = document.createElement("div");
-      card.style.cssText = "padding:12px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere";
+      card.className = "post-card";
 
       const text = document.createElement("p");
-      text.style.cssText = "font-size:14px;white-space:pre-wrap";
       text.textContent = post.content || post.text || "";
       card.appendChild(text);
 
-      const mediaUrl = post.media_url || post.image_url || post.video_url;
-      const mediaType = String(post.media_type || post.type || "");
+      const url = post.media_url || post.image_url || post.video_url;
+      const type = String(post.media_type || post.type || "");
 
-      if (mediaUrl) {
-        let media;
-        if (mediaType.includes("video")) {
-          media = document.createElement("video");
-          media.controls = true;
-          media.playsInline = true;
-        } else {
-          media = document.createElement("img");
-          media.alt = "Post media";
-        }
-        media.src = mediaUrl;
-        media.style.cssText = "width:100%;max-height:360px;object-fit:contain;margin-top:10px;border-radius:10px";
+      if (url) {
+        const media = document.createElement(type.includes("video") ? "video" : "img");
+        media.src = url;
+        media.controls = type.includes("video");
+        media.alt = "Post media";
         card.appendChild(media);
       }
 
       const date = document.createElement("p");
       date.className = "muted";
-      date.style.marginTop = "7px";
+      date.style.marginTop = "8px";
       date.textContent = post.created_at ? new Date(post.created_at).toLocaleString() : "";
       card.appendChild(date);
+
       container.appendChild(card);
     });
 
   } catch (error) {
     container.textContent = "Could not load posts: " + error.message;
   }
-}
-
-function openPostModal() {
-  document.getElementById("postModal").classList.add("open");
-}
-
-function logout() {
-  try { localStorage.removeItem(TOKEN_KEY); } catch {}
-  sessionValid = false;
-  location.replace("auth.html");
 }
 
 function goHome() {
@@ -865,6 +664,14 @@ function goDiscover() {
   location.href = "home.html#discover";
 }
 
+function goCreate() {
+  location.href = "home.html# create";
+}
+
+function goNotifications() {
+  location.href = "home.html#notifications";
+}
+
 function showDashboard() {
   notify("Creator dashboard is not connected yet.");
 }
@@ -873,6 +680,7 @@ function notify(message) {
   const el = document.getElementById("toast");
   el.textContent = message;
   el.style.display = "block";
+
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     el.style.display = "none";
@@ -880,21 +688,8 @@ function notify(message) {
 }
 
 window.addEventListener("DOMContentLoaded",function() {
-  try {
-    const p = getProfile();
-    renderProfile();
-
-    // Restore old device-only photos as a fallback.
-    const avatar = localStorage.getItem(AVATAR_KEY);
-    const cover = localStorage.getItem(COVER_KEY);
-    if (avatar) document.getElementById("profileAvatar").src = avatar;
-    if (cover) document.getElementById("coverPhoto").src = cover;
-
-    loadProfile();
-  } catch (error) {
-    console.error(error);
-    setSessionStatus("Could not load profile. Please reload.","error");
-  }
+  renderProfile();
+  loadProfile();
 });
 </script>
 </body>
