@@ -385,6 +385,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
     stream.end(buffer);
   });
 }
+
 // Initialize database tables without deleting existing data.
 async function initializeDatabase() {
   if (!pool) return;
@@ -466,6 +467,16 @@ async function initializeDatabase() {
       UNIQUE (post_id, reporter_id)
     );
 
+    -- NEW: Track daily views per post and authenticated user.
+    CREATE TABLE IF NOT EXISTS ft_post_views (
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      view_day DATE NOT NULL DEFAULT CURRENT_DATE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (post_id, user_id, view_day)
+    );
+
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
 
@@ -483,6 +494,9 @@ async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS ft_follows_following_idx
       ON ft_follows(following_id);
+
+    CREATE INDEX IF NOT EXISTS ft_post_views_post_idx
+      ON ft_post_views(post_id);
   `);
 
   console.log("FreeTube database initialized.");
@@ -493,7 +507,7 @@ app.get("/", (req, res) => {
   res.json({
     name: "FreeTube Backend API",
     status: "running",
-    version: "3.0.0"
+    version: "3.1.0"
   });
 });
 
@@ -532,6 +546,7 @@ app.get("/api", (req, res) => {
       "GET /api/users/search?q=username",
       "POST /api/media/upload",
       "GET /api/posts",
+      "POST /api/posts/:id/view",
       "POST /api/posts",
       "PUT /api/posts/:id",
       "DELETE /api/posts/:id",
@@ -758,6 +773,7 @@ app.post("/api/auth/login", async (req, res, next) => {
 app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
+
 // Search active users.
 app.get("/api/users/search", requireAuth, async (req, res, next) => {
   try {
@@ -960,14 +976,63 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
 
     res.status(201).json({
       message: "Post created.",
-      post: result.rows[0]
+      post: {
+        ...result.rows[0],
+        view_count: 0
+      }
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Feed.
+// NEW: Count one view per authenticated user per post per day.
+app.post("/api/posts/:id/view", requireAuth, async (req, res, next) => {
+  try {
+    const postId = Number.parseInt(req.params.id, 10);
+    const userId = String(req.user.id);
+
+    if (!Number.isSafeInteger(postId) || postId <= 0) {
+      return res.status(400).json({
+        error: "Invalid post ID."
+      });
+    }
+
+    const post = await pool.query(
+      "SELECT id FROM ft_posts WHERE id = $1",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      return res.status(404).json({
+        error: "Post not found."
+      });
+    }
+
+    const inserted = await pool.query(
+      `INSERT INTO ft_post_views (post_id, user_id, view_day)
+       VALUES ($1, $2, CURRENT_DATE)
+       ON CONFLICT (post_id, user_id, view_day) DO NOTHING
+       RETURNING post_id`,
+      [postId, userId]
+    );
+
+    const countResult = await pool.query(
+      "SELECT COUNT(*) AS view_count FROM ft_post_views WHERE post_id = $1",
+      [postId]
+    );
+
+    res.json({
+      post_id: String(postId),
+      viewed_today: inserted.rowCount > 0,
+      view_count: Number(countResult.rows[0].view_count)
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Feed with view_count.
 app.get("/api/posts", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -991,6 +1056,8 @@ app.get("/api/posts", async (req, res, next) => {
                WHERE l.post_id = p.id) AS like_count,
               (SELECT COUNT(*) FROM ft_comments c
                WHERE c.post_id = p.id) AS comment_count,
+              (SELECT COUNT(*) FROM ft_post_views v
+               WHERE v.post_id = p.id) AS view_count,
               EXISTS (
                 SELECT 1 FROM ft_likes l
                 WHERE l.post_id = p.id AND l.user_id = $2
@@ -1267,6 +1334,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
+
 // Follow a user.
 app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   try {
