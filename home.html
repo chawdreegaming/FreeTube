@@ -2,748 +2,411 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0d3b22">
 <title>FreeTube - Home</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
-:root {
-  --green: #00ff88;
-  --red: #ff5e62;
-  --bg: #0d2419;
-  --panel: rgba(19,45,31,.96);
-  --border: rgba(255,255,255,.14);
-  --muted: rgba(255,255,255,.65);
-}
-* { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; -webkit-tap-highlight-color:transparent; }
-body { color:#fff; background:linear-gradient(135deg,#0d3b22,#102d20,#35121b); min-height:100vh; }
-button,input,textarea { font:inherit; }
-button { cursor:pointer; color:inherit; border:0; }
-.app { max-width:480px; min-height:100dvh; margin:auto; padding-bottom:78px; background:#0d3b222b; }
-.topbar { position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding:15px 16px; background:rgba(13,59,34,.97); border-bottom:1px solid var(--border); }
-.brand { font-size:25px; font-weight:900; letter-spacing:-1px; }
-.brand i,.brand span { color:var(--green); }
-.icon-btn { width:40px; height:40px; border-radius:50%; background:#ffffff18; border:1px solid var(--border); position:relative; }
-.badge { position:absolute; top:-4px; right:-4px; background:var(--red); border-radius:12px; font-size:10px; padding:3px 5px; }
-.composer { display:flex; align-items:center; gap:10px; padding:13px 16px; background:var(--panel); border-bottom:1px solid var(--border); cursor:pointer; }
-.avatar { width:42px; height:42px; object-fit:cover; border-radius:50%; border:1px solid var(--border); flex-shrink:0; }
-.fake-input { flex:1; border:1px solid var(--border); border-radius:25px; padding:12px 15px; background:#ffffff0d; color:var(--muted); font-size:14px; }
-.fake-input i { float:right; color:var(--green); }
-.stories { display:flex; gap:9px; overflow-x:auto; padding:12px 15px; background:#0d3b2270; scrollbar-width:none; }
-.story { width:100px; height:155px; flex-shrink:0; position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--border); background:#244b37; display:flex; justify-content:flex-end; padding:8px; }
-.story img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-.story:after { content:""; position:absolute; inset:45% 0 0; background:linear-gradient(transparent,#000b); }
-.story span { position:relative; z-index:2; font-size:11px; font-weight:bold; }
-.story.create { align-items:center; justify-content:center; flex-direction:column; gap:10px; text-align:center; background:#ffffff0b; cursor:pointer; }
-.story.create:after { display:none; }
-.story.create i { background:var(--green); color:#06351f; padding:12px; border-radius:50%; }
-.post { margin:10px 0; background:var(--panel); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
-.post-header { display:flex; align-items:center; justify-content:space-between; padding:12px 15px; }
-.author-row { display:flex; align-items:center; gap:10px; min-width:0; }
-.author-name { font-size:14px; font-weight:bold; overflow-wrap:anywhere; }
-.post-time { color:var(--muted); font-size:11px; margin-top:4px; }
-.profile-clickable { cursor:pointer; }
-.profile-clickable:active { opacity:.75; }
-.post-text { padding:0 15px 12px; font-size:14px; line-height:1.5; overflow-wrap:anywhere; white-space:pre-wrap; }
-.media { position:relative; background:#000; display:flex; justify-content:center; max-height:500px; overflow:hidden; }
-.media img,.media video { width:100%; max-height:500px; object-fit:contain; display:block; }
-.sound { position:absolute; right:12px; top:12px; z-index:2; width:42px; height:42px; border-radius:50%; background:#000b; border:1px solid #ffffff70; }
-.stats { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:11px 12px; color:var(--muted); font-size:12px; border-bottom:1px solid #ffffff12; }
-.stats span { white-space:nowrap; }
-.actions { display:flex; align-items:center; padding:4px; }
-.action { flex:1; min-width:0; background:none; border-radius:7px; padding:12px 3px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:bold; color:#ddd; }
-.action:active { background:#ffffff12; }
-.action.loved { color:#ff687e; }
-.bottom-nav { position:fixed; z-index:30; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; justify-content:space-around; padding:9px 3px calc(8px + env(safe-area-inset-bottom)); background:rgba(13,59,34,.98); border-top:1px solid var(--border); }
-.nav-item { background:none; color:#ffffff9c; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; min-width:48px; position:relative; }
-.nav-item i { font-size:18px; }
-.nav-item.active { color:var(--green); }
-.modal { display:none; position:fixed; inset:0; z-index:50; background:#000a; align-items:flex-end; justify-content:center; padding:10px; }
-.modal.open { display:flex; }
-.modal-content { width:100%; max-width:460px; max-height:88dvh; overflow:auto; background:#142a1e; border:1px solid var(--border); border-radius:18px; padding:17px; }
-.modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
-.close { background:#ffffff18; border-radius:50%; width:35px; height:35px; }
-.field { width:100%; color:white; background:#ffffff0b; border:1px solid var(--border); border-radius:10px; padding:12px; margin:7px 0; outline:none; }
-textarea.field { min-height:100px; resize:vertical; }
-.primary { background:var(--green); color:#07351f; font-weight:bold; padding:11px 15px; border-radius:10px; }
-.secondary { background:#ffffff12; border:1px solid var(--border); padding:10px 14px; border-radius:10px; }
-.comment { padding:10px 0; border-bottom:1px solid #ffffff15; font-size:13px; overflow-wrap:anywhere; white-space:pre-wrap; }
-.toast { position:fixed; z-index:100; bottom:80px; left:50%; transform:translateX(-50%); background:#18241d; border:1px solid var(--border); padding:12px 16px; border-radius:10px; font-size:13px; display:none; max-width:90%; text-align:center; }
-.toast.show { display:block; }
-.empty { padding:35px 18px; text-align:center; color:var(--muted); font-size:14px; }
-.reaction-picker { display:flex; gap:5px; justify-content:center; padding:8px; }
-.reaction-picker button { background:none; font-size:24px; padding:5px; }
-@media(max-width:350px) { .action { font-size:10px; } .nav-item { min-width:40px; } }
+:root{--green:#00ff88;--red:#ff5e62;--panel:#132d1f;--border:#ffffff24;--muted:#b7c5bc}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff;min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
+.app{max-width:480px;margin:auto;min-height:100vh;padding-bottom:78px}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:13px 16px;background:#0d3b22f5;border-bottom:1px solid var(--border)}
+.brand{font-size:24px;font-weight:900}.brand i{color:var(--green)}.brand span{color:var(--red)}
+.icon-btn{position:relative;width:40px;height:40px;border-radius:50%;background:#ffffff12;border:1px solid var(--border)}
+.badge{position:absolute;top:-4px;right:-4px;background:var(--red);padding:3px 5px;border-radius:12px;font-size:10px}
+.composer{display:flex;align-items:center;gap:10px;padding:13px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
+.avatar,.post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+.fake-input{flex:1;padding:12px 15px;border:1px solid var(--border);border-radius:25px;color:var(--muted);font-size:14px}
+.fake-input i{float:right;color:var(--green)}
+.stories{display:flex;gap:8px;padding:12px;overflow-x:auto;background:#0d3b2277;border-bottom:1px solid var(--border)}
+.story{position:relative;flex:0 0 95px;height:145px;border-radius:13px;overflow:hidden;display:flex;align-items:flex-end;padding:8px;background:#244b37}
+.story img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.story:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,#000c)}
+.story span{position:relative;z-index:1;font-size:11px;font-weight:bold}
+.story.create{align-items:center;justify-content:center;flex-direction:column;gap:10px;background:#ffffff0d;cursor:pointer}
+.story.create:after{display:none}.story.create i{background:var(--green);color:#06351f;padding:12px;border-radius:50%}
+.feed{padding-top:8px}.post-card{background:#132d1ff2;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
+.post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px 9px}
+.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
+.post-author{font-size:14px;font-weight:bold;overflow-wrap:anywhere}
+.post-time{font-size:11px;color:var(--muted);margin-top:4px}
+.profile-clickable{cursor:pointer}.profile-clickable:active{opacity:.65}
+.post-options{background:none;color:var(--muted);padding:8px}
+.post-body-text{padding:0 14px 12px;font-size:14px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.post-media-container{width:100%;max-height:480px;background:#000;position:relative;display:flex;justify-content:center;overflow:hidden}
+.post-media-container img,.post-media-container video{width:100%;max-height:480px;object-fit:contain;display:block}
+.sound-toggle{position:absolute;right:12px;top:12px;width:40px;height:40px;border-radius:50%;background:#000b;border:1px solid #ffffff55}
+.post-stats{display:flex;justify-content:space-between;gap:6px;padding:10px 12px;color:var(--muted);font-size:11px;border-bottom:1px solid #ffffff12}
+.post-stats span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.post-actions-bar{display:flex;align-items:center;padding:4px}
+.post-action-btn{flex:1;min-width:0;background:none;color:#ffffffdd;font-size:12px;font-weight:bold;padding:11px 3px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;touch-action:manipulation}
+.post-action-btn:active{background:#ffffff14}
+.post-action-btn.selected{color:#54a8ff}.post-action-btn.reaction-love{color:#ff687e}.post-action-btn.reaction-sad{color:#ffd166}.post-action-btn.reaction-angry{color:#ff785c}
+.reaction-wrap{position:relative;display:flex;flex:1;min-width:0}.reaction-wrap>.post-action-btn{width:100%}
+.reaction-picker{display:none;position:absolute;bottom:calc(100% + 6px);left:0;z-index:35;background:#14251d;border:1px solid var(--border);border-radius:28px;padding:6px;gap:3px;box-shadow:0 5px 20px #0009}
+.reaction-wrap.open .reaction-picker{display:flex}
+.reaction-choice{width:40px;height:42px;border-radius:50%;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.reaction-choice .emoji{font-size:22px}.reaction-choice small{font-size:8px}
+.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;padding:9px 3px calc(9px + env(safe-area-inset-bottom));background:#0d3b22f7;border-top:1px solid var(--border)}
+.nav-item{position:relative;background:none;color:#ffffff9c;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;min-width:45px}
+.nav-item i{font-size:18px}.nav-item.active{color:var(--green)}
+.modal{display:none;position:fixed;z-index:60;inset:0;background:#000b;align-items:flex-end;justify-content:center;padding:10px}
+.modal.open{display:flex}.modal-content{width:100%;max-width:460px;max-height:88vh;overflow:auto;background:#142d1f;border:1px solid var(--border);border-radius:18px;padding:17px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.close{width:35px;height:35px;border-radius:50%;background:#ffffff12}
+.field{display:block;width:100%;padding:12px;background:#ffffff0a;border:1px solid var(--border);border-radius:10px;color:#fff;margin:8px 0;font-size:14px}
+.field::placeholder{color:#ffffff75}textarea.field{min-height:100px;resize:vertical}
+.primary{padding:11px 15px;border-radius:10px;background:var(--green);color:#06351f;font-weight:bold}
+.secondary{padding:10px;border-radius:10px;background:#ffffff12;border:1px solid var(--border)}
+.row{display:flex;gap:8px}.row .field{flex:1;min-width:0}
+.comment{padding:10px 0;border-bottom:1px solid #ffffff18;font-size:13px;line-height:1.5;white-space:pre-wrap}
+.toast{display:none;position:fixed;z-index:100;bottom:80px;left:50%;transform:translateX(-50%);background:#18241d;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;max-width:90%}
+.toast.show{display:block}.empty-state,.loading{text-align:center;padding:30px 15px;color:var(--muted);font-size:13px}
+@media(max-width:350px){.nav-item{min-width:38px}.post-action-btn{font-size:10px}.reaction-choice{width:35px}}
 </style>
 </head>
-
 <body>
 <div class="app">
-  <header class="topbar">
-    <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
-    <button class="icon-btn" onclick="openInbox()" aria-label="Messages">
-      <i class="fa-brands fa-facebook-messenger"></i>
-      <span id="messageBadge" class="badge" hidden>0</span>
-    </button>
-  </header>
+<header class="topbar">
+  <div class="brand"><i class="fa-solid fa-play"></i>Free<span>Tube</span></div>
+  <button class="icon-btn" onclick="openInbox()" aria-label="Messages"><i class="fa-brands fa-facebook-messenger"></i><span id="messageBadge" class="badge" hidden>0</span></button>
+</header>
 
-  <div class="composer" onclick="openUpload()">
-    <img id="composerAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="My profile">
-    <div class="fake-input">What's on your mind? <i class="fa-solid fa-photo-film"></i></div>
-  </div>
-
-  <div class="stories">
-    <div class="story create" onclick="openUpload()"><i class="fa-solid fa-plus"></i><span>Create story</span></div>
-    <div class="story"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt=""><span>Alex Morgan</span></div>
-    <div class="story"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200" alt=""><span>Travel Vlogs</span></div>
-    <div class="story"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200" alt=""><span>Sophia Lee</span></div>
-  </div>
-
-  <main id="feed"><div class="empty">Loading posts...</div></main>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" onclick="goHome()"><i class="fa-solid fa-house"></i><span>Home</span></button>
-    <button class="nav-item" onclick="goDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-    <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
-    <button class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span>Notifications</span><span id="notificationBadge" class="badge" hidden>0</span></button>
-    <button class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
-  </nav>
+<div class="composer" onclick="openUpload()">
+  <img id="composerAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Avatar">
+  <div class="fake-input">What's on your mind? <i class="fa-solid fa-photo-film"></i></div>
 </div>
 
-<div class="modal" id="postModal">
+<div class="stories">
+  <div class="story create" onclick="openUpload()"><i class="fa-solid fa-plus"></i><span>Create story</span></div>
+  <div class="story"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=180" alt=""><span>Alex Morgan</span></div>
+  <div class="story"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=180" alt=""><span>Travel Vlogs</span></div>
+  <div class="story"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=180" alt=""><span>Sophia Lee</span></div>
+</div>
+
+<main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
+
+<nav class="bottom-nav">
+  <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
+  <button id="navDiscover" class="nav-item" onclick="openDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
+  <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
+  <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Alerts</span></button>
+  <button id="navProfile" class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+</nav>
+</div>
+
+<div class="modal" id="uploadModal">
   <div class="modal-content">
-    <div class="modal-head"><h3>Create post</h3><button class="close" onclick="closeModal('postModal')"><i class="fa-solid fa-xmark"></i></button></div>
-    <textarea id="postText" class="field" maxlength="5000" placeholder="What's on your mind?"></textarea>
-    <input id="postFile" class="field" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime">
-    <p style="color:var(--muted);font-size:11px;margin:5px 0 12px">Photos or videos · Maximum 50 MB</p>
-    <button id="publishButton" class="primary" onclick="publishPost()">Publish post</button>
+    <div class="modal-head"><h3>Create post</h3><button class="close" onclick="closeModal('uploadModal')">✕</button></div>
+    <textarea id="postText" class="field" placeholder="Write something..."></textarea>
+    <input id="postFile" class="field" type="file" accept="image/*,video/mp4,video/webm,video/quicktime">
+    <button id="publishButton" class="primary" style="width:100%" onclick="submitPost()">Publish post</button>
   </div>
 </div>
 
 <div class="modal" id="commentModal">
   <div class="modal-content">
-    <div class="modal-head"><h3>Comments</h3><button class="close" onclick="closeModal('commentModal')"><i class="fa-solid fa-xmark"></i></button></div>
-    <div id="commentList"><div class="empty">Loading comments...</div></div>
-    <form id="commentForm" style="display:flex;gap:8px;margin-top:12px">
-      <input id="commentInput" class="field" maxlength="2000" placeholder="Write a comment..." required style="margin:0;min-width:0">
-      <button class="primary" type="submit">Send</button>
+    <div class="modal-head"><h3>Comments</h3><button class="close" onclick="closeModal('commentModal')">✕</button></div>
+    <div id="commentList"></div>
+    <form id="commentForm">
+      <div class="row"><input id="commentInput" class="field" placeholder="Write a comment..." maxlength="2000" required><button class="primary" type="submit">Send</button></div>
     </form>
   </div>
 </div>
 
 <div class="modal" id="discoverModal">
   <div class="modal-content">
-    <div class="modal-head"><h3>Discover FreeTube</h3><button class="close" onclick="closeModal('discoverModal')"><i class="fa-solid fa-xmark"></i></button></div>
-    <input id="searchInput" class="field" placeholder="Search posts or people..." oninput="searchPosts(this.value)">
-    <button class="secondary" onclick="searchPosts('')">Show all posts</button>
+    <div class="modal-head"><h3>Discover posts</h3><button class="close" onclick="closeModal('discoverModal')">✕</button></div>
+    <input id="searchInput" class="field" placeholder="Search posts or users..." oninput="filterPosts(this.value)">
+    <button class="secondary" onclick="clearSearch()">Clear search</button>
   </div>
 </div>
-
 <div id="toast" class="toast" role="status"></div>
 
 <script>
 "use strict";
-
-const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
-const FALLBACK_AVATAR = "https://placehold.co/120x120/244b37/ffffff?text=FT";
-
-let posts = [];
-let currentUser = null;
-let activeCommentId = null;
-let toastTimer = null;
-let publishing = false;
-
-const reactionTypes = {
-  like: { label: "Like", emoji: "👍" },
-  love: { label: "Love", emoji: "❤️" },
-  sad: { label: "Sad", emoji: "😢" },
-  angry: { label: "Angry", emoji: "😡" }
+const API_BASE="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
+const REACTIONS={
+  like:{label:"Like",emoji:"👍",className:"selected"},
+  love:{label:"Love",emoji:"❤️",className:"reaction-love"},
+  sad:{label:"Sad",emoji:"😢",className:"reaction-sad"},
+  angry:{label:"Angry",emoji:"😡",className:"reaction-angry"}
 };
+let videos=[],currentUser=null,activeCommentId=null,toastTimer=null,loading=false;
+const pendingReactions=new Set(),viewRequestsInSession=new Set();
+let holdTimer=null,holdTriggered=false,holdPostId=null,holdStartX=0,holdStartY=0;
 
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
-}
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
-  })[ch]);
-}
-
-function toast(message) {
-  const el = document.getElementById("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
-}
-
-async function api(path, options = {}) {
-  const headers = { ...(options.headers || {}) };
-  if (getToken()) headers.Authorization = "Bearer " + getToken();
-  if (options.body && !(options.body instanceof FormData)) {
-    headers["Content-Type"] = "application/json";
-  }
-
+function token(){return localStorage.getItem(TOKEN_KEY)||""}
+function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function count(value){const n=Number(value);return Number.isFinite(n)&&n>0?Math.floor(n):0}
+function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2800)}
+function requireLogin(){if(!token()){location.href="auth.html?mode=login";return false}return true}
+async function api(path,options={}){
+  const headers={...(options.headers||{})};
+  if(token())headers.Authorization="Bearer "+token();
+  if(options.body&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
   let response;
-  try {
-    response = await fetch(API_BASE + path, {
-      ...options, headers, cache: "no-store"
-    });
-  } catch (_) {
-    throw new Error("Cannot connect to FreeTube server. Check your internet.");
-  }
-
-  const data = await response.json().catch(() => ({}));
-
-  if (response.status === 401) {
-    localStorage.removeItem(TOKEN_KEY);
-    location.replace("auth.html?mode=login");
-    throw new Error("Please log in again.");
-  }
-
-  if (!response.ok) {
-    throw new Error(data.error || data.message || "Request failed.");
-  }
+  try{response=await fetch(API_BASE+path,{...options,headers})}
+  catch(_){throw new Error("Server connection failed. Please try again.")}
+  let data={};try{data=await response.json()}catch(_){}
+  if(response.status===401){localStorage.removeItem(TOKEN_KEY);location.href="auth.html?mode=login";throw new Error("Please log in again.")}
+  if(!response.ok)throw new Error(data.message||data.error||"Request failed ("+response.status+")");
   return data;
 }
-
-function requireLogin() {
-  if (!getToken()) {
-    location.href = "auth.html?mode=login";
-    return false;
-  }
-  return true;
+function openModal(id){document.getElementById(id).classList.add("open")}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
+function openUpload(){if(requireLogin())openModal("uploadModal")}
+function openDiscover(){document.getElementById("navDiscover").classList.add("active");openModal("discoverModal");document.getElementById("searchInput").focus()}
+function openProfile(){if(currentUser?.username)openUserProfile(currentUser.username,currentUser.id);else location.href="profile.html"}
+function openUserProfile(username,userId){
+  const u=String(username||"").trim(),id=String(userId||"").trim();
+  if(!u&&!id){toast("This user has no profile link.");return}
+  const params=new URLSearchParams();
+  if(u)params.set("username",u);
+  if(id)params.set("userId",id);
+  location.href="profile.html?"+params.toString();
 }
-
-function closeModal(id) {
-  document.getElementById(id).classList.remove("open");
+function openInbox(){if(requireLogin())location.href="inbox.html"}
+function openNotifications(){if(requireLogin())location.href="notifications.html"}
+function home(){document.querySelectorAll(".nav-item").forEach(x=>x.classList.remove("active"));document.getElementById("navHome").classList.add("active");window.scrollTo({top:0,behavior:"smooth"});closePickers()}
+function closePickers(){document.querySelectorAll(".reaction-wrap.open").forEach(x=>x.classList.remove("open"))}
+function ago(value){
+  if(!value)return "Just now";
+  const date=new Date(value);if(Number.isNaN(date.getTime()))return "";
+  const seconds=Math.max(0,Math.floor((Date.now()-date.getTime())/1000));
+  if(seconds<60)return "Just now";if(seconds<3600)return Math.floor(seconds/60)+"m";
+  if(seconds<86400)return Math.floor(seconds/3600)+"h";if(seconds<604800)return Math.floor(seconds/86400)+"d";
+  return date.toLocaleDateString();
 }
-
-function openUpload() {
-  if (!requireLogin()) return;
-  document.getElementById("postText").value = "";
-  document.getElementById("postFile").value = "";
-  document.getElementById("postModal").classList.add("open");
-}
-
-function openProfile() {
-  if (requireLogin()) location.href = "profile.html";
-}
-function openInbox() {
-  if (requireLogin()) location.href = "inbox.html";
-}
-function openNotifications() {
-  if (requireLogin()) location.href = "notifications.html";
-}
-function goHome() {
-  document.getElementById("discoverModal").classList.remove("open");
-  renderPosts(posts);
-}
-function goDiscover() {
-  document.getElementById("discoverModal").classList.add("open");
-  document.getElementById("searchInput").focus();
-}
-
-function openUserProfile(username, userId) {
-  username = String(username || "").trim().replace(/^@/, "");
-  userId = userId == null ? "" : String(userId).trim();
-
-  if (!username && !userId) {
-    toast("এই ব্যবহারকারীর username পাওয়া যায়নি।");
-    return;
-  }
-
-  // profile.html-এ username না থাকলে user ID-ও পাঠানো হচ্ছে
-  const params = new URLSearchParams();
-  if (username) params.set("username", username);
-  if (userId) params.set("userId", userId);
-
-  location.href = "profile.html?" + params.toString();
-}
-
-function findAvatar(obj) {
-  if (!obj || typeof obj !== "object") return "";
-  const keys = [
-    "avatar_url", "avatarUrl", "profile_picture", "profilePicture",
-    "profile_image", "profileImage", "photo_url", "photoURL",
-    "image_url", "imageUrl", "avatar", "picture"
-  ];
-
-  for (const key of keys) {
-    const value = obj[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
-    if (value && typeof value === "object") {
-      const url = value.url || value.secure_url || value.src;
-      if (typeof url === "string" && url.trim()) return url.trim();
-    }
-  }
-
-  for (const key of ["user", "author", "profile", "account"]) {
-    if (obj[key] && typeof obj[key] === "object") {
-      const result = findAvatar(obj[key]);
-      if (result) return result;
-    }
-  }
-  return "";
-}
-
-function setAvatar(element, url) {
-  if (!element) return;
-  element.onerror = function () {
-    this.onerror = null;
-    this.src = FALLBACK_AVATAR;
-  };
-  element.src = url || FALLBACK_AVATAR;
-}
-
-function relativeTime(date) {
-  const timestamp = new Date(date).getTime();
-  if (!Number.isFinite(timestamp)) return "Just now";
-  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000));
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return minutes + "m ago";
-  if (minutes < 1440) return Math.floor(minutes / 60) + "h ago";
-  return Math.floor(minutes / 1440) + "d ago";
-}
-
-function normalizePost(post) {
-  const author = post.user || post.author || post.profile || {};
-
-  // Backend-এ বিভিন্ন প্রচলিত নামে username থাকতে পারে
-  const profileUsername = String(
-    post.author_username ||
-    post.user_username ||
-    post.username ||
-    author.username ||
-    author.handle ||
-    ""
-  ).trim().replace(/^@/, "");
-
-  const displayName = String(
-    post.display_name ||
-    post.full_name ||
-    post.fullName ||
-    author.display_name ||
-    author.displayName ||
-    author.full_name ||
-    author.fullName ||
-    author.name ||
-    author.username ||
-    post.username ||
-    "FreeTube User"
-  ).trim();
-
-  const rawType = String(post.media_type || post.type || "").toLowerCase();
-  const type = ["video", "mp4", "webm", "quicktime"].includes(rawType)
-    ? "video"
-    : ["image", "photo", "png", "jpg", "jpeg", "webp", "gif"].includes(rawType)
-      ? "photo" : "";
-
-  const rawCounts = post.reaction_counts || post.reactions_count || {};
-  const counts = {
-    like: Number(rawCounts.like ?? rawCounts.likes ?? post.like_count ?? post.likes ?? 0) || 0,
-    love: Number(rawCounts.love ?? rawCounts.loves ?? post.love_count ?? 0) || 0,
-    sad: Number(rawCounts.sad ?? rawCounts.sads ?? post.sad_count ?? 0) || 0,
-    angry: Number(rawCounts.angry ?? rawCounts.angries ?? post.angry_count ?? 0) || 0
-  };
-
-  const myReaction = reactionTypes[post.my_reaction]
-    ? post.my_reaction
-    : (post.liked_by_me === true || post.liked === true ? "like" : null);
-
+function normalizePost(post){
+  const author=post.user||post.author||post.profile||{};
+  const profileUsername=String(post.author_username||post.user_username||post.username||author.username||author.handle||"").trim();
+  const displayName=post.display_name||post.author_name||author.display_name||author.full_name||post.full_name||profileUsername||"FreeTube User";
+  const media=post.media_url||post.media?.url||post.video_url||post.image_url||"";
+  const mediaType=post.media_type||post.media?.resource_type||(/\.(mp4|webm|mov)(\?|$)/i.test(media)?"video":media?"image":"");
+  const rawCounts=post.reaction_counts||post.reactions||{};
   return {
-    ...post,
-    id: String(post.id),
-    username: displayName,
-    profileUsername,
-    authorId: post.user_id ?? post.author_id ?? author.id ?? post.userId ?? "",
-    avatar: findAvatar(post) || findAvatar(author) || FALLBACK_AVATAR,
-    content: post.content || "",
-    src: post.media_url || post.url || "",
-    type,
-    counts,
-    myReaction,
-    comments: Number(post.comment_count ?? post.comments_count ?? 0) || 0,
-    views: Number(post.view_count ?? post.views ?? 0) || 0,
-    time: relativeTime(post.created_at)
+    id:String(post.id??post.post_id??""),content:post.content||post.caption||post.text||"",
+    username:String(displayName),profileUsername,authorId:String(post.user_id||post.author_id||author.id||post.userId||""),
+    avatar:post.avatar_url||post.profile_picture||post.profile_image||author.avatar_url||author.profile_picture||FALLBACK_AVATAR,
+    createdAt:post.created_at||post.createdAt||post.created||"",media,mediaType,
+    likes:count(post.like_count??post.likes_count??rawCounts.like??rawCounts.likes),
+    comments:count(post.comment_count??post.comments_count??(Array.isArray(post.comments)?post.comments.length:0)),
+    views:count(post.view_count??post.views_count??post.views),
+    counts:{like:count(rawCounts.like??rawCounts.likes??post.like_count),love:count(rawCounts.love??rawCounts.loves),sad:count(rawCounts.sad??rawCounts.sads),angry:count(rawCounts.angry??rawCounts.angries)},
+    myReaction:REACTIONS[post.my_reaction]?post.my_reaction:(REACTIONS[post.user_reaction]?post.user_reaction:null)
   };
 }
-
-async function loadMe() {
-  const data = await api("/auth/me");
-  currentUser = data.user || data.profile || data.data?.user || data.data || data;
-  const avatar = findAvatar(data) || findAvatar(currentUser);
-  setAvatar(document.getElementById("composerAvatar"), avatar);
+function reactionTotal(v){return Object.values(v.counts).reduce((sum,n)=>sum+count(n),0)}
+function reactionButtonHTML(v){
+  const r=REACTIONS[v.myReaction]||REACTIONS.like;
+  return `<div class="reaction-wrap" data-reaction-wrap="${esc(v.id)}">
+    <div class="reaction-picker">
+      ${Object.entries(REACTIONS).map(([key,item])=>`<button type="button" class="reaction-choice" data-choose-reaction="${esc(key)}" data-post-id="${esc(v.id)}" aria-label="${item.label}"><span class="emoji">${item.emoji}</span><small>${item.label}</small></button>`).join("")}
+    </div>
+    <button type="button" class="post-action-btn ${v.myReaction?r.className:""}" data-like-button="${esc(v.id)}"><i class="fa-solid fa-thumbs-up"></i><span>${v.myReaction?r.label:"Like"}</span></button>
+  </div>`;
 }
-
-async function loadFeed() {
-  const feed = document.getElementById("feed");
-  feed.innerHTML = '<div class="empty">Loading posts...</div>';
-
-  try {
-    const data = await api("/posts?limit=30");
-    posts = (data.posts || []).map(normalizePost);
-    renderPosts(posts);
-  } catch (error) {
-    feed.innerHTML = '<div class="empty">' + escapeHTML(error.message) +
-      '<br><br><button class="secondary" onclick="loadFeed()">Try again</button></div>';
-  }
-}
-
-function renderPosts(list) {
-  const feed = document.getElementById("feed");
-
-  if (!list.length) {
-    feed.innerHTML = '<div class="empty">No posts yet. Be the first to share something!</div>';
-    return;
-  }
-
-  feed.innerHTML = list.map(post => {
-    const username = escapeHTML(post.profileUsername);
-    const userId = escapeHTML(post.authorId);
-    const avatar = escapeHTML(post.avatar);
-    const name = escapeHTML(post.username);
-    const id = escapeHTML(post.id);
-
-    let media = "";
-    if (post.src && post.type === "video") {
-      media = `
-        <div class="media">
-          <video src="${escapeHTML(post.src)}" controls muted loop playsinline preload="metadata"></video>
-          <button class="sound" onclick="toggleSound(this)" aria-label="Toggle sound">
-            <i class="fa-solid fa-volume-xmark"></i>
-          </button>
-        </div>`;
-    } else if (post.src && post.type === "photo") {
-      media = `<div class="media"><img src="${escapeHTML(post.src)}" loading="lazy" alt="Post media"></div>`;
-    }
-
-    const total = Object.values(post.counts).reduce((sum, n) => sum + Math.max(0, n), 0);
-    const emojiSummary = ["like", "love", "sad", "angry"]
-      .filter(key => post.counts[key] > 0)
-      .map(key => reactionTypes[key].emoji).join(" ");
-
-    const reaction = post.myReaction;
-    const reactionLabel = reaction ? reactionTypes[reaction].label : "Like";
-    const reactionEmoji = reaction ? reactionTypes[reaction].emoji : "👍";
-
-    return `
-      <article class="post" id="post-${id}" data-id="${id}">
-        <div class="post-header">
-          <div class="author-row">
-            <img
-              class="avatar profile-clickable"
-              data-profile-username="${username}"
-              data-user-id="${userId}"
-              src="${avatar}"
-              alt="Open ${name} profile"
-              role="button"
-              tabindex="0"
-              onclick="openUserProfile(this.dataset.profileUsername,this.dataset.userId)"
-              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserProfile(this.dataset.profileUsername,this.dataset.userId)}"
-            >
-            <div>
-              <div
-                class="author-name profile-clickable"
-                data-profile-username="${username}"
-                data-user-id="${userId}"
-                role="link"
-                tabindex="0"
-                onclick="openUserProfile(this.dataset.profileUsername,this.dataset.userId)"
-                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserProfile(this.dataset.profileUsername,this.dataset.userId)}"
-              >${name}</div>
-              <div class="post-time">${escapeHTML(post.time)} · <i class="fa-solid fa-earth-americas"></i></div>
-            </div>
-          </div>
-          <button class="secondary" aria-label="Post options" onclick="postOptions('${id}')">•••</button>
-        </div>
-
-        ${post.content ? `<div class="post-text">${escapeHTML(post.content)}</div>` : ""}
-        ${media}
-
-        <div class="stats">
-          <span>${emojiSummary || "♡"} ${total}</span>
-          <span>${post.comments} comments</span>
-          <span><i class="fa-solid fa-eye"></i> ${post.views} views</span>
-        </div>
-
-        <div class="actions">
-          <button class="action ${reaction === "love" ? "loved" : ""}" onclick="reactToPost('${id}','${reaction === "like" ? "like" : "like"}')">
-            ${reactionEmoji} ${reactionLabel}
-          </button>
-          <button class="action" onclick="openComments('${id}')"><i class="fa-regular fa-comment"></i> Comment</button>
-          <button class="action" onclick="sharePost('${id}')"><i class="fa-solid fa-share"></i> Share</button>
-        </div>
-        <div class="reaction-picker">
-          ${Object.entries(reactionTypes).map(([key, item]) =>
-            `<button aria-label="${item.label}" title="${item.label}" onclick="reactToPost('${id}','${key}')">${item.emoji}</button>`
-          ).join("")}
-        </div>
-      </article>`;
+function render(list=videos){
+  const feed=document.getElementById("feed");
+  if(!list.length){feed.innerHTML='<div class="empty-state">No posts found.</div>';return}
+  feed.innerHTML=list.map(v=>{
+    const authorAttrs=`data-profile-username="${esc(v.profileUsername)}" data-user-id="${esc(v.authorId)}"`;
+    const media=v.media?`<div class="post-media-container">${v.mediaType==="video"?`<video class="post-video" src="${esc(v.media)}" playsinline muted loop preload="metadata"></video><button class="sound-toggle" aria-label="Toggle sound"><i class="fa-solid fa-volume-xmark"></i></button>`:`<img src="${esc(v.media)}" alt="Post media" loading="lazy">`}</div>`:"";
+    return `<article class="post-card" data-id="${esc(v.id)}">
+      <div class="post-header"><div class="post-user-info">
+        <img class="post-avatar profile-clickable" ${authorAttrs} src="${esc(v.avatar)}" alt="Profile" onerror="this.src='${FALLBACK_AVATAR}'" tabindex="0">
+        <div><div class="post-author profile-clickable" ${authorAttrs} tabindex="0" role="link">${esc(v.username)}</div><div class="post-time">${esc(ago(v.createdAt))}</div></div>
+      </div><button class="post-options" onclick="postOptions('${esc(v.id)}')" aria-label="Post options"><i class="fa-solid fa-ellipsis"></i></button></div>
+      ${v.content?`<div class="post-body-text">${esc(v.content)}</div>`:""}${media}
+      <div class="post-stats"><span class="reaction-summary"><span>👍</span><span>❤️</span><span>😢</span><span>😡</span><span>${reactionTotal(v)}</span></span><span class="comment-count">${v.comments} comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> ${v.views} views</span></div>
+      <div class="post-actions-bar">${reactionButtonHTML(v)}<button class="post-action-btn" onclick="comments('${esc(v.id)}')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost('${esc(v.id)}')"><i class="fa-solid fa-share"></i> Share</button></div>
+    </article>`;
   }).join("");
-
-  // Browser supports fragment navigation when opening a shared post
-  if (location.hash.startsWith("#post-")) {
-    const id = decodeURIComponent(location.hash.slice(6));
-    setTimeout(() => document.getElementById("post-" + CSS.escape(id))?.scrollIntoView(), 150);
-  }
+  setupVideoAutoplay();setupPostViewObserver();
 }
-
-function toggleSound(button) {
-  const video = button.closest(".media")?.querySelector("video");
-  if (!video) return;
-
-  const turnOn = video.muted;
-  document.querySelectorAll(".media video").forEach(other => {
-    if (other !== video) other.muted = true;
+function updateOnePost(post){
+  const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===post.id);
+  if(!card)return;
+  const temp=document.createElement("div");
+  temp.innerHTML=reactionButtonHTML(post);
+  const old=card.querySelector(".reaction-wrap"),fresh=temp.firstElementChild;
+  if(old)old.replaceWith(fresh);
+  const stats=card.querySelector(".reaction-summary");
+  if(stats)stats.innerHTML=`<span>👍</span><span>❤️</span><span>😢</span><span>😡</span><span>${reactionTotal(post)}</span>`;
+}
+async function loadMe(){
+  const data=await api("/auth/me");currentUser=data.user||data;
+  const avatar=currentUser.avatar_url||currentUser.profile_picture||currentUser.avatar||FALLBACK_AVATAR;
+  document.getElementById("composerAvatar").src=avatar;
+}
+async function loadFeed(){
+  if(loading)return;loading=true;
+  try{const data=await api("/posts?limit=30");const list=Array.isArray(data)?data:(data.posts||data.items||[]);videos=list.map(normalizePost).filter(v=>v.id);render()}
+  catch(error){document.getElementById("feed").innerHTML=`<div class="empty-state">${esc(error.message)}<br><br><button class="primary" onclick="loadFeed()">Try again</button></div>`}
+  finally{loading=false}
+}
+function showPicker(id){closePickers();const el=document.querySelector(`[data-reaction-wrap="${CSS.escape(String(id))}"]`);if(el)el.classList.add("open")}
+function clearHold(){clearTimeout(holdTimer);holdTimer=null;holdPostId=null}
+document.addEventListener("pointerdown",event=>{
+  const button=event.target.closest("[data-like-button]");if(!button)return;
+  holdTriggered=false;holdPostId=button.dataset.likeButton;holdStartX=event.clientX;holdStartY=event.clientY;
+  const id=holdPostId;holdTimer=setTimeout(()=>{holdTriggered=true;showPicker(id)},450);
+});
+document.addEventListener("pointermove",event=>{
+  if(holdTimer&&(Math.abs(event.clientX-holdStartX)>12||Math.abs(event.clientY-holdStartY)>12))clearHold();
+});
+document.addEventListener("pointerup",clearHold);
+document.addEventListener("pointercancel",clearHold);
+document.addEventListener("click",event=>{
+  const author=event.target.closest("[data-profile-username]");
+  if(author){event.preventDefault();event.stopPropagation();openUserProfile(author.dataset.profileUsername,author.dataset.userId);return}
+  const choice=event.target.closest("[data-choose-reaction]");
+  if(choice){chooseReaction(event,choice.dataset.postId,choice.dataset.chooseReaction);return}
+  const like=event.target.closest("[data-like-button]");
+  if(like){
+    event.preventDefault();event.stopPropagation();
+    if(holdTriggered){holdTriggered=false;return}
+    closePickers();reactToPost(like.dataset.likeButton,"like");return;
+  }
+  if(!event.target.closest(".reaction-wrap"))closePickers();
+});
+document.addEventListener("keydown",event=>{
+  if(event.key!=="Enter"&&event.key!==" ")return;
+  const el=event.target.closest("[data-profile-username]");
+  if(el){event.preventDefault();openUserProfile(el.dataset.profileUsername,el.dataset.userId)}
+});
+async function chooseReaction(event,id,reaction){
+  event.preventDefault();event.stopPropagation();closePickers();holdTriggered=true;
+  await reactToPost(id,reaction);setTimeout(()=>holdTriggered=false,250);
+}
+async function reactToPost(id,reaction){
+  const post=videos.find(v=>v.id===String(id));if(!post||!REACTIONS[reaction])return;
+  if(!requireLogin()||pendingReactions.has(post.id))return;
+  pendingReactions.add(post.id);
+  const oldReaction=post.myReaction,oldCounts={...post.counts};
+  if(oldReaction===reaction){post.myReaction=null;post.counts[reaction]=Math.max(0,post.counts[reaction]-1)}
+  else{
+    if(oldReaction&&REACTIONS[oldReaction])post.counts[oldReaction]=Math.max(0,post.counts[oldReaction]-1);
+    post.myReaction=reaction;post.counts[reaction]=count(post.counts[reaction])+1;
+  }
+  updateOnePost(post);
+  try{
+    const data=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{method:"PUT",body:JSON.stringify({reaction})});
+    if(data.my_reaction!==undefined)post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
+    if(data.reaction_counts)for(const key of Object.keys(REACTIONS))post.counts[key]=count(data.reaction_counts[key]??data.reaction_counts[key+"s"]??post.counts[key]);
+    else if(data.like_count!==undefined)post.counts.like=count(data.like_count);
+    updateOnePost(post);
+  }catch(error){post.myReaction=oldReaction;post.counts=oldCounts;updateOnePost(post);toast(error.message)}
+  finally{pendingReactions.delete(post.id)}
+}
+function setupVideoAutoplay(){
+  const items=Array.from(document.querySelectorAll("#feed video.post-video"));
+  items.forEach(video=>{
+    video.loop=true;video.playsInline=true;video.muted=true;
+    const button=video.closest(".post-media-container")?.querySelector(".sound-toggle");
+    if(button&&!button.dataset.bound){
+      button.dataset.bound="1";
+      button.addEventListener("click",event=>{
+        event.preventDefault();event.stopPropagation();
+        if(video.muted){items.forEach(other=>{if(other!==video){other.muted=true;const b=other.closest(".post-media-container")?.querySelector(".sound-toggle");if(b)b.innerHTML='<i class="fa-solid fa-volume-xmark"></i>'}});video.muted=false;video.play().catch(()=>toast("Tap video to play."))}
+        else video.muted=true;
+        button.innerHTML=video.muted?'<i class="fa-solid fa-volume-xmark"></i>':'<i class="fa-solid fa-volume-high"></i>';
+      });
+    }
   });
-
-  video.muted = !turnOn;
-  if (turnOn) video.play().catch(() => toast("Tap the video to play."));
-  button.innerHTML = video.muted
-    ? '<i class="fa-solid fa-volume-xmark"></i>'
-    : '<i class="fa-solid fa-volume-high"></i>';
-}
-
-async function reactToPost(id, reaction) {
-  if (!requireLogin()) return;
-  const post = posts.find(p => p.id === String(id));
-  if (!post) return;
-
-  const oldReaction = post.myReaction;
-  const oldCounts = { ...post.counts };
-
-  if (oldReaction === reaction) {
-    post.counts[reaction] = Math.max(0, post.counts[reaction] - 1);
-    post.myReaction = null;
-  } else {
-    if (oldReaction && post.counts[oldReaction] > 0) post.counts[oldReaction]--;
-    post.counts[reaction]++;
-    post.myReaction = reaction;
-  }
-
-  renderPosts(posts);
-
-  try {
-    const result = await api("/posts/" + encodeURIComponent(id) + "/reaction", {
-      method: "PUT",
-      body: JSON.stringify({ reaction })
-    });
-
-    if (result.my_reaction !== undefined) {
-      post.myReaction = reactionTypes[result.my_reaction] ? result.my_reaction : null;
-    }
-    if (result.reaction_counts) {
-      for (const key of Object.keys(reactionTypes)) {
-        post.counts[key] = Number(
-          result.reaction_counts[key] ??
-          result.reaction_counts[key + "s"] ??
-          post.counts[key]
-        ) || 0;
-      }
-    }
-    renderPosts(posts);
-  } catch (error) {
-    post.myReaction = oldReaction;
-    post.counts = oldCounts;
-    renderPosts(posts);
-    toast(error.message);
+  if("IntersectionObserver"in window){
+    const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      const video=entry.target;
+      if(entry.isIntersecting&&entry.intersectionRatio>=.6)video.play().catch(()=>{});
+      else video.pause();
+    }),{threshold:[0,.6]});
+    items.forEach(video=>observer.observe(video));
   }
 }
-
-async function openComments(id) {
-  if (!requireLogin()) return;
-  activeCommentId = String(id);
-  document.getElementById("commentModal").classList.add("open");
-  document.getElementById("commentList").innerHTML = '<div class="empty">Loading comments...</div>';
-
-  try {
-    const data = await api("/posts/" + encodeURIComponent(id) + "/comments");
-    document.getElementById("commentList").innerHTML = (data.comments || []).map(comment =>
-      `<div class="comment"><strong>${escapeHTML(comment.username || comment.display_name || "User")}</strong><br>${escapeHTML(comment.content || "")}</div>`
-    ).join("") || '<div class="empty">No comments yet.</div>';
-  } catch (error) {
-    document.getElementById("commentList").innerHTML =
-      '<div class="empty">' + escapeHTML(error.message) + '</div>';
-  }
+function setupPostViewObserver(){
+  if(!("IntersectionObserver"in window))return;
+  const observer=new IntersectionObserver(entries=>entries.forEach(async entry=>{
+    if(!entry.isIntersecting||entry.intersectionRatio<.5)return;
+    observer.unobserve(entry.target);const id=String(entry.target.dataset.id);
+    if(viewRequestsInSession.has(id)||!token())return;
+    viewRequestsInSession.add(id);
+    try{
+      const data=await api("/posts/"+encodeURIComponent(id)+"/view",{method:"POST",body:JSON.stringify({})});
+      const post=videos.find(v=>v.id===id);
+      if(post&&data.view_count!==undefined){post.views=count(data.view_count);const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===id);const label=card?.querySelector(".view-count");if(label)label.innerHTML='<i class="fa-solid fa-eye"></i> '+post.views+' views'}
+    }catch(_){viewRequestsInSession.delete(id)}
+  }),{threshold:[.5]});
+  document.querySelectorAll("#feed .post-card").forEach(card=>observer.observe(card));
 }
-
-document.getElementById("commentForm").addEventListener("submit", async event => {
-  event.preventDefault();
-  if (!requireLogin() || !activeCommentId) return;
-
-  const input = document.getElementById("commentInput");
-  const content = input.value.trim();
-  if (!content) return;
-
-  try {
-    await api("/posts/" + encodeURIComponent(activeCommentId) + "/comments", {
-      method: "POST",
-      body: JSON.stringify({ content })
-    });
-
-    input.value = "";
-    const post = posts.find(p => p.id === activeCommentId);
-    if (post) post.comments++;
-    renderPosts(posts);
-    await openComments(activeCommentId);
-    toast("Comment added.");
-  } catch (error) {
-    toast(error.message);
-  }
+async function comments(id){
+  if(!requireLogin())return;activeCommentId=String(id);openModal("commentModal");
+  document.getElementById("commentList").innerHTML='<div class="loading">Loading comments...</div>';
+  try{
+    const data=await api("/posts/"+encodeURIComponent(id)+"/comments");
+    document.getElementById("commentList").innerHTML=(data.comments||[]).map(c=>`<div class="comment"><strong>${esc(c.display_name||c.username||"User")}</strong><br>${esc(c.content)}</div>`).join("")||'<div class="empty-state">No comments yet.</div>';
+  }catch(error){document.getElementById("commentList").innerHTML=`<div class="empty-state">${esc(error.message)}</div>`}
+}
+document.getElementById("commentForm").addEventListener("submit",async event=>{
+  event.preventDefault();if(!requireLogin()||!activeCommentId)return;
+  const input=document.getElementById("commentInput"),content=input.value.trim();if(!content)return;
+  const button=event.submitter;if(button)button.disabled=true;
+  try{
+    await api("/posts/"+encodeURIComponent(activeCommentId)+"/comments",{method:"POST",body:JSON.stringify({content})});
+    input.value="";const p=videos.find(v=>v.id===activeCommentId);if(p)p.comments++;
+    const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===activeCommentId);
+    const label=card?.querySelector(".comment-count");if(label&&p)label.textContent=p.comments+" comments";
+    await comments(activeCommentId);toast("Comment added.");
+  }catch(error){toast(error.message)}finally{if(button)button.disabled=false}
 });
-
-async function publishPost() {
-  if (!requireLogin() || publishing) return;
-
-  const button = document.getElementById("publishButton");
-  const content = document.getElementById("postText").value.trim();
-  const fileInput = document.getElementById("postFile");
-  const file = fileInput.files?.[0];
-
-  if (!content && !file) {
-    toast("Write something or select a photo/video.");
-    return;
-  }
-  if (file && file.size > 50 * 1024 * 1024) {
-    toast("File must be smaller than 50 MB.");
-    return;
-  }
-
-  publishing = true;
-  button.disabled = true;
-  button.textContent = "Publishing...";
-
-  try {
-    let media = null;
-
-    if (file) {
-      const allowed = [
-        "image/jpeg", "image/png", "image/webp", "image/gif",
-        "video/mp4", "video/webm", "video/quicktime"
-      ];
-      if (!allowed.includes(file.type)) throw new Error("Unsupported media format.");
-
-      const formData = new FormData();
-      formData.append("file", file);
-      const upload = await api("/media/upload", {
-        method: "POST",
-        body: formData
-      });
-      media = upload.media || upload;
-    }
-
-    await api("/posts", {
-      method: "POST",
-      body: JSON.stringify({
-        content,
-        media_url: media?.url || "",
-        media_type: media?.resource_type || (file ? (file.type.startsWith("video/") ? "video" : "image") : ""),
-        media_public_id: media?.public_id || ""
-      })
-    });
-
-    closeModal("postModal");
-    await loadFeed();
-    toast("Post published successfully.");
-  } catch (error) {
-    toast(error.message);
-  } finally {
-    publishing = false;
-    button.disabled = false;
-    button.textContent = "Publish post";
-  }
+async function submitPost(){
+  if(!requireLogin())return;
+  const button=document.getElementById("publishButton"),content=document.getElementById("postText").value.trim(),file=document.getElementById("postFile").files?.[0];
+  if(!content&&!file){toast("Write something or select media.");return}
+  if(file&&file.size>50*1024*1024){toast("File must be smaller than 50 MB.");return}
+  const allowed=["image/jpeg","image/png","image/webp","image/gif","video/mp4","video/webm","video/quicktime"];
+  if(file&&!allowed.includes(file.type)){toast("Unsupported file type.");return}
+  button.disabled=true;button.textContent="Publishing...";
+  try{
+    let media=null;
+    if(file){const form=new FormData();form.append("file",file);const uploaded=await api("/media/upload",{method:"POST",body:form});media=uploaded.media||uploaded}
+    await api("/posts",{method:"POST",body:JSON.stringify({content,media_url:media?.url||"",media_type:media?.resource_type||(file?(file.type.startsWith("video/")?"video":"image"):""),media_public_id:media?.public_id||""})});
+    closeModal("uploadModal");document.getElementById("postText").value="";document.getElementById("postFile").value="";
+    await loadFeed();home();toast("Post published successfully.");
+  }catch(error){toast(error.message)}finally{button.disabled=false;button.textContent="Publish post"}
 }
-
-async function sharePost(id) {
-  const post = posts.find(p => p.id === String(id));
-  if (!post) return;
-
-  const url = location.href.split("#")[0] + "#post-" + encodeURIComponent(id);
-  try {
-    if (navigator.share) {
-      await navigator.share({
-        title: "FreeTube post by " + post.username,
-        text: post.content,
-        url
-      });
-    } else if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(url);
-      toast("Post link copied.");
-    } else {
-      toast("Sharing is not supported on this device.");
-    }
-  } catch (error) {
-    if (error.name !== "AbortError") toast("Unable to share this post.");
-  }
+async function sharePost(id){
+  const p=videos.find(v=>v.id===String(id));if(!p)return;
+  const url=location.href.split("#")[0]+"#post-"+encodeURIComponent(id);
+  try{
+    if(navigator.share)await navigator.share({title:"FreeTube post by "+p.username,text:p.content,url});
+    else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);toast("Post link copied.")}
+    else toast("Sharing is not supported on this device.");
+  }catch(error){if(error.name!=="AbortError")toast("Unable to share post.")}
 }
-
-function postOptions(id) {
-  const post = posts.find(p => p.id === String(id));
-  if (!post) return;
-  if (confirm("Share this post?")) sharePost(id);
+function postOptions(id){const p=videos.find(v=>v.id===String(id));if(p&&confirm("Share this post?"))sharePost(id)}
+function filterPosts(query){
+  const q=String(query||"").toLowerCase();
+  render(videos.filter(v=>String(v.content).toLowerCase().includes(q)||String(v.username).toLowerCase().includes(q)||String(v.profileUsername).toLowerCase().includes(q)));
 }
-
-function searchPosts(query) {
-  const q = String(query || "").trim().toLowerCase();
-  renderPosts(posts.filter(p =>
-    String(p.content).toLowerCase().includes(q) ||
-    String(p.username).toLowerCase().includes(q) ||
-    String(p.profileUsername).toLowerCase().includes(q)
-  ));
+function clearSearch(){document.getElementById("searchInput").value="";render(videos)}
+async function loadNotificationCount(){
+  try{const data=await api("/notifications");const n=count(data.unread_count);const el=document.getElementById("notificationBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}
 }
-
-async function loadNotificationCount() {
-  try {
-    const data = await api("/notifications");
-    const count = Number(data.unread_count || 0);
-    const badge = document.getElementById("notificationBadge");
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.hidden = count <= 0;
-  } catch (_) {}
+async function loadMessageCount(){
+  try{const data=await api("/messages");const n=(data.conversations||[]).reduce((s,item)=>s+count(item.unread_count),0);const el=document.getElementById("messageBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}
 }
-
-async function loadMessageCount() {
-  try {
-    const data = await api("/messages");
-    const conversations = data.conversations || [];
-    const count = conversations.reduce((sum, item) => sum + (Number(item.unread_count) || 0), 0);
-    const badge = document.getElementById("messageBadge");
-    badge.textContent = count > 99 ? "99+" : String(count);
-    badge.hidden = count <= 0;
-  } catch (_) {}
+async function initialize(){
+  if(!token()){location.replace("auth.html?mode=login");return}
+  try{await loadMe()}catch(error){toast(error.message);return}
+  await loadFeed();await Promise.all([loadNotificationCount(),loadMessageCount()]);
 }
-
-async function initialize() {
-  if (!requireLogin()) return;
-
-  try {
-    await loadMe();
-  } catch (error) {
-    console.warn("Could not load current profile:", error.message);
-  }
-
-  await loadFeed();
-  await Promise.all([loadNotificationCount(), loadMessageCount()]);
-}
-
-window.addEventListener("focus", () => {
-  if (getToken()) {
-    loadFeed();
-    loadNotificationCount();
-    loadMessageCount();
-  }
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    document.querySelectorAll(".media video").forEach(video => video.pause());
-  }
-});
-
+window.addEventListener("focus",()=>{if(token()){loadFeed();loadNotificationCount();loadMessageCount()}});
+document.addEventListener("visibilitychange",()=>{if(document.hidden)document.querySelectorAll("#feed video").forEach(v=>v.pause())});
 initialize();
 </script>
 </body>
