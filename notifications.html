@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,18 @@
   <title>Notifications | FreeTube</title>
 
   <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
   <style>
+    :root {
+      --bg: #101010;
+      --panel: #191919;
+      --border: #303030;
+      --green: #43e477;
+      --muted: #aaa;
+      --red: #e53935;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -17,214 +26,206 @@
     }
 
     body {
-      font-family: Arial, sans-serif;
-      background: #101010;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
       color: #fff;
       min-height: 100vh;
-      padding-bottom: 80px;
+      padding-bottom: 85px;
+    }
+
+    button, a {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button {
+      cursor: pointer;
+      font-family: inherit;
     }
 
     header {
       position: sticky;
       top: 0;
       z-index: 10;
+      min-height: 72px;
+      padding: 14px 16px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 16px;
+      align-items: center;
+      gap: 10px;
       background: #181818;
-      border-bottom: 1px solid #292929;
+      border-bottom: 1px solid var(--border);
     }
 
     .brand {
+      color: var(--green);
       font-size: 21px;
       font-weight: bold;
-      color: #43e477;
+      text-decoration: none;
+      white-space: nowrap;
     }
 
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
-    }
-
-    button {
-      cursor: pointer;
-      border: 0;
-      color: white;
-      font-size: 14px;
-    }
-
-    .icon-button {
-      background: transparent;
-      font-size: 19px;
-      padding: 6px;
-    }
-
-    .mark-all {
-      background: #252525;
-      border-radius: 8px;
-      padding: 9px 11px;
-    }
-
-    .mark-all:hover {
-      background: #333;
-    }
-
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 18px 12px;
-    }
-
-    .summary {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 3px 4px 18px;
-    }
-
-    .summary h1 {
-      font-size: 23px;
-    }
-
-    .count {
-      background: #e53935;
-      border-radius: 20px;
-      padding: 5px 10px;
-      font-size: 12px;
-    }
-
-    .notice {
-      padding: 13px;
-      margin-bottom: 10px;
-      border: 1px solid #292929;
-      border-radius: 12px;
-      background: #191919;
-      display: flex;
-      align-items: flex-start;
       gap: 12px;
     }
 
-    .notice.unread {
-      background: #1c2820;
-      border-color: #285d39;
+    .icon-btn {
+      color: #fff;
+      background: transparent;
+      border: 0;
+      font-size: 19px;
+      padding: 8px;
+    }
+
+    .mark-all {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 12px;
+      background: #292929;
+      color: #fff;
+      font-size: 12px;
+    }
+
+    .mark-all:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    main {
+      width: 100%;
+      max-width: 760px;
+      margin: auto;
+      padding: 22px 14px;
+    }
+
+    .page-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .page-heading h1 {
+      font-size: 25px;
+    }
+
+    .unread-count {
+      flex-shrink: 0;
+      background: var(--red);
+      padding: 7px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .notification {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 14px;
+      margin-bottom: 11px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    .notification.unread {
+      background: #1b2b21;
+      border-color: #316641;
     }
 
     .avatar {
       flex-shrink: 0;
-      width: 43px;
-      height: 43px;
+      width: 45px;
+      height: 45px;
       display: flex;
       justify-content: center;
       align-items: center;
       border-radius: 50%;
-      background: linear-gradient(135deg, #28c76f, #e53935);
+      background: linear-gradient(135deg, #43e477, #e53935);
       font-size: 18px;
-      font-weight: bold;
-      overflow: hidden;
     }
 
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .notice-content {
+    .notification-body {
       flex: 1;
       min-width: 0;
     }
 
-    .notice-message {
+    .message {
       font-size: 14px;
-      line-height: 1.55;
+      line-height: 1.6;
       overflow-wrap: anywhere;
     }
 
-    .notice-meta {
+    .meta {
       display: flex;
-      align-items: center;
       flex-wrap: wrap;
       gap: 8px;
+      align-items: center;
       margin-top: 7px;
-      color: #aaa;
+      color: var(--muted);
       font-size: 12px;
     }
 
     .type {
-      color: #65e890;
+      color: var(--green);
       text-transform: capitalize;
     }
 
-    .notice-actions {
+    .notification-actions {
       display: flex;
       flex-direction: column;
-      gap: 9px;
       align-items: center;
-    }
-
-    .small-action {
-      background: transparent;
-      color: #bbb;
-      font-size: 15px;
-      padding: 4px;
-    }
-
-    .small-action:hover {
-      color: #43e477;
+      gap: 12px;
     }
 
     .unread-dot {
-      width: 8px;
-      height: 8px;
+      width: 9px;
+      height: 9px;
+      background: var(--green);
       border-radius: 50%;
-      background: #43e477;
+    }
+
+    .read-btn {
+      color: #bbb;
+      background: transparent;
+      border: 0;
+      padding: 4px;
+      font-size: 15px;
+    }
+
+    .read-btn:hover {
+      color: var(--green);
     }
 
     .state {
       text-align: center;
-      padding: 55px 18px;
-      color: #aaa;
+      padding: 55px 16px;
+      color: var(--muted);
       line-height: 1.7;
     }
 
-    .state i {
-      font-size: 42px;
-      margin-bottom: 15px;
+    .state > i {
+      font-size: 43px;
       color: #555;
+      margin-bottom: 16px;
     }
 
     .state h2 {
       font-size: 19px;
+      color: #fff;
       margin-bottom: 8px;
-      color: #eee;
     }
 
-    .primary-button {
-      margin-top: 17px;
+    .primary-btn {
       background: linear-gradient(100deg, #28c76f, #df3434);
+      color: white;
+      border: 0;
       padding: 11px 18px;
       border-radius: 9px;
+      margin-top: 17px;
       font-weight: bold;
-    }
-
-    .error-text {
-      color: #ff8888;
-      font-size: 13px;
-      margin-top: 10px;
-      overflow-wrap: anywhere;
-    }
-
-    .loading {
-      text-align: center;
-      color: #aaa;
-      padding: 45px 10px;
-    }
-
-    .loading i {
-      margin-right: 8px;
     }
 
     .bottom-nav {
@@ -236,9 +237,9 @@
       display: flex;
       justify-content: space-around;
       align-items: center;
+      padding: 10px 2px calc(10px + env(safe-area-inset-bottom));
       background: #181818;
       border-top: 1px solid #333;
-      padding: 10px 3px calc(10px + env(safe-area-inset-bottom));
     }
 
     .nav-item {
@@ -246,11 +247,11 @@
       flex-direction: column;
       align-items: center;
       gap: 5px;
-      background: transparent;
+      min-width: 0;
+      flex: 1;
       color: #999;
-      font-size: 11px;
       text-decoration: none;
-      min-width: 48px;
+      font-size: 10px;
     }
 
     .nav-item i {
@@ -258,95 +259,97 @@
     }
 
     .nav-item.active {
-      color: #43e477;
+      color: var(--green);
     }
 
-    @media (max-width: 400px) {
-      header {
-        padding: 13px 10px;
-      }
+    .error {
+      margin-top: 12px;
+      color: #ff8888;
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
 
-      .brand {
-        font-size: 18px;
-      }
+    .loading {
+      text-align: center;
+      padding: 45px 12px;
+      color: var(--muted);
+    }
 
-      .mark-all {
-        font-size: 12px;
-        padding: 8px;
-      }
-
-      .notice {
-        padding: 10px;
-        gap: 9px;
-      }
-
-      .avatar {
-        width: 37px;
-        height: 37px;
-      }
+    @media (max-width: 380px) {
+      .brand { font-size: 17px; }
+      .page-heading h1 { font-size: 21px; }
+      .notification { padding: 10px; gap: 9px; }
+      .avatar { width: 38px; height: 38px; }
+      .mark-all { padding: 9px; }
     }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="brand">
+    <a class="brand" href="index.html">
       <i class="fa-solid fa-circle-play"></i> FreeTube
-    </div>
+    </a>
 
     <div class="header-actions">
       <button class="mark-all" id="markAllBtn" type="button">
-        <i class="fa-solid fa-check-double"></i> সব পড়া
+        <i class="fa-solid fa-check-double"></i>
+        Mark all as read
       </button>
 
-      <button class="icon-button" id="refreshBtn"
-              type="button" aria-label="Refresh">
+      <button class="icon-btn" id="refreshBtn"
+        type="button" aria-label="Refresh notifications">
         <i class="fa-solid fa-rotate"></i>
       </button>
     </div>
   </header>
 
   <main>
-    <div class="summary">
+    <div class="page-heading">
       <h1>Notifications</h1>
-      <span class="count" id="unreadCount">০টি নতুন</span>
+      <span class="unread-count" id="unreadCount">0 new</span>
     </div>
 
-    <div id="notificationList">
+    <section id="notificationList" aria-live="polite">
       <div class="loading">
         <i class="fa-solid fa-spinner fa-spin"></i>
-        নোটিফিকেশন লোড হচ্ছে...
+        Loading notifications...
       </div>
-    </div>
+    </section>
   </main>
 
   <nav class="bottom-nav">
     <a class="nav-item" href="index.html">
-      <i class="fa-solid fa-house"></i><span>Home</span>
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
     </a>
 
     <a class="nav-item" href="discover.html">
-      <i class="fa-solid fa-compass"></i><span>Discover</span>
+      <i class="fa-solid fa-compass"></i>
+      <span>Discover</span>
     </a>
 
     <a class="nav-item" href="create.html">
-      <i class="fa-solid fa-plus-circle"></i><span>Create</span>
+      <i class="fa-solid fa-circle-plus"></i>
+      <span>Create</span>
     </a>
 
-    <a class="nav-item active" href="notification.html">
-      <i class="fa-solid fa-bell"></i><span>Notifications</span>
+    <a class="nav-item active" href="notifications.html">
+      <i class="fa-solid fa-bell"></i>
+      <span>Notifications</span>
     </a>
 
     <a class="nav-item" href="profile.html">
-      <i class="fa-solid fa-user"></i><span>Profile</span>
+      <i class="fa-solid fa-user"></i>
+      <span>Profile</span>
     </a>
   </nav>
 
   <script>
     "use strict";
 
-    // তোমার FreeTube backend API
-    const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+    const API_BASE =
+      "https://freetube-backend-a222.onrender.com/api";
 
     const list = document.getElementById("notificationList");
     const unreadCount = document.getElementById("unreadCount");
@@ -361,18 +364,16 @@
     }
 
     function escapeHTML(value) {
-      return String(value ?? "").replace(/[&<>"']/g, function (char) {
-        return {
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        }[char];
-      });
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
     }
 
-    function typeIcon(type) {
+    function iconFor(type) {
       const icons = {
         like: "fa-heart",
         reaction: "fa-face-smile",
@@ -384,35 +385,40 @@
       return icons[String(type || "").toLowerCase()] || "fa-bell";
     }
 
-    function formatDate(dateValue) {
-      if (!dateValue) return "";
+    function formatDate(value) {
+      if (!value) return "";
 
-      const date = new Date(dateValue);
+      const date = new Date(value);
       if (Number.isNaN(date.getTime())) return "";
 
-      return date.toLocaleString("bn-BD", {
-        dateStyle: "medium",
-        timeStyle: "short"
+      return date.toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit"
       });
     }
 
-    function showState(icon, heading, message, buttonLabel, action) {
+    function showState(icon, title, description, buttonText, callback) {
       list.innerHTML = `
         <div class="state">
           <i class="fa-solid ${icon}"></i>
-          <h2>${escapeHTML(heading)}</h2>
-          <p>${escapeHTML(message)}</p>
-          ${buttonLabel ? `
-            <button class="primary-button" id="stateAction" type="button">
-              ${escapeHTML(buttonLabel)}
+          <h2>${escapeHTML(title)}</h2>
+          <p>${escapeHTML(description)}</p>
+          ${buttonText ? `
+            <button class="primary-btn" id="stateButton" type="button">
+              ${escapeHTML(buttonText)}
             </button>
           ` : ""}
-          <p class="error-text" id="stateError"></p>
+          <p class="error" id="stateError"></p>
         </div>
       `;
 
-      const btn = document.getElementById("stateAction");
-      if (btn && action) btn.addEventListener("click", action);
+      const button = document.getElementById("stateButton");
+      if (button && callback) {
+        button.addEventListener("click", callback);
+      }
     }
 
     async function apiRequest(path, options = {}) {
@@ -427,19 +433,19 @@
       const response = await fetch(API_BASE + path, {
         ...options,
         headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+          ...(options.body ? { "Content-Type": "application/json" } : {}),
           ...(options.headers || {})
         }
       });
 
-      const rawText = await response.text();
+      const text = await response.text();
       let data = {};
 
       try {
-        data = rawText ? JSON.parse(rawText) : {};
-      } catch (_) {
-        data = { error: rawText || "সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।" };
+        data = text ? JSON.parse(text) : {};
+      } catch {
+        data = { error: text || "Invalid server response." };
       }
 
       if (!response.ok) {
@@ -453,7 +459,7 @@
       return data;
     }
 
-    function normalizeItems(data) {
+    function getItems(data) {
       if (Array.isArray(data)) return data;
       if (Array.isArray(data.notifications)) return data.notifications;
       if (Array.isArray(data.data)) return data.data;
@@ -461,20 +467,19 @@
     }
 
     function renderNotifications(data) {
-      notifications = normalizeItems(data);
+      notifications = getItems(data);
 
       const unread = notifications.filter(item => !item.read_at).length;
+      unreadCount.textContent = `${unread} new`;
 
-      unreadCount.textContent = `${unread.toLocaleString("bn-BD")}টি নতুন`;
       markAllBtn.disabled = unread === 0;
-      markAllBtn.style.opacity = unread === 0 ? "0.55" : "1";
 
       if (notifications.length === 0) {
         showState(
           "fa-bell-slash",
-          "এখনো কোনো নোটিফিকেশন নেই",
-          "কেউ লাইক, কমেন্ট, ফলো বা মেসেজ করলে এখানে দেখা যাবে।",
-          "আবার লোড করুন",
+          "No notifications yet",
+          "Likes, comments, follows and messages will appear here.",
+          "Refresh",
           loadNotifications
         );
         return;
@@ -482,49 +487,45 @@
 
       list.innerHTML = notifications.map(item => {
         const type = String(item.type || "notification").toLowerCase();
-        const actor = item.actor_username || item.username || "কেউ একজন";
-        const message = item.message || `${actor} তোমার সঙ্গে ইন্টারঅ্যাক্ট করেছে।`;
         const isUnread = !item.read_at;
-        const initial = actor.trim().charAt(0).toUpperCase() || "F";
+        const message = item.message || "You have a new notification.";
 
         return `
-          <article class="notice ${isUnread ? "unread" : ""}"
-                   data-id="${escapeHTML(item.id)}">
-            <div class="avatar" aria-hidden="true">
-              <i class="fa-solid ${typeIcon(type)}"></i>
+          <article class="notification ${isUnread ? "unread" : ""}">
+            <div class="avatar">
+              <i class="fa-solid ${iconFor(type)}"></i>
             </div>
 
-            <div class="notice-content">
-              <div class="notice-message">${escapeHTML(message)}</div>
-              <div class="notice-meta">
+            <div class="notification-body">
+              <div class="message">${escapeHTML(message)}</div>
+
+              <div class="meta">
                 <span class="type">
-                  <i class="fa-solid ${typeIcon(type)}"></i>
+                  <i class="fa-solid ${iconFor(type)}"></i>
                   ${escapeHTML(type)}
                 </span>
                 <span>${escapeHTML(formatDate(item.created_at))}</span>
               </div>
             </div>
 
-            <div class="notice-actions">
+            <div class="notification-actions">
               ${isUnread ? `
-                <span class="unread-dot" title="নতুন"></span>
-                <button class="small-action mark-one"
-                        type="button"
-                        data-id="${escapeHTML(item.id)}"
-                        aria-label="পড়া হয়েছে">
+                <span class="unread-dot" title="Unread"></span>
+                <button class="read-btn" type="button"
+                  data-id="${escapeHTML(item.id)}"
+                  aria-label="Mark as read">
                   <i class="fa-solid fa-check"></i>
                 </button>
               ` : `
                 <i class="fa-solid fa-check"
-                   style="color:#43e477;font-size:13px"
-                   title="পড়া হয়েছে"></i>
+                  style="color:#43e477" title="Read"></i>
               `}
             </div>
           </article>
         `;
       }).join("");
 
-      list.querySelectorAll(".mark-one").forEach(button => {
+      list.querySelectorAll(".read-btn").forEach(button => {
         button.addEventListener("click", () => {
           markOneAsRead(button.dataset.id);
         });
@@ -536,69 +537,68 @@
       loading = true;
 
       refreshBtn.disabled = true;
-      refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-      if (!getToken()) {
-        unreadCount.textContent = "লগইন প্রয়োজন";
-        showState(
-          "fa-user-lock",
-          "লগইন করো",
-          "নোটিফিকেশন দেখতে তোমার FreeTube অ্যাকাউন্টে লগইন করতে হবে।",
-          "লগইন",
-          () => {
-            window.location.href = "login.html";
-          }
-        );
-
-        loading = false;
-        refreshBtn.disabled = false;
-        refreshBtn.innerHTML = '<i class="fa-solid fa-rotate"></i>';
-        return;
-      }
-
-      list.innerHTML = `
-        <div class="loading">
-          <i class="fa-solid fa-spinner fa-spin"></i>
-          নোটিফিকেশন লোড হচ্ছে...
-        </div>
-      `;
+      refreshBtn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i>';
 
       try {
-        const data = await apiRequest("/notifications");
-        renderNotifications(data);
-      } catch (error) {
-        console.error("Notification loading error:", error);
+        if (!getToken()) {
+          unreadCount.textContent = "Login required";
 
-        if (error.message === "LOGIN_REQUIRED" || error.status === 401) {
           showState(
             "fa-user-lock",
-            "লগইন আবার করো",
-            "তোমার লগইন সেশন শেষ হয়েছে অথবা টোকেন গ্রহণ করা হয়নি।",
-            "লগইন",
+            "Please log in",
+            "Log in to your FreeTube account to view notifications.",
+            "Login",
+            () => {
+              window.location.href = "login.html";
+            }
+          );
+          return;
+        }
+
+        list.innerHTML = `
+          <div class="loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            Loading notifications...
+          </div>
+        `;
+
+        const data = await apiRequest("/notifications");
+        renderNotifications(data);
+
+      } catch (error) {
+        console.error("Notification error:", error);
+
+        if (error.status === 401 || error.message === "LOGIN_REQUIRED") {
+          showState(
+            "fa-user-lock",
+            "Login required",
+            "Your session may have expired. Please log in again.",
+            "Login",
             () => window.location.href = "login.html"
           );
         } else if (error.status === 404) {
           showState(
             "fa-triangle-exclamation",
-            "API Route পাওয়া যায়নি (404)",
-            "ব্যাকএন্ডে /api/notifications রুটটি নেই, অথবা Render-এ পুরোনো কোড চলছে। server.js ডিপ্লয়মেন্ট ও API_BASE ঠিক করো।",
-            "আবার চেষ্টা করো",
+            "API route not found (404)",
+            "Check that the latest server.js is deployed and that /api/notifications exists on the backend.",
+            "Try again",
             loadNotifications
           );
         } else if (error.status === 503) {
           showState(
             "fa-database",
-            "সার্ভার প্রস্তুত নয়",
-            "ব্যাকএন্ডের DATABASE_URL, ডেটাবেস সংযোগ ও সার্ভার কনফিগারেশন পরীক্ষা করো।",
-            "আবার চেষ্টা করো",
+            "Backend not ready",
+            "Check the Render service logs and database configuration.",
+            "Try again",
             loadNotifications
           );
         } else {
           showState(
             "fa-triangle-exclamation",
-            "নোটিফিকেশন লোড হয়নি",
-            `সার্ভারের সঙ্গে সংযোগ বা অনুমতিতে সমস্যা হয়েছে। HTTP: ${error.status || "Network Error"}`,
-            "আবার চেষ্টা করো",
+            "Could not load notifications",
+            `Please check your internet connection and backend. Error: ${error.message}`,
+            "Try again",
             loadNotifications
           );
         }
@@ -619,20 +619,20 @@
         );
 
         const item = notifications.find(
-          notification => String(notification.id) === String(id)
+          entry => String(entry.id) === String(id)
         );
 
         if (item) item.read_at = new Date().toISOString();
 
         renderNotifications(notifications);
       } catch (error) {
-        console.error("Mark one read error:", error);
-        alert("নোটিফিকেশন পড়া হয়েছে হিসেবে চিহ্নিত করা যায়নি। আবার চেষ্টা করো।");
+        console.error("Mark as read error:", error);
+        alert("Could not mark this notification as read. Please try again.");
       }
     }
 
     async function markAllAsRead() {
-      if (loading) return;
+      if (loading || markAllBtn.disabled) return;
 
       markAllBtn.disabled = true;
 
@@ -642,6 +642,7 @@
         });
 
         const now = new Date().toISOString();
+
         notifications = notifications.map(item => ({
           ...item,
           read_at: item.read_at || now
@@ -649,8 +650,8 @@
 
         renderNotifications(notifications);
       } catch (error) {
-        console.error("Mark all read error:", error);
-        alert("সব নোটিফিকেশন পড়া হয়েছে হিসেবে চিহ্নিত করা যায়নি।");
+        console.error("Mark all as read error:", error);
+        alert("Could not mark all notifications as read. Please try again.");
       } finally {
         markAllBtn.disabled = false;
       }
@@ -659,7 +660,6 @@
     refreshBtn.addEventListener("click", loadNotifications);
     markAllBtn.addEventListener("click", markAllAsRead);
 
-    // পেজ খোলার সঙ্গে নোটিফিকেশন লোড হবে
     loadNotifications();
   </script>
 </body>
