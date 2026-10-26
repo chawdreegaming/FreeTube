@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,11 +20,15 @@ body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,
 button,input,textarea{font:inherit}
 button{cursor:pointer;color:inherit}
 .app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:85px}
-.menu-row{display:flex;justify-content:flex-start;padding:12px 16px}
-.menu-button{width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#ffffff12;font-size:20px}
-.cover-container{height:180px;position:relative;background:#24382e}
+.cover-container{height:200px;position:relative;background:#24382e}
 .cover-photo{width:100%;height:100%;object-fit:cover}
-.cover-upload-btn{position:absolute;right:12px;bottom:12px;background:#111b;padding:10px 12px;border-radius:9px;font-size:13px;cursor:pointer}
+.cover-upload-btn{position:absolute;right:68px;bottom:12px;background:#111c;padding:10px 12px;border-radius:9px;font-size:12px;cursor:pointer}
+.menu-row{position:absolute;top:12px;right:12px;z-index:30}
+.menu-button{width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#101a;color:white;font-size:20px}
+.menu-dropdown{display:none;position:absolute;right:0;top:51px;width:190px;padding:7px;background:#14251c;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 25px #0006}
+.menu-dropdown.open{display:block}
+.menu-dropdown button{display:block;width:100%;padding:13px;text-align:left;background:transparent;border:0;border-radius:8px;color:white;font-size:14px}
+.menu-dropdown button:active{background:#ffffff18}
 .profile-header-section{text-align:center;padding:0 16px 20px;border-bottom:1px solid var(--border)}
 .avatar-container{width:104px;height:104px;margin:-50px auto 12px;position:relative}
 .avatar{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid #133a26;background:#111}
@@ -59,34 +64,37 @@ input[type=file]{display:none}
 .field textarea{min-height:100px;resize:vertical}
 .field input:focus,.field textarea:focus{border-color:var(--green)}
 .primary-button{width:100%;padding:14px;border:0;border-radius:10px;background:linear-gradient(135deg,#00b074,#008253);color:white;font-weight:bold;margin-top:10px}
-.settings-option{width:100%;padding:16px;margin-bottom:10px;border:1px solid var(--border);border-radius:12px;background:#ffffff0d;color:white;display:flex;align-items:center;gap:13px;text-align:left;font-size:14px}
-.settings-option i{width:24px;text-align:center;color:var(--green);font-size:18px}
 .toast{position:fixed;z-index:200;bottom:82px;left:50%;transform:translateX(-50%);background:#151d18;border:1px solid var(--border);padding:12px 16px;border-radius:10px;font-size:13px;display:none;width:max-content;max-width:90%;text-align:center}
 .status{font-size:13px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
 .status.error{color:#ffb3b3}
 .status.success{color:var(--green)}
-#retrySessionButton{display:none;width:100%;margin-top:10px}
 .post-card{padding:14px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
 .post-card img,.post-card video{width:100%;max-height:360px;object-fit:contain;margin-top:10px;border-radius:10px}
 @media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
 </style>
 </head>
-
 <body>
 <div class="app">
 
-<!-- Facebook-style three-line menu; no top Profile header -->
-<div class="menu-row">
-  <button class="menu-button" onclick="openSettings()" aria-label="Open menu">
-    <i class="fa-solid fa-bars"></i>
-  </button>
-</div>
-
 <section class="cover-container">
-  <img id="coverPhoto"
-       class="cover-photo"
+  <img id="coverPhoto" class="cover-photo"
        src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
        alt="Cover photo">
+
+  <div class="menu-row">
+    <button class="menu-button" onclick="toggleProfileMenu()" aria-label="Profile menu">
+      <i class="fa-solid fa-ellipsis"></i>
+    </button>
+    <div class="menu-dropdown" id="profileMenu">
+      <button onclick="closeProfileMenu();openEditModal()">
+        <i class="fa-solid fa-user-pen"></i> Edit profile
+      </button>
+      <button onclick="closeProfileMenu();notify('Settings page will be added later.')">
+        <i class="fa-solid fa-gear"></i> Settings
+      </button>
+    </div>
+  </div>
+
   <label for="coverInput" class="cover-upload-btn">
     <i class="fa-solid fa-camera"></i> Edit cover
   </label>
@@ -95,8 +103,7 @@ input[type=file]{display:none}
 
 <section class="profile-header-section">
   <div class="avatar-container">
-    <img id="profileAvatar"
-         class="avatar"
+    <img id="profileAvatar" class="avatar"
          src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250"
          alt="Profile photo">
     <label for="avatarInput" class="avatar-upload-btn" aria-label="Change profile photo">
@@ -109,7 +116,6 @@ input[type=file]{display:none}
     <span id="username">User</span>
     <i class="fa-solid fa-circle-check verified-badge"></i>
   </div>
-
   <div id="handle" class="handle-text">@username</div>
 
   <div class="follow-stats">
@@ -132,12 +138,11 @@ input[type=file]{display:none}
   </div>
 
   <p class="status" id="sessionStatus">Checking login status...</p>
-  <button class="btn" id="retrySessionButton" onclick="loadProfile()">Retry connection</button>
+  <button class="btn" id="retrySessionButton" onclick="loadProfile()" style="display:none;width:100%;margin-top:10px">Retry connection</button>
 </section>
 
 <section class="panel">
-  <div class="panel-title">
-    Personal details
+  <div class="panel-title">Personal details
     <button class="inline-edit" onclick="openEditModal()" aria-label="Edit personal details">
       <i class="fa-solid fa-pen"></i>
     </button>
@@ -148,8 +153,7 @@ input[type=file]{display:none}
 </section>
 
 <section class="panel">
-  <div class="panel-title">
-    Work &amp; Education
+  <div class="panel-title">Work &amp; Education
     <button class="inline-edit" onclick="openEditModal()" aria-label="Edit work and education">
       <i class="fa-solid fa-pen"></i>
     </button>
@@ -162,45 +166,19 @@ input[type=file]{display:none}
   <div class="panel-title">My Posts <span id="postCount" class="muted">0 posts</span></div>
   <div id="myPosts" class="muted">Loading posts...</div>
 </section>
-
 </div>
 
 <nav class="bottom-nav">
   <button class="nav-item" onclick="goHome()"><i class="fa-solid fa-house"></i><span>Home</span></button>
   <button class="nav-item" onclick="goDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-  <button class="nav-item" onclick="goCreate()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
+  <button class="nav-item" onclick="goCreate()"><i class="fa-solid fa-square-plus"></i><span>Create</span></button>
   <button class="nav-item" onclick="goNotifications()"><i class="fa-solid fa-bell"></i><span>Notifications</span></button>
   <button class="nav-item active" onclick="location.href='profile.html'"><i class="fa-regular fa-user"></i><span>Profile</span></button>
 </nav>
 
-<!-- Settings menu -->
-<div class="modal" id="settingsModal">
-  <header class="modal-header">
-    <button class="close-btn" onclick="closeModal('settingsModal')" aria-label="Close menu">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-    <h2>Settings</h2><span></span>
-  </header>
-  <div class="modal-content">
-    <button class="settings-option" onclick="closeModal('settingsModal');openEditModal()">
-      <i class="fa-solid fa-user-pen"></i>
-      <span>Edit Profile<br><small class="muted">Name, bio and personal details</small></span>
-    </button>
-    <button class="settings-option" onclick="closeModal('settingsModal');notify('Account settings are coming soon.')">
-      <i class="fa-solid fa-user-shield"></i>
-      <span>Account Settings<br><small class="muted">Manage your account</small></span>
-    </button>
-    <button class="settings-option" onclick="closeModal('settingsModal');notify('Privacy settings are coming soon.')">
-      <i class="fa-solid fa-lock"></i>
-      <span>Privacy<br><small class="muted">Privacy options</small></span>
-    </button>
-  </div>
-</div>
-
-<!-- Edit profile -->
 <div class="modal" id="editModal">
   <header class="modal-header">
-    <button class="close-btn" onclick="closeModal('editModal')" aria-label="Close edit profile">
+    <button class="close-btn" onclick="closeModal('editModal')" aria-label="Close">
       <i class="fa-solid fa-xmark"></i>
     </button>
     <h2>Edit profile</h2><span></span>
@@ -246,20 +224,14 @@ const PROFILE_KEY = "freetube_profile_data";
 let toastTimer;
 let currentUser = null;
 let serverProfile = {};
-let sessionValid = false;
 let loadingProfile = false;
 
-const defaultProfile = {
-  name:"",
-  handle:"",
+const defaults = {
+  name:"", handle:"",
   bio:"Welcome to my FreeTube profile!",
-  city:"",
-  home:"",
-  birthday:"",
-  work:"",
-  education:"",
-  followers:0,
-  following:0
+  city:"", home:"", birthday:"",
+  work:"", education:"",
+  followers:0, following:0
 };
 
 function getToken() {
@@ -269,31 +241,21 @@ function getToken() {
 
 function getProfile() {
   try {
-    const saved = JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}");
-    return {...defaultProfile,...saved};
+    return {...defaults,...JSON.parse(localStorage.getItem(PROFILE_KEY) || "{}")};
   } catch {
-    return {...defaultProfile};
+    return {...defaults};
   }
 }
 
 function saveLocalProfile(profile) {
-  try {
-    localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));
-  } catch (error) {
-    console.warn("Local profile could not be saved:",error);
-  }
-}
-
-function displayName(profile) {
-  return String(profile.name || profile.handle || "User").replace(/^@/,"");
+  try { localStorage.setItem(PROFILE_KEY,JSON.stringify(profile)); }
+  catch (e) { console.warn("Local profile save failed",e); }
 }
 
 function renderProfile() {
   const p = getProfile();
-
-  document.getElementById("username").textContent = displayName(p);
-  document.getElementById("handle").textContent =
-    p.handle ? "@" + String(p.handle).replace(/^@/,"") : "@username";
+  document.getElementById("username").textContent = p.name || p.handle || "User";
+  document.getElementById("handle").textContent = p.handle ? "@" + String(p.handle).replace(/^@/,"") : "@username";
   document.getElementById("bioText").textContent = p.bio || "No bio added yet.";
   document.getElementById("cityText").textContent = p.city || "Not added";
   document.getElementById("homeText").textContent = p.home || "Not added";
@@ -313,7 +275,6 @@ function setStatus(message,type="") {
 async function apiRequest(path,options={}) {
   const headers = {...(options.headers || {})};
   const token = getToken();
-
   if (token) headers.Authorization = "Bearer " + token;
 
   if (options.body !== undefined && !(options.body instanceof FormData)) {
@@ -321,9 +282,7 @@ async function apiRequest(path,options={}) {
   }
 
   const response = await fetch(API_BASE_URL + path,{
-    ...options,
-    headers,
-    cache:"no-store"
+    ...options, headers, cache:"no-store"
   });
 
   let data = {};
@@ -332,7 +291,6 @@ async function apiRequest(path,options={}) {
   if (!response.ok) {
     throw new Error(data.error || data.message || ("Server error: " + response.status));
   }
-
   return data;
 }
 
@@ -344,46 +302,29 @@ function applyServerProfile(profile,user) {
   serverProfile = profile || {};
   const p = getProfile();
 
-  const name =
-    serverProfile.display_name ||
-    user?.display_name ||
-    user?.full_name ||
-    user?.fullName ||
-    user?.name;
-
-  const handle =
-    user?.username ||
-    user?.handle ||
-    serverProfile.username;
-
-  if (name) p.name = name;
-  if (handle) p.handle = String(handle).replace(/^@/,"");
+  p.name = serverProfile.display_name || user?.display_name || user?.full_name || user?.name || p.name;
+  p.handle = user?.username || user?.handle || p.handle;
   if (typeof serverProfile.bio === "string") p.bio = serverProfile.bio;
 
   saveLocalProfile(p);
 
-  // Load saved images from the server.
   if (serverProfile.avatar_url) {
     document.getElementById("profileAvatar").src = serverProfile.avatar_url;
   }
   if (serverProfile.cover_url) {
     document.getElementById("coverPhoto").src = serverProfile.cover_url;
   }
-
   renderProfile();
 }
 
 async function loadProfile() {
   if (loadingProfile) return;
   loadingProfile = true;
-
   document.getElementById("retrySessionButton").style.display = "none";
   setStatus("Connecting to FreeTube...");
 
   try {
-    if (!getToken()) {
-      throw new Error("Please log in first.");
-    }
+    if (!getToken()) throw new Error("Please log in first.");
 
     const meData = await apiRequest("/auth/me");
     currentUser = extractUser(meData);
@@ -393,23 +334,17 @@ async function loadProfile() {
 
     if (username) {
       try {
-        const profileData = await apiRequest(
-          "/profile/" + encodeURIComponent(String(username).replace(/^@/,""))
-        );
-        profile = profileData.profile || profileData.data?.profile || profileData;
-      } catch (error) {
-        console.warn("Public profile fetch failed:",error.message);
+        const data = await apiRequest("/profile/" + encodeURIComponent(String(username).replace(/^@/,"")));
+        profile = data.profile || data.data?.profile || data;
+      } catch (e) {
+        console.warn("Profile lookup route unavailable:",e.message);
       }
     }
 
     applyServerProfile(profile,currentUser);
-    sessionValid = true;
     setStatus("Profile connected to server.","success");
-
     await loadMyPosts();
-
   } catch (error) {
-    sessionValid = false;
     setStatus(error.message || "Could not connect to server.","error");
     document.getElementById("retrySessionButton").style.display = "flex";
   } finally {
@@ -417,13 +352,8 @@ async function loadProfile() {
   }
 }
 
-function openSettings() {
-  document.getElementById("settingsModal").classList.add("open");
-}
-
 function openEditModal() {
   const p = getProfile();
-
   document.getElementById("editName").value = p.name || "";
   document.getElementById("editBio").value = p.bio || "";
   document.getElementById("editCity").value = p.city || "";
@@ -432,7 +362,6 @@ function openEditModal() {
   document.getElementById("editWork").value = p.work || "";
   document.getElementById("editEducation").value = p.education || "";
   document.getElementById("editStatus").textContent = "";
-
   document.getElementById("editModal").classList.add("open");
 }
 
@@ -440,9 +369,20 @@ function closeModal(id) {
   document.getElementById(id).classList.remove("open");
 }
 
+function toggleProfileMenu() {
+  document.getElementById("profileMenu").classList.toggle("open");
+}
+
+function closeProfileMenu() {
+  document.getElementById("profileMenu").classList.remove("open");
+}
+
+document.addEventListener("click",function(event) {
+  if (!event.target.closest(".menu-row")) closeProfileMenu();
+});
+
 document.getElementById("editForm").addEventListener("submit",async function(event) {
   event.preventDefault();
-
   if (!getToken()) {
     notify("Please log in before editing your profile.");
     return;
@@ -451,10 +391,8 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
   const button = document.getElementById("saveProfileButton");
   const status = document.getElementById("editStatus");
   const oldText = button.textContent;
-
   button.disabled = true;
   button.textContent = "Saving...";
-  status.textContent = "";
 
   const p = {
     ...getProfile(),
@@ -489,16 +427,14 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
     serverProfile = result.profile || serverProfile;
     saveLocalProfile(p);
     renderProfile();
-
-    status.textContent = "Profile saved successfully.";
+    status.textContent = "Profile saved to server.";
     status.className = "status success";
     closeModal("editModal");
-    notify("Profile updated.");
-
+    notify("Profile updated successfully.");
   } catch (error) {
     status.textContent = error.message;
     status.className = "status error";
-    notify("Could not save: " + error.message);
+    notify("Could not save profile: " + error.message);
   } finally {
     button.disabled = false;
     button.textContent = oldText;
@@ -507,47 +443,34 @@ document.getElementById("editForm").addEventListener("submit",async function(eve
 
 async function uploadProfileImage(file) {
   if (!file) throw new Error("Please choose an image.");
-
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Please select an image file.");
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error("Image must be smaller than 5 MB.");
-  }
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+  if (file.size > 5 * 1024 * 1024) throw new Error("Image must be smaller than 5 MB.");
 
   const form = new FormData();
   form.append("file",file);
 
   const result = await apiRequest("/media/upload",{
-    method:"POST",
-    body:form
+    method:"POST", body:form
   });
 
   const media = result.media || result.data?.media;
   const url = media?.url || media?.secure_url;
-
   if (!url || !url.startsWith("https://")) {
-    throw new Error("Server did not return a valid image URL.");
+    throw new Error("Server did not return a valid HTTPS image URL.");
   }
-
   return url;
 }
 
 async function changeProfileImage(file,type) {
   if (!file) return;
-
   if (!getToken()) {
     notify("Please log in first.");
     return;
   }
 
   setStatus("Uploading image...");
-
   try {
     const url = await uploadProfileImage(file);
-
-    // Save the new URL to the server before showing success.
     const p = getProfile();
 
     const payload = {
@@ -558,24 +481,21 @@ async function changeProfileImage(file,type) {
     };
 
     const result = await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
+      method:"PUT", body:JSON.stringify(payload)
     });
 
     serverProfile = result.profile || {...serverProfile,...payload};
 
-    // Update the displayed image only after the server saves it.
     if (type === "avatar") {
-      document.getElementById("profileAvatar").src = url;
+      document.getElementById("profileAvatar").src = serverProfile.avatar_url || url;
     } else {
-      document.getElementById("coverPhoto").src = url;
+      document.getElementById("coverPhoto").src = serverProfile.cover_url || url;
     }
 
-    setStatus("Profile connected to server.","success");
+    setStatus("Profile image saved to server.","success");
     notify(type === "avatar" ? "Profile photo saved." : "Cover photo saved.");
-
   } catch (error) {
-    console.error("Image upload error:",error);
+    console.error(error);
     setStatus(error.message,"error");
     notify("Image save failed: " + error.message);
   }
@@ -600,22 +520,17 @@ async function loadMyPosts() {
   try {
     const data = await apiRequest("/posts?limit=30");
     const posts = data.posts || data.data?.posts || [];
-
     const myId = String(currentUser?.id ?? currentUser?.user_id ?? "");
     const myUsername = String(currentUser?.username || currentUser?.handle || "").toLowerCase();
 
     const mine = posts.filter(post => {
       const author = post.user || post.author || post.owner || {};
-      const postId = String(post.user_id ?? post.author_id ?? author.id ?? author.user_id ?? "");
-      const postName = String(post.username ?? post.author_username ?? author.username ?? author.handle ?? "").toLowerCase();
-
-      return (myId && postId && myId === postId) ||
-             (myUsername && postName && myUsername === postName);
+      const id = String(post.user_id ?? post.author_id ?? author.id ?? author.user_id ?? "");
+      const username = String(post.username ?? post.author_username ?? author.username ?? author.handle ?? "").toLowerCase();
+      return (myId && id && myId === id) || (myUsername && username && myUsername === username);
     });
 
-    document.getElementById("postCount").textContent =
-      mine.length + (mine.length === 1 ? " post" : " posts");
-
+    document.getElementById("postCount").textContent = mine.length + (mine.length === 1 ? " post" : " posts");
     container.replaceChildren();
 
     if (!mine.length) {
@@ -633,7 +548,6 @@ async function loadMyPosts() {
 
       const url = post.media_url || post.image_url || post.video_url;
       const type = String(post.media_type || post.type || "");
-
       if (url) {
         const media = document.createElement(type.includes("video") ? "video" : "img");
         media.src = url;
@@ -647,44 +561,25 @@ async function loadMyPosts() {
       date.style.marginTop = "8px";
       date.textContent = post.created_at ? new Date(post.created_at).toLocaleString() : "";
       card.appendChild(date);
-
       container.appendChild(card);
     });
-
   } catch (error) {
     container.textContent = "Could not load posts: " + error.message;
   }
 }
 
-function goHome() {
-  location.href = "home.html";
-}
-
-function goDiscover() {
-  location.href = "home.html#discover";
-}
-
-function goCreate() {
-  location.href = "home.html# create";
-}
-
-function goNotifications() {
-  location.href = "home.html#notifications";
-}
-
-function showDashboard() {
-  notify("Creator dashboard is not connected yet.");
-}
+function goHome() { location.href = "home.html"; }
+function goDiscover() { location.href = "home.html#discover"; }
+function goCreate() { location.href = "home.html# create"; }
+function goNotifications() { location.href = "home.html#notifications"; }
+function showDashboard() { notify("Creator dashboard is not connected yet."); }
 
 function notify(message) {
   const el = document.getElementById("toast");
   el.textContent = message;
   el.style.display = "block";
-
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    el.style.display = "none";
-  },3000);
+  toastTimer = setTimeout(() => { el.style.display = "none"; },3000);
 }
 
 window.addEventListener("DOMContentLoaded",function() {
