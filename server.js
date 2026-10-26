@@ -7,6 +7,8 @@ const cors = require("cors");
 const { Pool } = require("pg");
 const crypto = require("crypto");
 const { promisify } = require("util");
+const multer = require("multer");
+const cloudinary = require("cloudinary").v2;
 
 const scryptAsync = promisify(crypto.scrypt);
 const app = express();
@@ -20,88 +22,79 @@ const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
   .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Origin not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 
-      return callback(new Error("Origin not allowed by CORS"));
-    },
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+app.use(express.json({ limit: "100kb" }));
 
-app.use(express.json({ limit: "20kb" }));
-
-// PostgreSQL connection
 const pool = process.env.DATABASE_URL
   ? new Pool({
       connectionString: process.env.DATABASE_URL,
       max: 5,
       connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 30000,
+      ssl: process.env.DATABASE_SSL === "false"
+        ? false
+        : { rejectUnauthorized: false }
     })
   : null;
 
 if (pool) {
   pool.on("error", (error) => {
-    console.error("Unexpected database pool error:", {
-      code: error.code,
-      message: error.message,
-    });
+    console.error("Database pool error:", error.message);
   });
 }
 
-// Basic routes
-app.get("/", (req, res) => {
-  res.json({
-    name: "FreeTube Backend API",
-    status: "running",
-    version: "1.1.0",
-  });
-});
+const cloudinaryConfigured = Boolean(
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET
+);
 
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "FreeTube Backend",
-    databaseConfigured: Boolean(pool),
+if (cloudinaryConfigured) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure: true
   });
-});
+}
 
-app.get("/api/health/database", async (req, res, next) => {
-  if (!pool) {
-    return res.status(503).json({
-      status: "not_configured",
-      message: "Database has not been configured.",
-    });
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+    files: 1
+  },
+  fileFilter(req, file, callback) {
+    const allowed = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime"
+    ];
+
+    if (!allowed.includes(file.mimetype)) {
+      return callback(
+        new Error("Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM.")
+      );
+    }
+
+    callback(null, true);
   }
-
-  try {
-    await pool.query("SELECT 1");
-    return res.json({ status: "connected" });
-  } catch (error) {
-    return next(error);
-  }
 });
 
-app.get("/api", (req, res) => {
-  res.json({
-    message: "Welcome to FreeTube API",
-    endpoints: [
-      "GET /api/health",
-      "GET /api/health/database",
-      "POST /api/auth/register",
-      "POST /api/auth/login",
-      "GET /api/auth/me",
-    ],
-  });
-});
-
-// Authentication configuration
 function authReady(res) {
   if (!pool) {
     res.status(503).json({ error: "Database is not configured." });
@@ -113,7 +106,7 @@ function authReady(res) {
     Buffer.byteLength(process.env.JWT_SECRET, "utf8") < 32
   ) {
     res.status(503).json({
-      error: "Authentication is not configured on the server.",
+      error: "Authentication is not configured on the server."
     });
     return false;
   }
@@ -121,106 +114,78 @@ function authReady(res) {
   return true;
 }
 
-// Password hashing using Node.js scrypt
-async function hashPassword(password) {
+function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
-  const derivedKey = await scryptAsync(password, salt, 64);
-
-  return "scrypt$" + salt + "$" + derivedKey.toString("hex");
+  return scryptAsync(password, salt, 64).then(
+    (key) => `scrypt$${salt}$${key.toString("hex")}`
+  );
 }
 
 async function verifyPassword(password, storedHash) {
   try {
     const parts = String(storedHash).split("$");
+    if (parts.length !== 3 || parts[0] !== "scrypt") return false;
 
-    if (parts.length !== 3 || parts[0] !== "scrypt") {
-      return false;
-    }
-
-    const salt = parts[1];
     const storedKey = Buffer.from(parts[2], "hex");
+    if (storedKey.length !== 64) return false;
 
-    if (storedKey.length !== 64) {
-      return false;
-    }
-
-    const derivedKey = await scryptAsync(password, salt, 64);
-
+    const derivedKey = await scryptAsync(password, parts[1], 64);
     return crypto.timingSafeEqual(storedKey, derivedKey);
   } catch (_) {
     return false;
   }
 }
 
-// Signed access token. JWT_SECRET must remain private.
 function createToken(user) {
   const now = Math.floor(Date.now() / 1000);
-
   const payload = {
-    sub: user.id,
+    sub: String(user.id),
     username: user.username,
     role: user.role,
     iat: now,
-    exp: now + 60 * 60 * 24 * 7,
+    exp: now + 60 * 60 * 24 * 7
   };
 
-  const encodedPayload = Buffer.from(
-    JSON.stringify(payload)
-  ).toString("base64url");
-
+  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
   const signature = crypto
     .createHmac("sha256", process.env.JWT_SECRET)
-    .update(encodedPayload)
+    .update(encoded)
     .digest("base64url");
 
-  return encodedPayload + "." + signature;
+  return `${encoded}.${signature}`;
 }
 
 function verifyToken(token) {
-  if (typeof token !== "string" || token.length > 4096) {
-    return null;
-  }
+  if (typeof token !== "string" || token.length > 4096) return null;
 
   const parts = token.split(".");
+  if (parts.length !== 2) return null;
 
-  if (parts.length !== 2) {
-    return null;
-  }
-
-  const [encodedPayload, suppliedSignature] = parts;
-
-  const expectedSignature = crypto
+  const [encoded, supplied] = parts;
+  const expected = crypto
     .createHmac("sha256", process.env.JWT_SECRET)
-    .update(encodedPayload)
+    .update(encoded)
     .digest();
 
-  let actualSignature;
-
-  try {
-    actualSignature = Buffer.from(suppliedSignature, "base64url");
-  } catch (_) {
-    return null;
-  }
+  const actual = Buffer.from(supplied, "base64url");
 
   if (
-    actualSignature.length !== expectedSignature.length ||
-    !crypto.timingSafeEqual(actualSignature, expectedSignature)
+    actual.length !== expected.length ||
+    !crypto.timingSafeEqual(actual, expected)
   ) {
     return null;
   }
 
   try {
     const payload = JSON.parse(
-      Buffer.from(encodedPayload, "base64url").toString("utf8")
+      Buffer.from(encoded, "base64url").toString("utf8")
     );
 
     if (
       !payload.sub ||
       !Number.isInteger(payload.exp) ||
       payload.exp <= Math.floor(Date.now() / 1000)
-    ) {
-      return null;
-    }
+    ) return null;
 
     return payload;
   } catch (_) {
@@ -228,110 +193,245 @@ function verifyToken(token) {
   }
 }
 
-// Verify Bearer token and confirm the account still exists.
 async function requireAuth(req, res, next) {
   if (!authReady(res)) return;
 
-  const authorization = req.get("authorization") || "";
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  const match = (req.get("authorization") || "")
+    .match(/^Bearer\s+(.+)$/i);
 
   if (!match) {
     return res.status(401).json({ error: "Authentication required." });
   }
 
   const payload = verifyToken(match[1]);
-
   if (!payload) {
-    return res.status(401).json({
-      error: "Invalid or expired access token.",
-    });
+    return res.status(401).json({ error: "Invalid or expired access token." });
   }
 
   try {
     const result = await pool.query(
       `SELECT id, username, email, role, account_status, created_at
-       FROM users
-       WHERE id = $1
-       LIMIT 1`,
-      [payload.sub]
+       FROM users WHERE id::text = $1 LIMIT 1`,
+      [String(payload.sub)]
     );
 
-    if (result.rows.length === 0) {
+    if (!result.rows.length) {
       return res.status(401).json({ error: "Account not found." });
     }
 
-    const user = result.rows[0];
-
-    if (user.account_status !== "active") {
-      return res.status(403).json({
-        error: "This account is not active.",
-      });
+    if (result.rows[0].account_status !== "active") {
+      return res.status(403).json({ error: "This account is not active." });
     }
 
-    req.user = user;
+    req.user = result.rows[0];
     next();
   } catch (error) {
     next(error);
   }
 }
 
-// Register
+function cleanText(value, maxLength = 2000) {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, maxLength);
+}
+
+function publicUser(user) {
+  return {
+    id: String(user.id),
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    account_status: user.account_status,
+    created_at: user.created_at
+  };
+}
+
+function sendCloudinaryUpload(buffer, mimetype) {
+  return new Promise((resolve, reject) => {
+    const resourceType = mimetype.startsWith("video/")
+      ? "video"
+      : "image";
+
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "freetube",
+        resource_type: resourceType
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve({
+          url: result.secure_url,
+          public_id: result.public_id,
+          resource_type: result.resource_type,
+          bytes: result.bytes
+        });
+      }
+    );
+
+    stream.end(buffer);
+  });
+}
+
+// Create only new tables. Never drop or recreate users.
+async function initializeDatabase() {
+  if (!pool) return;
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ft_profiles (
+      user_id TEXT PRIMARY KEY,
+      display_name VARCHAR(80),
+      bio VARCHAR(500),
+      avatar_url TEXT,
+      cover_url TEXT,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_posts (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      content TEXT NOT NULL DEFAULT '',
+      media_url TEXT,
+      media_type VARCHAR(20),
+      media_public_id TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_likes (
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (post_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_comments (
+      id BIGSERIAL PRIMARY KEY,
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      content VARCHAR(2000) NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_messages (
+      id BIGSERIAL PRIMARY KEY,
+      sender_id TEXT NOT NULL,
+      recipient_id TEXT NOT NULL,
+      content VARCHAR(5000) NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      read_at TIMESTAMPTZ
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_notifications (
+      id BIGSERIAL PRIMARY KEY,
+      recipient_id TEXT NOT NULL,
+      actor_id TEXT NOT NULL,
+      type VARCHAR(30) NOT NULL,
+      post_id BIGINT,
+      message TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      read_at TIMESTAMPTZ
+    );
+
+    CREATE INDEX IF NOT EXISTS ft_posts_created_idx
+      ON ft_posts(created_at DESC);
+    CREATE INDEX IF NOT EXISTS ft_comments_post_idx
+      ON ft_comments(post_id, created_at);
+    CREATE INDEX IF NOT EXISTS ft_messages_pair_idx
+      ON ft_messages(sender_id, recipient_id, created_at);
+    CREATE INDEX IF NOT EXISTS ft_notifications_recipient_idx
+      ON ft_notifications(recipient_id, created_at DESC);
+  `);
+
+  console.log("FreeTube tables initialized.");
+}
+
+// Health and API info
+app.get("/", (req, res) => {
+  res.json({ name: "FreeTube Backend API", status: "running", version: "2.0.0" });
+});
+
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    databaseConfigured: Boolean(pool),
+    cloudinaryConfigured
+  });
+});
+
+app.get("/api/health/database", async (req, res, next) => {
+  if (!pool) {
+    return res.status(503).json({ status: "not_configured" });
+  }
+
+  try {
+    await pool.query("SELECT 1");
+    res.json({ status: "connected" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.get("/api", (req, res) => {
+  res.json({
+    message: "Welcome to FreeTube API",
+    endpoints: [
+      "POST /api/auth/register",
+      "POST /api/auth/login",
+      "GET /api/auth/me",
+      "GET /api/profile/:username",
+      "PUT /api/profile",
+      "GET /api/users/search?q=username",
+      "POST /api/media/upload",
+      "GET /api/posts",
+      "POST /api/posts",
+      "POST /api/posts/:id/like",
+      "GET /api/posts/:id/comments",
+      "POST /api/posts/:id/comments",
+      "GET /api/messages/:userId",
+      "POST /api/messages",
+      "GET /api/notifications",
+      "PATCH /api/notifications/:id/read"
+    ]
+  });
+});
+
+// Registration
 app.post("/api/auth/register", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
-    const username =
-      typeof req.body.username === "string"
-        ? req.body.username.trim()
-        : "";
-
-    const email =
-      typeof req.body.email === "string"
-        ? req.body.email.trim().toLowerCase()
-        : "";
-
-    const password =
-      typeof req.body.password === "string"
-        ? req.body.password
-        : "";
+    const username = cleanText(req.body.username, 50);
+    const email = cleanText(req.body.email, 255).toLowerCase();
+    const password = typeof req.body.password === "string"
+      ? req.body.password
+      : "";
 
     if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
       return res.status(400).json({
-        error:
-          "Username must be 3-50 characters using letters, numbers or underscores.",
+        error: "Username must be 3-50 characters using letters, numbers or underscores."
       });
     }
 
-    if (
-      email.length > 255 ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-      return res.status(400).json({
-        error: "Enter a valid email address.",
-      });
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Enter a valid email address." });
     }
 
-    if (
-      Buffer.byteLength(password, "utf8") < 8 ||
-      Buffer.byteLength(password, "utf8") > 128
-    ) {
+    const bytes = Buffer.byteLength(password, "utf8");
+    if (bytes < 8 || bytes > 128) {
       return res.status(400).json({
-        error: "Password must be 8-128 bytes long.",
+        error: "Password must be 8-128 bytes long."
       });
     }
 
     const existing = await pool.query(
-      `SELECT id
-       FROM users
+      `SELECT id FROM users
        WHERE LOWER(username) = LOWER($1)
-          OR LOWER(email) = LOWER($2)
-       LIMIT 1`,
+          OR LOWER(email) = LOWER($2) LIMIT 1`,
       [username, email]
     );
 
-    if (existing.rows.length > 0) {
+    if (existing.rows.length) {
       return res.status(409).json({
-        error: "Username or email is already registered.",
+        error: "Username or email is already registered."
       });
     }
 
@@ -339,34 +439,31 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     const result = await pool.query(
       `INSERT INTO users
-        (username, email, password_hash, role, account_status)
+       (username, email, password_hash, role, account_status)
        VALUES ($1, $2, $3, 'creator', 'active')
        RETURNING id, username, email, role, account_status, created_at`,
       [username, email, passwordHash]
     );
 
     const user = result.rows[0];
-    const token = createToken(user);
 
-    return res.status(201).json({
+    await pool.query(
+      `INSERT INTO ft_profiles (user_id, display_name)
+       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
+      [String(user.id), user.username]
+    );
+
+    res.status(201).json({
       message: "Account created successfully.",
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        account_status: user.account_status,
-        created_at: user.created_at,
-      },
+      token: createToken(user),
+      user: publicUser(user)
     });
   } catch (error) {
     if (error.code === "23505") {
       return res.status(409).json({
-        error: "Username or email is already registered.",
+        error: "Username or email is already registered."
       });
     }
-
     next(error);
   }
 });
@@ -376,23 +473,18 @@ app.post("/api/auth/login", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
-    const identifier =
-      typeof req.body.identifier === "string"
-        ? req.body.identifier.trim()
-        : typeof req.body.email === "string"
-        ? req.body.email.trim()
-        : typeof req.body.username === "string"
-        ? req.body.username.trim()
-        : "";
+    const identifier = cleanText(
+      req.body.identifier || req.body.email || req.body.username,
+      255
+    );
 
-    const password =
-      typeof req.body.password === "string"
-        ? req.body.password
-        : "";
+    const password = typeof req.body.password === "string"
+      ? req.body.password
+      : "";
 
-    if (!identifier || !password || identifier.length > 255) {
+    if (!identifier || !password) {
       return res.status(400).json({
-        error: "Enter your email or username and password.",
+        error: "Enter your email or username and password."
       });
     }
 
@@ -410,91 +502,681 @@ app.post("/api/auth/login", async (req, res, next) => {
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
       return res.status(401).json({
-        error: "Invalid username/email or password.",
+        error: "Invalid username/email or password."
       });
     }
 
     if (user.account_status !== "active") {
-      return res.status(403).json({
-        error: "This account is not active.",
-      });
+      return res.status(403).json({ error: "This account is not active." });
     }
 
-    const token = createToken(user);
+    await pool.query(
+      `INSERT INTO ft_profiles (user_id, display_name)
+       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
+      [String(user.id), user.username]
+    );
 
-    return res.json({
+    res.json({
       message: "Login successful.",
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        account_status: user.account_status,
-        created_at: user.created_at,
-      },
+      token: createToken(user),
+      user: publicUser(user)
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Current logged-in user
 app.get("/api/auth/me", requireAuth, (req, res) => {
-  const user = req.user;
-
-  res.json({
-    user: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      role: user.role,
-      account_status: user.account_status,
-      created_at: user.created_at,
-    },
-  });
+  res.json({ user: publicUser(req.user) });
 });
 
-// Unknown routes
+// Search users for the inbox
+app.get("/api/users/search", requireAuth, async (req, res, next) => {
+  try {
+    const q = cleanText(req.query.q, 50);
+
+    if (q.length < 2) {
+      return res.json({ users: [] });
+    }
+
+    const result = await pool.query(
+      `SELECT u.id, u.username, p.display_name, p.avatar_url
+       FROM users u
+       LEFT JOIN ft_profiles p ON p.user_id = u.id::text
+       WHERE u.account_status = 'active'
+         AND u.id::text <> $1
+         AND LOWER(u.username) LIKE LOWER($2)
+       ORDER BY u.username LIMIT 20`,
+      [String(req.user.id), `%${q}%`]
+    );
+
+    res.json({ users: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Read a profile by username
+app.get("/api/profile/:username", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const result = await pool.query(
+      `SELECT u.id, u.username, p.display_name, p.bio,
+              p.avatar_url, p.cover_url, p.updated_at
+       FROM users u
+       LEFT JOIN ft_profiles p ON p.user_id = u.id::text
+       WHERE LOWER(u.username) = LOWER($1)
+         AND u.account_status = 'active'
+       LIMIT 1`,
+      [cleanText(req.params.username, 50)]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const user = result.rows[0];
+
+    const count = await pool.query(
+      `SELECT
+         (SELECT COUNT(*) FROM ft_posts WHERE user_id = $1) AS posts,
+         (SELECT COUNT(*) FROM ft_likes l
+           JOIN ft_posts p ON p.id = l.post_id
+           WHERE p.user_id = $1) AS likes`,
+      [String(user.id)]
+    );
+
+    res.json({ profile: user, stats: count.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Update the signed-in user's profile
+app.put("/api/profile", requireAuth, async (req, res, next) => {
+  try {
+    const displayName = cleanText(req.body.display_name, 80);
+    const bio = cleanText(req.body.bio, 500);
+    const avatarUrl = cleanText(req.body.avatar_url, 2000);
+    const coverUrl = cleanText(req.body.cover_url, 2000);
+
+    for (const url of [avatarUrl, coverUrl]) {
+      if (url && !/^https:\/\/res\.cloudinary\.com\//i.test(url)) {
+        return res.status(400).json({
+          error: "Profile images must use a valid Cloudinary HTTPS URL."
+        });
+      }
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_profiles
+       (user_id, display_name, bio, avatar_url, cover_url, updated_at)
+       VALUES ($1, $2, $3, $4, $5, NOW())
+       ON CONFLICT (user_id) DO UPDATE SET
+         display_name = EXCLUDED.display_name,
+         bio = EXCLUDED.bio,
+         avatar_url = EXCLUDED.avatar_url,
+         cover_url = EXCLUDED.cover_url,
+         updated_at = NOW()
+       RETURNING *`,
+      [
+        String(req.user.id),
+        displayName || req.user.username,
+        bio,
+        avatarUrl || null,
+        coverUrl || null
+      ]
+    );
+
+    res.json({ message: "Profile updated.", profile: result.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Upload one image or video to Cloudinary
+app.post(
+  "/api/media/upload",
+  requireAuth,
+  (req, res, next) => {
+    if (!cloudinaryConfigured) {
+      return res.status(503).json({
+        error: "Cloudinary is not configured on the server."
+      });
+    }
+    next();
+  },
+  (req, res, next) => {
+    upload.single("file")(req, res, (error) => {
+      if (error) return next(error);
+      next();
+    });
+  },
+  async (req, res, next) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          error: 'Choose a file using the "file" field.'
+        });
+      }
+
+      const result = await sendCloudinaryUpload(
+        req.file.buffer,
+        req.file.mimetype
+      );
+
+      res.status(201).json({ media: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Create a post
+app.post("/api/posts", requireAuth, async (req, res, next) => {
+  try {
+    const content = cleanText(req.body.content, 5000);
+    const mediaUrl = cleanText(req.body.media_url, 2000);
+    const mediaType = cleanText(req.body.media_type, 20);
+    const mediaPublicId = cleanText(req.body.media_public_id, 255);
+
+    if (!content && !mediaUrl) {
+      return res.status(400).json({
+        error: "Write something or attach media to create a post."
+      });
+    }
+
+    if (
+      mediaUrl &&
+      !/^https:\/\/res\.cloudinary\.com\//i.test(mediaUrl)
+    ) {
+      return res.status(400).json({
+        error: "Post media must use a valid Cloudinary HTTPS URL."
+      });
+    }
+
+    if (mediaType && !["image", "video"].includes(mediaType)) {
+      return res.status(400).json({ error: "Invalid media type." });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_posts
+       (user_id, content, media_url, media_type, media_public_id)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
+      [
+        String(req.user.id),
+        content,
+        mediaUrl || null,
+        mediaType || null,
+        mediaPublicId || null
+      ]
+    );
+
+    res.status(201).json({
+      message: "Post created.",
+      post: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Feed
+app.get("/api/posts", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const limit = Math.min(
+      50,
+      Math.max(1, Number.parseInt(req.query.limit, 10) || 20)
+    );
+
+    const before = Number.parseInt(req.query.before, 10);
+    const result = await pool.query(
+      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type,
+              p.created_at, u.username,
+              pr.display_name, pr.avatar_url,
+              (SELECT COUNT(*) FROM ft_likes l
+                WHERE l.post_id = p.id) AS like_count,
+              (SELECT COUNT(*) FROM ft_comments c
+                WHERE c.post_id = p.id) AS comment_count,
+              EXISTS (
+                SELECT 1 FROM ft_likes l
+                WHERE l.post_id = p.id AND l.user_id = $2
+              ) AS liked_by_me
+       FROM ft_posts p
+       JOIN users u ON u.id::text = p.user_id
+       LEFT JOIN ft_profiles pr ON pr.user_id = p.user_id
+       WHERE u.account_status = 'active'
+         AND ($1::bigint IS NULL OR p.id < $1)
+       ORDER BY p.id DESC LIMIT $3`,
+      [
+        Number.isSafeInteger(before) && before > 0 ? before : null,
+        req.headers.authorization && verifyToken(
+          (req.headers.authorization.match(/^Bearer\s+(.+)$/i) || [])[1]
+        )
+          ? verifyToken(
+              req.headers.authorization.match(/^Bearer\s+(.+)$/i)[1]
+            ).sub
+          : "",
+        limit
+      ]
+    );
+
+    res.json({ posts: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Toggle like on/off
+app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
+  const postId = Number.parseInt(req.params.id, 10);
+  if (!Number.isSafeInteger(postId) || postId <= 0) {
+    return res.status(400).json({ error: "Invalid post ID." });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const post = await client.query(
+      "SELECT id, user_id FROM ft_posts WHERE id = $1 FOR UPDATE",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    const userId = String(req.user.id);
+    const existing = await client.query(
+      "SELECT 1 FROM ft_likes WHERE post_id = $1 AND user_id = $2",
+      [postId, userId]
+    );
+
+    let liked;
+
+    if (existing.rows.length) {
+      await client.query(
+        "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
+        [postId, userId]
+      );
+      liked = false;
+    } else {
+      await client.query(
+        "INSERT INTO ft_likes (post_id, user_id) VALUES ($1, $2)",
+        [postId, userId]
+      );
+      liked = true;
+
+      if (post.rows[0].user_id !== userId) {
+        await client.query(
+          `INSERT INTO ft_notifications
+           (recipient_id, actor_id, type, post_id, message)
+           VALUES ($1, $2, 'like', $3, $4)`,
+          [
+            post.rows[0].user_id,
+            userId,
+            postId,
+            `${req.user.username} liked your post.`
+          ]
+        );
+      }
+    }
+
+    const count = await client.query(
+      "SELECT COUNT(*) FROM ft_likes WHERE post_id = $1",
+      [postId]
+    );
+
+    await client.query("COMMIT");
+    res.json({ liked, like_count: Number(count.rows[0].count) });
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => {});
+    next(error);
+  } finally {
+    client.release();
+  }
+});
+
+// List comments for a post
+app.get("/api/posts/:id/comments", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const postId = Number.parseInt(req.params.id, 10);
+    if (!Number.isSafeInteger(postId) || postId <= 0) {
+      return res.status(400).json({ error: "Invalid post ID." });
+    }
+
+    const result = await pool.query(
+      `SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
+              u.username, p.avatar_url
+       FROM ft_comments c
+       JOIN users u ON u.id::text = c.user_id
+       LEFT JOIN ft_profiles p ON p.user_id = c.user_id
+       WHERE c.post_id = $1
+       ORDER BY c.id ASC LIMIT 100`,
+      [postId]
+    );
+
+    res.json({ comments: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Add a comment
+app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
+  try {
+    const postId = Number.parseInt(req.params.id, 10);
+    const content = cleanText(req.body.content, 2000);
+
+    if (!Number.isSafeInteger(postId) || postId <= 0 || !content) {
+      return res.status(400).json({
+        error: "A valid post ID and comment are required."
+      });
+    }
+
+    const post = await pool.query(
+      "SELECT user_id FROM ft_posts WHERE id = $1",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_comments (post_id, user_id, content)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [postId, String(req.user.id), content]
+    );
+
+    if (post.rows[0].user_id !== String(req.user.id)) {
+      await pool.query(
+        `INSERT INTO ft_notifications
+         (recipient_id, actor_id, type, post_id, message)
+         VALUES ($1, $2, 'comment', $3, $4)`,
+        [
+          post.rows[0].user_id,
+          String(req.user.id),
+          postId,
+          `${req.user.username} commented on your post.`
+        ]
+      );
+    }
+
+    res.status(201).json({
+      message: "Comment added.",
+      comment: {
+        ...result.rows[0],
+        username: req.user.username
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Inbox conversation
+app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
+  try {
+    const me = String(req.user.id);
+    const other = cleanText(req.params.userId, 100);
+
+    if (!other || other === me) {
+      return res.status(400).json({ error: "Invalid conversation user." });
+    }
+
+    const account = await pool.query(
+      "SELECT id FROM users WHERE id::text = $1 AND account_status = 'active'",
+      [other]
+    );
+
+    if (!account.rows.length) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    await pool.query(
+      `UPDATE ft_messages SET read_at = NOW()
+       WHERE sender_id = $1 AND recipient_id = $2 AND read_at IS NULL`,
+      [other, me]
+    );
+
+    const result = await pool.query(
+      `SELECT id, sender_id, recipient_id, content, created_at, read_at
+       FROM ft_messages
+       WHERE (sender_id = $1 AND recipient_id = $2)
+          OR (sender_id = $2 AND recipient_id = $1)
+       ORDER BY id DESC LIMIT 100`,
+      [me, other]
+    );
+
+    res.json({ messages: result.rows.reverse() });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Send a message
+app.post("/api/messages", requireAuth, async (req, res, next) => {
+  try {
+    const recipientId = cleanText(req.body.recipient_id, 100);
+    const content = cleanText(req.body.content, 5000);
+    const senderId = String(req.user.id);
+
+    if (!recipientId || recipientId === senderId || !content) {
+      return res.status(400).json({
+        error: "A valid recipient and message are required."
+      });
+    }
+
+    const recipient = await pool.query(
+      `SELECT id FROM users
+       WHERE id::text = $1 AND account_status = 'active'`,
+      [recipientId]
+    );
+
+    if (!recipient.rows.length) {
+      return res.status(404).json({ error: "Recipient not found." });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_messages (sender_id, recipient_id, content)
+       VALUES ($1, $2, $3) RETURNING *`,
+      [senderId, recipientId, content]
+    );
+
+    await pool.query(
+      `INSERT INTO ft_notifications
+       (recipient_id, actor_id, type, message)
+       VALUES ($1, $2, 'message', $3)`,
+      [
+        recipientId,
+        senderId,
+        `New message from ${req.user.username}.`
+      ]
+    );
+
+    res.status(201).json({
+      message: "Message sent.",
+      item: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Inbox conversation list
+app.get("/api/messages", requireAuth, async (req, res, next) => {
+  try {
+    const me = String(req.user.id);
+
+    const result = await pool.query(
+      `WITH conversation_messages AS (
+         SELECT *,
+           CASE WHEN sender_id = $1 THEN recipient_id ELSE sender_id END AS other_id
+         FROM ft_messages
+         WHERE sender_id = $1 OR recipient_id = $1
+       ),
+       latest AS (
+         SELECT DISTINCT ON (other_id)
+           other_id, id, sender_id, recipient_id, content, created_at
+         FROM conversation_messages
+         ORDER BY other_id, id DESC
+       )
+       SELECT l.*, u.username, p.display_name, p.avatar_url,
+         (SELECT COUNT(*) FROM ft_messages m
+          WHERE m.sender_id = l.other_id
+            AND m.recipient_id = $1
+            AND m.read_at IS NULL) AS unread_count
+       FROM latest l
+       JOIN users u ON u.id::text = l.other_id
+       LEFT JOIN ft_profiles p ON p.user_id = l.other_id
+       ORDER BY l.id DESC`,
+      [me]
+    );
+
+    res.json({ conversations: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Notifications
+app.get("/api/notifications", requireAuth, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `SELECT n.*, u.username AS actor_username
+       FROM ft_notifications n
+       LEFT JOIN users u ON u.id::text = n.actor_id
+       WHERE n.recipient_id = $1
+       ORDER BY n.id DESC LIMIT 100`,
+      [String(req.user.id)]
+    );
+
+    const unread = await pool.query(
+      `SELECT COUNT(*) FROM ft_notifications
+       WHERE recipient_id = $1 AND read_at IS NULL`,
+      [String(req.user.id)]
+    );
+
+    res.json({
+      notifications: result.rows,
+      unread_count: Number(unread.rows[0].count)
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Mark one notification as read
+app.patch(
+  "/api/notifications/:id/read",
+  requireAuth,
+  async (req, res, next) => {
+    try {
+      const id = Number.parseInt(req.params.id, 10);
+
+      if (!Number.isSafeInteger(id) || id <= 0) {
+        return res.status(400).json({ error: "Invalid notification ID." });
+      }
+
+      const result = await pool.query(
+        `UPDATE ft_notifications SET read_at = NOW()
+         WHERE id = $1 AND recipient_id = $2
+         RETURNING id, read_at`,
+        [id, String(req.user.id)]
+      );
+
+      if (!result.rows.length) {
+        return res.status(404).json({ error: "Notification not found." });
+      }
+
+      res.json({ notification: result.rows[0] });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+// Mark all notifications as read
+app.patch("/api/notifications/read-all", requireAuth, async (req, res, next) => {
+  try {
+    const result = await pool.query(
+      `UPDATE ft_notifications SET read_at = NOW()
+       WHERE recipient_id = $1 AND read_at IS NULL`,
+      [String(req.user.id)]
+    );
+
+    res.json({ message: "Notifications marked as read.", updated: result.rowCount });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// 404
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
 });
 
-// Central error handler
+// Error handler
 app.use((error, req, res, next) => {
-  if (res.headersSent) {
-    return next(error);
-  }
+  if (res.headersSent) return next(error);
 
   if (error.message === "Origin not allowed by CORS") {
     return res.status(403).json({ error: "Origin not allowed." });
   }
 
+  if (error instanceof multer.MulterError) {
+    return res.status(400).json({
+      error: error.code === "LIMIT_FILE_SIZE"
+        ? "File is too large. Maximum size is 50 MB."
+        : "Upload failed. Check the file and try again."
+    });
+  }
+
+  if (
+    error.message &&
+    error.message.startsWith("Unsupported file type")
+  ) {
+    return res.status(400).json({ error: error.message });
+  }
+
   console.error("Request failed:", {
     code: error.code,
-    message: error.message,
+    message: error.message
   });
 
-  return res.status(500).json({
-    error: "Internal server error.",
-  });
+  res.status(500).json({ error: "Internal server error." });
 });
 
-// Start server
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`FreeTube API listening on port ${PORT}`);
-});
+// Initialize tables before accepting requests
+async function startServer() {
+  try {
+    if (pool) await initializeDatabase();
 
-// Graceful shutdown
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`FreeTube API listening on port ${PORT}`);
+    });
+  } catch (error) {
+    console.error("Startup failed:", error.message);
+    process.exit(1);
+  }
+}
+
 async function shutdown() {
-  server.close(async () => {
-    if (pool) {
-      await pool.end().catch(() => {});
-    }
-
-    process.exit(0);
-  });
+  if (pool) await pool.end().catch(() => {});
+  process.exit(0);
 }
 
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
+
+startServer();
