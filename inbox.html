@@ -1,0 +1,521 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#173d2b">
+<title>FreeTube - Inbox</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+:root{--green:#00d084;--bg:#101713;--panel:#19231d;--text:#f4fff7;--muted:#9caaa1;--red:#e84b5b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(145deg,#102d20,#111713 45%,#281419);color:var(--text);min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.topbar{position:sticky;top:0;z-index:5;background:#101713ed;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff12;padding:15px 16px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
+.brand-icon{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#00c878,#006c43);display:grid;place-items:center;color:white}
+.brand span{color:var(--green)}
+.icon-btn{width:42px;height:42px;border:1px solid #ffffff18;background:#ffffff09;color:white;border-radius:14px;font-size:17px}
+.page{max-width:780px;margin:auto;padding:20px 14px 100px}
+.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+h1{font-size:28px}
+.subtitle{font-size:13px;color:var(--muted);margin:8px 0 20px}
+.searchbox{display:flex;align-items:center;gap:10px;padding:13px 15px;background:#ffffff0c;border:1px solid #ffffff12;border-radius:16px;margin-bottom:18px}
+.searchbox i{color:var(--muted)}
+.searchbox input{width:100%;background:none;border:0;outline:none;color:white;font-size:14px}
+.section-title{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;margin:22px 0 12px}
+.small-muted{font-size:12px;color:var(--muted);font-weight:400}
+.chat-list{display:flex;flex-direction:column;gap:8px}
+.chat-row{display:flex;align-items:center;gap:12px;padding:13px;background:#ffffff08;border:1px solid #ffffff0c;border-radius:17px;text-align:left;color:white;width:100%;min-width:0}
+.chat-row:active{background:#ffffff15}
+.avatar{width:49px;height:49px;flex-shrink:0;border-radius:50%;object-fit:cover;background:#254332;display:grid;place-items:center;color:#d4ffdf;font-weight:bold;font-size:19px}
+.avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.chat-info{flex:1;min-width:0}
+.chat-name-line{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.chat-name{font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.handle{font-size:12px;color:var(--muted);margin-top:3px}
+.last-message{font-size:13px;color:#aebbb2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.time{font-size:10px;color:var(--muted)}
+.unread{background:var(--green);color:#062d1b;font-size:11px;font-weight:bold;min-width:20px;height:20px;padding:0 6px;border-radius:20px;display:grid;place-items:center}
+.empty{padding:35px 15px;text-align:center;color:var(--muted);background:#ffffff06;border:1px dashed #ffffff20;border-radius:17px;line-height:1.7}
+.empty i{font-size:30px;color:var(--green);display:block;margin-bottom:12px}
+.primary-btn{background:linear-gradient(135deg,#00c878,#007c4b);border:0;border-radius:13px;color:white;font-weight:bold;padding:12px 15px}
+.secondary-btn{background:#ffffff10;border:1px solid #ffffff1c;color:white;border-radius:12px;padding:10px 13px}
+.status{font-size:13px;color:var(--muted);padding:12px 2px;line-height:1.6}
+.status.error{color:#ff9ca5}
+.bottom-nav{position:fixed;z-index:8;bottom:0;left:0;right:0;background:#111813f5;backdrop-filter:blur(16px);border-top:1px solid #ffffff15;display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;color:#92a096;font-size:10px;min-width:53px}
+.nav-item i{font-size:19px}
+.nav-item.active{color:var(--green)}
+.overlay{position:fixed;inset:0;background:#000b;z-index:20;display:none;align-items:stretch;justify-content:center}
+.overlay.show{display:flex}
+.chat-window{width:100%;max-width:780px;background:#111914;display:flex;flex-direction:column;min-height:0;height:100%;padding-bottom:env(safe-area-inset-bottom)}
+.chat-header{display:flex;align-items:center;gap:11px;padding:12px;border-bottom:1px solid #ffffff15;background:#17211a}
+.chat-person{flex:1;min-width:0}
+.chat-person strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chat-person small{color:var(--muted);font-size:12px}
+.messages{flex:1;overflow-y:auto;padding:18px 13px;display:flex;flex-direction:column;gap:10px}
+.date-note{text-align:center;color:var(--muted);font-size:11px;margin:6px 0}
+.bubble-row{display:flex;width:100%}
+.bubble-row.mine{justify-content:flex-end}
+.bubble{max-width:82%;padding:11px 13px;border-radius:17px;background:#26352b;color:#f5fff7;font-size:14px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.mine .bubble{background:linear-gradient(135deg,#087f50,#075b3d);border-bottom-right-radius:5px}
+.theirs .bubble{border-bottom-left-radius:5px}
+.bubble-time{text-align:right;color:#c4d9cc;font-size:10px;margin-top:5px}
+.compose{display:flex;align-items:flex-end;gap:9px;padding:12px;background:#17211a;border-top:1px solid #ffffff12}
+.compose textarea{flex:1;min-width:0;max-height:120px;resize:none;background:#ffffff0b;border:1px solid #ffffff17;border-radius:20px;color:white;padding:12px 15px;outline:none;line-height:1.4}
+.send-btn{width:45px;height:45px;flex-shrink:0;border:0;border-radius:50%;background:var(--green);color:#07321f;font-size:17px}
+.modal-card{margin:auto;width:calc(100% - 24px);max-width:480px;max-height:82vh;display:flex;flex-direction:column;background:#17211a;border:1px solid #ffffff20;border-radius:22px;overflow:hidden}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px;border-bottom:1px solid #ffffff15}
+.modal-head h2{font-size:19px}
+.modal-body{padding:15px;overflow:auto}
+.search-hint{font-size:12px;color:var(--muted);margin:0 0 12px}
+.user-result{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:white;background:#ffffff07;border:1px solid #ffffff0c;border-radius:14px;padding:12px;margin-bottom:8px}
+.user-result .chat-info{overflow:hidden}
+@media(min-width:600px){.chat-window{height:min(850px,95vh);align-self:center;border:1px solid #ffffff25;border-radius:20px;overflow:hidden}.overlay{padding:2vh 12px}}
+</style>
+</head>
+
+<body>
+<header class="topbar">
+  <button class="icon-btn" id="backBtn" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
+  <div class="brand"><div class="brand-icon"><i class="fa-solid fa-play"></i></div>Free<span>Tube</span></div>
+  <button class="icon-btn" id="newChatBtn" aria-label="New message"><i class="fa-solid fa-pen-to-square"></i></button>
+</header>
+
+<main class="page">
+  <div class="page-heading">
+    <h1>Messages</h1>
+    <button class="primary-btn" id="startChatBtn"><i class="fa-solid fa-plus"></i> New</button>
+  </div>
+  <p class="subtitle">Talk to people in the FreeTube community.</p>
+
+  <label class="searchbox">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="search" id="conversationSearch" placeholder="Search conversations..." autocomplete="off">
+  </label>
+
+  <div class="section-title"><span>Your conversations</span><span class="small-muted" id="conversationCount"></span></div>
+  <div id="chatList" class="chat-list">
+    <div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading conversations...</div>
+  </div>
+  <div id="pageStatus" class="status" role="status" aria-live="polite"></div>
+</main>
+
+<nav class="bottom-nav">
+  <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a class="nav-item" href="home.html#discover"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
+  <a class="nav-item" href="home.html"><i class="fa-solid fa-circle-plus"></i><span>Create</span></a>
+  <a class="nav-item active" href="inbox.html"><i class="fa-solid fa-envelope"></i><span>Inbox</span></a>
+  <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i><span>Profile</span></a>
+</nav>
+
+<!-- Chat window -->
+<div class="overlay" id="chatOverlay" role="dialog" aria-modal="true" aria-label="Conversation">
+  <section class="chat-window">
+    <header class="chat-header">
+      <button class="icon-btn" id="closeChatBtn" aria-label="Close conversation"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="avatar" id="activeAvatar">?</div>
+      <div class="chat-person"><strong id="activeName">Conversation</strong><small id="activeHandle"></small></div>
+      <button class="icon-btn" id="refreshChatBtn" aria-label="Refresh messages"><i class="fa-solid fa-rotate"></i></button>
+    </header>
+    <div class="messages" id="messageList"><div class="status">Loading messages...</div></div>
+    <form class="compose" id="messageForm">
+      <textarea id="messageInput" rows="1" maxlength="5000" placeholder="Write a message..." aria-label="Write a message" required></textarea>
+      <button class="send-btn" id="sendBtn" type="submit" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
+    </form>
+  </section>
+</div>
+
+<!-- New conversation modal -->
+<div class="overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Find people">
+  <section class="modal-card">
+    <header class="modal-head">
+      <h2>New message</h2>
+      <button class="icon-btn" id="closeSearchBtn" aria-label="Close search"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="modal-body">
+      <label class="searchbox">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="search" id="userSearch" placeholder="Search by username..." autocomplete="off">
+      </label>
+      <p class="search-hint">Type at least 2 characters to find FreeTube users.</p>
+      <div id="userResults"><div class="empty"><i class="fa-solid fa-users"></i>Search for a user to start a conversation.</div></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let conversations = [];
+let activeUser = null;
+let messages = [];
+let loadingMessages = false;
+let sending = false;
+let searchTimer = null;
+let searchRequestId = 0;
+
+function getToken(){
+  try { return localStorage.getItem(TOKEN_KEY); }
+  catch(e){ return null; }
+}
+
+async function api(path, options = {}){
+  const token = getToken();
+  if(!token) throw new Error("Your session is missing. Please log in to FreeTube again.");
+
+  const headers = {
+    "Authorization": "Bearer " + token,
+    ...(options.body ? {"Content-Type":"application/json"} : {}),
+    ...(options.headers || {})
+  };
+
+  let response;
+  try {
+    response = await fetch(API_BASE_URL + path, {...options, headers});
+  } catch(e) {
+    throw new Error("Cannot connect to the server. Check your internet connection and try again.");
+  }
+
+  let data = {};
+  try { data = await response.json(); } catch(e) {}
+
+  if(!response.ok){
+    if(response.status === 401 || response.status === 403){
+      throw new Error("Your login session may have expired. Please log in again.");
+    }
+    throw new Error(data.error || data.message || "Request failed (" + response.status + ").");
+  }
+  return data;
+}
+
+function escapeHTML(value){
+  return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+
+function displayName(user){
+  return user.display_name || user.name || user.username || "FreeTube user";
+}
+
+function avatarHTML(user, className = "avatar"){
+  const name = displayName(user);
+  const initial = escapeHTML((name.trim()[0] || "?").toUpperCase());
+  const url = user.avatar_url || user.avatar || "";
+  if(url && /^https?:\/\//i.test(url)){
+    return '<div class="'+className+'"><img src="'+escapeHTML(url)+'" alt="" loading="lazy" onerror="this.parentElement.textContent='+JSON.stringify((name.trim()[0] || "?").toUpperCase())+'"></div>';
+  }
+  return '<div class="'+className+'">'+initial+'</div>';
+}
+
+function setPageStatus(message, isError = false){
+  $("pageStatus").textContent = message || "";
+  $("pageStatus").className = "status" + (isError ? " error" : "");
+}
+
+function formatTime(value){
+  if(!value) return "";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "";
+  const now = new Date();
+  if(date.toDateString() === now.toDateString()){
+    return date.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  }
+  return date.toLocaleDateString([], {month:"short", day:"numeric"});
+}
+
+function formatMessageTime(value){
+  if(!value) return "";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+}
+
+function openOverlay(id){ $(id).classList.add("show"); }
+function closeOverlay(id){ $(id).classList.remove("show"); }
+
+function renderConversations(){
+  const query = $("conversationSearch").value.trim().toLowerCase();
+  const filtered = conversations.filter(c => {
+    const name = displayName(c).toLowerCase();
+    const username = String(c.username || "").toLowerCase();
+    const last = String(c.content || "").toLowerCase();
+    return !query || name.includes(query) || username.includes(query) || last.includes(query);
+  });
+
+  $("conversationCount").textContent = conversations.length
+    ? conversations.length + (conversations.length === 1 ? " chat" : " chats")
+    : "";
+
+  if(!filtered.length){
+    $("chatList").innerHTML = '<div class="empty"><i class="fa-regular fa-comments"></i>'+
+      (query ? 'No conversations match your search.' : 'No messages yet.<br>Start a conversation with a FreeTube user.')+
+      '<br><button class="primary-btn" style="margin-top:15px" id="emptyNewChat"><i class="fa-solid fa-plus"></i> New message</button></div>';
+    const btn = $("emptyNewChat");
+    if(btn) btn.addEventListener("click", showUserSearch);
+    return;
+  }
+
+  $("chatList").innerHTML = filtered.map(c => {
+    const id = String(c.other_id);
+    const unread = Number(c.unread_count || 0);
+    const preview = c.content
+      ? ((String(c.sender_id) === String(currentUser.id) ? "You: " : "") + c.content)
+      : "Start a conversation";
+    return '<button class="chat-row" type="button" data-user-id="'+escapeHTML(id)+'">'+
+      avatarHTML(c)+
+      '<div class="chat-info"><div class="chat-name-line"><span class="chat-name">'+escapeHTML(displayName(c))+'</span></div>'+
+      '<div class="last-message">'+escapeHTML(preview)+'</div>'+
+      '<div class="handle">@'+escapeHTML(c.username || "user")+'</div></div>'+
+      '<div class="chat-meta"><span class="time">'+escapeHTML(formatTime(c.created_at))+'</span>'+
+      (unread ? '<span class="unread">'+(unread > 99 ? "99+" : unread)+'</span>' : '')+
+      '</div></button>';
+  }).join("");
+
+  $("chatList").querySelectorAll("[data-user-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const contact = conversations.find(c => String(c.other_id) === btn.dataset.userId);
+      if(contact) openChat({
+        id: contact.other_id,
+        username: contact.username,
+        display_name: contact.display_name,
+        avatar_url: contact.avatar_url
+      });
+    });
+  });
+}
+
+async function loadConversations(){
+  try{
+    const data = await api("/messages");
+    conversations = Array.isArray(data.conversations) ? data.conversations : [];
+    renderConversations();
+    setPageStatus("");
+  }catch(error){
+    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>'+escapeHTML(error.message)+'<br><button class="secondary-btn" id="retryConversations" style="margin-top:15px">Try again</button></div>';
+    $("retryConversations").addEventListener("click", loadConversations);
+    setPageStatus("", true);
+  }
+}
+
+function renderMessages(){
+  const list = $("messageList");
+  if(!messages.length){
+    list.innerHTML = '<div class="empty"><i class="fa-regular fa-paper-plane"></i>No messages here yet.<br>Say hello!</div>';
+    return;
+  }
+
+  list.innerHTML = messages.map(m => {
+    const mine = String(m.sender_id) === String(currentUser.id);
+    return '<div class="bubble-row '+(mine ? "mine" : "theirs")+'"><div class="bubble">'+
+      escapeHTML(m.content)+'<div class="bubble-time">'+escapeHTML(formatMessageTime(m.created_at))+
+      (mine && m.read_at ? ' · Seen' : '')+'</div></div></div>';
+  }).join("");
+
+  list.scrollTop = list.scrollHeight;
+}
+
+async function loadMessages(){
+  if(!activeUser || loadingMessages) return;
+  loadingMessages = true;
+  $("messageList").innerHTML = '<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading messages...</div>';
+  try{
+    const data = await api("/messages/" + encodeURIComponent(activeUser.id));
+    if(!activeUser) return;
+    messages = Array.isArray(data.messages) ? data.messages : [];
+    renderMessages();
+    await loadConversations();
+  }catch(error){
+    $("messageList").innerHTML = '<div class="empty">'+escapeHTML(error.message)+'<br><button class="secondary-btn" id="retryMessages" style="margin-top:12px">Try again</button></div>';
+    const retry = $("retryMessages");
+    if(retry) retry.addEventListener("click", loadMessages);
+  }finally{
+    loadingMessages = false;
+  }
+}
+
+async function openChat(user){
+  if(!user || user.id == null) return;
+  activeUser = {
+    id: user.id,
+    username: user.username || "",
+    display_name: user.display_name || user.name || user.username || "FreeTube user",
+    avatar_url: user.avatar_url || ""
+  };
+  messages = [];
+
+  $("activeName").textContent = displayName(activeUser);
+  $("activeHandle").textContent = activeUser.username ? "@"+activeUser.username : "FreeTube messages";
+  $("activeAvatar").innerHTML = avatarHTML(activeUser).replace(/^<div class="avatar">|<\/div>$/g,"");
+  if(activeUser.avatar_url && /^https?:\/\//i.test(activeUser.avatar_url)){
+    $("activeAvatar").innerHTML = '<img src="'+escapeHTML(activeUser.avatar_url)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  }else{
+    $("activeAvatar").textContent = (displayName(activeUser).trim()[0] || "?").toUpperCase();
+  }
+
+  closeOverlay("searchOverlay");
+  openOverlay("chatOverlay");
+  $("messageInput").value = "";
+  await loadMessages();
+  $("messageInput").focus();
+}
+
+async function sendMessage(event){
+  event.preventDefault();
+  if(sending || !activeUser) return;
+  const input = $("messageInput");
+  const content = input.value.trim();
+  if(!content) return;
+
+  sending = true;
+  $("sendBtn").disabled = true;
+  try{
+    await api("/messages", {
+      method:"POST",
+      body:JSON.stringify({
+        recipient_id:activeUser.id,
+        content:content
+      })
+    });
+    input.value = "";
+    input.style.height = "auto";
+    await loadMessages();
+  }catch(error){
+    alert(error.message);
+  }finally{
+    sending = false;
+    $("sendBtn").disabled = false;
+    input.focus();
+  }
+}
+
+function showUserSearch(){
+  $("userSearch").value = "";
+  $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-users"></i>Type a username to find people.</div>';
+  openOverlay("searchOverlay");
+  $("userSearch").focus();
+}
+
+async function searchUsers(query){
+  const requestId = ++searchRequestId;
+  if(query.length < 2){
+    $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i>Type at least 2 characters to search.</div>';
+    return;
+  }
+
+  $("userResults").innerHTML = '<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</div>';
+  try{
+    const data = await api("/users/search?q=" + encodeURIComponent(query));
+    if(requestId !== searchRequestId) return;
+
+    const users = Array.isArray(data.users) ? data.users : [];
+    const filtered = users.filter(u => String(u.id) !== String(currentUser.id));
+
+    if(!filtered.length){
+      $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-user-slash"></i>No users found. Try another username.</div>';
+      return;
+    }
+
+    $("userResults").innerHTML = filtered.map(u =>
+      '<button class="user-result" type="button" data-user-id="'+escapeHTML(u.id)+'">'+
+      avatarHTML(u)+
+      '<div class="chat-info"><div class="chat-name">'+escapeHTML(displayName(u))+'</div>'+
+      '<div class="handle">@'+escapeHTML(u.username || "user")+'</div></div>'+
+      '<i class="fa-solid fa-chevron-right" style="color:#91a397"></i></button>'
+    ).join("");
+
+    $("userResults").querySelectorAll("[data-user-id]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const user = filtered.find(u => String(u.id) === btn.dataset.userId);
+        if(user) openChat(user);
+      });
+    });
+  }catch(error){
+    if(requestId !== searchRequestId) return;
+    $("userResults").innerHTML = '<div class="empty">'+escapeHTML(error.message)+'</div>';
+  }
+}
+
+$("conversationSearch").addEventListener("input", renderConversations);
+$("newChatBtn").addEventListener("click", showUserSearch);
+$("startChatBtn").addEventListener("click", showUserSearch);
+$("closeChatBtn").addEventListener("click", () => {
+  closeOverlay("chatOverlay");
+  activeUser = null;
+  loadConversations();
+});
+$("closeSearchBtn").addEventListener("click", () => closeOverlay("searchOverlay"));
+$("refreshChatBtn").addEventListener("click", loadMessages);
+$("messageForm").addEventListener("submit", sendMessage);
+$("userSearch").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  const query = $("userSearch").value.trim();
+  searchTimer = setTimeout(() => searchUsers(query), 300);
+});
+$("messageInput").addEventListener("input", function(){
+  this.style.height = "auto";
+  this.style.height = Math.min(this.scrollHeight,120) + "px";
+});
+$("backBtn").addEventListener("click", () => {
+  if(history.length > 1) history.back();
+  else window.location.href = "home.html";
+});
+
+$("chatOverlay").addEventListener("click", e => {
+  if(e.target === $("chatOverlay")){
+    closeOverlay("chatOverlay");
+    activeUser = null;
+    loadConversations();
+  }
+});
+$("searchOverlay").addEventListener("click", e => {
+  if(e.target === $("searchOverlay")) closeOverlay("searchOverlay");
+});
+
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape"){
+    closeOverlay("searchOverlay");
+    closeOverlay("chatOverlay");
+    activeUser = null;
+  }
+});
+
+async function init(){
+  if(!getToken()){
+    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-lock"></i>You need to log in before using messages.<br><button class="primary-btn" id="loginNow" style="margin-top:15px">Go to Login</button></div>';
+    $("loginNow").addEventListener("click", () => window.location.href = "login.html");
+    return;
+  }
+
+  try{
+    const data = await api("/auth/me");
+    currentUser = data.user;
+    if(!currentUser || currentUser.id == null) throw new Error("Could not identify your account.");
+    await loadConversations();
+  }catch(error){
+    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-lock"></i>'+escapeHTML(error.message)+'<br><button class="primary-btn" id="loginNow" style="margin-top:15px">Go to Login</button></div>';
+    $("loginNow").addEventListener("click", () => {
+      try{localStorage.removeItem(TOKEN_KEY);}catch(e){}
+      window.location.href = "login.html";
+    });
+  }
+}
+
+init();
+})();
+</script>
+</body>
+</html>
