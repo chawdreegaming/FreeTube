@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -136,7 +135,9 @@ async function verifyPassword(password, storedHash) {
 
     const storedKey = Buffer.from(parts[2], "hex");
 
-    if (storedKey.length !== 64) return false;
+    if (storedKey.length !== 64) {
+      return false;
+    }
 
     const derivedKey = await scryptAsync(password, parts[1], 64);
 
@@ -175,7 +176,10 @@ function verifyToken(token) {
   }
 
   const parts = token.split(".");
-  if (parts.length !== 2) return null;
+
+  if (parts.length !== 2) {
+    return null;
+  }
 
   const [encoded, supplied] = parts;
 
@@ -271,12 +275,6 @@ function cleanText(value, maxLength = 2000) {
   return value.trim().slice(0, maxLength);
 }
 
-/*
- * Generate a username from the user's full name.
- * Example: "Abdur Rouf" -> "abdur_rouf".
- * If the name contains no English letters or digits,
- * use "user" as the base.
- */
 function makeUsernameBase(fullName) {
   let username = String(fullName || "")
     .normalize("NFKD")
@@ -307,6 +305,60 @@ function publicUser(user) {
   };
 }
 
+function isCloudinaryUrl(value) {
+  try {
+    const parsed = new URL(value);
+
+    return parsed.protocol === "https:" &&
+      parsed.hostname === "res.cloudinary.com" &&
+      parsed.pathname.split("/").filter(Boolean).length >= 3;
+  } catch (_) {
+    return false;
+  }
+}
+
+function checkFileSignature(buffer, mimetype) {
+  if (!buffer || buffer.length < 12) return false;
+
+  if (mimetype === "image/jpeg") {
+    return buffer[0] === 0xff &&
+      buffer[1] === 0xd8 &&
+      buffer[2] === 0xff;
+  }
+
+  if (mimetype === "image/png") {
+    return buffer.subarray(0, 8).equals(
+      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
+    );
+  }
+
+  if (mimetype === "image/gif") {
+    return ["GIF87a", "GIF89a"].includes(
+      buffer.subarray(0, 6).toString("ascii")
+    );
+  }
+
+  if (mimetype === "image/webp") {
+    return buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
+      buffer.subarray(8, 12).toString("ascii") === "WEBP";
+  }
+
+  if (
+    mimetype === "video/mp4" ||
+    mimetype === "video/quicktime"
+  ) {
+    return buffer.subarray(4, 8).toString("ascii") === "ftyp";
+  }
+
+  if (mimetype === "video/webm") {
+    return buffer.subarray(0, 4).equals(
+      Buffer.from([0x1a, 0x45, 0xdf, 0xa3])
+    );
+  }
+
+  return false;
+}
+
 function sendCloudinaryUpload(buffer, mimetype) {
   return new Promise((resolve, reject) => {
     const resourceType = mimetype.startsWith("video/")
@@ -333,8 +385,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
     stream.end(buffer);
   });
 }
-
-// Initialize new tables without deleting existing users or posts.
+// Initialize database tables without deleting existing data.
 async function initializeDatabase() {
   if (!pool) return;
 
@@ -395,8 +446,31 @@ async function initializeDatabase() {
       read_at TIMESTAMPTZ
     );
 
+    CREATE TABLE IF NOT EXISTS ft_follows (
+      follower_id TEXT NOT NULL,
+      following_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (follower_id, following_id),
+      CHECK (follower_id <> following_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_post_reports (
+      id BIGSERIAL PRIMARY KEY,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
+      reporter_id TEXT NOT NULL,
+      reason VARCHAR(500) NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending', 'reviewed', 'dismissed')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (post_id, reporter_id)
+    );
+
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
+
+    CREATE INDEX IF NOT EXISTS ft_posts_user_idx
+      ON ft_posts(user_id, created_at DESC);
 
     CREATE INDEX IF NOT EXISTS ft_comments_post_idx
       ON ft_comments(post_id, created_at);
@@ -406,17 +480,20 @@ async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS ft_notifications_recipient_idx
       ON ft_notifications(recipient_id, created_at DESC);
+
+    CREATE INDEX IF NOT EXISTS ft_follows_following_idx
+      ON ft_follows(following_id);
   `);
 
-  console.log("FreeTube tables initialized.");
+  console.log("FreeTube database initialized.");
 }
 
-// Health endpoints
+// Health endpoints.
 app.get("/", (req, res) => {
   res.json({
     name: "FreeTube Backend API",
     status: "running",
-    version: "2.1.0"
+    version: "3.0.0"
   });
 });
 
@@ -456,9 +533,16 @@ app.get("/api", (req, res) => {
       "POST /api/media/upload",
       "GET /api/posts",
       "POST /api/posts",
+      "PUT /api/posts/:id",
+      "DELETE /api/posts/:id",
       "POST /api/posts/:id/like",
       "GET /api/posts/:id/comments",
       "POST /api/posts/:id/comments",
+      "POST /api/posts/:id/report",
+      "POST /api/users/:id/follow",
+      "DELETE /api/users/:id/follow",
+      "GET /api/users/:id/followers",
+      "GET /api/users/:id/following",
       "GET /api/messages/:userId",
       "POST /api/messages",
       "GET /api/messages",
@@ -469,7 +553,7 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Registration: username is generated automatically.
+// Registration.
 app.post("/api/auth/register", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -513,8 +597,6 @@ app.post("/api/auth/register", async (req, res, next) => {
     client = await pool.connect();
     await client.query("BEGIN");
 
-    // Prevent two registrations from choosing the same generated name
-    // at the same time. This lock is held only during registration.
     await client.query(
       "SELECT pg_advisory_xact_lock(hashtext($1))",
       [baseUsername]
@@ -529,7 +611,6 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     if (existingEmail.rows.length) {
       await client.query("ROLLBACK");
-
       return res.status(409).json({
         error: "This email is already registered."
       });
@@ -538,18 +619,10 @@ app.post("/api/auth/register", async (req, res, next) => {
     let user = null;
 
     for (let attempt = 0; attempt < 100; attempt++) {
-      let username;
+      const suffix = attempt === 0 ? "" : String(attempt + 1);
+      const username =
+        baseUsername.slice(0, 50 - suffix.length) + suffix;
 
-      if (attempt === 0) {
-        username = baseUsername;
-      } else {
-        const suffix = String(attempt + 1);
-        username =
-          baseUsername.slice(0, 50 - suffix.length) + suffix;
-      }
-
-      // Savepoints allow a duplicate username to be retried safely
-      // without leaving the PostgreSQL transaction in an error state.
       await client.query("SAVEPOINT username_attempt");
 
       try {
@@ -569,43 +642,35 @@ app.post("/api/auth/register", async (req, res, next) => {
         await client.query("ROLLBACK TO SAVEPOINT username_attempt");
         await client.query("RELEASE SAVEPOINT username_attempt");
 
-        if (error.code === "23505") {
-          const duplicateEmail = await client.query(
-            `SELECT id FROM users
-             WHERE LOWER(email) = LOWER($1)
-             LIMIT 1`,
-            [email]
-          );
+        if (error.code !== "23505") throw error;
 
-          if (duplicateEmail.rows.length) {
-            await client.query("ROLLBACK");
+        const duplicateEmail = await client.query(
+          `SELECT id FROM users
+           WHERE LOWER(email) = LOWER($1)
+           LIMIT 1`,
+          [email]
+        );
 
-            return res.status(409).json({
-              error: "This email is already registered."
-            });
-          }
-
-          // A username collision: try the next suffix.
-          continue;
+        if (duplicateEmail.rows.length) {
+          await client.query("ROLLBACK");
+          return res.status(409).json({
+            error: "This email is already registered."
+          });
         }
-
-        throw error;
       }
     }
 
     if (!user) {
       await client.query("ROLLBACK");
-
       return res.status(409).json({
-        error: "Could not generate a unique username. Please try again."
+        error: "Could not generate a unique username."
       });
     }
 
     await client.query(
       `INSERT INTO ft_profiles (user_id, display_name)
        VALUES ($1, $2)
-       ON CONFLICT (user_id) DO UPDATE
-       SET display_name = EXCLUDED.display_name`,
+       ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), fullName]
     );
 
@@ -623,20 +688,13 @@ app.post("/api/auth/register", async (req, res, next) => {
     if (client) {
       await client.query("ROLLBACK").catch(() => {});
     }
-
-    if (error.code === "23505") {
-      return res.status(409).json({
-        error: "This email or username is already registered. Please try again."
-      });
-    }
-
     next(error);
   } finally {
     if (client) client.release();
   }
 });
 
-// Login: email or username.
+// Login using email or username.
 app.post("/api/auth/login", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -700,8 +758,7 @@ app.post("/api/auth/login", async (req, res, next) => {
 app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
-
-// Search users.
+// Search active users.
 app.get("/api/users/search", requireAuth, async (req, res, next) => {
   try {
     const q = cleanText(req.query.q, 50);
@@ -745,26 +802,29 @@ app.get("/api/profile/:username", async (req, res, next) => {
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({
-        error: "User not found."
-      });
+      return res.status(404).json({ error: "User not found." });
     }
 
-    const user = result.rows[0];
+    const profile = result.rows[0];
+    const userId = String(profile.id);
 
-    const count = await pool.query(
+    const stats = await pool.query(
       `SELECT
          (SELECT COUNT(*) FROM ft_posts
           WHERE user_id = $1) AS posts,
          (SELECT COUNT(*) FROM ft_likes l
           JOIN ft_posts p ON p.id = l.post_id
-          WHERE p.user_id = $1) AS likes`,
-      [String(user.id)]
+          WHERE p.user_id = $1) AS likes,
+         (SELECT COUNT(*) FROM ft_follows
+          WHERE following_id = $1) AS followers,
+         (SELECT COUNT(*) FROM ft_follows
+          WHERE follower_id = $1) AS following`,
+      [userId]
     );
 
     res.json({
-      profile: user,
-      stats: count.rows[0]
+      profile,
+      stats: stats.rows[0]
     });
   } catch (error) {
     next(error);
@@ -780,7 +840,7 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
     const coverUrl = cleanText(req.body.cover_url, 2000);
 
     for (const url of [avatarUrl, coverUrl]) {
-      if (url && !/^https:\/\/res\.cloudinary\.com\//i.test(url)) {
+      if (url && !isCloudinaryUrl(url)) {
         return res.status(400).json({
           error: "Profile images must use a valid Cloudinary HTTPS URL."
         });
@@ -816,7 +876,7 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
   }
 });
 
-// Upload media to Cloudinary.
+// Upload image or video.
 app.post(
   "/api/media/upload",
   requireAuth,
@@ -826,7 +886,6 @@ app.post(
         error: "Cloudinary is not configured on the server."
       });
     }
-
     next();
   },
   (req, res, next) => {
@@ -843,12 +902,18 @@ app.post(
         });
       }
 
-      const result = await sendCloudinaryUpload(
+      if (!checkFileSignature(req.file.buffer, req.file.mimetype)) {
+        return res.status(400).json({
+          error: "File content does not match its declared type."
+        });
+      }
+
+      const media = await sendCloudinaryUpload(
         req.file.buffer,
         req.file.mimetype
       );
 
-      res.status(201).json({ media: result });
+      res.status(201).json({ media });
     } catch (error) {
       next(error);
     }
@@ -869,19 +934,14 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
       });
     }
 
-    if (
-      mediaUrl &&
-      !/^https:\/\/res\.cloudinary\.com\//i.test(mediaUrl)
-    ) {
+    if (mediaUrl && !isCloudinaryUrl(mediaUrl)) {
       return res.status(400).json({
         error: "Post media must use a valid Cloudinary HTTPS URL."
       });
     }
 
     if (mediaType && !["image", "video"].includes(mediaType)) {
-      return res.status(400).json({
-        error: "Invalid media type."
-      });
+      return res.status(400).json({ error: "Invalid media type." });
     }
 
     const result = await pool.query(
@@ -918,9 +978,9 @@ app.get("/api/posts", async (req, res, next) => {
     );
 
     const before = Number.parseInt(req.query.before, 10);
-    const authMatch = (req.headers.authorization || "")
+    const match = (req.headers.authorization || "")
       .match(/^Bearer\s+(.+)$/i);
-    const payload = authMatch ? verifyToken(authMatch[1]) : null;
+    const payload = match ? verifyToken(match[1]) : null;
     const viewerId = payload ? String(payload.sub) : "";
 
     const result = await pool.query(
@@ -928,9 +988,9 @@ app.get("/api/posts", async (req, res, next) => {
               p.created_at, u.username,
               pr.display_name, pr.avatar_url,
               (SELECT COUNT(*) FROM ft_likes l
-                WHERE l.post_id = p.id) AS like_count,
+               WHERE l.post_id = p.id) AS like_count,
               (SELECT COUNT(*) FROM ft_comments c
-                WHERE c.post_id = p.id) AS comment_count,
+               WHERE c.post_id = p.id) AS comment_count,
               EXISTS (
                 SELECT 1 FROM ft_likes l
                 WHERE l.post_id = p.id AND l.user_id = $2
@@ -955,14 +1015,102 @@ app.get("/api/posts", async (req, res, next) => {
   }
 });
 
+// Edit your own post.
+app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    const content = cleanText(req.body.content, 5000);
+    const mediaUrl = cleanText(req.body.media_url, 2000);
+    const mediaType = cleanText(req.body.media_type, 20);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid post ID." });
+    }
+
+    if (!content && !mediaUrl) {
+      return res.status(400).json({
+        error: "A post must contain text or media."
+      });
+    }
+
+    if (mediaUrl && !isCloudinaryUrl(mediaUrl)) {
+      return res.status(400).json({
+        error: "Post media must use a valid Cloudinary HTTPS URL."
+      });
+    }
+
+    if (mediaType && !["image", "video"].includes(mediaType)) {
+      return res.status(400).json({ error: "Invalid media type." });
+    }
+
+    const result = await pool.query(
+      `UPDATE ft_posts
+       SET content = $1,
+           media_url = $2,
+           media_type = $3
+       WHERE id = $4 AND user_id = $5
+       RETURNING *`,
+      [
+        content,
+        mediaUrl || null,
+        mediaType || null,
+        id,
+        String(req.user.id)
+      ]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Post not found or you do not own this post."
+      });
+    }
+
+    res.json({
+      message: "Post updated.",
+      post: result.rows[0]
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Delete your own post.
+app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+
+    if (!Number.isSafeInteger(id) || id <= 0) {
+      return res.status(400).json({ error: "Invalid post ID." });
+    }
+
+    const result = await pool.query(
+      `DELETE FROM ft_posts
+       WHERE id = $1 AND user_id = $2
+       RETURNING id`,
+      [id, String(req.user.id)]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({
+        error: "Post not found or you do not own this post."
+      });
+    }
+
+    res.json({
+      message: "Post deleted.",
+      id: result.rows[0].id
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Toggle like.
 app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   const postId = Number.parseInt(req.params.id, 10);
 
   if (!Number.isSafeInteger(postId) || postId <= 0) {
-    return res.status(400).json({
-      error: "Invalid post ID."
-    });
+    return res.status(400).json({ error: "Invalid post ID." });
   }
 
   let client;
@@ -978,10 +1126,7 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
 
     if (!post.rows.length) {
       await client.query("ROLLBACK");
-
-      return res.status(404).json({
-        error: "Post not found."
-      });
+      return res.status(404).json({ error: "Post not found." });
     }
 
     const userId = String(req.user.id);
@@ -998,14 +1143,12 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
         "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
         [postId, userId]
       );
-
       liked = false;
     } else {
       await client.query(
         "INSERT INTO ft_likes (post_id, user_id) VALUES ($1, $2)",
         [postId, userId]
       );
-
       liked = true;
 
       if (post.rows[0].user_id !== userId) {
@@ -1035,10 +1178,7 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
       like_count: Number(count.rows[0].count)
     });
   } catch (error) {
-    if (client) {
-      await client.query("ROLLBACK").catch(() => {});
-    }
-
+    if (client) await client.query("ROLLBACK").catch(() => {});
     next(error);
   } finally {
     if (client) client.release();
@@ -1053,9 +1193,7 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
     const postId = Number.parseInt(req.params.id, 10);
 
     if (!Number.isSafeInteger(postId) || postId <= 0) {
-      return res.status(400).json({
-        error: "Invalid post ID."
-      });
+      return res.status(400).json({ error: "Invalid post ID." });
     }
 
     const result = await pool.query(
@@ -1094,9 +1232,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     );
 
     if (!post.rows.length) {
-      return res.status(404).json({
-        error: "Post not found."
-      });
+      return res.status(404).json({ error: "Post not found." });
     }
 
     const result = await pool.query(
@@ -1131,6 +1267,170 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     next(error);
   }
 });
+// Follow a user.
+app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
+  try {
+    const targetId = cleanText(req.params.id, 100);
+    const myId = String(req.user.id);
+
+    if (!targetId || targetId === myId) {
+      return res.status(400).json({
+        error: "You cannot follow yourself."
+      });
+    }
+
+    const target = await pool.query(
+      `SELECT id FROM users
+       WHERE id::text = $1 AND account_status = 'active'`,
+      [targetId]
+    );
+
+    if (!target.rows.length) {
+      return res.status(404).json({ error: "User not found." });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_follows (follower_id, following_id)
+       VALUES ($1, $2)
+       ON CONFLICT (follower_id, following_id) DO NOTHING
+       RETURNING follower_id`,
+      [myId, targetId]
+    );
+
+    if (result.rowCount > 0) {
+      await pool.query(
+        `INSERT INTO ft_notifications
+         (recipient_id, actor_id, type, message)
+         VALUES ($1, $2, 'follow', $3)`,
+        [
+          targetId,
+          myId,
+          `${req.user.username} started following you.`
+        ]
+      );
+    }
+
+    res.json({
+      following: true,
+      already_following: result.rowCount === 0
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Unfollow a user.
+app.delete("/api/users/:id/follow", requireAuth, async (req, res, next) => {
+  try {
+    const targetId = cleanText(req.params.id, 100);
+
+    const result = await pool.query(
+      `DELETE FROM ft_follows
+       WHERE follower_id = $1 AND following_id = $2
+       RETURNING follower_id`,
+      [String(req.user.id), targetId]
+    );
+
+    res.json({
+      following: false,
+      unfollowed: result.rowCount > 0
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// List a user's followers.
+app.get("/api/users/:id/followers", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const userId = cleanText(req.params.id, 100);
+
+    const result = await pool.query(
+      `SELECT u.id, u.username, p.display_name, p.avatar_url,
+              f.created_at AS followed_at
+       FROM ft_follows f
+       JOIN users u ON u.id::text = f.follower_id
+       LEFT JOIN ft_profiles p ON p.user_id = u.id::text
+       WHERE f.following_id = $1
+         AND u.account_status = 'active'
+       ORDER BY f.created_at DESC
+       LIMIT 200`,
+      [userId]
+    );
+
+    res.json({ followers: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// List accounts followed by a user.
+app.get("/api/users/:id/following", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const userId = cleanText(req.params.id, 100);
+
+    const result = await pool.query(
+      `SELECT u.id, u.username, p.display_name, p.avatar_url,
+              f.created_at AS followed_at
+       FROM ft_follows f
+       JOIN users u ON u.id::text = f.following_id
+       LEFT JOIN ft_profiles p ON p.user_id = u.id::text
+       WHERE f.follower_id = $1
+         AND u.account_status = 'active'
+       ORDER BY f.created_at DESC
+       LIMIT 200`,
+      [userId]
+    );
+
+    res.json({ following: result.rows });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Report a post.
+app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
+  try {
+    const postId = Number.parseInt(req.params.id, 10);
+    const reason = cleanText(req.body.reason, 500);
+
+    if (!Number.isSafeInteger(postId) || postId <= 0 || !reason) {
+      return res.status(400).json({
+        error: "A valid post ID and report reason are required."
+      });
+    }
+
+    const post = await pool.query(
+      "SELECT id FROM ft_posts WHERE id = $1",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    const result = await pool.query(
+      `INSERT INTO ft_post_reports (post_id, reporter_id, reason)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (post_id, reporter_id) DO NOTHING
+       RETURNING id`,
+      [postId, String(req.user.id), reason]
+    );
+
+    res.status(201).json({
+      message: result.rowCount
+        ? "Report submitted for review."
+        : "You have already reported this post.",
+      reported: true
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Read a conversation.
 app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
@@ -1151,9 +1451,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
     );
 
     if (!account.rows.length) {
-      return res.status(404).json({
-        error: "User not found."
-      });
+      return res.status(404).json({ error: "User not found." });
     }
 
     await pool.query(
@@ -1200,9 +1498,7 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
     );
 
     if (!recipient.rows.length) {
-      return res.status(404).json({
-        error: "Recipient not found."
-      });
+      return res.status(404).json({ error: "Recipient not found." });
     }
 
     const result = await pool.query(
@@ -1357,9 +1653,7 @@ app.patch(
 
 // 404 handler.
 app.use((req, res) => {
-  res.status(404).json({
-    error: "Route not found."
-  });
+  res.status(404).json({ error: "Route not found." });
 });
 
 // Error handler.
@@ -1384,9 +1678,7 @@ app.use((error, req, res, next) => {
     error.message &&
     error.message.startsWith("Unsupported file type")
   ) {
-    return res.status(400).json({
-      error: error.message
-    });
+    return res.status(400).json({ error: error.message });
   }
 
   console.error("Request failed:", {
@@ -1399,7 +1691,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start the server.
+// Start server.
 async function startServer() {
   try {
     if (pool) await initializeDatabase();
