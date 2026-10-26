@@ -1,7 +1,7 @@
 
 {
   "name": "freetube-backend",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "FreeTube backend API",
   "private": true,
   "main": "server.js",
@@ -12,6 +12,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
