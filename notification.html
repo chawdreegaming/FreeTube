@@ -1,545 +1,666 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0d3b22">
-<title>FreeTube - Notifications</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101010">
+  <title>Notifications | FreeTube</title>
 
-<style>
-:root{
-  --bg-gradient:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);
-  --panel-bg:rgba(19,45,31,.85);
-  --panel-border:rgba(255,255,255,.18);
-  --accent-green:#00ff88;
-  --accent-red:#ff5e62;
-  --muted:rgba(255,255,255,.65);
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:var(--bg-gradient);background-attachment:fixed;color:#fff;min-height:100vh}
-button{font:inherit;cursor:pointer;color:inherit;border:0}
-.app{max-width:480px;margin:auto;position:relative;background:rgba(13,59,34,.3);min-height:100dvh;padding-bottom:80px;box-shadow:0 0 40px rgba(0,0,0,.5)}
-.topbar{position:sticky;z-index:10;top:0;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(13,59,34,.9);backdrop-filter:blur(15px);border-bottom:1px solid var(--panel-border)}
-.topbar-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
-.top-actions{display:flex;gap:8px}
-.icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid var(--panel-border);display:grid;place-items:center;color:#fff;font-size:15px;position:relative}
-.notif-badge{position:absolute;top:-2px;right:-2px;background:var(--accent-red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;border:1px solid #0d3b22}
-.notif-header-section{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 8px}
-.notif-section-title{font-size:16px;font-weight:700}
-.mark-read-btn{background:none;color:var(--accent-green);font-size:12px;font-weight:600}
-.notif-list{display:flex;flex-direction:column}
-.notif-item{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;background:var(--panel-bg);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;transition:background .2s;position:relative}
-.notif-item:hover{background:rgba(25,60,41,.95)}
-.notif-item.unread{background:rgba(0,255,136,.08)}
-.notif-avatar-wrap{position:relative;flex-shrink:0;width:46px;height:46px}
-.notif-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:1px solid var(--panel-border);background:#234432}
-.notif-type-icon{position:absolute;bottom:0;right:0;width:18px;height:18px;border-radius:50%;background:#1877f2;color:#fff;font-size:9px;display:grid;place-items:center;border:2px solid #0d3b22}
-.notif-type-icon.video{background:var(--accent-red)}
-.notif-type-icon.heart{background:#e41e3f}
-.notif-type-icon.follow{background:#00a86b}
-.notif-type-icon.message{background:#1877f2}
-.notif-content{flex:1;min-width:0;font-size:13px;line-height:1.5}
-.notif-text{color:rgba(255,255,255,.9);overflow-wrap:anywhere}
-.notif-text strong{color:#fff}
-.notif-time{font-size:11px;color:var(--accent-green);margin-top:4px}
-.notif-item.read .notif-time{color:var(--muted)}
-.unread-dot{width:8px;height:8px;background:var(--accent-green);border-radius:50%;align-self:center;flex-shrink:0}
-.empty-state{padding:48px 22px;text-align:center;color:var(--muted);line-height:1.7}
-.empty-state i{display:block;font-size:42px;color:var(--accent-green);margin-bottom:16px}
-.empty-state strong{display:block;color:#fff;margin-bottom:7px;font-size:15px}
-.status-message{margin:12px 16px;padding:12px;border:1px solid var(--panel-border);border-radius:10px;background:rgba(0,0,0,.2);font-size:12px;line-height:1.6;color:var(--muted);overflow-wrap:anywhere}
-.status-message.error{color:#ffd0d0;border-color:rgba(255,94,98,.5)}
-.status-message.success{color:var(--accent-green)}
-.hidden{display:none!important}
-.bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:55px;padding:6px 5px calc(6px + env(safe-area-inset-bottom));background:rgba(13,59,34,.95);backdrop-filter:blur(18px);border-top:1px solid var(--panel-border)}
-.nav-item{background:none;color:rgba(255,255,255,.6);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;min-width:48px;position:relative;text-decoration:none}
-.nav-item i{font-size:18px}
-.nav-item.active{color:var(--accent-green)}
-.toast{position:fixed;z-index:150;left:50%;bottom:75px;transform:translate(-50%,10px);opacity:0;pointer-events:none;background:rgba(20,20,30,.95);backdrop-filter:blur(10px);border:1px solid var(--panel-border);border-radius:10px;padding:10px 14px;font-size:12px;transition:.2s;text-align:center;max-width:90%;box-shadow:0 5px 15px rgba(0,0,0,.3)}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-button:disabled{opacity:.5;cursor:not-allowed}
-@media(min-width:481px){body{padding-bottom:20px}.app{margin-bottom:20px}}
-</style>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #101010;
+      color: #fff;
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      background: #181818;
+      border-bottom: 1px solid #292929;
+    }
+
+    .brand {
+      font-size: 21px;
+      font-weight: bold;
+      color: #43e477;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      color: white;
+      font-size: 14px;
+    }
+
+    .icon-button {
+      background: transparent;
+      font-size: 19px;
+      padding: 6px;
+    }
+
+    .mark-all {
+      background: #252525;
+      border-radius: 8px;
+      padding: 9px 11px;
+    }
+
+    .mark-all:hover {
+      background: #333;
+    }
+
+    main {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 18px 12px;
+    }
+
+    .summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 3px 4px 18px;
+    }
+
+    .summary h1 {
+      font-size: 23px;
+    }
+
+    .count {
+      background: #e53935;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .notice {
+      padding: 13px;
+      margin-bottom: 10px;
+      border: 1px solid #292929;
+      border-radius: 12px;
+      background: #191919;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .notice.unread {
+      background: #1c2820;
+      border-color: #285d39;
+    }
+
+    .avatar {
+      flex-shrink: 0;
+      width: 43px;
+      height: 43px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #28c76f, #e53935);
+      font-size: 18px;
+      font-weight: bold;
+      overflow: hidden;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .notice-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .notice-message {
+      font-size: 14px;
+      line-height: 1.55;
+      overflow-wrap: anywhere;
+    }
+
+    .notice-meta {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 7px;
+      color: #aaa;
+      font-size: 12px;
+    }
+
+    .type {
+      color: #65e890;
+      text-transform: capitalize;
+    }
+
+    .notice-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .small-action {
+      background: transparent;
+      color: #bbb;
+      font-size: 15px;
+      padding: 4px;
+    }
+
+    .small-action:hover {
+      color: #43e477;
+    }
+
+    .unread-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #43e477;
+    }
+
+    .state {
+      text-align: center;
+      padding: 55px 18px;
+      color: #aaa;
+      line-height: 1.7;
+    }
+
+    .state i {
+      font-size: 42px;
+      margin-bottom: 15px;
+      color: #555;
+    }
+
+    .state h2 {
+      font-size: 19px;
+      margin-bottom: 8px;
+      color: #eee;
+    }
+
+    .primary-button {
+      margin-top: 17px;
+      background: linear-gradient(100deg, #28c76f, #df3434);
+      padding: 11px 18px;
+      border-radius: 9px;
+      font-weight: bold;
+    }
+
+    .error-text {
+      color: #ff8888;
+      font-size: 13px;
+      margin-top: 10px;
+      overflow-wrap: anywhere;
+    }
+
+    .loading {
+      text-align: center;
+      color: #aaa;
+      padding: 45px 10px;
+    }
+
+    .loading i {
+      margin-right: 8px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      background: #181818;
+      border-top: 1px solid #333;
+      padding: 10px 3px calc(10px + env(safe-area-inset-bottom));
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      background: transparent;
+      color: #999;
+      font-size: 11px;
+      text-decoration: none;
+      min-width: 48px;
+    }
+
+    .nav-item i {
+      font-size: 19px;
+    }
+
+    .nav-item.active {
+      color: #43e477;
+    }
+
+    @media (max-width: 400px) {
+      header {
+        padding: 13px 10px;
+      }
+
+      .brand {
+        font-size: 18px;
+      }
+
+      .mark-all {
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      .notice {
+        padding: 10px;
+        gap: 9px;
+      }
+
+      .avatar {
+        width: 37px;
+        height: 37px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="topbar-title">
-      <button class="icon-btn" id="backBtn" aria-label="Go back">
-        <i class="fa-solid fa-arrow-left"></i>
-      </button>
-      Notifications
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-circle-play"></i> FreeTube
     </div>
-    <div class="top-actions">
-      <button class="icon-btn" id="messengerBtn" aria-label="Messenger">
-        <i class="fa-brands fa-facebook-messenger"></i>
+
+    <div class="header-actions">
+      <button class="mark-all" id="markAllBtn" type="button">
+        <i class="fa-solid fa-check-double"></i> সব পড়া
+      </button>
+
+      <button class="icon-button" id="refreshBtn"
+              type="button" aria-label="Refresh">
+        <i class="fa-solid fa-rotate"></i>
       </button>
     </div>
   </header>
 
-  <section class="notif-header-section">
-    <span class="notif-section-title" id="sectionTitle">Notifications</span>
-    <button class="mark-read-btn" id="markReadBtn">Mark all as read</button>
-  </section>
+  <main>
+    <div class="summary">
+      <h1>Notifications</h1>
+      <span class="count" id="unreadCount">০টি নতুন</span>
+    </div>
 
-  <div id="statusMessage" class="status-message hidden" role="status"></div>
-
-  <main class="notif-list" id="notifList" aria-live="polite">
-    <div class="empty-state">
-      <i class="fa-solid fa-spinner fa-spin"></i>
-      <strong>Loading notifications...</strong>
-      Please wait.
+    <div id="notificationList">
+      <div class="loading">
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        নোটিফিকেশন লোড হচ্ছে...
+      </div>
     </div>
   </main>
 
   <nav class="bottom-nav">
-    <a class="nav-item" href="home.html">
+    <a class="nav-item" href="index.html">
       <i class="fa-solid fa-house"></i><span>Home</span>
     </a>
-    <a class="nav-item" href="home.html#discover">
+
+    <a class="nav-item" href="discover.html">
       <i class="fa-solid fa-compass"></i><span>Discover</span>
     </a>
-    <a class="nav-item" href="home.html">
-      <i class="fa-solid fa-square-plus" style="font-size:20px;color:var(--accent-green)"></i><span>Create</span>
+
+    <a class="nav-item" href="create.html">
+      <i class="fa-solid fa-plus-circle"></i><span>Create</span>
     </a>
+
     <a class="nav-item active" href="notification.html">
       <i class="fa-solid fa-bell"></i><span>Notifications</span>
     </a>
+
     <a class="nav-item" href="profile.html">
-      <i class="fa-regular fa-user"></i><span>Profile</span>
+      <i class="fa-solid fa-user"></i><span>Profile</span>
     </a>
   </nav>
-</div>
 
-<div id="toast" class="toast" role="status"></div>
+  <script>
+    "use strict";
 
-<script>
-"use strict";
+    // তোমার FreeTube backend API
+    const API_BASE = "https://freetube-backend-a222.onrender.com/api";
 
-/*
-  FreeTube notification page.
+    const list = document.getElementById("notificationList");
+    const unreadCount = document.getElementById("unreadCount");
+    const markAllBtn = document.getElementById("markAllBtn");
+    const refreshBtn = document.getElementById("refreshBtn");
 
-  API_BASE and token key match the current FreeTube project.
-  IMPORTANT:
-  GET /api/notifications, PATCH /api/notifications/:id/read,
-  and POST /api/notifications/read-all are expected endpoint
-  examples, NOT confirmed existing routes in your server.js.
+    let notifications = [];
+    let loading = false;
 
-  If the backend returns 404, this page reports that the
-  notification API is not available. It does not show fake data.
-*/
-
-const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
-
-let notifications = [];
-let toastTimer;
-let loading = false;
-
-const listEl = document.getElementById("notifList");
-const statusEl = document.getElementById("statusMessage");
-const titleEl = document.getElementById("sectionTitle");
-const markReadBtn = document.getElementById("markReadBtn");
-
-function toast(message) {
-  const el = document.getElementById("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("show"), 2600);
-}
-
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;"
-  })[char]);
-}
-
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
-}
-
-function setStatus(message, type = "") {
-  statusEl.textContent = message;
-  statusEl.className = "status-message" + (type ? " " + type : "");
-  statusEl.classList.remove("hidden");
-}
-
-function hideStatus() {
-  statusEl.textContent = "";
-  statusEl.className = "status-message hidden";
-}
-
-async function apiRequest(path, options = {}) {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("LOGIN_REQUIRED");
-  }
-
-  const response = await fetch(API_BASE + path, {
-    ...options,
-    headers: {
-      "Accept": "application/json",
-      ...(options.body ? { "Content-Type": "application/json" } : {}),
-      "Authorization": "Bearer " + token,
-      ...(options.headers || {})
+    function getToken() {
+      return localStorage.getItem("freetube_access_token");
     }
-  });
 
-  const raw = await response.text();
-  let data = {};
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, function (char) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char];
+      });
+    }
 
-  try {
-    data = raw ? JSON.parse(raw) : {};
-  } catch {
-    data = { message: raw };
-  }
+    function typeIcon(type) {
+      const icons = {
+        like: "fa-heart",
+        reaction: "fa-face-smile",
+        comment: "fa-comment",
+        follow: "fa-user-plus",
+        message: "fa-envelope"
+      };
 
-  if (!response.ok) {
-    const error = new Error(
-      data.message || data.error || `HTTP ${response.status}`
-    );
-    error.status = response.status;
-    throw error;
-  }
+      return icons[String(type || "").toLowerCase()] || "fa-bell";
+    }
 
-  return data;
-}
+    function formatDate(dateValue) {
+      if (!dateValue) return "";
 
-function normalizeNotification(item) {
-  const type = String(item.type || item.notification_type || "notification").toLowerCase();
+      const date = new Date(dateValue);
+      if (Number.isNaN(date.getTime())) return "";
 
-  let icon = "fa-bell";
-  let iconClass = "";
+      return date.toLocaleString("bn-BD", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
 
-  if (["like", "reaction", "love", "sad", "angry"].includes(type)) {
-    icon = "fa-heart";
-    iconClass = "heart";
-  } else if (type === "comment") {
-    icon = "fa-comment";
-  } else if (["follow", "followed", "new_follower"].includes(type)) {
-    icon = "fa-user-plus";
-    iconClass = "follow";
-  } else if (["message", "chat", "new_message"].includes(type)) {
-    icon = "fa-comment-dots";
-    iconClass = "message";
-  } else if (["video", "upload", "new_video"].includes(type)) {
-    icon = "fa-video";
-    iconClass = "video";
-  }
-
-  const actor = item.actor || item.sender || item.user || {};
-  const actorName = typeof actor === "string"
-    ? actor
-    : actor.username || actor.name || item.actor_name || item.sender_name || "FreeTube user";
-
-  const avatar = typeof actor === "object"
-    ? actor.avatar_url || actor.avatar || actor.profile_image || ""
-    : "";
-
-  const message = item.message || item.text || item.body ||
-    item.content || "You have a new notification.";
-
-  const created = item.created_at || item.createdAt || item.timestamp || "";
-  const read = Boolean(item.read || item.is_read || item.read_at);
-
-  return {
-    id: item.id ?? item.notification_id,
-    type,
-    icon,
-    iconClass,
-    actorName,
-    avatar,
-    message,
-    created,
-    read,
-    link: item.link || item.target_url || "",
-    raw: item
-  };
-}
-
-function timeAgo(value) {
-  if (!value) return "";
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
-
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-
-  if (seconds < 60) return "Just now";
-  if (seconds < 3600) return Math.floor(seconds / 60) + " minutes ago";
-  if (seconds < 86400) return Math.floor(seconds / 3600) + " hours ago";
-  if (seconds < 172800) return "Yesterday";
-  if (seconds < 604800) return Math.floor(seconds / 86400) + " days ago";
-
-  return date.toLocaleDateString();
-}
-
-function avatarHTML(item) {
-  const fallback = "https://ui-avatars.com/api/?name=" +
-    encodeURIComponent(item.actorName) +
-    "&background=16452e&color=ffffff&size=96";
-
-  const src = item.avatar || fallback;
-
-  return `
-    <div class="notif-avatar-wrap">
-      <img class="notif-avatar"
-           src="${escapeHTML(src)}"
-           alt=""
-           loading="lazy"
-           onerror="this.onerror=null;this.src='${fallback}'">
-      <div class="notif-type-icon ${escapeHTML(item.iconClass)}">
-        <i class="fa-solid ${escapeHTML(item.icon)}"></i>
-      </div>
-    </div>
-  `;
-}
-
-function renderNotifications() {
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  titleEl.textContent = unreadCount
-    ? `Earlier · ${unreadCount} unread`
-    : "Earlier";
-
-  markReadBtn.disabled = unreadCount === 0;
-
-  if (!notifications.length) {
-    listEl.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-regular fa-bell-slash"></i>
-        <strong>No notifications yet</strong>
-        Real notifications from your FreeTube account will appear here
-        when the backend provides them.
-      </div>
-    `;
-    return;
-  }
-
-  listEl.innerHTML = notifications.map(item => {
-    const safeMessage = escapeHTML(item.message);
-    const safeActor = escapeHTML(item.actorName);
-    const text = safeMessage.includes(safeActor)
-      ? safeMessage
-      : `<strong>${safeActor}</strong> ${safeMessage}`;
-
-    return `
-      <article class="notif-item ${item.read ? "read" : "unread"}"
-               data-notification-id="${escapeHTML(item.id)}"
-               tabindex="0"
-               role="button"
-               aria-label="Notification from ${safeActor}">
-        ${avatarHTML(item)}
-        <div class="notif-content">
-          <div class="notif-text">${text}</div>
-          <div class="notif-time">${escapeHTML(timeAgo(item.created))}</div>
+    function showState(icon, heading, message, buttonLabel, action) {
+      list.innerHTML = `
+        <div class="state">
+          <i class="fa-solid ${icon}"></i>
+          <h2>${escapeHTML(heading)}</h2>
+          <p>${escapeHTML(message)}</p>
+          ${buttonLabel ? `
+            <button class="primary-button" id="stateAction" type="button">
+              ${escapeHTML(buttonLabel)}
+            </button>
+          ` : ""}
+          <p class="error-text" id="stateError"></p>
         </div>
-        ${item.read ? "" : '<div class="unread-dot" aria-label="Unread"></div>'}
-      </article>
-    `;
-  }).join("");
-}
+      `;
 
-function extractNotificationArray(data) {
-  if (Array.isArray(data)) return data;
-  if (Array.isArray(data.notifications)) return data.notifications;
-  if (Array.isArray(data.items)) return data.items;
-  if (Array.isArray(data.data)) return data.data;
-  return null;
-}
-
-async function loadNotifications() {
-  if (loading) return;
-  loading = true;
-  hideStatus();
-
-  if (!getToken()) {
-    listEl.innerHTML = `
-      <div class="empty-state">
-        <i class="fa-solid fa-user-lock"></i>
-        <strong>Login required</strong>
-        Please log in to your FreeTube account to load notifications.
-        <br><br>
-        <button class="icon-btn" onclick="location.href='index.html'"
-                style="display:inline-grid;width:auto;padding:0 16px;border-radius:10px">
-          Login
-        </button>
-      </div>
-    `;
-    setStatus("No access token found in localStorage. Expected key: freetube_access_token.", "error");
-    loading = false;
-    return;
-  }
-
-  listEl.innerHTML = `
-    <div class="empty-state">
-      <i class="fa-solid fa-spinner fa-spin"></i>
-      <strong>Loading notifications...</strong>
-    </div>
-  `;
-
-  try {
-    /*
-      This route must exist in server.js for real notifications.
-      It has not been confirmed in the currently known backend routes.
-    */
-    const data = await apiRequest("/notifications");
-    const rows = extractNotificationArray(data);
-
-    if (!rows) {
-      throw new Error("Unexpected API response. Expected an array of notifications.");
+      const btn = document.getElementById("stateAction");
+      if (btn && action) btn.addEventListener("click", action);
     }
 
-    notifications = rows.map(normalizeNotification);
-    renderNotifications();
-  } catch (error) {
-    notifications = [];
-    renderNotifications();
+    async function apiRequest(path, options = {}) {
+      const token = getToken();
 
-    if (error.message === "LOGIN_REQUIRED") {
-      setStatus("Please log in first. Your FreeTube access token was not found.", "error");
-    } else if (error.status === 401) {
-      setStatus("Your login token was rejected or expired. Please log in again.", "error");
-    } else if (error.status === 404) {
-      setStatus(
-        "The backend does not currently provide GET /api/notifications (404). Real notifications cannot load until this endpoint is implemented in server.js.",
-        "error"
-      );
-    } else {
-      setStatus(
-        "Could not load notifications: " + error.message +
-        ". Check the backend status and notification API.",
-        "error"
-      );
-    }
+      if (!token) {
+        const error = new Error("LOGIN_REQUIRED");
+        error.status = 401;
+        throw error;
+      }
 
-    console.error("FreeTube notification load error:", error);
-  } finally {
-    loading = false;
-  }
-}
-
-async function markAsRead(id) {
-  const item = notifications.find(n => String(n.id) === String(id));
-  if (!item || item.read) return;
-
-  if (item.id === undefined || item.id === null) {
-    toast("This notification has no server ID.");
-    return;
-  }
-
-  try {
-    /*
-      Requires PATCH /api/notifications/:id/read in server.js.
-      This endpoint is not confirmed to exist.
-    */
-    await apiRequest(
-      "/notifications/" + encodeURIComponent(item.id) + "/read",
-      { method: "PATCH", body: JSON.stringify({ read: true }) }
-    );
-
-    item.read = true;
-    renderNotifications();
-    toast("Notification marked as read");
-  } catch (error) {
-    toast(error.status === 404
-      ? "Mark-as-read API is not available in the backend."
-      : "Could not mark notification as read.");
-    console.error("Mark notification read error:", error);
-  }
-}
-
-async function markAllAsRead() {
-  const unread = notifications.some(item => !item.read);
-  if (!unread) return;
-
-  markReadBtn.disabled = true;
-
-  try {
-    /*
-      Requires POST /api/notifications/read-all in server.js.
-      This endpoint is not confirmed to exist.
-    */
-    await apiRequest("/notifications/read-all", {
-      method: "POST",
-      body: JSON.stringify({})
-    });
-
-    notifications = notifications.map(item => ({ ...item, read: true }));
-    renderNotifications();
-    toast("All notifications marked as read");
-  } catch (error) {
-    toast(error.status === 404
-      ? "Read-all API is not available in the backend."
-      : "Could not mark all notifications as read.");
-    console.error("Mark all read error:", error);
-  } finally {
-    markReadBtn.disabled = false;
-  }
-}
-
-listEl.addEventListener("click", event => {
-  const itemEl = event.target.closest("[data-notification-id]");
-  if (!itemEl) return;
-
-  const item = notifications.find(
-    n => String(n.id) === itemEl.dataset.notificationId
-  );
-  if (!item) return;
-
-  if (item.link) {
-    /*
-      Only allow relative page links or HTTPS links.
-    */
-    try {
-      const target = new URL(item.link, window.location.href);
-      if (target.protocol === "https:" || target.origin === location.origin) {
-        if (!item.read) markAsRead(item.id);
-        if (target.origin === location.origin) {
-          location.href = target.href;
-        } else {
-          window.open(target.href, "_blank", "noopener,noreferrer");
+      const response = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json",
+          ...(options.headers || {})
         }
+      });
+
+      const rawText = await response.text();
+      let data = {};
+
+      try {
+        data = rawText ? JSON.parse(rawText) : {};
+      } catch (_) {
+        data = { error: rawText || "সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।" };
+      }
+
+      if (!response.ok) {
+        const error = new Error(
+          data.error || data.message || `HTTP ${response.status}`
+        );
+        error.status = response.status;
+        throw error;
+      }
+
+      return data;
+    }
+
+    function normalizeItems(data) {
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data.notifications)) return data.notifications;
+      if (Array.isArray(data.data)) return data.data;
+      return [];
+    }
+
+    function renderNotifications(data) {
+      notifications = normalizeItems(data);
+
+      const unread = notifications.filter(item => !item.read_at).length;
+
+      unreadCount.textContent = `${unread.toLocaleString("bn-BD")}টি নতুন`;
+      markAllBtn.disabled = unread === 0;
+      markAllBtn.style.opacity = unread === 0 ? "0.55" : "1";
+
+      if (notifications.length === 0) {
+        showState(
+          "fa-bell-slash",
+          "এখনো কোনো নোটিফিকেশন নেই",
+          "কেউ লাইক, কমেন্ট, ফলো বা মেসেজ করলে এখানে দেখা যাবে।",
+          "আবার লোড করুন",
+          loadNotifications
+        );
         return;
       }
-    } catch (error) {
-      console.warn("Invalid notification link:", error);
+
+      list.innerHTML = notifications.map(item => {
+        const type = String(item.type || "notification").toLowerCase();
+        const actor = item.actor_username || item.username || "কেউ একজন";
+        const message = item.message || `${actor} তোমার সঙ্গে ইন্টারঅ্যাক্ট করেছে।`;
+        const isUnread = !item.read_at;
+        const initial = actor.trim().charAt(0).toUpperCase() || "F";
+
+        return `
+          <article class="notice ${isUnread ? "unread" : ""}"
+                   data-id="${escapeHTML(item.id)}">
+            <div class="avatar" aria-hidden="true">
+              <i class="fa-solid ${typeIcon(type)}"></i>
+            </div>
+
+            <div class="notice-content">
+              <div class="notice-message">${escapeHTML(message)}</div>
+              <div class="notice-meta">
+                <span class="type">
+                  <i class="fa-solid ${typeIcon(type)}"></i>
+                  ${escapeHTML(type)}
+                </span>
+                <span>${escapeHTML(formatDate(item.created_at))}</span>
+              </div>
+            </div>
+
+            <div class="notice-actions">
+              ${isUnread ? `
+                <span class="unread-dot" title="নতুন"></span>
+                <button class="small-action mark-one"
+                        type="button"
+                        data-id="${escapeHTML(item.id)}"
+                        aria-label="পড়া হয়েছে">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+              ` : `
+                <i class="fa-solid fa-check"
+                   style="color:#43e477;font-size:13px"
+                   title="পড়া হয়েছে"></i>
+              `}
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      list.querySelectorAll(".mark-one").forEach(button => {
+        button.addEventListener("click", () => {
+          markOneAsRead(button.dataset.id);
+        });
+      });
     }
-  }
 
-  markAsRead(item.id);
-});
+    async function loadNotifications() {
+      if (loading) return;
+      loading = true;
 
-listEl.addEventListener("keydown", event => {
-  if (event.key === "Enter" || event.key === " ") {
-    const itemEl = event.target.closest("[data-notification-id]");
-    if (itemEl) {
-      event.preventDefault();
-      itemEl.click();
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+      if (!getToken()) {
+        unreadCount.textContent = "লগইন প্রয়োজন";
+        showState(
+          "fa-user-lock",
+          "লগইন করো",
+          "নোটিফিকেশন দেখতে তোমার FreeTube অ্যাকাউন্টে লগইন করতে হবে।",
+          "লগইন",
+          () => {
+            window.location.href = "login.html";
+          }
+        );
+
+        loading = false;
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = '<i class="fa-solid fa-rotate"></i>';
+        return;
+      }
+
+      list.innerHTML = `
+        <div class="loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          নোটিফিকেশন লোড হচ্ছে...
+        </div>
+      `;
+
+      try {
+        const data = await apiRequest("/notifications");
+        renderNotifications(data);
+      } catch (error) {
+        console.error("Notification loading error:", error);
+
+        if (error.message === "LOGIN_REQUIRED" || error.status === 401) {
+          showState(
+            "fa-user-lock",
+            "লগইন আবার করো",
+            "তোমার লগইন সেশন শেষ হয়েছে অথবা টোকেন গ্রহণ করা হয়নি।",
+            "লগইন",
+            () => window.location.href = "login.html"
+          );
+        } else if (error.status === 404) {
+          showState(
+            "fa-triangle-exclamation",
+            "API Route পাওয়া যায়নি (404)",
+            "ব্যাকএন্ডে /api/notifications রুটটি নেই, অথবা Render-এ পুরোনো কোড চলছে। server.js ডিপ্লয়মেন্ট ও API_BASE ঠিক করো।",
+            "আবার চেষ্টা করো",
+            loadNotifications
+          );
+        } else if (error.status === 503) {
+          showState(
+            "fa-database",
+            "সার্ভার প্রস্তুত নয়",
+            "ব্যাকএন্ডের DATABASE_URL, ডেটাবেস সংযোগ ও সার্ভার কনফিগারেশন পরীক্ষা করো।",
+            "আবার চেষ্টা করো",
+            loadNotifications
+          );
+        } else {
+          showState(
+            "fa-triangle-exclamation",
+            "নোটিফিকেশন লোড হয়নি",
+            `সার্ভারের সঙ্গে সংযোগ বা অনুমতিতে সমস্যা হয়েছে। HTTP: ${error.status || "Network Error"}`,
+            "আবার চেষ্টা করো",
+            loadNotifications
+          );
+        }
+      } finally {
+        loading = false;
+        refreshBtn.disabled = false;
+        refreshBtn.innerHTML = '<i class="fa-solid fa-rotate"></i>';
+      }
     }
-  }
-});
 
-markReadBtn.addEventListener("click", markAllAsRead);
+    async function markOneAsRead(id) {
+      if (!id) return;
 
-document.getElementById("backBtn").addEventListener("click", () => {
-  if (history.length > 1) history.back();
-  else location.href = "home.html";
-});
+      try {
+        await apiRequest(
+          `/notifications/${encodeURIComponent(id)}/read`,
+          { method: "PATCH" }
+        );
 
-document.getElementById("messengerBtn").addEventListener("click", () => {
-  location.href = "inbox.html";
-});
+        const item = notifications.find(
+          notification => String(notification.id) === String(id)
+        );
 
-loadNotifications();
-</script>
+        if (item) item.read_at = new Date().toISOString();
+
+        renderNotifications(notifications);
+      } catch (error) {
+        console.error("Mark one read error:", error);
+        alert("নোটিফিকেশন পড়া হয়েছে হিসেবে চিহ্নিত করা যায়নি। আবার চেষ্টা করো।");
+      }
+    }
+
+    async function markAllAsRead() {
+      if (loading) return;
+
+      markAllBtn.disabled = true;
+
+      try {
+        await apiRequest("/notifications/read-all", {
+          method: "PATCH"
+        });
+
+        const now = new Date().toISOString();
+        notifications = notifications.map(item => ({
+          ...item,
+          read_at: item.read_at || now
+        }));
+
+        renderNotifications(notifications);
+      } catch (error) {
+        console.error("Mark all read error:", error);
+        alert("সব নোটিফিকেশন পড়া হয়েছে হিসেবে চিহ্নিত করা যায়নি।");
+      } finally {
+        markAllBtn.disabled = false;
+      }
+    }
+
+    refreshBtn.addEventListener("click", loadNotifications);
+    markAllBtn.addEventListener("click", markAllAsRead);
+
+    // পেজ খোলার সঙ্গে নোটিফিকেশন লোড হবে
+    loadNotifications();
+  </script>
 </body>
 </html>
