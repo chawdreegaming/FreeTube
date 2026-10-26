@@ -807,5 +807,40 @@ document.addEventListener("visibilitychange",()=>{
 });
 initialize();
 </script>
+<script>
+function openUserProfile(username) {
+  if (!username) return;
+
+  username = String(username).replace(/^@/, "").trim();
+
+  if (!username) return;
+
+  window.location.href =
+    "profile.html?username=" + encodeURIComponent(username);
+}
+
+// পোস্টের লেখকের নাম বা ছবিতে ক্লিক ধরবে
+document.addEventListener("click", function (event) {
+  const target = event.target.closest(
+    "[data-username], .post-author, .author-name, .post-username, .post-avatar"
+  );
+
+  if (!target) return;
+
+  // যদি প্রোফাইল লিংক আগে থেকেই থাকে, সেটি চলতে দাও
+  if (target.tagName === "A" && target.href) return;
+
+  const username =
+    target.dataset.username ||
+    target.closest("[data-username]")?.dataset.username ||
+    target.dataset.authorUsername ||
+    target.closest("[data-author-username]")?.dataset.authorUsername;
+
+  if (username) {
+    event.preventDefault();
+    openUserProfile(username);
+  }
+});
+</script>
 </body>
 </html>
