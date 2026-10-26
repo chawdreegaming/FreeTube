@@ -38,11 +38,22 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .sound-toggle{position:absolute;z-index:5;right:12px;top:12px;width:43px;height:43px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.55);box-shadow:0 2px 12px #0007;font-size:17px;touch-action:manipulation}
 .sound-toggle:active{transform:scale(.94)}.sound-toggle:focus-visible{outline:2px solid var(--accent-green)}
 .video-error-message{padding:8px 16px;color:#ffb5b5;font-size:12px}
-.post-stats{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:8px 12px;font-size:11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.08)}
-.post-stats span{white-space:nowrap}
-.post-actions-bar{display:flex;justify-content:space-around;padding:4px 0}
-.post-action-btn{background:none;color:rgba(255,255,255,.8);font-size:12px;font-weight:600;padding:8px 12px;display:flex;align-items:center;gap:6px;border-radius:6px}
-.post-action-btn:hover{background:rgba(255,255,255,.08)}.post-action-btn.liked{color:var(--accent-red)}
+.post-stats{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:9px 12px;font-size:11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.08)}
+.post-stats>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.post-stats .comment-count{text-align:center}.post-stats .view-count{text-align:right}
+.reaction-summary{display:flex;align-items:center;gap:3px;min-width:0}
+.reaction-summary .reaction-emoji{font-size:13px}
+.post-actions-bar{display:flex;justify-content:space-around;align-items:center;padding:4px 3px}
+.post-action-btn{background:none;color:rgba(255,255,255,.8);font-size:12px;font-weight:600;padding:9px 8px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;min-width:0;flex:1}
+.post-action-btn:hover{background:rgba(255,255,255,.08)}
+.post-action-btn.selected{color:#54a8ff}.post-action-btn.reaction-love{color:#ff687e}.post-action-btn.reaction-sad{color:#ffd166}.post-action-btn.reaction-angry{color:#ff785c}
+.reaction-wrap{position:relative;display:flex;flex:1;min-width:0}
+.reaction-wrap>.post-action-btn{width:100%}
+.reaction-picker{display:none;position:absolute;bottom:calc(100% + 5px);left:0;z-index:30;background:#14251d;border:1px solid var(--panel-border);border-radius:24px;padding:6px;gap:3px;box-shadow:0 4px 18px #0008}
+.reaction-wrap.open .reaction-picker{display:flex}
+.reaction-choice{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
+.reaction-choice:hover,.reaction-choice:focus-visible{background:rgba(255,255,255,.15);transform:scale(1.08)}
+.reaction-choice .emoji{font-size:23px;line-height:25px}.reaction-choice small{font-size:8px;color:#fff}
 .bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:55px;padding:6px 5px calc(6px + env(safe-area-inset-bottom));background:rgba(13,59,34,.97);backdrop-filter:blur(18px);border-top:1px solid var(--panel-border)}
 .nav-item{background:none;color:rgba(255,255,255,.6);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;min-width:48px;position:relative}
 .nav-item i{font-size:18px}.nav-item.active{color:var(--accent-green)}
@@ -73,7 +84,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .comment{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
 .toast{position:fixed;z-index:150;left:50%;bottom:75px;transform:translate(-50%,10px);opacity:0;pointer-events:none;background:rgba(20,20,30,.97);border:1px solid var(--panel-border);border-radius:10px;padding:10px 14px;font-size:12px;transition:.2s;text-align:center;max-width:90%}
 .toast.show{opacity:1;transform:translate(-50%,0)}.empty-state{padding:35px 20px;text-align:center;color:var(--muted);font-size:13px}.loading{text-align:center;padding:30px;color:var(--muted);font-size:13px}
-@media(max-width:350px){.nav-item{min-width:42px}.sound-toggle{width:39px;height:39px}.post-stats{font-size:10px}}
+@media(max-width:350px){.nav-item{min-width:42px}.sound-toggle{width:39px;height:39px}.post-stats{font-size:9px;gap:4px;padding:8px 7px}.post-action-btn{font-size:11px;padding:8px 4px}.reaction-choice{width:36px;height:40px}}
 </style>
 </head>
 <body>
@@ -81,7 +92,6 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <header class="topbar">
   <div class="brand"><i class="fa-solid fa-play"></i>Free<span>Tube</span></div>
   <div class="top-actions">
-    <!-- উপরের Profile আইকন সরানো হয়েছে; Messenger রাখা হয়েছে -->
     <button class="icon-btn" onclick="openInbox()" aria-label="Messenger">
       <i class="fa-brands fa-facebook-messenger"></i>
       <span id="messageBadge" class="notif-badge" hidden>0</span>
@@ -151,6 +161,12 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 const API_BASE="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
+const REACTIONS={
+  like:{label:"Like",emoji:"👍",icon:"fa-thumbs-up",className:"selected"},
+  love:{label:"Love",emoji:"❤️",icon:"fa-heart",className:"reaction-love"},
+  sad:{label:"Sad",emoji:"😢",icon:"fa-face-sad-tear",className:"reaction-sad"},
+  angry:{label:"Angry",emoji:"😡",icon:"fa-face-angry",className:"reaction-angry"}
+};
 
 let videos=[];
 let currentUser=null;
@@ -164,6 +180,7 @@ let videoObserver=null;
 let viewObserver=null;
 let activeVideo=null;
 const viewRequestsInSession=new Set();
+const pendingReactions=new Set();
 
 function token(){return localStorage.getItem(TOKEN_KEY)||""}
 
@@ -191,10 +208,13 @@ async function api(path,options={}){
     throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
   }
   const data=await response.json().catch(()=>({}));
-  if(response.status===401||response.status===403){
+  if(response.status===401){
     localStorage.removeItem(TOKEN_KEY);
     location.replace("auth.html?mode=login");
     throw new Error("Your session expired. Please log in again.");
+  }
+  if(response.status===403){
+    throw new Error(data.error||"You do not have permission to do this.");
   }
   if(!response.ok)throw new Error(data.error||data.message||"Request failed.");
   return data;
@@ -262,9 +282,25 @@ function setAvatarImage(element,url){
   element.src=url||FALLBACK_AVATAR;
 }
 
+function safeCount(value){
+  const n=Number(value);
+  return Number.isFinite(n)&&n>=0?n:0;
+}
+function normalizeReactionCounts(post){
+  const raw=post.reaction_counts||post.reactions_count||{};
+  return {
+    like:safeCount(raw.like??raw.likes??post.like_count??post.likes),
+    love:safeCount(raw.love??raw.loves??post.love_count),
+    sad:safeCount(raw.sad??raw.sads??post.sad_count),
+    angry:safeCount(raw.angry??raw.angries??post.angry_count)
+  };
+}
 function normalizePost(post){
   const avatar=findAvatar(post)||FALLBACK_AVATAR;
   const mediaType=String(post.media_type||post.type||"").toLowerCase();
+  const reactionCounts=normalizeReactionCounts(post);
+  const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:
+    (post.liked_by_me===true||post.liked===true?"like":null);
   return {
     ...post,
     id:String(post.id),
@@ -274,10 +310,12 @@ function normalizePost(post){
     src:post.media_url||post.url||"",
     type:["video","mp4","webm","quicktime"].includes(mediaType)?"video":
       ["image","photo","png","jpg","jpeg","webp","gif"].includes(mediaType)?"photo":"",
-    likes:Number(post.like_count||0),
-    comments:Number(post.comment_count||0),
-    views:Number(post.view_count??post.views??0),
-    liked:post.liked_by_me===true,
+    likes:reactionCounts.like,
+    reactionCounts,
+    myReaction,
+    liked:myReaction==="like",
+    comments:safeCount(post.comment_count??post.comments_count??0),
+    views:safeCount(post.view_count??post.views??0),
     time:relativeTime(post.created_at)
   };
 }
@@ -331,21 +369,22 @@ async function loadFeed(){
   }finally{loading=false}
 }
 
-/* পোস্ট দৃশ্যমান হলে ভিউ API-তে পাঠানো হয়। */
 async function recordPostView(id){
   id=String(id);
   if(!id||viewRequestsInSession.has(id)||!token())return;
   viewRequestsInSession.add(id);
   try{
     const data=await api("/posts/"+encodeURIComponent(id)+"/view",{
-      method:"POST",
-      body:JSON.stringify({})
+      method:"POST",body:JSON.stringify({})
     });
     const post=videos.find(v=>String(v.id)===id);
     if(post&&data.view_count!==undefined){
-      post.views=Number(data.view_count)||0;
-      document.querySelectorAll('.post-card[data-id="'+CSS.escape(id)+'"] .view-count').forEach(el=>{
-        el.innerHTML='<i class="fa-solid fa-eye"></i> '+post.views+' views';
+      post.views=safeCount(data.view_count);
+      document.querySelectorAll(".post-card").forEach(card=>{
+        if(card.dataset.id===id){
+          const el=card.querySelector(".view-count");
+          if(el)el.innerHTML='<i class="fa-solid fa-eye"></i> '+post.views+' views';
+        }
       });
     }
   }catch(error){
@@ -365,16 +404,14 @@ function setupPostViewObserver(){
   viewObserver=new IntersectionObserver(entries=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting&&entry.intersectionRatio>=0.5){
-        const id=entry.target.dataset.id;
         viewObserver.unobserve(entry.target);
-        recordPostView(id);
+        recordPostView(entry.target.dataset.id);
       }
     });
   },{threshold:[0.5]});
   cards.forEach(card=>viewObserver.observe(card));
 }
 
-/* ভিডিও স্বয়ংক্রিয়ভাবে চলে; শুরুতে মিউট থাকে, ব্যবহারকারী সাউন্ড চালু করতে পারেন। */
 function setupVideoAutoplay(){
   if(videoObserver){videoObserver.disconnect();videoObserver=null}
   activeVideo=null;
@@ -451,6 +488,19 @@ function setupVideoAutoplay(){
   }
 }
 
+function reactionButtonHTML(v){
+  const reaction=v.myReaction&&REACTIONS[v.myReaction]?REACTIONS[v.myReaction]:null;
+  const label=reaction?reaction.label:"React";
+  const icon=reaction?reaction.emoji:"👍";
+  const cls=reaction?" "+reaction.className:"";
+  const picker=Object.entries(REACTIONS).map(([key,item])=>
+    '<button type="button" class="reaction-choice" aria-label="'+item.label+'" title="'+item.label+'" onclick="chooseReaction(event,\''+esc(v.id)+'\',\''+key+'\')"><span class="emoji">'+item.emoji+'</span><small>'+item.label+'</small></button>'
+  ).join("");
+  return '<div class="reaction-wrap" data-reaction-wrap="'+esc(v.id)+'">'+
+    '<button type="button" class="post-action-btn'+cls+'" onclick="toggleReactionPicker(event,\''+esc(v.id)+'\')" aria-label="Choose reaction"><span>'+icon+'</span> '+label+'</button>'+
+    '<div class="reaction-picker">'+picker+'</div></div>';
+}
+
 function render(list=videos){
   const feed=document.getElementById("feed");
   if(videoObserver){videoObserver.disconnect();videoObserver=null}
@@ -470,6 +520,20 @@ function render(list=videos){
       media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
     }
 
+    const counts=v.reactionCounts||{like:0,love:0,sad:0,angry:0};
+    const totalReactions=safeCount(counts.like)+safeCount(counts.love)+safeCount(counts.sad)+safeCount(counts.angry);
+    let reactionSummary="";
+    if(totalReactions>0){
+      reactionSummary=
+        (counts.like?'<span class="reaction-emoji">👍</span>':'')+
+        (counts.love?'<span class="reaction-emoji">❤️</span>':'')+
+        (counts.sad?'<span class="reaction-emoji">😢</span>':'')+
+        (counts.angry?'<span class="reaction-emoji">😡</span>':'')+
+        '<span>'+totalReactions+'</span>';
+    }else{
+      reactionSummary='<span>0 reactions</span>';
+    }
+
     return `
       <article class="post-card" data-id="${esc(v.id)}">
         <div class="post-header">
@@ -485,12 +549,12 @@ function render(list=videos){
         ${v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':""}
         ${media}
         <div class="post-stats">
-          <span><i class="fa-solid fa-thumbs-up" style="color:#1877f2"></i> ${Number(v.likes)||0} likes</span>
-          <span class="view-count"><i class="fa-solid fa-eye"></i> ${Number(v.views)||0} views</span>
-          <span class="comment-count">${Number(v.comments)||0} comments</span>
+          <span class="reaction-summary">${reactionSummary}</span>
+          <span class="comment-count">${safeCount(v.comments)} comments</span>
+          <span class="view-count"><i class="fa-solid fa-eye"></i> ${safeCount(v.views)} views</span>
         </div>
         <div class="post-actions-bar">
-          <button class="post-action-btn ${v.liked?"liked":""}" onclick="likePost('${esc(v.id)}')"><i class="fa-solid fa-thumbs-up"></i> ${v.liked?"Liked":"Like"}</button>
+          ${reactionButtonHTML(v)}
           <button class="post-action-btn" onclick="comments('${esc(v.id)}')"><i class="fa-regular fa-comment"></i> Comment</button>
           <button class="post-action-btn" onclick="sharePost('${esc(v.id)}')"><i class="fa-solid fa-share"></i> Share</button>
         </div>
@@ -501,17 +565,92 @@ function render(list=videos){
   setupPostViewObserver();
 }
 
-async function likePost(id){
-  if(!requireLogin())return;
-  const v=videos.find(item=>item.id===String(id));
-  if(!v)return;
-  try{
-    const data=await api("/posts/"+encodeURIComponent(id)+"/like",{method:"POST",body:JSON.stringify({})});
-    v.liked=data.liked;
-    v.likes=Number(data.like_count);
-    render(videos);
-  }catch(error){toast(error.message)}
+function toggleReactionPicker(event,id){
+  event.preventDefault();
+  event.stopPropagation();
+  const target=String(id);
+  const wrap=document.querySelector('[data-reaction-wrap="'+CSS.escape(target)+'"]');
+  if(!wrap)return;
+  const wasOpen=wrap.classList.contains("open");
+  document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
+  if(!wasOpen)wrap.classList.add("open");
 }
+
+async function chooseReaction(event,id,reaction){
+  event.preventDefault();
+  event.stopPropagation();
+  const postId=String(id);
+  const post=videos.find(item=>item.id===postId);
+  if(!post||!REACTIONS[reaction])return;
+  if(!requireLogin())return;
+  if(pendingReactions.has(postId))return;
+
+  document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
+  pendingReactions.add(postId);
+
+  const oldReaction=post.myReaction;
+  const oldCounts={...post.reactionCounts};
+  const oldLikes=post.likes;
+
+  // Update the screen immediately; restore the old values if the API fails.
+  if(oldReaction===reaction){
+    post.myReaction=null;
+    post.reactionCounts[reaction]=Math.max(0,safeCount(post.reactionCounts[reaction])-1);
+  }else{
+    if(oldReaction&&REACTIONS[oldReaction]){
+      post.reactionCounts[oldReaction]=Math.max(0,safeCount(post.reactionCounts[oldReaction])-1);
+    }
+    post.myReaction=reaction;
+    post.reactionCounts[reaction]=safeCount(post.reactionCounts[reaction])+1;
+  }
+  post.liked=post.myReaction==="like";
+  post.likes=safeCount(post.reactionCounts.like);
+  render(videos);
+
+  try{
+    const data=await api("/posts/"+encodeURIComponent(postId)+"/reaction",{
+      method:"PUT",
+      body:JSON.stringify({reaction})
+    });
+    post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
+    if(data.reaction_counts){
+      post.reactionCounts=normalizeReactionCounts({reaction_counts:data.reaction_counts});
+    }else{
+      post.reactionCounts=normalizeReactionCounts({
+        reaction_counts:oldCounts,
+        like_count:data.like_count
+      });
+    }
+    post.likes=safeCount(data.like_count??post.reactionCounts.like);
+    post.reactionCounts.like=post.likes;
+    post.liked=post.myReaction==="like";
+    render(videos);
+  }catch(error){
+    post.myReaction=oldReaction;
+    post.reactionCounts=oldCounts;
+    post.likes=oldLikes;
+    post.liked=oldReaction==="like";
+    render(videos);
+    toast(error.message);
+  }finally{
+    pendingReactions.delete(postId);
+  }
+}
+
+// Compatibility function in case another part of the page calls likePost().
+async function likePost(id){
+  return chooseReaction(
+    {preventDefault(){},stopPropagation(){}},
+    String(id),
+    "like"
+  );
+}
+
+document.addEventListener("click",event=>{
+  if(!event.target.closest(".reaction-wrap")){
+    document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
+  }
+});
 
 async function comments(id){
   activeCommentId=String(id);
@@ -630,7 +769,7 @@ async function sharePost(id){
 async function loadNotificationCount(){
   try{
     const data=await api("/notifications");
-    const count=Number(data.unread_count||0);
+    const count=safeCount(data.unread_count);
     const badge=document.getElementById("notificationBadge");
     badge.textContent=count>99?"99+":String(count);
     badge.hidden=count===0;
@@ -639,7 +778,7 @@ async function loadNotificationCount(){
 async function loadMessageCount(){
   try{
     const data=await api("/messages");
-    const count=(data.conversations||[]).reduce((sum,item)=>sum+Number(item.unread_count||0),0);
+    const count=(data.conversations||[]).reduce((sum,item)=>sum+safeCount(item.unread_count),0);
     const badge=document.getElementById("messageBadge");
     badge.textContent=count>99?"99+":String(count);
     badge.hidden=count===0;
