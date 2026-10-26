@@ -1,0 +1,685 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#173d2b">
+<title>FreeTube - Login & Sign Up</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    background: linear-gradient(135deg, #0d3b22, #1b4d3e, #4a0e17, #7a1c24);
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.bg-circle {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(50px);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.bg1 {
+    width: 250px;
+    height: 250px;
+    background: rgba(0, 200, 100, 0.3);
+    top: -50px;
+    left: -50px;
+}
+
+.bg2 {
+    width: 220px;
+    height: 220px;
+    background: rgba(220, 20, 60, 0.3);
+    bottom: -30px;
+    right: -30px;
+}
+
+.container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.form-box {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    padding: 30px 25px;
+    border-radius: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    display: none;
+    text-align: center;
+}
+
+.form-box.active {
+    display: block;
+}
+
+.header-icon {
+    width: 70px;
+    height: 70px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #00ff88;
+    font-size: 24px;
+}
+
+.form-box h2 {
+    color: #fff;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.sub-title {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 13px;
+    margin-bottom: 25px;
+}
+
+.input-field {
+    position: relative;
+    margin-bottom: 16px;
+}
+
+.input-field input {
+    width: 100%;
+    padding: 14px 44px 14px 18px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 30px;
+    color: #fff;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+.input-field input:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: #00ff88;
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+}
+
+.input-field input::placeholder {
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.toggle-password {
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+    padding: 5px;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    outline: none;
+    background: linear-gradient(135deg, #00b074, #008253);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0, 176, 116, 0.3);
+    transition: 0.3s ease;
+    margin-top: 8px;
+}
+
+.submit-btn:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.switch-link {
+    margin-top: 20px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.switch-link button {
+    background: none;
+    border: none;
+    color: #00ff88;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.status-message {
+    display: none;
+    margin: 0 0 16px;
+    padding: 11px 13px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.status-message.show {
+    display: block;
+}
+
+.status-message.error {
+    background: rgba(255, 60, 80, 0.18);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+    color: #fff;
+}
+
+.status-message.success {
+    background: rgba(0, 255, 136, 0.12);
+    border: 1px solid rgba(0, 255, 136, 0.35);
+    color: #fff;
+}
+
+@media (max-width: 360px) {
+    .container {
+        padding: 12px;
+    }
+
+    .form-box {
+        padding: 25px 18px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-circle bg1"></div>
+<div class="bg-circle bg2"></div>
+
+<div class="container">
+
+    <!-- Create Account -->
+    <section class="form-box signup-box active">
+        <div class="header-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <h2>Create Account</h2>
+        <p class="sub-title">Start your journey with FreeTube</p>
+
+        <div id="signupStatus" class="status-message" role="status" aria-live="polite"></div>
+
+        <form id="signupForm">
+            <div class="input-field">
+                <input
+                    type="text"
+                    id="signup-name"
+                    name="full_name"
+                    placeholder="Full Name"
+                    autocomplete="name"
+                    maxlength="80"
+                    minlength="2"
+                    required
+                >
+            </div>
+
+            <div class="input-field">
+                <input
+                    type="email"
+                    id="signup-email"
+                    name="email"
+                    placeholder="Email Address"
+                    autocomplete="email"
+                    maxlength="254"
+                    required
+                >
+            </div>
+
+            <div class="input-field">
+                <input
+                    type="password"
+                    id="signup-password"
+                    name="password"
+                    placeholder="Password (at least 8 characters)"
+                    autocomplete="new-password"
+                    minlength="8"
+                    maxlength="128"
+                    required
+                >
+                <i class="fa-solid fa-eye-slash toggle-password"
+                   data-target="signup-password"
+                   role="button"
+                   tabindex="0"
+                   aria-label="Show password"></i>
+            </div>
+
+            <div class="input-field">
+                <input
+                    type="password"
+                    id="signup-confirm-password"
+                    name="confirmPassword"
+                    placeholder="Confirm Password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    maxlength="128"
+                    required
+                >
+                <i class="fa-solid fa-eye-slash toggle-password"
+                   data-target="signup-confirm-password"
+                   role="button"
+                   tabindex="0"
+                   aria-label="Show confirm password"></i>
+            </div>
+
+            <button type="submit" class="submit-btn" id="signupButton">
+                CREATE ACCOUNT
+            </button>
+        </form>
+
+        <div class="switch-link">
+            <span>Already have an account?</span>
+            <button type="button" id="to-login">Login</button>
+        </div>
+    </section>
+
+    <!-- Login -->
+    <section class="form-box login-box">
+        <div class="header-icon">
+            <i class="fa-solid fa-lock"></i>
+        </div>
+
+        <h2>Welcome Back</h2>
+        <p class="sub-title">Please login to your account</p>
+
+        <div id="loginStatus" class="status-message" role="status" aria-live="polite"></div>
+
+        <form id="loginForm">
+            <div class="input-field">
+                <input
+                    type="text"
+                    id="login-identifier"
+                    name="identifier"
+                    placeholder="Email Address or Username"
+                    autocomplete="username"
+                    maxlength="255"
+                    required
+                >
+            </div>
+
+            <div class="input-field">
+                <input
+                    type="password"
+                    id="login-password"
+                    name="password"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required
+                >
+                <i class="fa-solid fa-eye-slash toggle-password"
+                   data-target="login-password"
+                   role="button"
+                   tabindex="0"
+                   aria-label="Show password"></i>
+            </div>
+
+            <button type="submit" class="submit-btn" id="loginButton">
+                LOGIN
+            </button>
+        </form>
+
+        <div class="switch-link">
+            <span>Don't have an account?</span>
+            <button type="button" id="to-signup">Sign Up</button>
+        </div>
+    </section>
+
+</div>
+
+<script>
+(function () {
+    "use strict";
+
+    const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
+    const TOKEN_KEY = "freetube_access_token";
+
+    const signupBox = document.querySelector(".signup-box");
+    const loginBox = document.querySelector(".login-box");
+
+    const signupForm = document.getElementById("signupForm");
+    const loginForm = document.getElementById("loginForm");
+
+    const signupButton = document.getElementById("signupButton");
+    const loginButton = document.getElementById("loginButton");
+
+    const signupStatus = document.getElementById("signupStatus");
+    const loginStatus = document.getElementById("loginStatus");
+
+    function showForm(formName) {
+        const showLogin = formName === "login";
+
+        signupBox.classList.toggle("active", !showLogin);
+        loginBox.classList.toggle("active", showLogin);
+
+        clearStatus(signupStatus);
+        clearStatus(loginStatus);
+    }
+
+    document.getElementById("to-login").addEventListener("click", function () {
+        showForm("login");
+    });
+
+    document.getElementById("to-signup").addEventListener("click", function () {
+        showForm("signup");
+    });
+
+    function showStatus(element, message, type) {
+        element.textContent = message;
+        element.className = "status-message show " + type;
+    }
+
+    function clearStatus(element) {
+        element.textContent = "";
+        element.className = "status-message";
+    }
+
+    function setLoading(button, loading, normalText) {
+        button.disabled = loading;
+        button.textContent = loading ? "Please wait..." : normalText;
+    }
+
+    function getToken() {
+        try {
+            return localStorage.getItem(TOKEN_KEY);
+        } catch (_) {
+            return null;
+        }
+    }
+
+    function saveToken(token) {
+        try {
+            localStorage.setItem(TOKEN_KEY, token);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
+
+    function clearToken() {
+        try {
+            localStorage.removeItem(TOKEN_KEY);
+        } catch (_) {}
+    }
+
+    async function apiRequest(path, options) {
+        const response = await fetch(API_BASE_URL + path, {
+            ...options,
+            headers: {
+                "Content-Type": "application/json",
+                ...(options && options.headers ? options.headers : {})
+            }
+        });
+
+        let data = {};
+
+        try {
+            data = await response.json();
+        } catch (_) {}
+
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                data.message ||
+                "Request failed. Please try again."
+            );
+        }
+
+        return data;
+    }
+
+    function extractToken(data) {
+        return (
+            data.token ||
+            data.accessToken ||
+            data.access_token ||
+            (data.data && (
+                data.data.token ||
+                data.data.accessToken ||
+                data.data.access_token
+            )) ||
+            null
+        );
+    }
+
+    function getErrorMessage(error) {
+        if (error instanceof TypeError) {
+            return "Could not connect to the server. Check your internet connection and try again.";
+        }
+
+        return error.message || "Something went wrong. Please try again.";
+    }
+
+    async function checkExistingSession() {
+        const token = getToken();
+
+        if (!token) return;
+
+        try {
+            const response = await fetch(API_BASE_URL + "/auth/me", {
+                method: "GET",
+                headers: {
+                    "Authorization": "Bearer " + token
+                }
+            });
+
+            if (response.ok) {
+                window.location.replace("home.html");
+                return;
+            }
+
+            if (response.status === 401 || response.status === 403) {
+                clearToken();
+            }
+        } catch (_) {
+            // Keep the login screen available if the server is unreachable.
+        }
+    }
+
+    document.querySelectorAll(".toggle-password").forEach(function (icon) {
+        function togglePassword() {
+            const input = document.getElementById(icon.dataset.target);
+            if (!input) return;
+
+            const showing = input.type === "password";
+            input.type = showing ? "text" : "password";
+
+            icon.classList.toggle("fa-eye", showing);
+            icon.classList.toggle("fa-eye-slash", !showing);
+            icon.setAttribute(
+                "aria-label",
+                showing ? "Hide password" : "Show password"
+            );
+        }
+
+        icon.addEventListener("click", togglePassword);
+
+        icon.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                togglePassword();
+            }
+        });
+    });
+
+    // SIGN UP
+    signupForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearStatus(signupStatus);
+
+        const fullName = document.getElementById("signup-name").value.trim();
+        const email = document.getElementById("signup-email").value.trim();
+        const password = document.getElementById("signup-password").value;
+        const confirmPassword = document.getElementById("signup-confirm-password").value;
+
+        if (fullName.length < 2) {
+            showStatus(signupStatus, "Please enter your full name.", "error");
+            return;
+        }
+
+        if (new TextEncoder().encode(password).length > 128) {
+            showStatus(signupStatus, "Password is too long.", "error");
+            return;
+        }
+
+        if (password.length < 8) {
+            showStatus(signupStatus, "Password must contain at least 8 characters.", "error");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showStatus(signupStatus, "Passwords do not match.", "error");
+            return;
+        }
+
+        setLoading(signupButton, true, "CREATE ACCOUNT");
+
+        try {
+            const data = await apiRequest("/auth/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    full_name: fullName,
+                    email: email,
+                    password: password
+                })
+            });
+
+            const token = extractToken(data);
+
+            if (token) {
+                if (!saveToken(token)) {
+                    showForm("login");
+                    document.getElementById("login-identifier").value = email;
+
+                    showStatus(
+                        loginStatus,
+                        "Account created. Please log in to continue.",
+                        "success"
+                    );
+                    return;
+                }
+
+                showStatus(
+                    signupStatus,
+                    "Account created successfully. Opening FreeTube...",
+                    "success"
+                );
+
+                setTimeout(function () {
+                    window.location.replace("home.html");
+                }, 500);
+
+                return;
+            }
+
+            showForm("login");
+            document.getElementById("login-identifier").value = email;
+
+            showStatus(
+                loginStatus,
+                "Account created successfully. Please log in.",
+                "success"
+            );
+
+        } catch (error) {
+            showStatus(signupStatus, getErrorMessage(error), "error");
+        } finally {
+            setLoading(signupButton, false, "CREATE ACCOUNT");
+        }
+    });
+
+    // LOGIN WITH EMAIL OR USERNAME
+    loginForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        clearStatus(loginStatus);
+
+        const identifier = document.getElementById("login-identifier").value.trim();
+        const password = document.getElementById("login-password").value;
+
+        setLoading(loginButton, true, "LOGIN");
+
+        try {
+            const data = await apiRequest("/auth/login", {
+                method: "POST",
+                body: JSON.stringify({
+                    identifier: identifier,
+                    password: password
+                })
+            });
+
+            const token = extractToken(data);
+
+            if (!token) {
+                throw new Error(
+                    "The server did not return an access token. Please check the backend login response."
+                );
+            }
+
+            if (!saveToken(token)) {
+                throw new Error(
+                    "Login succeeded, but this browser could not save your session."
+                );
+            }
+
+            showStatus(
+                loginStatus,
+                "Login successful. Opening FreeTube...",
+                "success"
+            );
+
+            setTimeout(function () {
+                window.location.replace("home.html");
+            }, 400);
+
+        } catch (error) {
+            showStatus(loginStatus, getErrorMessage(error), "error");
+        } finally {
+            setLoading(loginButton, false, "LOGIN");
+        }
+    });
+
+    checkExistingSession();
+})();
+</script>
+
+</body>
+</html>
