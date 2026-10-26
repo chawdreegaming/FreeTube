@@ -2,845 +2,749 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d3b22">
-<title>FreeTube - Home Feed</title>
+<title>FreeTube - Home</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
-:root{--bg-gradient:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);--panel-bg:rgba(19,45,31,.92);--panel-border:rgba(255,255,255,.18);--accent-green:#00ff88;--accent-red:#ff5e62;--muted:rgba(255,255,255,.65)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:var(--bg-gradient);background-attachment:fixed;color:#fff;min-height:100vh}
-button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
-.app{max-width:480px;margin:auto;position:relative;background:rgba(13,59,34,.3);min-height:100dvh;padding-bottom:75px;box-shadow:0 0 40px rgba(0,0,0,.5)}
-.topbar{position:sticky;z-index:10;top:0;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(13,59,34,.94);backdrop-filter:blur(15px);border-bottom:1px solid var(--panel-border)}
-.brand{font-size:22px;font-weight:900;letter-spacing:-.5px}.brand span,.brand i{color:var(--accent-green)}.brand i{margin-right:4px}
-.top-actions{display:flex;gap:8px}.icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid var(--panel-border);display:grid;place-items:center;color:#fff;font-size:15px;position:relative}
-.notif-badge{position:absolute;top:-2px;right:-2px;background:var(--accent-red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:10px;border:1px solid #0d3b22}
-.create-post-box{background:rgba(19,45,31,.85);border-bottom:1px solid var(--panel-border);padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer}
-.create-post-box img{width:40px;height:40px;border-radius:50%;object-fit:cover}
-.create-input-fake{flex:1;background:rgba(255,255,255,.08);border:1px solid var(--panel-border);border-radius:20px;padding:10px 16px;color:rgba(255,255,255,.7);font-size:14px;display:flex;align-items:center;justify-content:space-between}
-.create-input-fake i{color:var(--accent-green);font-size:18px}
-.stories-container{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;background:rgba(13,59,34,.5);border-bottom:1px solid var(--panel-border);scrollbar-width:none}
-.stories-container::-webkit-scrollbar{display:none}
-.story-card{flex-shrink:0;width:100px;height:160px;border-radius:14px;overflow:hidden;position:relative;background:#222;border:1px solid var(--panel-border);display:flex;flex-direction:column;justify-content:flex-end;padding:8px}
-.story-card.create-story{background:rgba(255,255,255,.05);justify-content:center;align-items:center;text-align:center;cursor:pointer}
-.story-card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.story-avatar{position:absolute!important;top:8px!important;left:8px!important;inset:auto!important;width:32px!important;height:32px!important;border-radius:50%;border:2px solid var(--accent-green);z-index:2}
-.story-card span{position:relative;z-index:2;font-size:11px;font-weight:700;text-shadow:0 1px 3px #000}
-.create-story-icon{width:36px;height:36px;border-radius:50%;background:var(--accent-green);color:#0d3b22;display:grid;place-items:center;margin-bottom:8px}
-.feed{padding-top:8px}.post-card{background:var(--panel-bg);backdrop-filter:blur(12px);border-top:1px solid var(--panel-border);border-bottom:1px solid var(--panel-border);margin-bottom:10px}
-.post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
-.post-user-info{display:flex;align-items:center;gap:10px}.post-avatar{width:40px;height:40px;border-radius:50%;object-fit:cover;border:1px solid var(--panel-border)}
-.post-author{font-size:14px;font-weight:700}.post-time{font-size:11px;color:var(--muted);margin-top:3px}.post-options{color:var(--muted);font-size:16px}
-.post-body-text{padding:0 16px 10px;font-size:14px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
-.post-media-container{width:100%;background:#000;max-height:450px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
-.post-media-container img,.post-media-container video{width:100%;max-height:450px;object-fit:contain;display:block}.post-media-container video{background:#000}
-.sound-toggle{position:absolute;z-index:5;right:12px;top:12px;width:43px;height:43px;border-radius:50%;display:grid;place-items:center;color:#fff;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.55);box-shadow:0 2px 12px #0007;font-size:17px;touch-action:manipulation}
-.sound-toggle:active{transform:scale(.94)}.sound-toggle:focus-visible{outline:2px solid var(--accent-green)}
-.video-error-message{padding:8px 16px;color:#ffb5b5;font-size:12px}
-.post-stats{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;padding:9px 12px;font-size:11px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.08)}
-.post-stats>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.post-stats .comment-count{text-align:center}.post-stats .view-count{text-align:right}
-.reaction-summary{display:flex;align-items:center;gap:3px;min-width:0}
-.reaction-summary .reaction-emoji{font-size:13px}
-.post-actions-bar{display:flex;justify-content:space-around;align-items:center;padding:4px 3px}
-.post-action-btn{background:none;color:rgba(255,255,255,.8);font-size:12px;font-weight:600;padding:9px 8px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;min-width:0;flex:1}
-.post-action-btn:hover{background:rgba(255,255,255,.08)}
-.post-action-btn.selected{color:#54a8ff}.post-action-btn.reaction-love{color:#ff687e}.post-action-btn.reaction-sad{color:#ffd166}.post-action-btn.reaction-angry{color:#ff785c}
-.reaction-wrap{position:relative;display:flex;flex:1;min-width:0}
-.reaction-wrap>.post-action-btn{width:100%}
-.reaction-picker{display:none;position:absolute;bottom:calc(100% + 5px);left:0;z-index:30;background:#14251d;border:1px solid var(--panel-border);border-radius:24px;padding:6px;gap:3px;box-shadow:0 4px 18px #0008}
-.reaction-wrap.open .reaction-picker{display:flex}
-.reaction-choice{width:42px;height:42px;flex-shrink:0;border-radius:50%;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0}
-.reaction-choice:hover,.reaction-choice:focus-visible{background:rgba(255,255,255,.15);transform:scale(1.08)}
-.reaction-choice .emoji{font-size:23px;line-height:25px}.reaction-choice small{font-size:8px;color:#fff}
-.bottom-nav{position:fixed;z-index:20;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:55px;padding:6px 5px calc(6px + env(safe-area-inset-bottom));background:rgba(13,59,34,.97);backdrop-filter:blur(18px);border-top:1px solid var(--panel-border)}
-.nav-item{background:none;color:rgba(255,255,255,.6);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;min-width:48px;position:relative}
-.nav-item i{font-size:18px}.nav-item.active{color:var(--accent-green)}
-.screen{display:none;position:fixed;z-index:15;inset:0;overflow-y:auto;background:var(--bg-gradient);padding:20px 16px 100px}.screen.active{display:block}
-.screen-head{display:flex;align-items:center;justify-content:space-between;padding:10px 0 20px}
-.panel{background:var(--panel-bg);border:1px solid var(--panel-border);border-radius:16px;padding:16px;margin-bottom:12px}
-.field{display:block;width:100%;padding:11px 13px;background:rgba(255,255,255,.06);border:1px solid var(--panel-border);border-radius:10px;color:#fff;margin-top:8px;outline:none;font-size:13px}
-.secondary{padding:10px 13px;border-radius:10px;background:rgba(255,255,255,.08);border:1px solid var(--panel-border);color:#fff;font-size:13px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.row>*{flex:1;min-width:0}
-.fb-modal{display:none;position:fixed;z-index:100;inset:0;background:#111419;flex-direction:column}.fb-modal.open{display:flex}
-.fb-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
-.fb-header .close-btn{background:none;font-size:20px}.fb-header h2{font-size:17px}.fb-header .next-btn{background:#1877f2;font-weight:700;padding:7px 18px;border-radius:8px;font-size:14px}
-.fb-body{flex:1;overflow-y:auto;padding:16px}.fb-user-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.fb-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover}.fb-user-name{font-weight:700;font-size:15px}
-.fb-textarea{width:100%;background:transparent;border:none;outline:none;color:#fff;font-size:18px;resize:vertical;min-height:100px;margin-top:6px}
-.fb-textarea::placeholder{color:rgba(255,255,255,.4)}
-.fb-media-container{margin-top:14px;border-radius:12px;overflow:hidden;background:#1c2128;border:1px solid rgba(255,255,255,.1);min-height:200px;display:flex;align-items:center;justify-content:center}
-.fb-add-media-trigger{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,.7);cursor:pointer;width:100%;height:200px}
-.fb-add-media-trigger i{font-size:32px;color:var(--accent-green)}.fb-media-preview-box{display:none;position:relative;width:100%}
-.fb-media-preview-box img,.fb-media-preview-box video{width:100%;max-height:380px;object-fit:contain;display:block}
-.fb-overlay-actions{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:center;z-index:5}
-.fb-overlay-btn{background:rgba(0,0,0,.75);color:#fff;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px}
-.fb-icon-circle{width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.75);display:grid;place-items:center;cursor:pointer}
-.modal{display:none;position:fixed;z-index:50;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);align-items:flex-end;justify-content:center;padding:12px}
-.modal.open{display:flex}.modal-content{background:rgba(19,45,31,.98);border:1px solid var(--panel-border);border-radius:18px;padding:18px;width:100%;max-width:460px;max-height:85dvh;overflow:auto}
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-.close{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid var(--panel-border);display:grid;place-items:center}
-.comment{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
-.toast{position:fixed;z-index:150;left:50%;bottom:75px;transform:translate(-50%,10px);opacity:0;pointer-events:none;background:rgba(20,20,30,.97);border:1px solid var(--panel-border);border-radius:10px;padding:10px 14px;font-size:12px;transition:.2s;text-align:center;max-width:90%}
-.toast.show{opacity:1;transform:translate(-50%,0)}.empty-state{padding:35px 20px;text-align:center;color:var(--muted);font-size:13px}.loading{text-align:center;padding:30px;color:var(--muted);font-size:13px}
-@media(max-width:350px){.nav-item{min-width:42px}.sound-toggle{width:39px;height:39px}.post-stats{font-size:9px;gap:4px;padding:8px 7px}.post-action-btn{font-size:11px;padding:8px 4px}.reaction-choice{width:36px;height:40px}}
+:root {
+  --green: #00ff88;
+  --red: #ff5e62;
+  --bg: #0d2419;
+  --panel: rgba(19,45,31,.96);
+  --border: rgba(255,255,255,.14);
+  --muted: rgba(255,255,255,.65);
+}
+* { box-sizing:border-box; margin:0; padding:0; font-family:Arial, sans-serif; -webkit-tap-highlight-color:transparent; }
+body { color:#fff; background:linear-gradient(135deg,#0d3b22,#102d20,#35121b); min-height:100vh; }
+button,input,textarea { font:inherit; }
+button { cursor:pointer; color:inherit; border:0; }
+.app { max-width:480px; min-height:100dvh; margin:auto; padding-bottom:78px; background:#0d3b222b; }
+.topbar { position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center; padding:15px 16px; background:rgba(13,59,34,.97); border-bottom:1px solid var(--border); }
+.brand { font-size:25px; font-weight:900; letter-spacing:-1px; }
+.brand i,.brand span { color:var(--green); }
+.icon-btn { width:40px; height:40px; border-radius:50%; background:#ffffff18; border:1px solid var(--border); position:relative; }
+.badge { position:absolute; top:-4px; right:-4px; background:var(--red); border-radius:12px; font-size:10px; padding:3px 5px; }
+.composer { display:flex; align-items:center; gap:10px; padding:13px 16px; background:var(--panel); border-bottom:1px solid var(--border); cursor:pointer; }
+.avatar { width:42px; height:42px; object-fit:cover; border-radius:50%; border:1px solid var(--border); flex-shrink:0; }
+.fake-input { flex:1; border:1px solid var(--border); border-radius:25px; padding:12px 15px; background:#ffffff0d; color:var(--muted); font-size:14px; }
+.fake-input i { float:right; color:var(--green); }
+.stories { display:flex; gap:9px; overflow-x:auto; padding:12px 15px; background:#0d3b2270; scrollbar-width:none; }
+.story { width:100px; height:155px; flex-shrink:0; position:relative; border-radius:14px; overflow:hidden; border:1px solid var(--border); background:#244b37; display:flex; justify-content:flex-end; padding:8px; }
+.story img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.story:after { content:""; position:absolute; inset:45% 0 0; background:linear-gradient(transparent,#000b); }
+.story span { position:relative; z-index:2; font-size:11px; font-weight:bold; }
+.story.create { align-items:center; justify-content:center; flex-direction:column; gap:10px; text-align:center; background:#ffffff0b; cursor:pointer; }
+.story.create:after { display:none; }
+.story.create i { background:var(--green); color:#06351f; padding:12px; border-radius:50%; }
+.post { margin:10px 0; background:var(--panel); border-top:1px solid var(--border); border-bottom:1px solid var(--border); }
+.post-header { display:flex; align-items:center; justify-content:space-between; padding:12px 15px; }
+.author-row { display:flex; align-items:center; gap:10px; min-width:0; }
+.author-name { font-size:14px; font-weight:bold; overflow-wrap:anywhere; }
+.post-time { color:var(--muted); font-size:11px; margin-top:4px; }
+.profile-clickable { cursor:pointer; }
+.profile-clickable:active { opacity:.75; }
+.post-text { padding:0 15px 12px; font-size:14px; line-height:1.5; overflow-wrap:anywhere; white-space:pre-wrap; }
+.media { position:relative; background:#000; display:flex; justify-content:center; max-height:500px; overflow:hidden; }
+.media img,.media video { width:100%; max-height:500px; object-fit:contain; display:block; }
+.sound { position:absolute; right:12px; top:12px; z-index:2; width:42px; height:42px; border-radius:50%; background:#000b; border:1px solid #ffffff70; }
+.stats { display:flex; align-items:center; justify-content:space-between; gap:6px; padding:11px 12px; color:var(--muted); font-size:12px; border-bottom:1px solid #ffffff12; }
+.stats span { white-space:nowrap; }
+.actions { display:flex; align-items:center; padding:4px; }
+.action { flex:1; min-width:0; background:none; border-radius:7px; padding:12px 3px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; font-weight:bold; color:#ddd; }
+.action:active { background:#ffffff12; }
+.action.loved { color:#ff687e; }
+.bottom-nav { position:fixed; z-index:30; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:480px; display:flex; justify-content:space-around; padding:9px 3px calc(8px + env(safe-area-inset-bottom)); background:rgba(13,59,34,.98); border-top:1px solid var(--border); }
+.nav-item { background:none; color:#ffffff9c; display:flex; flex-direction:column; align-items:center; gap:4px; font-size:10px; min-width:48px; position:relative; }
+.nav-item i { font-size:18px; }
+.nav-item.active { color:var(--green); }
+.modal { display:none; position:fixed; inset:0; z-index:50; background:#000a; align-items:flex-end; justify-content:center; padding:10px; }
+.modal.open { display:flex; }
+.modal-content { width:100%; max-width:460px; max-height:88dvh; overflow:auto; background:#142a1e; border:1px solid var(--border); border-radius:18px; padding:17px; }
+.modal-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; }
+.close { background:#ffffff18; border-radius:50%; width:35px; height:35px; }
+.field { width:100%; color:white; background:#ffffff0b; border:1px solid var(--border); border-radius:10px; padding:12px; margin:7px 0; outline:none; }
+textarea.field { min-height:100px; resize:vertical; }
+.primary { background:var(--green); color:#07351f; font-weight:bold; padding:11px 15px; border-radius:10px; }
+.secondary { background:#ffffff12; border:1px solid var(--border); padding:10px 14px; border-radius:10px; }
+.comment { padding:10px 0; border-bottom:1px solid #ffffff15; font-size:13px; overflow-wrap:anywhere; white-space:pre-wrap; }
+.toast { position:fixed; z-index:100; bottom:80px; left:50%; transform:translateX(-50%); background:#18241d; border:1px solid var(--border); padding:12px 16px; border-radius:10px; font-size:13px; display:none; max-width:90%; text-align:center; }
+.toast.show { display:block; }
+.empty { padding:35px 18px; text-align:center; color:var(--muted); font-size:14px; }
+.reaction-picker { display:flex; gap:5px; justify-content:center; padding:8px; }
+.reaction-picker button { background:none; font-size:24px; padding:5px; }
+@media(max-width:350px) { .action { font-size:10px; } .nav-item { min-width:40px; } }
 </style>
 </head>
+
 <body>
 <div class="app">
-<header class="topbar">
-  <div class="brand"><i class="fa-solid fa-play"></i>Free<span>Tube</span></div>
-  <div class="top-actions">
-    <button class="icon-btn" onclick="openInbox()" aria-label="Messenger">
+  <header class="topbar">
+    <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
+    <button class="icon-btn" onclick="openInbox()" aria-label="Messages">
       <i class="fa-brands fa-facebook-messenger"></i>
-      <span id="messageBadge" class="notif-badge" hidden>0</span>
+      <span id="messageBadge" class="badge" hidden>0</span>
     </button>
-  </div>
-</header>
-
-<div class="create-post-box" onclick="openUpload()">
-  <img id="composerAvatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Avatar">
-  <div class="create-input-fake"><span>What's on your mind?</span><i class="fa-solid fa-photo-film"></i></div>
-</div>
-
-<div class="stories-container">
-  <div class="story-card create-story" onclick="openUpload()"><div class="create-story-icon"><i class="fa-solid fa-plus"></i></div><span>Create story</span></div>
-  <div class="story-card"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160" alt=""><img class="story-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120" alt=""><span>Alex Morgan</span></div>
-  <div class="story-card"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=160" alt=""><img class="story-avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120" alt=""><span>Travel Vlogs</span></div>
-  <div class="story-card"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=160" alt=""><img class="story-avatar" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120" alt=""><span>Sophia Lee</span></div>
-</div>
-
-<main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
-
-<section id="discover" class="screen">
-  <div class="screen-head"><h2><i class="fa-solid fa-compass" style="color:var(--accent-green)"></i> Discover</h2><button class="secondary" onclick="home()">Close</button></div>
-  <div class="panel"><h3>Explore FreeTube</h3><input id="search" class="field" placeholder="Search posts..." oninput="filterVideos(this.value)"><div class="row"><button class="secondary" onclick="clearSearch()">Show All</button></div></div>
-</section>
-
-<nav class="bottom-nav">
-  <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button id="navDiscover" class="nav-item" onclick="openDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-  <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="font-size:20px;color:var(--accent-green)"></i><span>Create</span></button>
-  <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="notif-badge" hidden>0</span><span>Notifications</span></button>
-  <button id="navProfile" class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
-</nav>
-</div>
-
-<div class="fb-modal" id="fbUploadModal">
-  <header class="fb-header">
-    <button class="close-btn" onclick="closeFbModal()" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-    <h2>Create post</h2><button id="publishButton" class="next-btn" onclick="submitFbPost()">Post</button>
   </header>
-  <div class="fb-body">
-    <div class="fb-user-row"><img id="modalAvatar" class="fb-avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Avatar"><div id="modalUsername" class="fb-user-name">FreeTube User</div></div>
-    <textarea id="fbPostText" class="fb-textarea" maxlength="5000" placeholder="What's on your mind?"></textarea>
-    <div class="fb-media-container">
-      <label id="fbMediaTrigger" for="fbFileInput" class="fb-add-media-trigger"><i class="fa-solid fa-photo-film"></i><span>Add photos or videos (max 50 MB)</span></label>
-      <input type="file" id="fbFileInput" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" style="display:none" onchange="handleFbFileSelect(event)">
-      <div id="fbMediaPreviewBox" class="fb-media-preview-box">
-        <div class="fb-overlay-actions"><label for="fbFileInput" class="fb-overlay-btn"><i class="fa-solid fa-plus"></i> Change media</label><button type="button" class="fb-icon-circle" onclick="clearFbMedia()" aria-label="Remove media"><i class="fa-solid fa-trash-can"></i></button></div>
-        <div id="fbPreviewElementContainer"></div>
-      </div>
-    </div>
+
+  <div class="composer" onclick="openUpload()">
+    <img id="composerAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="My profile">
+    <div class="fake-input">What's on your mind? <i class="fa-solid fa-photo-film"></i></div>
+  </div>
+
+  <div class="stories">
+    <div class="story create" onclick="openUpload()"><i class="fa-solid fa-plus"></i><span>Create story</span></div>
+    <div class="story"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200" alt=""><span>Alex Morgan</span></div>
+    <div class="story"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200" alt=""><span>Travel Vlogs</span></div>
+    <div class="story"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=200" alt=""><span>Sophia Lee</span></div>
+  </div>
+
+  <main id="feed"><div class="empty">Loading posts...</div></main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" onclick="goHome()"><i class="fa-solid fa-house"></i><span>Home</span></button>
+    <button class="nav-item" onclick="goDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
+    <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
+    <button class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span>Notifications</span><span id="notificationBadge" class="badge" hidden>0</span></button>
+    <button class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+  </nav>
+</div>
+
+<div class="modal" id="postModal">
+  <div class="modal-content">
+    <div class="modal-head"><h3>Create post</h3><button class="close" onclick="closeModal('postModal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <textarea id="postText" class="field" maxlength="5000" placeholder="What's on your mind?"></textarea>
+    <input id="postFile" class="field" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime">
+    <p style="color:var(--muted);font-size:11px;margin:5px 0 12px">Photos or videos · Maximum 50 MB</p>
+    <button id="publishButton" class="primary" onclick="publishPost()">Publish post</button>
   </div>
 </div>
 
 <div class="modal" id="commentModal">
   <div class="modal-content">
-    <div class="modal-head"><h3>Comments</h3><button class="close" onclick="closeModal('commentModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
-    <div id="commentList"><div class="loading">Loading comments...</div></div>
-    <form id="commentForm" class="row" style="margin-top:12px"><input id="commentInput" class="field" maxlength="2000" placeholder="Write a comment..." required style="margin:0"><button class="secondary" type="submit">Send</button></form>
+    <div class="modal-head"><h3>Comments</h3><button class="close" onclick="closeModal('commentModal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="commentList"><div class="empty">Loading comments...</div></div>
+    <form id="commentForm" style="display:flex;gap:8px;margin-top:12px">
+      <input id="commentInput" class="field" maxlength="2000" placeholder="Write a comment..." required style="margin:0;min-width:0">
+      <button class="primary" type="submit">Send</button>
+    </form>
   </div>
 </div>
+
+<div class="modal" id="discoverModal">
+  <div class="modal-content">
+    <div class="modal-head"><h3>Discover FreeTube</h3><button class="close" onclick="closeModal('discoverModal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <input id="searchInput" class="field" placeholder="Search posts or people..." oninput="searchPosts(this.value)">
+    <button class="secondary" onclick="searchPosts('')">Show all posts</button>
+  </div>
+</div>
+
 <div id="toast" class="toast" role="status"></div>
 
 <script>
 "use strict";
 
-const API_BASE="https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY="freetube_access_token";
-const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
-const REACTIONS={
-  like:{label:"Like",emoji:"👍",icon:"fa-thumbs-up",className:"selected"},
-  love:{label:"Love",emoji:"❤️",icon:"fa-heart",className:"reaction-love"},
-  sad:{label:"Sad",emoji:"😢",icon:"fa-face-sad-tear",className:"reaction-sad"},
-  angry:{label:"Angry",emoji:"😡",icon:"fa-face-angry",className:"reaction-angry"}
+const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+const FALLBACK_AVATAR = "https://placehold.co/120x120/244b37/ffffff?text=FT";
+
+let posts = [];
+let currentUser = null;
+let activeCommentId = null;
+let toastTimer = null;
+let publishing = false;
+
+const reactionTypes = {
+  like: { label: "Like", emoji: "👍" },
+  love: { label: "Love", emoji: "❤️" },
+  sad: { label: "Sad", emoji: "😢" },
+  angry: { label: "Angry", emoji: "😡" }
 };
 
-let videos=[];
-let currentUser=null;
-let activeCommentId=null;
-let selectedFile=null;
-let selectedFileType=null;
-let previewUrl=null;
-let toastTimer=null;
-let loading=false;
-let videoObserver=null;
-let viewObserver=null;
-let activeVideo=null;
-const viewRequestsInSession=new Set();
-const pendingReactions=new Set();
-
-function token(){return localStorage.getItem(TOKEN_KEY)||""}
-
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function getToken() {
+  return localStorage.getItem(TOKEN_KEY) || "";
 }
 
-function toast(message){
-  const el=document.getElementById("toast");
-  el.textContent=message;
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  })[ch]);
+}
+
+function toast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = message;
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove("show"),2800);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
 }
 
-async function api(path,options={}){
-  const headers={...(options.headers||{})};
-  const accessToken=token();
-  if(accessToken)headers.Authorization="Bearer "+accessToken;
-  if(options.body&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
-  let response;
-  try{
-    response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"});
-  }catch(_){
-    throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
+async function api(path, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (getToken()) headers.Authorization = "Bearer " + getToken();
+  if (options.body && !(options.body instanceof FormData)) {
+    headers["Content-Type"] = "application/json";
   }
-  const data=await response.json().catch(()=>({}));
-  if(response.status===401){
+
+  let response;
+  try {
+    response = await fetch(API_BASE + path, {
+      ...options, headers, cache: "no-store"
+    });
+  } catch (_) {
+    throw new Error("Cannot connect to FreeTube server. Check your internet.");
+  }
+
+  const data = await response.json().catch(() => ({}));
+
+  if (response.status === 401) {
     localStorage.removeItem(TOKEN_KEY);
     location.replace("auth.html?mode=login");
-    throw new Error("Your session expired. Please log in again.");
+    throw new Error("Please log in again.");
   }
-  if(response.status===403){
-    throw new Error(data.error||"You do not have permission to do this.");
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "Request failed.");
   }
-  if(!response.ok)throw new Error(data.error||data.message||"Request failed.");
   return data;
 }
 
-function requireLogin(){
-  if(!token()){location.replace("auth.html?mode=login");return false}
+function requireLogin() {
+  if (!getToken()) {
+    location.href = "auth.html?mode=login";
+    return false;
+  }
   return true;
 }
-function openProfile(){if(requireLogin())location.href="profile.html"}
-function openInbox(){if(requireLogin())location.href="inbox.html"}
-function openNotifications(){if(requireLogin())location.href="notifications.html"}
-function closeModal(id){document.getElementById(id).classList.remove("open")}
 
-function home(){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-  document.getElementById("navHome").classList.add("active");
-  render(videos);
-}
-function openDiscover(){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("discover").classList.add("active");
-  document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-  document.getElementById("navDiscover").classList.add("active");
-}
-function filterVideos(query){
-  const q=String(query||"").toLowerCase();
-  render(videos.filter(v=>String(v.content||"").toLowerCase().includes(q)||String(v.username||"").toLowerCase().includes(q)));
-}
-function clearSearch(){document.getElementById("search").value="";render(videos)}
-
-function relativeTime(date){
-  const timestamp=new Date(date).getTime();
-  if(!Number.isFinite(timestamp))return "Just now";
-  const minutes=Math.max(0,Math.floor((Date.now()-timestamp)/60000));
-  if(minutes<1)return "Just now";
-  if(minutes<60)return minutes+"m ago";
-  if(minutes<1440)return Math.floor(minutes/60)+"h ago";
-  return Math.floor(minutes/1440)+"d ago";
+function closeModal(id) {
+  document.getElementById(id).classList.remove("open");
 }
 
-function findAvatar(source){
-  if(!source||typeof source!=="object")return "";
-  const keys=["avatar_url","avatarUrl","profile_picture","profilePicture","profile_image","profileImage","photo_url","photoURL","image_url","imageUrl","avatar","picture"];
-  for(const key of keys){
-    const value=source[key];
-    if(typeof value==="string"&&value.trim())return value.trim();
-    if(value&&typeof value==="object"){
-      const nested=value.url||value.secure_url||value.src;
-      if(typeof nested==="string"&&nested.trim())return nested.trim();
+function openUpload() {
+  if (!requireLogin()) return;
+  document.getElementById("postText").value = "";
+  document.getElementById("postFile").value = "";
+  document.getElementById("postModal").classList.add("open");
+}
+
+function openProfile() {
+  if (requireLogin()) location.href = "profile.html";
+}
+function openInbox() {
+  if (requireLogin()) location.href = "inbox.html";
+}
+function openNotifications() {
+  if (requireLogin()) location.href = "notifications.html";
+}
+function goHome() {
+  document.getElementById("discoverModal").classList.remove("open");
+  renderPosts(posts);
+}
+function goDiscover() {
+  document.getElementById("discoverModal").classList.add("open");
+  document.getElementById("searchInput").focus();
+}
+
+function openUserProfile(username, userId) {
+  username = String(username || "").trim().replace(/^@/, "");
+  userId = userId == null ? "" : String(userId).trim();
+
+  if (!username && !userId) {
+    toast("এই ব্যবহারকারীর username পাওয়া যায়নি।");
+    return;
+  }
+
+  // profile.html-এ username না থাকলে user ID-ও পাঠানো হচ্ছে
+  const params = new URLSearchParams();
+  if (username) params.set("username", username);
+  if (userId) params.set("userId", userId);
+
+  location.href = "profile.html?" + params.toString();
+}
+
+function findAvatar(obj) {
+  if (!obj || typeof obj !== "object") return "";
+  const keys = [
+    "avatar_url", "avatarUrl", "profile_picture", "profilePicture",
+    "profile_image", "profileImage", "photo_url", "photoURL",
+    "image_url", "imageUrl", "avatar", "picture"
+  ];
+
+  for (const key of keys) {
+    const value = obj[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (value && typeof value === "object") {
+      const url = value.url || value.secure_url || value.src;
+      if (typeof url === "string" && url.trim()) return url.trim();
     }
   }
-  for(const key of ["user","profile","data","account"]){
-    if(source[key]&&typeof source[key]==="object"){
-      const found=findAvatar(source[key]);
-      if(found)return found;
+
+  for (const key of ["user", "author", "profile", "account"]) {
+    if (obj[key] && typeof obj[key] === "object") {
+      const result = findAvatar(obj[key]);
+      if (result) return result;
     }
   }
   return "";
 }
-function setAvatarImage(element,url){
-  if(!element)return;
-  element.onerror=function(){this.onerror=null;this.src=FALLBACK_AVATAR};
-  element.src=url||FALLBACK_AVATAR;
+
+function setAvatar(element, url) {
+  if (!element) return;
+  element.onerror = function () {
+    this.onerror = null;
+    this.src = FALLBACK_AVATAR;
+  };
+  element.src = url || FALLBACK_AVATAR;
 }
 
-function safeCount(value){
-  const n=Number(value);
-  return Number.isFinite(n)&&n>=0?n:0;
+function relativeTime(date) {
+  const timestamp = new Date(date).getTime();
+  if (!Number.isFinite(timestamp)) return "Just now";
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60000));
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return minutes + "m ago";
+  if (minutes < 1440) return Math.floor(minutes / 60) + "h ago";
+  return Math.floor(minutes / 1440) + "d ago";
 }
-function normalizeReactionCounts(post){
-  const raw=post.reaction_counts||post.reactions_count||{};
-  return {
-    like:safeCount(raw.like??raw.likes??post.like_count??post.likes),
-    love:safeCount(raw.love??raw.loves??post.love_count),
-    sad:safeCount(raw.sad??raw.sads??post.sad_count),
-    angry:safeCount(raw.angry??raw.angries??post.angry_count)
+
+function normalizePost(post) {
+  const author = post.user || post.author || post.profile || {};
+
+  // Backend-এ বিভিন্ন প্রচলিত নামে username থাকতে পারে
+  const profileUsername = String(
+    post.author_username ||
+    post.user_username ||
+    post.username ||
+    author.username ||
+    author.handle ||
+    ""
+  ).trim().replace(/^@/, "");
+
+  const displayName = String(
+    post.display_name ||
+    post.full_name ||
+    post.fullName ||
+    author.display_name ||
+    author.displayName ||
+    author.full_name ||
+    author.fullName ||
+    author.name ||
+    author.username ||
+    post.username ||
+    "FreeTube User"
+  ).trim();
+
+  const rawType = String(post.media_type || post.type || "").toLowerCase();
+  const type = ["video", "mp4", "webm", "quicktime"].includes(rawType)
+    ? "video"
+    : ["image", "photo", "png", "jpg", "jpeg", "webp", "gif"].includes(rawType)
+      ? "photo" : "";
+
+  const rawCounts = post.reaction_counts || post.reactions_count || {};
+  const counts = {
+    like: Number(rawCounts.like ?? rawCounts.likes ?? post.like_count ?? post.likes ?? 0) || 0,
+    love: Number(rawCounts.love ?? rawCounts.loves ?? post.love_count ?? 0) || 0,
+    sad: Number(rawCounts.sad ?? rawCounts.sads ?? post.sad_count ?? 0) || 0,
+    angry: Number(rawCounts.angry ?? rawCounts.angries ?? post.angry_count ?? 0) || 0
   };
-}
-function normalizePost(post){
-  const avatar=findAvatar(post)||FALLBACK_AVATAR;
-  const mediaType=String(post.media_type||post.type||"").toLowerCase();
-  const reactionCounts=normalizeReactionCounts(post);
-  const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:
-    (post.liked_by_me===true||post.liked===true?"like":null);
+
+  const myReaction = reactionTypes[post.my_reaction]
+    ? post.my_reaction
+    : (post.liked_by_me === true || post.liked === true ? "like" : null);
+
   return {
     ...post,
-    id:String(post.id),
-    username:post.display_name||post.username||post.full_name||"FreeTube User",
-    avatar,
-    content:post.content||"",
-    src:post.media_url||post.url||"",
-    type:["video","mp4","webm","quicktime"].includes(mediaType)?"video":
-      ["image","photo","png","jpg","jpeg","webp","gif"].includes(mediaType)?"photo":"",
-    likes:reactionCounts.like,
-    reactionCounts,
+    id: String(post.id),
+    username: displayName,
+    profileUsername,
+    authorId: post.user_id ?? post.author_id ?? author.id ?? post.userId ?? "",
+    avatar: findAvatar(post) || findAvatar(author) || FALLBACK_AVATAR,
+    content: post.content || "",
+    src: post.media_url || post.url || "",
+    type,
+    counts,
     myReaction,
-    liked:myReaction==="like",
-    comments:safeCount(post.comment_count??post.comments_count??0),
-    views:safeCount(post.view_count??post.views??0),
-    time:relativeTime(post.created_at)
+    comments: Number(post.comment_count ?? post.comments_count ?? 0) || 0,
+    views: Number(post.view_count ?? post.views ?? 0) || 0,
+    time: relativeTime(post.created_at)
   };
 }
 
-async function loadMe(){
-  const requestedToken=token();
-  if(!requestedToken){location.replace("auth.html?mode=login");throw new Error("Please log in.")}
-  currentUser=null;
-  document.getElementById("modalUsername").textContent="Loading account...";
-  setAvatarImage(document.getElementById("modalAvatar"),FALLBACK_AVATAR);
-  setAvatarImage(document.getElementById("composerAvatar"),FALLBACK_AVATAR);
-  const data=await api("/auth/me");
-  if(token()!==requestedToken)return;
-  const user=data.user||data.profile||data.data?.user||data.data||data;
-  currentUser={...user};
-  let username=String(user.username||user.handle||user.email||"").trim();
-  let displayName=String(user.display_name||user.displayName||user.full_name||user.fullName||user.name||user.username||"FreeTube User").trim();
-  let avatar=findAvatar(data)||findAvatar(user);
-  document.getElementById("modalUsername").textContent=displayName;
-  setAvatarImage(document.getElementById("modalAvatar"),avatar||FALLBACK_AVATAR);
-  setAvatarImage(document.getElementById("composerAvatar"),avatar||FALLBACK_AVATAR);
-  if(username){
-    try{
-      const profileData=await api("/profile/"+encodeURIComponent(username));
-      if(token()!==requestedToken)return;
-      const profile=profileData.profile||profileData.user||profileData.data?.profile||profileData.data?.user||profileData.data||profileData;
-      const profileUsername=String(profile.username||profile.handle||"").trim();
-      if(!profileUsername||profileUsername.toLowerCase()===username.toLowerCase()){
-        currentUser={...currentUser,...profile};
-        displayName=String(profile.display_name||profile.displayName||profile.full_name||profile.fullName||profile.name||displayName).trim();
-        avatar=findAvatar(profileData)||findAvatar(profile)||avatar;
-      }
-    }catch(error){console.warn("Could not load additional profile information:",error.message)}
-  }
-  if(token()!==requestedToken)return;
-  document.getElementById("modalUsername").textContent=displayName;
-  setAvatarImage(document.getElementById("modalAvatar"),avatar||FALLBACK_AVATAR);
-  setAvatarImage(document.getElementById("composerAvatar"),avatar||FALLBACK_AVATAR);
+async function loadMe() {
+  const data = await api("/auth/me");
+  currentUser = data.user || data.profile || data.data?.user || data.data || data;
+  const avatar = findAvatar(data) || findAvatar(currentUser);
+  setAvatar(document.getElementById("composerAvatar"), avatar);
 }
 
-async function loadFeed(){
-  if(loading)return;
-  loading=true;
-  document.getElementById("feed").innerHTML='<div class="loading">Loading posts...</div>';
-  try{
-    const data=await api("/posts?limit=30");
-    videos=(data.posts||[]).map(normalizePost);
-    render(videos);
-  }catch(error){
-    document.getElementById("feed").innerHTML='<div class="empty-state">'+esc(error.message)+'<br><br><button class="secondary" onclick="loadFeed()">Try again</button></div>';
-  }finally{loading=false}
-}
+async function loadFeed() {
+  const feed = document.getElementById("feed");
+  feed.innerHTML = '<div class="empty">Loading posts...</div>';
 
-async function recordPostView(id){
-  id=String(id);
-  if(!id||viewRequestsInSession.has(id)||!token())return;
-  viewRequestsInSession.add(id);
-  try{
-    const data=await api("/posts/"+encodeURIComponent(id)+"/view",{
-      method:"POST",body:JSON.stringify({})
-    });
-    const post=videos.find(v=>String(v.id)===id);
-    if(post&&data.view_count!==undefined){
-      post.views=safeCount(data.view_count);
-      document.querySelectorAll(".post-card").forEach(card=>{
-        if(card.dataset.id===id){
-          const el=card.querySelector(".view-count");
-          if(el)el.innerHTML='<i class="fa-solid fa-eye"></i> '+post.views+' views';
-        }
-      });
-    }
-  }catch(error){
-    viewRequestsInSession.delete(id);
-    console.warn("Could not record post view:",error.message);
+  try {
+    const data = await api("/posts?limit=30");
+    posts = (data.posts || []).map(normalizePost);
+    renderPosts(posts);
+  } catch (error) {
+    feed.innerHTML = '<div class="empty">' + escapeHTML(error.message) +
+      '<br><br><button class="secondary" onclick="loadFeed()">Try again</button></div>';
   }
 }
 
-function setupPostViewObserver(){
-  if(viewObserver){viewObserver.disconnect();viewObserver=null}
-  const cards=document.querySelectorAll("#feed .post-card");
-  if(!cards.length)return;
-  if(!("IntersectionObserver" in window)){
-    cards.forEach(card=>recordPostView(card.dataset.id));
-    return;
-  }
-  viewObserver=new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting&&entry.intersectionRatio>=0.5){
-        viewObserver.unobserve(entry.target);
-        recordPostView(entry.target.dataset.id);
-      }
-    });
-  },{threshold:[0.5]});
-  cards.forEach(card=>viewObserver.observe(card));
-}
+function renderPosts(list) {
+  const feed = document.getElementById("feed");
 
-function setupVideoAutoplay(){
-  if(videoObserver){videoObserver.disconnect();videoObserver=null}
-  activeVideo=null;
-  const videoElements=Array.from(document.querySelectorAll("#feed video.post-video"));
-  if(!videoElements.length)return;
-
-  videoElements.forEach(video=>{
-    video.loop=true;
-    video.playsInline=true;
-    video.setAttribute("playsinline","");
-    video.setAttribute("webkit-playsinline","");
-    video.preload="metadata";
-    video.muted=true;
-    video.defaultMuted=true;
-    const card=video.closest(".post-card");
-    const soundButton=card?.querySelector(".sound-toggle");
-
-    function updateSoundButton(){
-      if(!soundButton)return;
-      soundButton.innerHTML=video.muted?'<i class="fa-solid fa-volume-xmark"></i>':'<i class="fa-solid fa-volume-high"></i>';
-      soundButton.setAttribute("aria-label",video.muted?"Turn sound on":"Turn sound off");
-      soundButton.title=video.muted?"Sound Off":"Sound On";
-    }
-    updateSoundButton();
-
-    if(soundButton){
-      soundButton.addEventListener("click",event=>{
-        event.preventDefault();event.stopPropagation();
-        if(video.muted){
-          videoElements.forEach(other=>{
-            if(other!==video){
-              other.muted=true;
-              const otherButton=other.closest(".post-card")?.querySelector(".sound-toggle");
-              if(otherButton){
-                otherButton.innerHTML='<i class="fa-solid fa-volume-xmark"></i>';
-                otherButton.setAttribute("aria-label","Turn sound on");
-                otherButton.title="Sound Off";
-              }
-            }
-          });
-          video.muted=false;video.defaultMuted=false;
-          video.play().catch(()=>toast("Tap the video to start playback."));
-        }else{video.muted=true}
-        updateSoundButton();
-      });
-    }
-    video.addEventListener("volumechange",updateSoundButton);
-    video.addEventListener("play",()=>{
-      videoElements.forEach(other=>{if(other!==video&&!other.paused)other.pause()});
-      activeVideo=video;
-    });
-    video.addEventListener("error",()=>{
-      const message=card?.querySelector(".video-error-message");
-      if(message)message.hidden=false;
-    },{once:true});
-  });
-
-  if("IntersectionObserver" in window){
-    videoObserver=new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        const video=entry.target;
-        if(entry.isIntersecting&&entry.intersectionRatio>=0.6){
-          video.play().catch(()=>{});
-        }else{
-          video.pause();
-          if(activeVideo===video)activeVideo=null;
-        }
-      });
-    },{threshold:[0,0.25,0.6,0.8,1]});
-    videoElements.forEach(video=>videoObserver.observe(video));
-  }else{
-    const firstVideo=videoElements[0];
-    if(firstVideo)firstVideo.play().catch(()=>{});
-  }
-}
-
-function reactionButtonHTML(v){
-  const reaction=v.myReaction&&REACTIONS[v.myReaction]?REACTIONS[v.myReaction]:null;
-  const label=reaction?reaction.label:"React";
-  const icon=reaction?reaction.emoji:"👍";
-  const cls=reaction?" "+reaction.className:"";
-  const picker=Object.entries(REACTIONS).map(([key,item])=>
-    '<button type="button" class="reaction-choice" aria-label="'+item.label+'" title="'+item.label+'" onclick="chooseReaction(event,\''+esc(v.id)+'\',\''+key+'\')"><span class="emoji">'+item.emoji+'</span><small>'+item.label+'</small></button>'
-  ).join("");
-  return '<div class="reaction-wrap" data-reaction-wrap="'+esc(v.id)+'">'+
-    '<button type="button" class="post-action-btn'+cls+'" onclick="toggleReactionPicker(event,\''+esc(v.id)+'\')" aria-label="Choose reaction"><span>'+icon+'</span> '+label+'</button>'+
-    '<div class="reaction-picker">'+picker+'</div></div>';
-}
-
-function render(list=videos){
-  const feed=document.getElementById("feed");
-  if(videoObserver){videoObserver.disconnect();videoObserver=null}
-  if(viewObserver){viewObserver.disconnect();viewObserver=null}
-  activeVideo=null;
-
-  if(!list.length){
-    feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';
+  if (!list.length) {
+    feed.innerHTML = '<div class="empty">No posts yet. Be the first to share something!</div>';
     return;
   }
 
-  feed.innerHTML=list.map(v=>{
-    let media="";
-    if(v.type==="video"&&v.src){
-      media='<div class="post-media-container"><video class="post-video" src="'+esc(v.src)+'" controls muted loop playsinline webkit-playsinline preload="metadata"></video><button type="button" class="sound-toggle" aria-label="Turn sound on" title="Sound Off"><i class="fa-solid fa-volume-xmark"></i></button></div><div class="video-error-message" hidden>This video could not be played. The media URL or format may be unsupported.</div>';
-    }else if(v.type==="photo"&&v.src){
-      media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
+  feed.innerHTML = list.map(post => {
+    const username = escapeHTML(post.profileUsername);
+    const userId = escapeHTML(post.authorId);
+    const avatar = escapeHTML(post.avatar);
+    const name = escapeHTML(post.username);
+    const id = escapeHTML(post.id);
+
+    let media = "";
+    if (post.src && post.type === "video") {
+      media = `
+        <div class="media">
+          <video src="${escapeHTML(post.src)}" controls muted loop playsinline preload="metadata"></video>
+          <button class="sound" onclick="toggleSound(this)" aria-label="Toggle sound">
+            <i class="fa-solid fa-volume-xmark"></i>
+          </button>
+        </div>`;
+    } else if (post.src && post.type === "photo") {
+      media = `<div class="media"><img src="${escapeHTML(post.src)}" loading="lazy" alt="Post media"></div>`;
     }
 
-    const counts=v.reactionCounts||{like:0,love:0,sad:0,angry:0};
-    const totalReactions=safeCount(counts.like)+safeCount(counts.love)+safeCount(counts.sad)+safeCount(counts.angry);
-    let reactionSummary="";
-    if(totalReactions>0){
-      reactionSummary=
-        (counts.like?'<span class="reaction-emoji">👍</span>':'')+
-        (counts.love?'<span class="reaction-emoji">❤️</span>':'')+
-        (counts.sad?'<span class="reaction-emoji">😢</span>':'')+
-        (counts.angry?'<span class="reaction-emoji">😡</span>':'')+
-        '<span>'+totalReactions+'</span>';
-    }else{
-      reactionSummary='<span>0 reactions</span>';
-    }
+    const total = Object.values(post.counts).reduce((sum, n) => sum + Math.max(0, n), 0);
+    const emojiSummary = ["like", "love", "sad", "angry"]
+      .filter(key => post.counts[key] > 0)
+      .map(key => reactionTypes[key].emoji).join(" ");
+
+    const reaction = post.myReaction;
+    const reactionLabel = reaction ? reactionTypes[reaction].label : "Like";
+    const reactionEmoji = reaction ? reactionTypes[reaction].emoji : "👍";
 
     return `
-      <article class="post-card" data-id="${esc(v.id)}">
+      <article class="post" id="post-${id}" data-id="${id}">
         <div class="post-header">
-          <div class="post-user-info">
-            <img class="post-avatar" src="${esc(v.avatar)}" alt="Profile picture" onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
+          <div class="author-row">
+            <img
+              class="avatar profile-clickable"
+              data-profile-username="${username}"
+              data-user-id="${userId}"
+              src="${avatar}"
+              alt="Open ${name} profile"
+              role="button"
+              tabindex="0"
+              onclick="openUserProfile(this.dataset.profileUsername,this.dataset.userId)"
+              onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserProfile(this.dataset.profileUsername,this.dataset.userId)}"
+            >
             <div>
-              <div class="post-author">${esc(v.username)}</div>
-              <div class="post-time">${esc(v.time)} · <i class="fa-solid fa-earth-americas"></i></div>
+              <div
+                class="author-name profile-clickable"
+                data-profile-username="${username}"
+                data-user-id="${userId}"
+                role="link"
+                tabindex="0"
+                onclick="openUserProfile(this.dataset.profileUsername,this.dataset.userId)"
+                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openUserProfile(this.dataset.profileUsername,this.dataset.userId)}"
+              >${name}</div>
+              <div class="post-time">${escapeHTML(post.time)} · <i class="fa-solid fa-earth-americas"></i></div>
             </div>
           </div>
-          <div class="post-options"><i class="fa-solid fa-ellipsis"></i></div>
+          <button class="secondary" aria-label="Post options" onclick="postOptions('${id}')">•••</button>
         </div>
-        ${v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':""}
+
+        ${post.content ? `<div class="post-text">${escapeHTML(post.content)}</div>` : ""}
         ${media}
-        <div class="post-stats">
-          <span class="reaction-summary">${reactionSummary}</span>
-          <span class="comment-count">${safeCount(v.comments)} comments</span>
-          <span class="view-count"><i class="fa-solid fa-eye"></i> ${safeCount(v.views)} views</span>
+
+        <div class="stats">
+          <span>${emojiSummary || "♡"} ${total}</span>
+          <span>${post.comments} comments</span>
+          <span><i class="fa-solid fa-eye"></i> ${post.views} views</span>
         </div>
-        <div class="post-actions-bar">
-          ${reactionButtonHTML(v)}
-          <button class="post-action-btn" onclick="comments('${esc(v.id)}')"><i class="fa-regular fa-comment"></i> Comment</button>
-          <button class="post-action-btn" onclick="sharePost('${esc(v.id)}')"><i class="fa-solid fa-share"></i> Share</button>
+
+        <div class="actions">
+          <button class="action ${reaction === "love" ? "loved" : ""}" onclick="reactToPost('${id}','${reaction === "like" ? "like" : "like"}')">
+            ${reactionEmoji} ${reactionLabel}
+          </button>
+          <button class="action" onclick="openComments('${id}')"><i class="fa-regular fa-comment"></i> Comment</button>
+          <button class="action" onclick="sharePost('${id}')"><i class="fa-solid fa-share"></i> Share</button>
+        </div>
+        <div class="reaction-picker">
+          ${Object.entries(reactionTypes).map(([key, item]) =>
+            `<button aria-label="${item.label}" title="${item.label}" onclick="reactToPost('${id}','${key}')">${item.emoji}</button>`
+          ).join("")}
         </div>
       </article>`;
   }).join("");
 
-  setupVideoAutoplay();
-  setupPostViewObserver();
-}
-
-function toggleReactionPicker(event,id){
-  event.preventDefault();
-  event.stopPropagation();
-  const target=String(id);
-  const wrap=document.querySelector('[data-reaction-wrap="'+CSS.escape(target)+'"]');
-  if(!wrap)return;
-  const wasOpen=wrap.classList.contains("open");
-  document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
-  if(!wasOpen)wrap.classList.add("open");
-}
-
-async function chooseReaction(event,id,reaction){
-  event.preventDefault();
-  event.stopPropagation();
-  const postId=String(id);
-  const post=videos.find(item=>item.id===postId);
-  if(!post||!REACTIONS[reaction])return;
-  if(!requireLogin())return;
-  if(pendingReactions.has(postId))return;
-
-  document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
-  pendingReactions.add(postId);
-
-  const oldReaction=post.myReaction;
-  const oldCounts={...post.reactionCounts};
-  const oldLikes=post.likes;
-
-  // Update the screen immediately; restore the old values if the API fails.
-  if(oldReaction===reaction){
-    post.myReaction=null;
-    post.reactionCounts[reaction]=Math.max(0,safeCount(post.reactionCounts[reaction])-1);
-  }else{
-    if(oldReaction&&REACTIONS[oldReaction]){
-      post.reactionCounts[oldReaction]=Math.max(0,safeCount(post.reactionCounts[oldReaction])-1);
-    }
-    post.myReaction=reaction;
-    post.reactionCounts[reaction]=safeCount(post.reactionCounts[reaction])+1;
+  // Browser supports fragment navigation when opening a shared post
+  if (location.hash.startsWith("#post-")) {
+    const id = decodeURIComponent(location.hash.slice(6));
+    setTimeout(() => document.getElementById("post-" + CSS.escape(id))?.scrollIntoView(), 150);
   }
-  post.liked=post.myReaction==="like";
-  post.likes=safeCount(post.reactionCounts.like);
-  render(videos);
+}
 
-  try{
-    const data=await api("/posts/"+encodeURIComponent(postId)+"/reaction",{
-      method:"PUT",
-      body:JSON.stringify({reaction})
+function toggleSound(button) {
+  const video = button.closest(".media")?.querySelector("video");
+  if (!video) return;
+
+  const turnOn = video.muted;
+  document.querySelectorAll(".media video").forEach(other => {
+    if (other !== video) other.muted = true;
+  });
+
+  video.muted = !turnOn;
+  if (turnOn) video.play().catch(() => toast("Tap the video to play."));
+  button.innerHTML = video.muted
+    ? '<i class="fa-solid fa-volume-xmark"></i>'
+    : '<i class="fa-solid fa-volume-high"></i>';
+}
+
+async function reactToPost(id, reaction) {
+  if (!requireLogin()) return;
+  const post = posts.find(p => p.id === String(id));
+  if (!post) return;
+
+  const oldReaction = post.myReaction;
+  const oldCounts = { ...post.counts };
+
+  if (oldReaction === reaction) {
+    post.counts[reaction] = Math.max(0, post.counts[reaction] - 1);
+    post.myReaction = null;
+  } else {
+    if (oldReaction && post.counts[oldReaction] > 0) post.counts[oldReaction]--;
+    post.counts[reaction]++;
+    post.myReaction = reaction;
+  }
+
+  renderPosts(posts);
+
+  try {
+    const result = await api("/posts/" + encodeURIComponent(id) + "/reaction", {
+      method: "PUT",
+      body: JSON.stringify({ reaction })
     });
-    post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
-    if(data.reaction_counts){
-      post.reactionCounts=normalizeReactionCounts({reaction_counts:data.reaction_counts});
-    }else{
-      post.reactionCounts=normalizeReactionCounts({
-        reaction_counts:oldCounts,
-        like_count:data.like_count
-      });
+
+    if (result.my_reaction !== undefined) {
+      post.myReaction = reactionTypes[result.my_reaction] ? result.my_reaction : null;
     }
-    post.likes=safeCount(data.like_count??post.reactionCounts.like);
-    post.reactionCounts.like=post.likes;
-    post.liked=post.myReaction==="like";
-    render(videos);
-  }catch(error){
-    post.myReaction=oldReaction;
-    post.reactionCounts=oldCounts;
-    post.likes=oldLikes;
-    post.liked=oldReaction==="like";
-    render(videos);
+    if (result.reaction_counts) {
+      for (const key of Object.keys(reactionTypes)) {
+        post.counts[key] = Number(
+          result.reaction_counts[key] ??
+          result.reaction_counts[key + "s"] ??
+          post.counts[key]
+        ) || 0;
+      }
+    }
+    renderPosts(posts);
+  } catch (error) {
+    post.myReaction = oldReaction;
+    post.counts = oldCounts;
+    renderPosts(posts);
     toast(error.message);
-  }finally{
-    pendingReactions.delete(postId);
   }
 }
 
-// Compatibility function in case another part of the page calls likePost().
-async function likePost(id){
-  return chooseReaction(
-    {preventDefault(){},stopPropagation(){}},
-    String(id),
-    "like"
-  );
-}
-
-document.addEventListener("click",event=>{
-  if(!event.target.closest(".reaction-wrap")){
-    document.querySelectorAll(".reaction-wrap.open").forEach(el=>el.classList.remove("open"));
-  }
-});
-
-async function comments(id){
-  activeCommentId=String(id);
-  document.getElementById("commentList").innerHTML='<div class="loading">Loading comments...</div>';
+async function openComments(id) {
+  if (!requireLogin()) return;
+  activeCommentId = String(id);
   document.getElementById("commentModal").classList.add("open");
-  try{
-    const data=await api("/posts/"+encodeURIComponent(id)+"/comments");
-    document.getElementById("commentList").innerHTML=(data.comments||[]).map(c=>'<div class="comment"><strong>'+esc(c.username||"User")+'</strong><br>'+esc(c.content)+'</div>').join("")||'<div class="empty-state">No comments yet.</div>';
-  }catch(error){
-    document.getElementById("commentList").innerHTML='<div class="empty-state">'+esc(error.message)+'</div>';
+  document.getElementById("commentList").innerHTML = '<div class="empty">Loading comments...</div>';
+
+  try {
+    const data = await api("/posts/" + encodeURIComponent(id) + "/comments");
+    document.getElementById("commentList").innerHTML = (data.comments || []).map(comment =>
+      `<div class="comment"><strong>${escapeHTML(comment.username || comment.display_name || "User")}</strong><br>${escapeHTML(comment.content || "")}</div>`
+    ).join("") || '<div class="empty">No comments yet.</div>';
+  } catch (error) {
+    document.getElementById("commentList").innerHTML =
+      '<div class="empty">' + escapeHTML(error.message) + '</div>';
   }
 }
 
-document.getElementById("commentForm").addEventListener("submit",async event=>{
+document.getElementById("commentForm").addEventListener("submit", async event => {
   event.preventDefault();
-  if(!requireLogin()||!activeCommentId)return;
-  const input=document.getElementById("commentInput");
-  const content=input.value.trim();
-  if(!content)return;
-  const button=event.submitter;
-  if(button)button.disabled=true;
-  try{
-    await api("/posts/"+encodeURIComponent(activeCommentId)+"/comments",{method:"POST",body:JSON.stringify({content})});
-    input.value="";
-    const v=videos.find(item=>item.id===activeCommentId);
-    if(v)v.comments++;
-    render(videos);
-    await comments(activeCommentId);
+  if (!requireLogin() || !activeCommentId) return;
+
+  const input = document.getElementById("commentInput");
+  const content = input.value.trim();
+  if (!content) return;
+
+  try {
+    await api("/posts/" + encodeURIComponent(activeCommentId) + "/comments", {
+      method: "POST",
+      body: JSON.stringify({ content })
+    });
+
+    input.value = "";
+    const post = posts.find(p => p.id === activeCommentId);
+    if (post) post.comments++;
+    renderPosts(posts);
+    await openComments(activeCommentId);
     toast("Comment added.");
-  }catch(error){toast(error.message)}
-  finally{if(button)button.disabled=false}
+  } catch (error) {
+    toast(error.message);
+  }
 });
 
-function openUpload(){
-  if(!requireLogin())return;
-  document.getElementById("fbPostText").value="";
-  clearFbMedia();
-  document.getElementById("fbUploadModal").classList.add("open");
-}
-function closeFbModal(){
-  document.getElementById("fbUploadModal").classList.remove("open");
-  clearFbMedia();
-}
-function clearFbMedia(){
-  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
-  selectedFile=null;selectedFileType=null;
-  document.getElementById("fbFileInput").value="";
-  document.getElementById("fbMediaPreviewBox").style.display="none";
-  document.getElementById("fbMediaTrigger").style.display="flex";
-  document.getElementById("fbPreviewElementContainer").innerHTML="";
-}
-function handleFbFileSelect(event){
-  const file=event.target.files&&event.target.files[0];
-  if(!file)return;
-  const allowedTypes=["image/jpeg","image/png","image/webp","image/gif","video/mp4","video/webm","video/quicktime"];
-  if(!allowedTypes.includes(file.type)){
-    toast("Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM.");
-    event.target.value="";return;
+async function publishPost() {
+  if (!requireLogin() || publishing) return;
+
+  const button = document.getElementById("publishButton");
+  const content = document.getElementById("postText").value.trim();
+  const fileInput = document.getElementById("postFile");
+  const file = fileInput.files?.[0];
+
+  if (!content && !file) {
+    toast("Write something or select a photo/video.");
+    return;
   }
-  if(file.size>50*1024*1024){
+  if (file && file.size > 50 * 1024 * 1024) {
     toast("File must be smaller than 50 MB.");
-    event.target.value="";return;
+    return;
   }
-  if(previewUrl)URL.revokeObjectURL(previewUrl);
-  selectedFile=file;
-  selectedFileType=file.type.startsWith("video/")?"video":"image";
-  previewUrl=URL.createObjectURL(file);
-  document.getElementById("fbPreviewElementContainer").innerHTML=selectedFileType==="video"?'<video src="'+previewUrl+'" controls playsinline></video>':'<img src="'+previewUrl+'" alt="Preview">';
-  document.getElementById("fbMediaTrigger").style.display="none";
-  document.getElementById("fbMediaPreviewBox").style.display="block";
-}
 
-async function submitFbPost(){
-  if(!requireLogin())return;
-  const button=document.getElementById("publishButton");
-  const content=document.getElementById("fbPostText").value.trim();
-  if(!selectedFile&&!content){toast("Please write something or select media.");return}
-  button.disabled=true;button.textContent="Publishing...";
-  try{
-    let media=null;
-    if(selectedFile){
-      toast("Uploading media...");
-      const formData=new FormData();
-      formData.append("file",selectedFile);
-      const uploadData=await api("/media/upload",{method:"POST",body:formData});
-      media=uploadData.media;
+  publishing = true;
+  button.disabled = true;
+  button.textContent = "Publishing...";
+
+  try {
+    let media = null;
+
+    if (file) {
+      const allowed = [
+        "image/jpeg", "image/png", "image/webp", "image/gif",
+        "video/mp4", "video/webm", "video/quicktime"
+      ];
+      if (!allowed.includes(file.type)) throw new Error("Unsupported media format.");
+
+      const formData = new FormData();
+      formData.append("file", file);
+      const upload = await api("/media/upload", {
+        method: "POST",
+        body: formData
+      });
+      media = upload.media || upload;
     }
-    await api("/posts",{method:"POST",body:JSON.stringify({
-      content,
-      media_url:media?media.url:"",
-      media_type:media?media.resource_type:"",
-      media_public_id:media?media.public_id:""
-    })});
-    closeFbModal();
+
+    await api("/posts", {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+        media_url: media?.url || "",
+        media_type: media?.resource_type || (file ? (file.type.startsWith("video/") ? "video" : "image") : ""),
+        media_public_id: media?.public_id || ""
+      })
+    });
+
+    closeModal("postModal");
     await loadFeed();
-    home();
     toast("Post published successfully.");
-  }catch(error){toast(error.message)}
-  finally{button.disabled=false;button.textContent="Post"}
+  } catch (error) {
+    toast(error.message);
+  } finally {
+    publishing = false;
+    button.disabled = false;
+    button.textContent = "Publish post";
+  }
 }
 
-async function sharePost(id){
-  const v=videos.find(item=>item.id===String(id));
-  if(!v)return;
-  const url=location.href.split("#")[0]+"#post-"+encodeURIComponent(id);
-  try{
-    if(navigator.share){
-      await navigator.share({title:"FreeTube post by "+v.username,text:v.content,url});
-    }else if(navigator.clipboard&&navigator.clipboard.writeText){
+async function sharePost(id) {
+  const post = posts.find(p => p.id === String(id));
+  if (!post) return;
+
+  const url = location.href.split("#")[0] + "#post-" + encodeURIComponent(id);
+  try {
+    if (navigator.share) {
+      await navigator.share({
+        title: "FreeTube post by " + post.username,
+        text: post.content,
+        url
+      });
+    } else if (navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(url);
       toast("Post link copied.");
-    }else{toast("Sharing is not supported on this device.")}
-  }catch(error){if(error.name!=="AbortError")toast("Unable to share this post.")}
+    } else {
+      toast("Sharing is not supported on this device.");
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") toast("Unable to share this post.");
+  }
 }
 
-async function loadNotificationCount(){
-  try{
-    const data=await api("/notifications");
-    const count=safeCount(data.unread_count);
-    const badge=document.getElementById("notificationBadge");
-    badge.textContent=count>99?"99+":String(count);
-    badge.hidden=count===0;
-  }catch(_){}
-}
-async function loadMessageCount(){
-  try{
-    const data=await api("/messages");
-    const count=(data.conversations||[]).reduce((sum,item)=>sum+safeCount(item.unread_count),0);
-    const badge=document.getElementById("messageBadge");
-    badge.textContent=count>99?"99+":String(count);
-    badge.hidden=count===0;
-  }catch(_){}
+function postOptions(id) {
+  const post = posts.find(p => p.id === String(id));
+  if (!post) return;
+  if (confirm("Share this post?")) sharePost(id);
 }
 
-async function initialize(){
-  if(!token()){location.replace("auth.html?mode=login");return}
-  try{
+function searchPosts(query) {
+  const q = String(query || "").trim().toLowerCase();
+  renderPosts(posts.filter(p =>
+    String(p.content).toLowerCase().includes(q) ||
+    String(p.username).toLowerCase().includes(q) ||
+    String(p.profileUsername).toLowerCase().includes(q)
+  ));
+}
+
+async function loadNotificationCount() {
+  try {
+    const data = await api("/notifications");
+    const count = Number(data.unread_count || 0);
+    const badge = document.getElementById("notificationBadge");
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.hidden = count <= 0;
+  } catch (_) {}
+}
+
+async function loadMessageCount() {
+  try {
+    const data = await api("/messages");
+    const conversations = data.conversations || [];
+    const count = conversations.reduce((sum, item) => sum + (Number(item.unread_count) || 0), 0);
+    const badge = document.getElementById("messageBadge");
+    badge.textContent = count > 99 ? "99+" : String(count);
+    badge.hidden = count <= 0;
+  } catch (_) {}
+}
+
+async function initialize() {
+  if (!requireLogin()) return;
+
+  try {
     await loadMe();
-    if(!token())return;
-    await loadFeed();
-    await Promise.all([loadNotificationCount(),loadMessageCount()]);
-  }catch(error){toast(error.message)}
+  } catch (error) {
+    console.warn("Could not load current profile:", error.message);
+  }
+
+  await loadFeed();
+  await Promise.all([loadNotificationCount(), loadMessageCount()]);
 }
 
-window.addEventListener("focus",()=>{
-  if(token()){
+window.addEventListener("focus", () => {
+  if (getToken()) {
     loadFeed();
     loadNotificationCount();
     loadMessageCount();
   }
 });
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden)document.querySelectorAll("#feed video").forEach(video=>video.pause());
-});
-initialize();
-</script>
-<script>
-function openUserProfile(username) {
-  if (!username) return;
 
-  username = String(username).replace(/^@/, "").trim();
-
-  if (!username) return;
-
-  window.location.href =
-    "profile.html?username=" + encodeURIComponent(username);
-}
-
-// পোস্টের লেখকের নাম বা ছবিতে ক্লিক ধরবে
-document.addEventListener("click", function (event) {
-  const target = event.target.closest(
-    "[data-username], .post-author, .author-name, .post-username, .post-avatar"
-  );
-
-  if (!target) return;
-
-  // যদি প্রোফাইল লিংক আগে থেকেই থাকে, সেটি চলতে দাও
-  if (target.tagName === "A" && target.href) return;
-
-  const username =
-    target.dataset.username ||
-    target.closest("[data-username]")?.dataset.username ||
-    target.dataset.authorUsername ||
-    target.closest("[data-author-username]")?.dataset.authorUsername;
-
-  if (username) {
-    event.preventDefault();
-    openUserProfile(username);
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    document.querySelectorAll(".media video").forEach(video => video.pause());
   }
 });
+
+initialize();
 </script>
 </body>
 </html>
