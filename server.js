@@ -19,7 +19,7 @@ app.use(helmet());
 
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
   .split(",")
-  .map((origin) => origin.trim())
+  .map(origin => origin.trim())
   .filter(Boolean);
 
 app.use(cors({
@@ -48,7 +48,7 @@ const pool = process.env.DATABASE_URL
   : null;
 
 if (pool) {
-  pool.on("error", (error) => {
+  pool.on("error", error => {
     console.error("Database pool error:", error.message);
   });
 }
@@ -87,7 +87,9 @@ const upload = multer({
 
     if (!allowed.includes(file.mimetype)) {
       return callback(
-        new Error("Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM.")
+        new Error(
+          "Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM."
+        )
       );
     }
 
@@ -97,7 +99,9 @@ const upload = multer({
 
 function authReady(res) {
   if (!pool) {
-    res.status(503).json({ error: "Database is not configured." });
+    res.status(503).json({
+      error: "Database is not configured."
+    });
     return false;
   }
 
@@ -116,20 +120,26 @@ function authReady(res) {
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
+
   return scryptAsync(password, salt, 64).then(
-    (key) => `scrypt$${salt}$${key.toString("hex")}`
+    key => `scrypt$${salt}$${key.toString("hex")}`
   );
 }
 
 async function verifyPassword(password, storedHash) {
   try {
     const parts = String(storedHash).split("$");
-    if (parts.length !== 3 || parts[0] !== "scrypt") return false;
+
+    if (parts.length !== 3 || parts[0] !== "scrypt") {
+      return false;
+    }
 
     const storedKey = Buffer.from(parts[2], "hex");
+
     if (storedKey.length !== 64) return false;
 
     const derivedKey = await scryptAsync(password, parts[1], 64);
+
     return crypto.timingSafeEqual(storedKey, derivedKey);
   } catch (_) {
     return false;
@@ -138,6 +148,7 @@ async function verifyPassword(password, storedHash) {
 
 function createToken(user) {
   const now = Math.floor(Date.now() / 1000);
+
   const payload = {
     sub: String(user.id),
     username: user.username,
@@ -146,7 +157,10 @@ function createToken(user) {
     exp: now + 60 * 60 * 24 * 7
   };
 
-  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const encoded = Buffer
+    .from(JSON.stringify(payload))
+    .toString("base64url");
+
   const signature = crypto
     .createHmac("sha256", process.env.JWT_SECRET)
     .update(encoded)
@@ -156,18 +170,27 @@ function createToken(user) {
 }
 
 function verifyToken(token) {
-  if (typeof token !== "string" || token.length > 4096) return null;
+  if (typeof token !== "string" || token.length > 4096) {
+    return null;
+  }
 
   const parts = token.split(".");
   if (parts.length !== 2) return null;
 
   const [encoded, supplied] = parts;
+
   const expected = crypto
     .createHmac("sha256", process.env.JWT_SECRET)
     .update(encoded)
     .digest();
 
-  const actual = Buffer.from(supplied, "base64url");
+  let actual;
+
+  try {
+    actual = Buffer.from(supplied, "base64url");
+  } catch (_) {
+    return null;
+  }
 
   if (
     actual.length !== expected.length ||
@@ -185,7 +208,9 @@ function verifyToken(token) {
       !payload.sub ||
       !Number.isInteger(payload.exp) ||
       payload.exp <= Math.floor(Date.now() / 1000)
-    ) return null;
+    ) {
+      return null;
+    }
 
     return payload;
   } catch (_) {
@@ -200,27 +225,38 @@ async function requireAuth(req, res, next) {
     .match(/^Bearer\s+(.+)$/i);
 
   if (!match) {
-    return res.status(401).json({ error: "Authentication required." });
+    return res.status(401).json({
+      error: "Authentication required."
+    });
   }
 
   const payload = verifyToken(match[1]);
+
   if (!payload) {
-    return res.status(401).json({ error: "Invalid or expired access token." });
+    return res.status(401).json({
+      error: "Invalid or expired access token."
+    });
   }
 
   try {
     const result = await pool.query(
       `SELECT id, username, email, role, account_status, created_at
-       FROM users WHERE id::text = $1 LIMIT 1`,
+       FROM users
+       WHERE id::text = $1
+       LIMIT 1`,
       [String(payload.sub)]
     );
 
     if (!result.rows.length) {
-      return res.status(401).json({ error: "Account not found." });
+      return res.status(401).json({
+        error: "Account not found."
+      });
     }
 
     if (result.rows[0].account_status !== "active") {
-      return res.status(403).json({ error: "This account is not active." });
+      return res.status(403).json({
+        error: "This account is not active."
+      });
     }
 
     req.user = result.rows[0];
@@ -233,6 +269,31 @@ async function requireAuth(req, res, next) {
 function cleanText(value, maxLength = 2000) {
   if (typeof value !== "string") return "";
   return value.trim().slice(0, maxLength);
+}
+
+/*
+ * Generate a username from the user's full name.
+ * Example: "Abdur Rouf" -> "abdur_rouf".
+ * If the name contains no English letters or digits,
+ * use "user" as the base.
+ */
+function makeUsernameBase(fullName) {
+  let username = String(fullName || "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .replace(/_+/g, "_")
+    .slice(0, 40)
+    .replace(/_+$/g, "");
+
+  if (username.length < 3) {
+    username = "user";
+  }
+
+  return username;
 }
 
 function publicUser(user) {
@@ -259,6 +320,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
       },
       (error, result) => {
         if (error) return reject(error);
+
         resolve({
           url: result.secure_url,
           public_id: result.public_id,
@@ -272,7 +334,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
   });
 }
 
-// Create only new tables. Never drop or recreate users.
+// Initialize new tables without deleting existing users or posts.
 async function initializeDatabase() {
   if (!pool) return;
 
@@ -297,7 +359,8 @@ async function initializeDatabase() {
     );
 
     CREATE TABLE IF NOT EXISTS ft_likes (
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (post_id, user_id)
@@ -305,7 +368,8 @@ async function initializeDatabase() {
 
     CREATE TABLE IF NOT EXISTS ft_comments (
       id BIGSERIAL PRIMARY KEY,
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       content VARCHAR(2000) NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -333,10 +397,13 @@ async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
+
     CREATE INDEX IF NOT EXISTS ft_comments_post_idx
       ON ft_comments(post_id, created_at);
+
     CREATE INDEX IF NOT EXISTS ft_messages_pair_idx
       ON ft_messages(sender_id, recipient_id, created_at);
+
     CREATE INDEX IF NOT EXISTS ft_notifications_recipient_idx
       ON ft_notifications(recipient_id, created_at DESC);
   `);
@@ -344,9 +411,13 @@ async function initializeDatabase() {
   console.log("FreeTube tables initialized.");
 }
 
-// Health and API info
+// Health endpoints
 app.get("/", (req, res) => {
-  res.json({ name: "FreeTube Backend API", status: "running", version: "2.0.0" });
+  res.json({
+    name: "FreeTube Backend API",
+    status: "running",
+    version: "2.1.0"
+  });
 });
 
 app.get("/api/health", (req, res) => {
@@ -359,7 +430,9 @@ app.get("/api/health", (req, res) => {
 
 app.get("/api/health/database", async (req, res, next) => {
   if (!pool) {
-    return res.status(503).json({ status: "not_configured" });
+    return res.status(503).json({
+      status: "not_configured"
+    });
   }
 
   try {
@@ -388,87 +461,182 @@ app.get("/api", (req, res) => {
       "POST /api/posts/:id/comments",
       "GET /api/messages/:userId",
       "POST /api/messages",
+      "GET /api/messages",
       "GET /api/notifications",
-      "PATCH /api/notifications/:id/read"
+      "PATCH /api/notifications/:id/read",
+      "PATCH /api/notifications/read-all"
     ]
   });
 });
 
-// Registration
+// Registration: username is generated automatically.
 app.post("/api/auth/register", async (req, res, next) => {
   if (!authReady(res)) return;
 
+  let client;
+
   try {
-    const username = cleanText(req.body.username, 50);
+    const fullName = cleanText(
+      req.body.full_name || req.body.fullName || req.body.name,
+      80
+    );
+
     const email = cleanText(req.body.email, 255).toLowerCase();
+
     const password = typeof req.body.password === "string"
       ? req.body.password
       : "";
 
-    if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+    if (fullName.length < 2) {
       return res.status(400).json({
-        error: "Username must be 3-50 characters using letters, numbers or underscores."
+        error: "Full name must contain at least 2 characters."
       });
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ error: "Enter a valid email address." });
+      return res.status(400).json({
+        error: "Enter a valid email address."
+      });
     }
 
-    const bytes = Buffer.byteLength(password, "utf8");
-    if (bytes < 8 || bytes > 128) {
+    const passwordBytes = Buffer.byteLength(password, "utf8");
+
+    if (passwordBytes < 8 || passwordBytes > 128) {
       return res.status(400).json({
         error: "Password must be 8-128 bytes long."
       });
     }
 
-    const existing = await pool.query(
-      `SELECT id FROM users
-       WHERE LOWER(username) = LOWER($1)
-          OR LOWER(email) = LOWER($2) LIMIT 1`,
-      [username, email]
+    const baseUsername = makeUsernameBase(fullName);
+    const passwordHash = await hashPassword(password);
+
+    client = await pool.connect();
+    await client.query("BEGIN");
+
+    // Prevent two registrations from choosing the same generated name
+    // at the same time. This lock is held only during registration.
+    await client.query(
+      "SELECT pg_advisory_xact_lock(hashtext($1))",
+      [baseUsername]
     );
 
-    if (existing.rows.length) {
+    const existingEmail = await client.query(
+      `SELECT id FROM users
+       WHERE LOWER(email) = LOWER($1)
+       LIMIT 1`,
+      [email]
+    );
+
+    if (existingEmail.rows.length) {
+      await client.query("ROLLBACK");
+
       return res.status(409).json({
-        error: "Username or email is already registered."
+        error: "This email is already registered."
       });
     }
 
-    const passwordHash = await hashPassword(password);
+    let user = null;
 
-    const result = await pool.query(
-      `INSERT INTO users
-       (username, email, password_hash, role, account_status)
-       VALUES ($1, $2, $3, 'creator', 'active')
-       RETURNING id, username, email, role, account_status, created_at`,
-      [username, email, passwordHash]
-    );
+    for (let attempt = 0; attempt < 100; attempt++) {
+      let username;
 
-    const user = result.rows[0];
+      if (attempt === 0) {
+        username = baseUsername;
+      } else {
+        const suffix = String(attempt + 1);
+        username =
+          baseUsername.slice(0, 50 - suffix.length) + suffix;
+      }
 
-    await pool.query(
+      // Savepoints allow a duplicate username to be retried safely
+      // without leaving the PostgreSQL transaction in an error state.
+      await client.query("SAVEPOINT username_attempt");
+
+      try {
+        const result = await client.query(
+          `INSERT INTO users
+           (username, email, password_hash, role, account_status)
+           VALUES ($1, $2, $3, 'creator', 'active')
+           RETURNING id, username, email, role, account_status, created_at`,
+          [username, email, passwordHash]
+        );
+
+        user = result.rows[0];
+
+        await client.query("RELEASE SAVEPOINT username_attempt");
+        break;
+      } catch (error) {
+        await client.query("ROLLBACK TO SAVEPOINT username_attempt");
+        await client.query("RELEASE SAVEPOINT username_attempt");
+
+        if (error.code === "23505") {
+          const duplicateEmail = await client.query(
+            `SELECT id FROM users
+             WHERE LOWER(email) = LOWER($1)
+             LIMIT 1`,
+            [email]
+          );
+
+          if (duplicateEmail.rows.length) {
+            await client.query("ROLLBACK");
+
+            return res.status(409).json({
+              error: "This email is already registered."
+            });
+          }
+
+          // A username collision: try the next suffix.
+          continue;
+        }
+
+        throw error;
+      }
+    }
+
+    if (!user) {
+      await client.query("ROLLBACK");
+
+      return res.status(409).json({
+        error: "Could not generate a unique username. Please try again."
+      });
+    }
+
+    await client.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
-      [String(user.id), user.username]
+       VALUES ($1, $2)
+       ON CONFLICT (user_id) DO UPDATE
+       SET display_name = EXCLUDED.display_name`,
+      [String(user.id), fullName]
     );
+
+    await client.query("COMMIT");
 
     res.status(201).json({
       message: "Account created successfully.",
       token: createToken(user),
-      user: publicUser(user)
+      user: {
+        ...publicUser(user),
+        display_name: fullName
+      }
     });
   } catch (error) {
+    if (client) {
+      await client.query("ROLLBACK").catch(() => {});
+    }
+
     if (error.code === "23505") {
       return res.status(409).json({
-        error: "Username or email is already registered."
+        error: "This email or username is already registered. Please try again."
       });
     }
+
     next(error);
+  } finally {
+    if (client) client.release();
   }
 });
 
-// Login
+// Login: email or username.
 app.post("/api/auth/login", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -507,12 +675,15 @@ app.post("/api/auth/login", async (req, res, next) => {
     }
 
     if (user.account_status !== "active") {
-      return res.status(403).json({ error: "This account is not active." });
+      return res.status(403).json({
+        error: "This account is not active."
+      });
     }
 
     await pool.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
+       VALUES ($1, $2)
+       ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), user.username]
     );
 
@@ -530,7 +701,7 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
 
-// Search users for the inbox
+// Search users.
 app.get("/api/users/search", requireAuth, async (req, res, next) => {
   try {
     const q = cleanText(req.query.q, 50);
@@ -546,7 +717,8 @@ app.get("/api/users/search", requireAuth, async (req, res, next) => {
        WHERE u.account_status = 'active'
          AND u.id::text <> $1
          AND LOWER(u.username) LIKE LOWER($2)
-       ORDER BY u.username LIMIT 20`,
+       ORDER BY u.username
+       LIMIT 20`,
       [String(req.user.id), `%${q}%`]
     );
 
@@ -556,7 +728,7 @@ app.get("/api/users/search", requireAuth, async (req, res, next) => {
   }
 });
 
-// Read a profile by username
+// Read a profile.
 app.get("/api/profile/:username", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -573,27 +745,33 @@ app.get("/api/profile/:username", async (req, res, next) => {
     );
 
     if (!result.rows.length) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({
+        error: "User not found."
+      });
     }
 
     const user = result.rows[0];
 
     const count = await pool.query(
       `SELECT
-         (SELECT COUNT(*) FROM ft_posts WHERE user_id = $1) AS posts,
+         (SELECT COUNT(*) FROM ft_posts
+          WHERE user_id = $1) AS posts,
          (SELECT COUNT(*) FROM ft_likes l
-           JOIN ft_posts p ON p.id = l.post_id
-           WHERE p.user_id = $1) AS likes`,
+          JOIN ft_posts p ON p.id = l.post_id
+          WHERE p.user_id = $1) AS likes`,
       [String(user.id)]
     );
 
-    res.json({ profile: user, stats: count.rows[0] });
+    res.json({
+      profile: user,
+      stats: count.rows[0]
+    });
   } catch (error) {
     next(error);
   }
 });
 
-// Update the signed-in user's profile
+// Update profile.
 app.put("/api/profile", requireAuth, async (req, res, next) => {
   try {
     const displayName = cleanText(req.body.display_name, 80);
@@ -629,13 +807,16 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
       ]
     );
 
-    res.json({ message: "Profile updated.", profile: result.rows[0] });
+    res.json({
+      message: "Profile updated.",
+      profile: result.rows[0]
+    });
   } catch (error) {
     next(error);
   }
 });
 
-// Upload one image or video to Cloudinary
+// Upload media to Cloudinary.
 app.post(
   "/api/media/upload",
   requireAuth,
@@ -645,10 +826,11 @@ app.post(
         error: "Cloudinary is not configured on the server."
       });
     }
+
     next();
   },
   (req, res, next) => {
-    upload.single("file")(req, res, (error) => {
+    upload.single("file")(req, res, error => {
       if (error) return next(error);
       next();
     });
@@ -673,7 +855,7 @@ app.post(
   }
 );
 
-// Create a post
+// Create a post.
 app.post("/api/posts", requireAuth, async (req, res, next) => {
   try {
     const content = cleanText(req.body.content, 5000);
@@ -697,7 +879,9 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
     }
 
     if (mediaType && !["image", "video"].includes(mediaType)) {
-      return res.status(400).json({ error: "Invalid media type." });
+      return res.status(400).json({
+        error: "Invalid media type."
+      });
     }
 
     const result = await pool.query(
@@ -723,7 +907,7 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
   }
 });
 
-// Feed
+// Feed.
 app.get("/api/posts", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -734,6 +918,11 @@ app.get("/api/posts", async (req, res, next) => {
     );
 
     const before = Number.parseInt(req.query.before, 10);
+    const authMatch = (req.headers.authorization || "")
+      .match(/^Bearer\s+(.+)$/i);
+    const payload = authMatch ? verifyToken(authMatch[1]) : null;
+    const viewerId = payload ? String(payload.sub) : "";
+
     const result = await pool.query(
       `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type,
               p.created_at, u.username,
@@ -751,16 +940,11 @@ app.get("/api/posts", async (req, res, next) => {
        LEFT JOIN ft_profiles pr ON pr.user_id = p.user_id
        WHERE u.account_status = 'active'
          AND ($1::bigint IS NULL OR p.id < $1)
-       ORDER BY p.id DESC LIMIT $3`,
+       ORDER BY p.id DESC
+       LIMIT $3`,
       [
         Number.isSafeInteger(before) && before > 0 ? before : null,
-        req.headers.authorization && verifyToken(
-          (req.headers.authorization.match(/^Bearer\s+(.+)$/i) || [])[1]
-        )
-          ? verifyToken(
-              req.headers.authorization.match(/^Bearer\s+(.+)$/i)[1]
-            ).sub
-          : "",
+        viewerId,
         limit
       ]
     );
@@ -771,16 +955,20 @@ app.get("/api/posts", async (req, res, next) => {
   }
 });
 
-// Toggle like on/off
+// Toggle like.
 app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   const postId = Number.parseInt(req.params.id, 10);
+
   if (!Number.isSafeInteger(postId) || postId <= 0) {
-    return res.status(400).json({ error: "Invalid post ID." });
+    return res.status(400).json({
+      error: "Invalid post ID."
+    });
   }
 
-  const client = await pool.connect();
+  let client;
 
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
     const post = await client.query(
@@ -790,10 +978,14 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
 
     if (!post.rows.length) {
       await client.query("ROLLBACK");
-      return res.status(404).json({ error: "Post not found." });
+
+      return res.status(404).json({
+        error: "Post not found."
+      });
     }
 
     const userId = String(req.user.id);
+
     const existing = await client.query(
       "SELECT 1 FROM ft_likes WHERE post_id = $1 AND user_id = $2",
       [postId, userId]
@@ -806,12 +998,14 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
         "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
         [postId, userId]
       );
+
       liked = false;
     } else {
       await client.query(
         "INSERT INTO ft_likes (post_id, user_id) VALUES ($1, $2)",
         [postId, userId]
       );
+
       liked = true;
 
       if (post.rows[0].user_id !== userId) {
@@ -835,23 +1029,33 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
     );
 
     await client.query("COMMIT");
-    res.json({ liked, like_count: Number(count.rows[0].count) });
+
+    res.json({
+      liked,
+      like_count: Number(count.rows[0].count)
+    });
   } catch (error) {
-    await client.query("ROLLBACK").catch(() => {});
+    if (client) {
+      await client.query("ROLLBACK").catch(() => {});
+    }
+
     next(error);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 });
 
-// List comments for a post
+// Read comments.
 app.get("/api/posts/:id/comments", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
     const postId = Number.parseInt(req.params.id, 10);
+
     if (!Number.isSafeInteger(postId) || postId <= 0) {
-      return res.status(400).json({ error: "Invalid post ID." });
+      return res.status(400).json({
+        error: "Invalid post ID."
+      });
     }
 
     const result = await pool.query(
@@ -861,7 +1065,8 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
        JOIN users u ON u.id::text = c.user_id
        LEFT JOIN ft_profiles p ON p.user_id = c.user_id
        WHERE c.post_id = $1
-       ORDER BY c.id ASC LIMIT 100`,
+       ORDER BY c.id ASC
+       LIMIT 100`,
       [postId]
     );
 
@@ -871,7 +1076,7 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
   }
 });
 
-// Add a comment
+// Add a comment.
 app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   try {
     const postId = Number.parseInt(req.params.id, 10);
@@ -889,12 +1094,15 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     );
 
     if (!post.rows.length) {
-      return res.status(404).json({ error: "Post not found." });
+      return res.status(404).json({
+        error: "Post not found."
+      });
     }
 
     const result = await pool.query(
       `INSERT INTO ft_comments (post_id, user_id, content)
-       VALUES ($1, $2, $3) RETURNING *`,
+       VALUES ($1, $2, $3)
+       RETURNING *`,
       [postId, String(req.user.id), content]
     );
 
@@ -924,28 +1132,35 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   }
 });
 
-// Inbox conversation
+// Read a conversation.
 app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
     const other = cleanText(req.params.userId, 100);
 
     if (!other || other === me) {
-      return res.status(400).json({ error: "Invalid conversation user." });
+      return res.status(400).json({
+        error: "Invalid conversation user."
+      });
     }
 
     const account = await pool.query(
-      "SELECT id FROM users WHERE id::text = $1 AND account_status = 'active'",
+      `SELECT id FROM users
+       WHERE id::text = $1 AND account_status = 'active'`,
       [other]
     );
 
     if (!account.rows.length) {
-      return res.status(404).json({ error: "User not found." });
+      return res.status(404).json({
+        error: "User not found."
+      });
     }
 
     await pool.query(
       `UPDATE ft_messages SET read_at = NOW()
-       WHERE sender_id = $1 AND recipient_id = $2 AND read_at IS NULL`,
+       WHERE sender_id = $1
+         AND recipient_id = $2
+         AND read_at IS NULL`,
       [other, me]
     );
 
@@ -954,7 +1169,8 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
        FROM ft_messages
        WHERE (sender_id = $1 AND recipient_id = $2)
           OR (sender_id = $2 AND recipient_id = $1)
-       ORDER BY id DESC LIMIT 100`,
+       ORDER BY id DESC
+       LIMIT 100`,
       [me, other]
     );
 
@@ -964,7 +1180,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   }
 });
 
-// Send a message
+// Send a message.
 app.post("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const recipientId = cleanText(req.body.recipient_id, 100);
@@ -984,12 +1200,15 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
     );
 
     if (!recipient.rows.length) {
-      return res.status(404).json({ error: "Recipient not found." });
+      return res.status(404).json({
+        error: "Recipient not found."
+      });
     }
 
     const result = await pool.query(
       `INSERT INTO ft_messages (sender_id, recipient_id, content)
-       VALUES ($1, $2, $3) RETURNING *`,
+       VALUES ($1, $2, $3)
+       RETURNING *`,
       [senderId, recipientId, content]
     );
 
@@ -1013,7 +1232,7 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
   }
 });
 
-// Inbox conversation list
+// List conversations.
 app.get("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
@@ -1021,7 +1240,10 @@ app.get("/api/messages", requireAuth, async (req, res, next) => {
     const result = await pool.query(
       `WITH conversation_messages AS (
          SELECT *,
-           CASE WHEN sender_id = $1 THEN recipient_id ELSE sender_id END AS other_id
+           CASE
+             WHEN sender_id = $1 THEN recipient_id
+             ELSE sender_id
+           END AS other_id
          FROM ft_messages
          WHERE sender_id = $1 OR recipient_id = $1
        ),
@@ -1049,7 +1271,7 @@ app.get("/api/messages", requireAuth, async (req, res, next) => {
   }
 });
 
-// Notifications
+// List notifications.
 app.get("/api/notifications", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
@@ -1057,7 +1279,8 @@ app.get("/api/notifications", requireAuth, async (req, res, next) => {
        FROM ft_notifications n
        LEFT JOIN users u ON u.id::text = n.actor_id
        WHERE n.recipient_id = $1
-       ORDER BY n.id DESC LIMIT 100`,
+       ORDER BY n.id DESC
+       LIMIT 100`,
       [String(req.user.id)]
     );
 
@@ -1076,7 +1299,7 @@ app.get("/api/notifications", requireAuth, async (req, res, next) => {
   }
 });
 
-// Mark one notification as read
+// Mark one notification as read.
 app.patch(
   "/api/notifications/:id/read",
   requireAuth,
@@ -1085,7 +1308,9 @@ app.patch(
       const id = Number.parseInt(req.params.id, 10);
 
       if (!Number.isSafeInteger(id) || id <= 0) {
-        return res.status(400).json({ error: "Invalid notification ID." });
+        return res.status(400).json({
+          error: "Invalid notification ID."
+        });
       }
 
       const result = await pool.query(
@@ -1096,7 +1321,9 @@ app.patch(
       );
 
       if (!result.rows.length) {
-        return res.status(404).json({ error: "Notification not found." });
+        return res.status(404).json({
+          error: "Notification not found."
+        });
       }
 
       res.json({ notification: result.rows[0] });
@@ -1106,32 +1333,43 @@ app.patch(
   }
 );
 
-// Mark all notifications as read
-app.patch("/api/notifications/read-all", requireAuth, async (req, res, next) => {
-  try {
-    const result = await pool.query(
-      `UPDATE ft_notifications SET read_at = NOW()
-       WHERE recipient_id = $1 AND read_at IS NULL`,
-      [String(req.user.id)]
-    );
+// Mark all notifications as read.
+app.patch(
+  "/api/notifications/read-all",
+  requireAuth,
+  async (req, res, next) => {
+    try {
+      const result = await pool.query(
+        `UPDATE ft_notifications SET read_at = NOW()
+         WHERE recipient_id = $1 AND read_at IS NULL`,
+        [String(req.user.id)]
+      );
 
-    res.json({ message: "Notifications marked as read.", updated: result.rowCount });
-  } catch (error) {
-    next(error);
+      res.json({
+        message: "Notifications marked as read.",
+        updated: result.rowCount
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-// 404
+// 404 handler.
 app.use((req, res) => {
-  res.status(404).json({ error: "Route not found." });
+  res.status(404).json({
+    error: "Route not found."
+  });
 });
 
-// Error handler
+// Error handler.
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
 
   if (error.message === "Origin not allowed by CORS") {
-    return res.status(403).json({ error: "Origin not allowed." });
+    return res.status(403).json({
+      error: "Origin not allowed."
+    });
   }
 
   if (error instanceof multer.MulterError) {
@@ -1146,7 +1384,9 @@ app.use((error, req, res, next) => {
     error.message &&
     error.message.startsWith("Unsupported file type")
   ) {
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({
+      error: error.message
+    });
   }
 
   console.error("Request failed:", {
@@ -1154,10 +1394,12 @@ app.use((error, req, res, next) => {
     message: error.message
   });
 
-  res.status(500).json({ error: "Internal server error." });
+  res.status(500).json({
+    error: "Internal server error."
+  });
 });
 
-// Initialize tables before accepting requests
+// Start the server.
 async function startServer() {
   try {
     if (pool) await initializeDatabase();
