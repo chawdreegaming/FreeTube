@@ -90,7 +90,7 @@ input[type=file]{display:none}
 
 <section class="profile-header-section">
   <div class="avatar-container">
-    <img id="profileAvatar" class="avatar" src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250" alt="Profile photo">
+    <img id="profileAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile photo">
     <label for="avatarInput" class="avatar-upload-btn" id="avatarUploadLabel" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
     <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif">
   </div>
@@ -278,8 +278,8 @@ function normalizeProfile(user={},profile={},stats={}){
     birthday:firstNonEmpty(profile.birthday,user.birthday)?String(firstNonEmpty(profile.birthday,user.birthday)).slice(0,10):"",
     work:String(firstNonEmpty(profile.work,user.work)||""),
     education:String(firstNonEmpty(profile.education,user.education)||""),
-    followers:Number(firstNonEmpty(stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
-    following:Number(firstNonEmpty(stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
+    followers:Number(firstNonEmpty(stats.followers,stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
+    following:Number(firstNonEmpty(stats.following,stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
     avatar_url:avatar||"",
     cover_url:cover||""
   };
@@ -300,8 +300,6 @@ function setImageSource(image,url,fallback){
 function formatBirthday(value){
   if(!value)return "Not added";
   const date=String(value).slice(0,10);
-  const parts=date.split("-");
-  if(parts.length!==3)return String(value);
   const parsed=new Date(date+"T00:00:00Z");
   if(Number.isNaN(parsed.getTime()))return String(value);
   return parsed.toLocaleDateString("en-US",{
@@ -376,11 +374,18 @@ async function loadProfile(){
     const myId=String(currentUser.id??currentUser.user_id??"");
     const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
 
-    // If a userId is present, it takes precedence over the username.
-    // A different userId must never silently fall back to the viewer's profile.
-    isOwnProfile=targetUserId
-      ? Boolean(myId&&targetUserId===myId)
-      : (!targetUsername||targetUsername.toLowerCase()===myUsername.toLowerCase());
+    /*
+      Username determines which account is requested.
+      userId is retained for navigation and follow actions, but a stale or
+      mismatched URL userId must not cause the page to silently show the
+      logged-in user's profile.
+    */
+    const requestedUsername=targetUsername;
+    const clearlyOwnByUsername=!requestedUsername||
+      requestedUsername.toLowerCase()===myUsername.toLowerCase();
+    const clearlyOwnById=Boolean(targetUserId&&myId&&targetUserId===myId);
+
+    isOwnProfile=clearlyOwnById||(!targetUserId&&clearlyOwnByUsername);
 
     if(isOwnProfile){
       const data=await apiRequest("/profile");
@@ -395,33 +400,39 @@ async function loadProfile(){
         cover_url:firstNonEmpty(serverProfile.cover_url,currentUser.cover_url)
       };
     }else{
-      if(!targetUsername){
-        throw new Error("This profile URL has a userId but no username. Open the profile again from the feed.");
+      if(!requestedUsername){
+        throw new Error("This profile link is missing a username. Open the profile again from the feed.");
       }
 
-      const data=await apiRequest("/profile/"+encodeURIComponent(targetUsername));
-      const apiProfile=data.profile&&typeof data.profile==="object"?data.profile:{};
-      const apiUser=data.user&&typeof data.user==="object"?data.user:{};
-      serverProfile={...apiProfile,...apiProfile};
+      const data=await apiRequest("/profile/"+encodeURIComponent(requestedUsername));
+      const apiProfile=data.profile&&typeof data.profile==="object"
+        ?data.profile
+        :(data.data?.profile&&typeof data.data.profile==="object"
+          ?data.data.profile:{});
+      const apiUser=data.user&&typeof data.user==="object"
+        ?data.user
+        :(data.data?.user&&typeof data.data.user==="object"
+          ?data.data.user:{});
+
+      serverProfile={...apiUser,...apiProfile};
       serverStats=data.stats||data.data?.stats||{};
 
       const returnedId=String(
         apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??""
       );
+      const returnedUsername=String(
+        apiProfile.username??apiUser.username??requestedUsername
+      ).replace(/^@/,"").trim();
 
-      if(targetUserId&&returnedId&&returnedId!==targetUserId){
-        throw new Error("The server returned a different user's profile. The profile ID and username do not match.");
-      }
-
-      if(targetUserId&&!returnedId){
-        throw new Error("The server did not return a user ID, so this profile cannot be verified safely. Check the backend profile API.");
+      if(returnedUsername.toLowerCase()!==requestedUsername.toLowerCase()){
+        throw new Error("The server returned a different username. Please retry or open the profile from the feed.");
       }
 
       viewedUser={
         ...apiUser,
         ...apiProfile,
         id:returnedId,
-        username:apiProfile.username||apiUser.username||targetUsername,
+        username:returnedUsername,
         avatar_url:firstNonEmpty(apiProfile.avatar_url,apiUser.avatar_url),
         cover_url:firstNonEmpty(apiProfile.cover_url,apiUser.cover_url),
         bio:firstNonEmpty(apiProfile.bio,apiUser.bio),
@@ -435,11 +446,18 @@ async function loadProfile(){
       if(!returnedId){
         throw new Error("The server did not return this user's ID. Please check the backend profile endpoint.");
       }
+
+      // If the username identifies the logged-in account, it is our profile.
+      // This avoids a stale userId query parameter forcing a false public view.
+      isOwnProfile=Boolean(
+        (myId&&returnedId===myId)||
+        returnedUsername.toLowerCase()===myUsername.toLowerCase()
+      );
     }
 
     const p=normalizeProfile(viewedUser,serverProfile,serverStats);
+    if(!p.handle&&!isOwnProfile)p.handle=requestedUsername;
 
-    if(!p.handle&&!isOwnProfile)p.handle=targetUsername;
     if(isOwnProfile)saveLocalProfile({...getProfile(),...p});
 
     renderProfile(p);
@@ -485,6 +503,7 @@ async function toggleFollow(){
       followingThisUser=nextState;
       serverProfile.is_following=nextState;
       serverProfile.followers_count=Math.max(0,Number(serverProfile.followers_count||0)+(nextState?1:-1));
+      serverStats.followers=serverProfile.followers_count;
       viewedUser={...viewedUser,...serverProfile};
       renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats));
     }
@@ -701,12 +720,15 @@ async function loadPostsForViewedUser(){
     const viewedId=String(viewedUser?.id??viewedUser?.user_id??"");
     const viewedName=String(viewedUser?.username||viewedUser?.handle||targetUsername||"").replace(/^@/,"").toLowerCase();
 
-    // Prefer the stable user ID. Use username only when a post has no ID.
     const filtered=posts.filter(post=>{
       const postId=String(postUserId(post)??"");
       const postName=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
-      if(viewedId&&postId)return postId===viewedId;
-      return Boolean(viewedName&&postName&&postName===viewedName);
+
+      // The backend's feed uses ft_posts.user_id, which maps to users.id.
+      // Match by ID when possible, with username as a compatibility fallback.
+      if(viewedId&&postId&&postId===viewedId)return true;
+      if(viewedName&&postName&&postName===viewedName)return true;
+      return false;
     });
 
     document.getElementById("postCount").textContent=filtered.length+(filtered.length===1?" post":" posts");
