@@ -1,27 +1,29 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#103626">
+<meta name="theme-color" content="#701b39">
 <title>FreeTube — Home</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
-  --bg:#10291f;
-  --panel:#172f24;
-  --panel2:#20392d;
-  --green:#00e991;
-  --text:#f6fff9;
-  --muted:#a9bdb2;
-  --border:rgba(255,255,255,.12);
+  --bg:#351b2b;
+  --panel:rgba(29,35,36,.58);
+  --panel2:rgba(255,255,255,.09);
+  --green:#00f59b;
+  --text:#ffffff;
+  --muted:#d3dcd7;
+  --border:rgba(255,255,255,.16);
   --red:#ff626b;
+  --glass:rgba(20,27,28,.56);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{min-height:100%;background:#173d30}
 body{
-  background:var(--bg);
+  background:linear-gradient(135deg,#a90f31 0%,#681d3d 27%,#3d2940 48%,#17563c 73%,#008a4b 100%);
+  background-attachment:fixed;
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   min-height:100vh;
@@ -35,52 +37,65 @@ button:disabled{opacity:.55;cursor:not-allowed}
   margin:auto;
   min-height:100dvh;
   padding-bottom:90px;
-  background:var(--bg);
+  background:linear-gradient(160deg,rgba(110,17,48,.18),rgba(0,105,61,.16));
 }
 .topbar{
   position:sticky;top:0;z-index:20;
   display:flex;align-items:center;justify-content:space-between;
   padding:15px 18px;
-  background:rgba(16,41,31,.96);
-  backdrop-filter:blur(14px);
+  background:rgba(29,25,34,.62);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
+  box-shadow:0 5px 22px rgba(0,0,0,.08);
 }
 .brand{font-size:26px;font-weight:900;letter-spacing:-1px}
-.brand i,.brand span{color:var(--green)}
+.brand i{color:#ff6675}
+.brand span{color:var(--green)}
 .top-actions{display:flex;gap:10px}
 .icon-btn{
   width:42px;height:42px;border-radius:50%;
   display:grid;place-items:center;
-  background:var(--panel2);border:1px solid var(--border);
+  background:rgba(255,255,255,.10);
+  border:1px solid var(--border);
+  backdrop-filter:blur(12px);
 }
+.icon-btn:active,.fake-input:active,.action:active{transform:scale(.97)}
 .create-box{
   display:flex;align-items:center;gap:12px;
-  padding:14px 16px;background:var(--panel);
+  padding:14px 16px;
+  background:rgba(28,32,34,.45);
+  backdrop-filter:blur(14px);
   border-bottom:1px solid var(--border);
 }
 .avatar{
   width:42px;height:42px;object-fit:cover;border-radius:50%;
   background:var(--panel2);flex-shrink:0;
+  border:1px solid rgba(255,255,255,.22);
 }
 .fake-input{
   flex:1;min-width:0;text-align:left;
   padding:13px 15px;border-radius:28px;
-  color:var(--muted);background:var(--panel2);
+  color:var(--muted);
+  background:rgba(255,255,255,.09);
   border:1px solid var(--border);
 }
 .fake-input i{float:right;color:var(--green)}
 .stories{
   display:flex;gap:10px;overflow-x:auto;
-  padding:13px 14px;background:#122d21;
+  padding:13px 14px;
+  background:rgba(31,29,37,.38);
   scrollbar-width:none;border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
 }
 .stories::-webkit-scrollbar{display:none}
 .story{
   flex:0 0 100px;height:150px;position:relative;
   overflow:hidden;border-radius:13px;
   display:flex;align-items:flex-end;padding:9px;
-  background:linear-gradient(145deg,#24694b,#342c45);
+  background:linear-gradient(145deg,rgba(193,28,66,.76),rgba(0,119,69,.8));
   border:1px solid var(--border);
+  box-shadow:0 5px 16px rgba(0,0,0,.12);
 }
 .story img.cover{
   position:absolute;inset:0;width:100%;height:100%;
@@ -91,18 +106,23 @@ button:disabled{opacity:.55;cursor:not-allowed}
   width:32px;height:32px;border-radius:50%;
   border:2px solid var(--green);object-fit:cover;
 }
-.story span{position:relative;z-index:1;font-size:12px;font-weight:bold}
+.story span{position:relative;z-index:1;font-size:12px;font-weight:bold;text-shadow:0 1px 5px #000}
 .story-create{
   align-items:center;justify-content:center;flex-direction:column;
-  gap:12px;text-align:center;background:var(--panel2);
+  gap:12px;text-align:center;
+  background:linear-gradient(145deg,rgba(194,25,64,.45),rgba(0,125,72,.42));
 }
 .story-create i{font-size:27px;color:var(--green)}
 #feed{padding-top:8px}
 .post{
-  background:var(--panel);margin-bottom:10px;
+  background:rgba(28,32,34,.57);
+  margin-bottom:10px;
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
   overflow:hidden;
+  backdrop-filter:blur(15px);
+  -webkit-backdrop-filter:blur(15px);
+  box-shadow:0 6px 22px rgba(0,0,0,.08);
 }
 .post-header{
   display:flex;align-items:center;gap:10px;
@@ -111,7 +131,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .post-user{flex:1;min-width:0}
 .post-name{font-size:15px;font-weight:700;overflow-wrap:anywhere}
 .post-time{font-size:12px;color:var(--muted);margin-top:4px}
-.post-menu{background:transparent;padding:10px;color:var(--muted)}
+.post-menu{background:transparent;padding:10px;color:var(--muted);border:0}
 .post-text{
   padding:0 15px 13px;white-space:pre-wrap;
   overflow-wrap:anywhere;line-height:1.5;font-size:15px;
@@ -139,8 +159,8 @@ button:disabled{opacity:.55;cursor:not-allowed}
   padding:4px 2px;gap:2px;
 }
 .action{
-  flex:1;min-width:0;background:transparent;
-  padding:12px 3px;color:#d6e4dc;
+  flex:1;min-width:0;background:transparent;border:0;
+  padding:12px 3px;color:#edf6f0;
   font-size:12px;display:flex;gap:6px;
   align-items:center;justify-content:center;
 }
@@ -148,9 +168,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .action.delete{color:#ff9999}
 .ad-card{
   margin:10px 0;padding:10px 8px;
-  text-align:center;background:#152c22;
+  text-align:center;background:rgba(25,31,32,.48);
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
+  backdrop-filter:blur(12px);
 }
 .ad-label{font-size:10px;color:var(--muted);margin-bottom:6px}
 .ad-slot{
@@ -163,19 +184,25 @@ button:disabled{opacity:.55;cursor:not-allowed}
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   z-index:30;width:100%;max-width:650px;
   display:flex;justify-content:space-around;align-items:center;
-  padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,41,31,.97);backdrop-filter:blur(14px);
-  border-top:1px solid var(--border);
+  padding:10px 5px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(36,29,39,.48);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.20);
+  box-shadow:0 -8px 30px rgba(0,0,0,.12);
 }
 .nav-item{
   flex:1;min-width:0;display:flex;flex-direction:column;
   align-items:center;gap:5px;background:transparent;
-  color:var(--muted);font-size:11px;
+  border:0;color:rgba(255,255,255,.76);font-size:11px;
+  transition:color .2s,transform .2s;
 }
 .nav-item i{font-size:21px}
 .nav-item.active{color:var(--green)}
+.nav-item.active i{filter:drop-shadow(0 0 6px rgba(0,245,155,.3))}
 .loading,.empty{
   padding:35px 18px;text-align:center;color:var(--muted);
+  background:rgba(30,33,34,.3);
 }
 .modal{
   display:none;position:fixed;inset:0;z-index:60;
@@ -185,8 +212,10 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .modal.open{display:flex}
 .modal-content{
   width:100%;max-width:600px;max-height:90dvh;overflow:auto;
-  background:#172f24;border:1px solid var(--border);
+  background:linear-gradient(145deg,rgba(104,26,56,.97),rgba(16,77,49,.97));
+  border:1px solid var(--border);
   border-radius:20px;padding:17px;
+  backdrop-filter:blur(20px);
 }
 .modal-head{
   display:flex;align-items:center;justify-content:space-between;
@@ -194,19 +223,23 @@ button:disabled{opacity:.55;cursor:not-allowed}
 }
 .close-btn{
   width:36px;height:36px;border-radius:50%;
-  background:var(--panel2);border:1px solid var(--border);
+  background:rgba(255,255,255,.1);border:1px solid var(--border);
 }
 .field{
   width:100%;margin:7px 0;padding:12px;
   border:1px solid var(--border);border-radius:10px;
-  color:white;background:#10291f;outline:none;
+  color:white;background:rgba(13,30,23,.65);outline:none;
 }
+.field::placeholder{color:#c8d2cc}
 textarea.field{min-height:110px;resize:vertical}
 .primary,.secondary{
   padding:11px 14px;border-radius:10px;border:1px solid var(--border);
 }
-.primary{background:#00a96a;color:white;font-weight:bold}
-.secondary{background:var(--panel2);color:white}
+.primary{
+  background:linear-gradient(110deg,#c91f4b,#008b52);
+  color:white;font-weight:bold;
+}
+.secondary{background:rgba(255,255,255,.1);color:white}
 .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .row>*{flex:1}
 .comment{
@@ -216,19 +249,22 @@ textarea.field{min-height:110px;resize:vertical}
 .toast{
   position:fixed;z-index:100;bottom:90px;left:50%;
   transform:translateX(-50%);max-width:90%;
-  background:#263e32;border:1px solid var(--border);
+  background:rgba(35,45,40,.95);
+  border:1px solid var(--border);
   padding:12px 16px;border-radius:12px;
   display:none;font-size:13px;text-align:center;
+  backdrop-filter:blur(16px);
 }
 .toast.show{display:block}
 @media(min-width:651px){
-  body{background:#0a1710}
+  body{background:linear-gradient(135deg,#a90f31 0%,#681d3d 27%,#3d2940 48%,#17563c 73%,#008a4b 100%);background-attachment:fixed}
   .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
 }
 @media(max-width:360px){
   .brand{font-size:23px}
   .action{font-size:10px;gap:4px}
   .nav-item{font-size:10px}
+  .nav-item i{font-size:19px}
 }
 </style>
 </head>
@@ -279,17 +315,14 @@ textarea.field{min-height:110px;resize:vertical}
   <main id="feed"><div class="loading">Loading posts...</div></main>
 
   <nav class="bottom-nav" aria-label="Main navigation">
-    <button class="nav-item active" onclick="go('home.html')">
+    <button class="nav-item active" onclick="go('home.html')" aria-current="page">
       <i class="fa-solid fa-house"></i><span>Home</span>
     </button>
     <button class="nav-item" onclick="go('discover.html')">
-      <i class="fa-solid fa-compass"></i><span>Discover</span>
-    </button>
-    <button class="nav-item" onclick="goCreate()">
-      <i class="fa-solid fa-square-plus"></i><span>Create</span>
+      <i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span>
     </button>
     <button class="nav-item" onclick="go('notifications.html')">
-      <i class="fa-solid fa-bell"></i><span>Alerts</span>
+      <i class="fa-solid fa-bell"></i><span>Notifications</span>
     </button>
     <button class="nav-item" onclick="go('profile.html')">
       <i class="fa-regular fa-user"></i><span>Profile</span>
@@ -318,12 +351,10 @@ textarea.field{min-height:110px;resize:vertical}
 <script>
 "use strict";
 
-/* FreeTube API settings */
 const API_BASE = "https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY = "freetube_access_token";
 const FALLBACK_AVATAR = "https://placehold.co/120x120/244b37/ffffff?text=FT";
 
-/* Keep the existing Adsterra banner configuration */
 const ADSTERRA_KEY = "ab837cf0ea9c26ae43b7bc4e05a0b5de";
 const ADSTERRA_SCRIPT = "https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";
 const AD_EVERY_POSTS = 3;
@@ -433,7 +464,6 @@ async function loadMe(){
   }
 }
 
-/* Convert backend post data into a consistent display shape. */
 function normalizePost(post){
   const mediaUrl = post.media_url || post.mediaUrl || post.src || "";
   let mediaType = String(post.media_type || post.type || "").toLowerCase();
@@ -483,7 +513,6 @@ function isAdmin(){
   return String(currentUser?.role || "").toLowerCase() === "admin";
 }
 
-/* Adsterra banner: inserted after every three posts. */
 function adBannerHTML(index){
   return `
     <aside class="ad-card" aria-label="Advertisement">
