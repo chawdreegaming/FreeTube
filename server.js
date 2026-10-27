@@ -1,4 +1,3 @@
-
 require("dotenv").config();
 
 const express = require("express");
@@ -18,9 +17,7 @@ app.disable("x-powered-by");
 app.use(helmet());
 
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
-  .split(",")
-  .map(origin => origin.trim())
-  .filter(Boolean);
+  .split(",").map(origin => origin.trim()).filter(Boolean);
 
 app.use(cors({
   origin(origin, callback) {
@@ -70,27 +67,17 @@ if (cloudinaryConfigured) {
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 50 * 1024 * 1024,
-    files: 1
-  },
+  limits: { fileSize: 50 * 1024 * 1024, files: 1 },
   fileFilter(req, file, callback) {
     const allowed = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-      "video/mp4",
-      "video/webm",
-      "video/quicktime"
+      "image/jpeg", "image/png", "image/webp", "image/gif",
+      "video/mp4", "video/webm", "video/quicktime"
     ];
 
     if (!allowed.includes(file.mimetype)) {
-      return callback(
-        new Error(
-          "Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM."
-        )
-      );
+      return callback(new Error(
+        "Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM."
+      ));
     }
 
     callback(null, true);
@@ -99,9 +86,7 @@ const upload = multer({
 
 function authReady(res) {
   if (!pool) {
-    res.status(503).json({
-      error: "Database is not configured."
-    });
+    res.status(503).json({ error: "Database is not configured." });
     return false;
   }
 
@@ -120,28 +105,19 @@ function authReady(res) {
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
-
-  return scryptAsync(password, salt, 64).then(
-    key => `scrypt$${salt}$${key.toString("hex")}`
-  );
+  return scryptAsync(password, salt, 64)
+    .then(key => `scrypt$${salt}$${key.toString("hex")}`);
 }
 
 async function verifyPassword(password, storedHash) {
   try {
     const parts = String(storedHash).split("$");
-
-    if (parts.length !== 3 || parts[0] !== "scrypt") {
-      return false;
-    }
+    if (parts.length !== 3 || parts[0] !== "scrypt") return false;
 
     const storedKey = Buffer.from(parts[2], "hex");
-
-    if (storedKey.length !== 64) {
-      return false;
-    }
+    if (storedKey.length !== 64) return false;
 
     const derivedKey = await scryptAsync(password, parts[1], 64);
-
     return crypto.timingSafeEqual(storedKey, derivedKey);
   } catch (_) {
     return false;
@@ -150,7 +126,6 @@ async function verifyPassword(password, storedHash) {
 
 function createToken(user) {
   const now = Math.floor(Date.now() / 1000);
-
   const payload = {
     sub: String(user.id),
     username: user.username,
@@ -159,38 +134,24 @@ function createToken(user) {
     exp: now + 60 * 60 * 24 * 7
   };
 
-  const encoded = Buffer
-    .from(JSON.stringify(payload))
-    .toString("base64url");
-
-  const signature = crypto
-    .createHmac("sha256", process.env.JWT_SECRET)
-    .update(encoded)
-    .digest("base64url");
+  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
+  const signature = crypto.createHmac("sha256", process.env.JWT_SECRET)
+    .update(encoded).digest("base64url");
 
   return `${encoded}.${signature}`;
 }
 
 function verifyToken(token) {
-  if (typeof token !== "string" || token.length > 4096) {
-    return null;
-  }
+  if (typeof token !== "string" || token.length > 4096) return null;
 
   const parts = token.split(".");
-
-  if (parts.length !== 2) {
-    return null;
-  }
+  if (parts.length !== 2) return null;
 
   const [encoded, supplied] = parts;
-
-  const expected = crypto
-    .createHmac("sha256", process.env.JWT_SECRET)
-    .update(encoded)
-    .digest();
+  const expected = crypto.createHmac("sha256", process.env.JWT_SECRET)
+    .update(encoded).digest();
 
   let actual;
-
   try {
     actual = Buffer.from(supplied, "base64url");
   } catch (_) {
@@ -200,9 +161,7 @@ function verifyToken(token) {
   if (
     actual.length !== expected.length ||
     !crypto.timingSafeEqual(actual, expected)
-  ) {
-    return null;
-  }
+  ) return null;
 
   try {
     const payload = JSON.parse(
@@ -213,9 +172,7 @@ function verifyToken(token) {
       !payload.sub ||
       !Number.isInteger(payload.exp) ||
       payload.exp <= Math.floor(Date.now() / 1000)
-    ) {
-      return null;
-    }
+    ) return null;
 
     return payload;
   } catch (_) {
@@ -230,13 +187,10 @@ async function requireAuth(req, res, next) {
     .match(/^Bearer\s+(.+)$/i);
 
   if (!match) {
-    return res.status(401).json({
-      error: "Authentication required."
-    });
+    return res.status(401).json({ error: "Authentication required." });
   }
 
   const payload = verifyToken(match[1]);
-
   if (!payload) {
     return res.status(401).json({
       error: "Invalid or expired access token."
@@ -246,16 +200,12 @@ async function requireAuth(req, res, next) {
   try {
     const result = await pool.query(
       `SELECT id, username, email, role, account_status, created_at
-       FROM users
-       WHERE id::text = $1
-       LIMIT 1`,
+       FROM users WHERE id::text = $1 LIMIT 1`,
       [String(payload.sub)]
     );
 
     if (!result.rows.length) {
-      return res.status(401).json({
-        error: "Account not found."
-      });
+      return res.status(401).json({ error: "Account not found." });
     }
 
     if (result.rows[0].account_status !== "active") {
@@ -289,7 +239,6 @@ function makeUsernameBase(fullName) {
     .replace(/_+$/g, "");
 
   if (username.length < 3) username = "user";
-
   return username;
 }
 
@@ -307,7 +256,6 @@ function publicUser(user) {
 function isCloudinaryUrl(value) {
   try {
     const parsed = new URL(value);
-
     return parsed.protocol === "https:" &&
       parsed.hostname === "res.cloudinary.com" &&
       parsed.pathname.split("/").filter(Boolean).length >= 3;
@@ -365,10 +313,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
       : "image";
 
     const stream = cloudinary.uploader.upload_stream(
-      {
-        folder: "freetube",
-        resource_type: resourceType
-      },
+      { folder: "freetube", resource_type: resourceType },
       (error, result) => {
         if (error) return reject(error);
 
@@ -385,7 +330,7 @@ function sendCloudinaryUpload(buffer, mimetype) {
   });
 }
 
-// Initialize tables and add new profile fields without deleting existing data.
+// Database initialization. Existing user data is preserved.
 async function initializeDatabase() {
   if (!pool) return;
 
@@ -404,20 +349,11 @@ async function initializeDatabase() {
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
-    ALTER TABLE ft_profiles
-      ADD COLUMN IF NOT EXISTS city VARCHAR(120);
-
-    ALTER TABLE ft_profiles
-      ADD COLUMN IF NOT EXISTS home VARCHAR(200);
-
-    ALTER TABLE ft_profiles
-      ADD COLUMN IF NOT EXISTS birthday DATE;
-
-    ALTER TABLE ft_profiles
-      ADD COLUMN IF NOT EXISTS work VARCHAR(200);
-
-    ALTER TABLE ft_profiles
-      ADD COLUMN IF NOT EXISTS education VARCHAR(200);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS city VARCHAR(120);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS home VARCHAR(200);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS birthday DATE;
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS work VARCHAR(200);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS education VARCHAR(200);
 
     CREATE TABLE IF NOT EXISTS ft_posts (
       id BIGSERIAL PRIMARY KEY,
@@ -430,17 +366,31 @@ async function initializeDatabase() {
     );
 
     CREATE TABLE IF NOT EXISTS ft_likes (
-      post_id BIGINT NOT NULL
-        REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (post_id, user_id)
     );
 
+    CREATE TABLE IF NOT EXISTS ft_post_reactions (
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      reaction VARCHAR(20) NOT NULL
+        CHECK (reaction IN ('like', 'love', 'sad', 'angry')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (post_id, user_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_post_views (
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      viewed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (post_id, user_id)
+    );
+
     CREATE TABLE IF NOT EXISTS ft_comments (
       id BIGSERIAL PRIMARY KEY,
-      post_id BIGINT NOT NULL
-        REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       content VARCHAR(2000) NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -476,8 +426,7 @@ async function initializeDatabase() {
 
     CREATE TABLE IF NOT EXISTS ft_post_reports (
       id BIGSERIAL PRIMARY KEY,
-      post_id BIGINT NOT NULL
-        REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
       reporter_id TEXT NOT NULL,
       reason VARCHAR(500) NOT NULL,
       status VARCHAR(20) NOT NULL DEFAULT 'pending'
@@ -488,32 +437,31 @@ async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
-
     CREATE INDEX IF NOT EXISTS ft_posts_user_idx
       ON ft_posts(user_id, created_at DESC);
-
     CREATE INDEX IF NOT EXISTS ft_comments_post_idx
       ON ft_comments(post_id, created_at);
-
     CREATE INDEX IF NOT EXISTS ft_messages_pair_idx
       ON ft_messages(sender_id, recipient_id, created_at);
-
     CREATE INDEX IF NOT EXISTS ft_notifications_recipient_idx
       ON ft_notifications(recipient_id, created_at DESC);
-
     CREATE INDEX IF NOT EXISTS ft_follows_following_idx
       ON ft_follows(following_id);
+    CREATE INDEX IF NOT EXISTS ft_post_reactions_post_idx
+      ON ft_post_reactions(post_id);
+    CREATE INDEX IF NOT EXISTS ft_post_views_post_idx
+      ON ft_post_views(post_id);
   `);
 
   console.log("FreeTube database initialized.");
 }
 
-// Health endpoints.
+// Health.
 app.get("/", (req, res) => {
   res.json({
     name: "FreeTube Backend API",
     status: "running",
-    version: "3.1.0"
+    version: "3.2.0"
   });
 });
 
@@ -526,9 +474,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/health/database", async (req, res, next) => {
-  if (!pool) {
-    return res.status(503).json({ status: "not_configured" });
-  }
+  if (!pool) return res.status(503).json({ status: "not_configured" });
 
   try {
     await pool.query("SELECT 1");
@@ -555,6 +501,8 @@ app.get("/api", (req, res) => {
       "PUT /api/posts/:id",
       "DELETE /api/posts/:id",
       "POST /api/posts/:id/like",
+      "PUT /api/posts/:id/reaction",
+      "POST /api/posts/:id/view",
       "GET /api/posts/:id/comments",
       "POST /api/posts/:id/comments",
       "POST /api/posts/:id/report",
@@ -572,7 +520,7 @@ app.get("/api", (req, res) => {
   });
 });
 
-// Registration.
+// Register.
 app.post("/api/auth/register", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -580,14 +528,11 @@ app.post("/api/auth/register", async (req, res, next) => {
 
   try {
     const fullName = cleanText(
-      req.body.full_name || req.body.fullName || req.body.name,
-      80
+      req.body.full_name || req.body.fullName || req.body.name, 80
     );
-
     const email = cleanText(req.body.email, 255).toLowerCase();
     const password = typeof req.body.password === "string"
-      ? req.body.password
-      : "";
+      ? req.body.password : "";
 
     if (fullName.length < 2) {
       return res.status(400).json({
@@ -596,13 +541,10 @@ app.post("/api/auth/register", async (req, res, next) => {
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({
-        error: "Enter a valid email address."
-      });
+      return res.status(400).json({ error: "Enter a valid email address." });
     }
 
     const passwordBytes = Buffer.byteLength(password, "utf8");
-
     if (passwordBytes < 8 || passwordBytes > 128) {
       return res.status(400).json({
         error: "Password must be 8-128 bytes long."
@@ -614,16 +556,12 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     client = await pool.connect();
     await client.query("BEGIN");
-
-    await client.query(
-      "SELECT pg_advisory_xact_lock(hashtext($1))",
-      [baseUsername]
-    );
+    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+      baseUsername
+    ]);
 
     const existingEmail = await client.query(
-      `SELECT id FROM users
-       WHERE LOWER(email) = LOWER($1)
-       LIMIT 1`,
+      `SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
       [email]
     );
 
@@ -653,19 +591,15 @@ app.post("/api/auth/register", async (req, res, next) => {
         );
 
         user = result.rows[0];
-
         await client.query("RELEASE SAVEPOINT username_attempt");
         break;
       } catch (error) {
         await client.query("ROLLBACK TO SAVEPOINT username_attempt");
         await client.query("RELEASE SAVEPOINT username_attempt");
-
         if (error.code !== "23505") throw error;
 
         const duplicateEmail = await client.query(
-          `SELECT id FROM users
-           WHERE LOWER(email) = LOWER($1)
-           LIMIT 1`,
+          `SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1`,
           [email]
         );
 
@@ -687,8 +621,7 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     await client.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2)
-       ON CONFLICT (user_id) DO NOTHING`,
+       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), fullName]
     );
 
@@ -697,10 +630,7 @@ app.post("/api/auth/register", async (req, res, next) => {
     res.status(201).json({
       message: "Account created successfully.",
       token: createToken(user),
-      user: {
-        ...publicUser(user),
-        display_name: fullName
-      }
+      user: { ...publicUser(user), display_name: fullName }
     });
   } catch (error) {
     if (client) await client.query("ROLLBACK").catch(() => {});
@@ -710,19 +640,16 @@ app.post("/api/auth/register", async (req, res, next) => {
   }
 });
 
-// Login using email or username.
+// Login.
 app.post("/api/auth/login", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
     const identifier = cleanText(
-      req.body.identifier || req.body.email || req.body.username,
-      255
+      req.body.identifier || req.body.email || req.body.username, 255
     );
-
     const password = typeof req.body.password === "string"
-      ? req.body.password
-      : "";
+      ? req.body.password : "";
 
     if (!identifier || !password) {
       return res.status(400).json({
@@ -741,7 +668,6 @@ app.post("/api/auth/login", async (req, res, next) => {
     );
 
     const user = result.rows[0];
-
     if (!user || !(await verifyPassword(password, user.password_hash))) {
       return res.status(401).json({
         error: "Invalid username/email or password."
@@ -756,8 +682,7 @@ app.post("/api/auth/login", async (req, res, next) => {
 
     await pool.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2)
-       ON CONFLICT (user_id) DO NOTHING`,
+       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), user.username]
     );
 
@@ -775,11 +700,10 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
 
-// Search active users.
+// Search users.
 app.get("/api/users/search", requireAuth, async (req, res, next) => {
   try {
     const q = cleanText(req.query.q, 50);
-
     if (q.length < 2) return res.json({ users: [] });
 
     const result = await pool.query(
@@ -789,8 +713,7 @@ app.get("/api/users/search", requireAuth, async (req, res, next) => {
        WHERE u.account_status = 'active'
          AND u.id::text <> $1
          AND LOWER(u.username) LIKE LOWER($2)
-       ORDER BY u.username
-       LIMIT 20`,
+       ORDER BY u.username LIMIT 20`,
       [String(req.user.id), `%${q}%`]
     );
 
@@ -800,18 +723,23 @@ app.get("/api/users/search", requireAuth, async (req, res, next) => {
   }
 });
 
-// Read your own profile.
+// Own profile.
 app.get("/api/profile", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
       `SELECT u.id, u.username, u.email, u.role, u.created_at,
               p.display_name, p.bio, p.avatar_url, p.cover_url,
               p.city, p.home, p.birthday, p.work, p.education,
-              p.updated_at
+              p.updated_at,
+              (SELECT COUNT(*) FROM ft_posts x
+               WHERE x.user_id = u.id::text)::int AS posts_count,
+              (SELECT COUNT(*) FROM ft_follows f
+               WHERE f.following_id = u.id::text)::int AS followers_count,
+              (SELECT COUNT(*) FROM ft_follows f
+               WHERE f.follower_id = u.id::text)::int AS following_count
        FROM users u
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
-       WHERE u.id::text = $1
-       LIMIT 1`,
+       WHERE u.id::text = $1 LIMIT 1`,
       [String(req.user.id)]
     );
 
@@ -825,7 +753,7 @@ app.get("/api/profile", requireAuth, async (req, res, next) => {
   }
 });
 
-// Read a public profile, including follow status.
+// Public profile.
 app.get("/api/profile/:username", async (req, res, next) => {
   if (!authReady(res)) return;
 
@@ -858,15 +786,14 @@ app.get("/api/profile/:username", async (req, res, next) => {
     const [statsResult, followResult] = await Promise.all([
       pool.query(
         `SELECT
-           (SELECT COUNT(*) FROM ft_posts
-            WHERE user_id = $1) AS posts,
+           (SELECT COUNT(*) FROM ft_posts WHERE user_id = $1)::int AS posts,
            (SELECT COUNT(*) FROM ft_likes l
             JOIN ft_posts p ON p.id = l.post_id
-            WHERE p.user_id = $1) AS likes,
+            WHERE p.user_id = $1)::int AS likes,
            (SELECT COUNT(*) FROM ft_follows
-            WHERE following_id = $1) AS followers,
+            WHERE following_id = $1)::int AS followers,
            (SELECT COUNT(*) FROM ft_follows
-            WHERE follower_id = $1) AS following`,
+            WHERE follower_id = $1)::int AS following`,
         [userId]
       ),
       viewerId && viewerId !== userId
@@ -878,20 +805,24 @@ app.get("/api/profile/:username", async (req, res, next) => {
         : Promise.resolve({ rows: [] })
     ]);
 
+    const stats = statsResult.rows[0];
+
     profile.is_following = Boolean(followResult.rows.length);
     profile.is_own_profile = Boolean(viewerId && viewerId === userId);
 
-    res.json({
-      profile,
-      user: profile,
-      stats: statsResult.rows[0]
-    });
+    // Counts are available both in profile and in stats for frontend compatibility.
+    profile.posts_count = Number(stats.posts);
+    profile.likes_count = Number(stats.likes);
+    profile.followers_count = Number(stats.followers);
+    profile.following_count = Number(stats.following);
+
+    res.json({ profile, user: profile, stats });
   } catch (error) {
     next(error);
   }
 });
 
-// Update profile. Fields not provided are preserved.
+// Update profile.
 app.put("/api/profile", requireAuth, async (req, res, next) => {
   try {
     const displayName = cleanText(req.body.display_name, 80);
@@ -922,14 +853,11 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
       }
 
       const parsed = new Date(`${birthdayInput}T00:00:00.000Z`);
-
       if (
         Number.isNaN(parsed.getTime()) ||
         parsed.toISOString().slice(0, 10) !== birthdayInput
       ) {
-        return res.status(400).json({
-          error: "Enter a valid birthday."
-        });
+        return res.status(400).json({ error: "Enter a valid birthday." });
       }
 
       if (birthdayInput > new Date().toISOString().slice(0, 10)) {
@@ -941,75 +869,39 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
       birthday = birthdayInput;
     }
 
-    // Keep existing values when the client omits a field.
     const result = await pool.query(
       `INSERT INTO ft_profiles
        (user_id, display_name, bio, avatar_url, cover_url,
         city, home, birthday, work, education, updated_at)
        VALUES (
-         $1,
-         COALESCE(NULLIF($2, ''), $3),
-         $4,
-         NULLIF($5, ''),
-         NULLIF($6, ''),
-         $7,
-         $8,
-         $9::date,
-         $10,
-         $11,
-         NOW()
+         $1, COALESCE(NULLIF($2, ''), $3), $4,
+         NULLIF($5, ''), NULLIF($6, ''),
+         $7, $8, $9::date, $10, $11, NOW()
        )
        ON CONFLICT (user_id) DO UPDATE SET
-         display_name = CASE
-           WHEN $12::boolean THEN EXCLUDED.display_name
-           ELSE ft_profiles.display_name
-         END,
-         bio = CASE
-           WHEN $13::boolean THEN EXCLUDED.bio
-           ELSE ft_profiles.bio
-         END,
-         avatar_url = CASE
-           WHEN $14::boolean THEN EXCLUDED.avatar_url
-           ELSE ft_profiles.avatar_url
-         END,
-         cover_url = CASE
-           WHEN $15::boolean THEN EXCLUDED.cover_url
-           ELSE ft_profiles.cover_url
-         END,
-         city = CASE
-           WHEN $16::boolean THEN EXCLUDED.city
-           ELSE ft_profiles.city
-         END,
-         home = CASE
-           WHEN $17::boolean THEN EXCLUDED.home
-           ELSE ft_profiles.home
-         END,
-         birthday = CASE
-           WHEN $18::boolean THEN EXCLUDED.birthday
-           ELSE ft_profiles.birthday
-         END,
-         work = CASE
-           WHEN $19::boolean THEN EXCLUDED.work
-           ELSE ft_profiles.work
-         END,
-         education = CASE
-           WHEN $20::boolean THEN EXCLUDED.education
-           ELSE ft_profiles.education
-         END,
+         display_name = CASE WHEN $12::boolean
+           THEN EXCLUDED.display_name ELSE ft_profiles.display_name END,
+         bio = CASE WHEN $13::boolean
+           THEN EXCLUDED.bio ELSE ft_profiles.bio END,
+         avatar_url = CASE WHEN $14::boolean
+           THEN EXCLUDED.avatar_url ELSE ft_profiles.avatar_url END,
+         cover_url = CASE WHEN $15::boolean
+           THEN EXCLUDED.cover_url ELSE ft_profiles.cover_url END,
+         city = CASE WHEN $16::boolean
+           THEN EXCLUDED.city ELSE ft_profiles.city END,
+         home = CASE WHEN $17::boolean
+           THEN EXCLUDED.home ELSE ft_profiles.home END,
+         birthday = CASE WHEN $18::boolean
+           THEN EXCLUDED.birthday ELSE ft_profiles.birthday END,
+         work = CASE WHEN $19::boolean
+           THEN EXCLUDED.work ELSE ft_profiles.work END,
+         education = CASE WHEN $20::boolean
+           THEN EXCLUDED.education ELSE ft_profiles.education END,
          updated_at = NOW()
        RETURNING *`,
       [
-        String(req.user.id),
-        displayName,
-        req.user.username,
-        bio,
-        avatarUrl,
-        coverUrl,
-        city,
-        home,
-        birthday,
-        work,
-        education,
+        String(req.user.id), displayName, req.user.username, bio,
+        avatarUrl, coverUrl, city, home, birthday, work, education,
         Object.prototype.hasOwnProperty.call(req.body, "display_name"),
         Object.prototype.hasOwnProperty.call(req.body, "bio"),
         Object.prototype.hasOwnProperty.call(req.body, "avatar_url"),
@@ -1022,16 +914,13 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
       ]
     );
 
-    res.json({
-      message: "Profile updated.",
-      profile: result.rows[0]
-    });
+    res.json({ message: "Profile updated.", profile: result.rows[0] });
   } catch (error) {
     next(error);
   }
 });
 
-// Upload image or video.
+// Upload media.
 app.post(
   "/api/media/upload",
   requireAuth,
@@ -1064,10 +953,8 @@ app.post(
       }
 
       const media = await sendCloudinaryUpload(
-        req.file.buffer,
-        req.file.mimetype
+        req.file.buffer, req.file.mimetype
       );
-
       res.status(201).json({ media });
     } catch (error) {
       next(error);
@@ -1075,7 +962,7 @@ app.post(
   }
 );
 
-// Create a post.
+// Create post.
 app.post("/api/posts", requireAuth, async (req, res, next) => {
   try {
     const content = cleanText(req.body.content, 5000);
@@ -1102,36 +989,29 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
     const result = await pool.query(
       `INSERT INTO ft_posts
        (user_id, content, media_url, media_type, media_public_id)
-       VALUES ($1, $2, $3, $4, $5)
-       RETURNING *`,
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [
-        String(req.user.id),
-        content,
-        mediaUrl || null,
-        mediaType || null,
-        mediaPublicId || null
+        String(req.user.id), content, mediaUrl || null,
+        mediaType || null, mediaPublicId || null
       ]
     );
 
     res.status(201).json({
-      message: "Post created.",
-      post: result.rows[0]
+      message: "Post created.", post: result.rows[0]
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Feed.
+// Feed with like, reaction and view counts.
 app.get("/api/posts", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
     const limit = Math.min(
-      50,
-      Math.max(1, Number.parseInt(req.query.limit, 10) || 20)
+      50, Math.max(1, Number.parseInt(req.query.limit, 10) || 20)
     );
-
     const before = Number.parseInt(req.query.before, 10);
     const match = (req.headers.authorization || "")
       .match(/^Bearer\s+(.+)$/i);
@@ -1142,21 +1022,35 @@ app.get("/api/posts", async (req, res, next) => {
       `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type,
               p.created_at, u.username,
               pr.display_name, pr.avatar_url,
-              (SELECT COUNT(*) FROM ft_likes l
+              (SELECT COUNT(*)::int FROM ft_likes l
                WHERE l.post_id = p.id) AS like_count,
-              (SELECT COUNT(*) FROM ft_comments c
+              (SELECT COUNT(*)::int FROM ft_comments c
                WHERE c.post_id = p.id) AS comment_count,
+              (SELECT COUNT(*)::int FROM ft_post_views v
+               WHERE v.post_id = p.id) AS view_count,
               EXISTS (
                 SELECT 1 FROM ft_likes l
                 WHERE l.post_id = p.id AND l.user_id = $2
-              ) AS liked_by_me
+              ) AS liked_by_me,
+              (SELECT r.reaction FROM ft_post_reactions r
+               WHERE r.post_id = p.id AND r.user_id = $2
+               LIMIT 1) AS my_reaction,
+              COALESCE((
+                SELECT jsonb_object_agg(rc.reaction, rc.total)
+                FROM (
+                  SELECT reaction, COUNT(*)::int AS total
+                  FROM ft_post_reactions
+                  WHERE post_id = p.id
+                  GROUP BY reaction
+                ) rc
+              ), '{"like":0,"love":0,"sad":0,"angry":0}'::jsonb)
+                AS reaction_counts
        FROM ft_posts p
        JOIN users u ON u.id::text = p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id = p.user_id
        WHERE u.account_status = 'active'
          AND ($1::bigint IS NULL OR p.id < $1)
-       ORDER BY p.id DESC
-       LIMIT $3`,
+       ORDER BY p.id DESC LIMIT $3`,
       [
         Number.isSafeInteger(before) && before > 0 ? before : null,
         viewerId,
@@ -1170,7 +1064,7 @@ app.get("/api/posts", async (req, res, next) => {
   }
 });
 
-// Edit your own post.
+// Edit own post.
 app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
@@ -1199,10 +1093,8 @@ app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `UPDATE ft_posts
-       SET content = $1, media_url = $2, media_type = $3
-       WHERE id = $4 AND user_id = $5
-       RETURNING *`,
+      `UPDATE ft_posts SET content = $1, media_url = $2, media_type = $3
+       WHERE id = $4 AND user_id = $5 RETURNING *`,
       [content, mediaUrl || null, mediaType || null, id, String(req.user.id)]
     );
 
@@ -1218,7 +1110,7 @@ app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
   }
 });
 
-// Delete your own post.
+// Delete own post.
 app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
@@ -1228,9 +1120,7 @@ app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
     }
 
     const result = await pool.query(
-      `DELETE FROM ft_posts
-       WHERE id = $1 AND user_id = $2
-       RETURNING id`,
+      `DELETE FROM ft_posts WHERE id = $1 AND user_id = $2 RETURNING id`,
       [id, String(req.user.id)]
     );
 
@@ -1246,10 +1136,9 @@ app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
   }
 });
 
-// Toggle like.
+// Like/unlike. Kept for compatibility with the existing frontend.
 app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   const postId = Number.parseInt(req.params.id, 10);
-
   if (!Number.isSafeInteger(postId) || postId <= 0) {
     return res.status(400).json({ error: "Invalid post ID." });
   }
@@ -1271,7 +1160,6 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
     }
 
     const userId = String(req.user.id);
-
     const existing = await client.query(
       "SELECT 1 FROM ft_likes WHERE post_id = $1 AND user_id = $2",
       [postId, userId]
@@ -1298,9 +1186,7 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
            (recipient_id, actor_id, type, post_id, message)
            VALUES ($1, $2, 'like', $3, $4)`,
           [
-            post.rows[0].user_id,
-            userId,
-            postId,
+            post.rows[0].user_id, userId, postId,
             `${req.user.username} liked your post.`
           ]
         );
@@ -1308,18 +1194,131 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
     }
 
     const count = await client.query(
-      "SELECT COUNT(*) FROM ft_likes WHERE post_id = $1",
+      "SELECT COUNT(*)::int AS count FROM ft_likes WHERE post_id = $1",
       [postId]
     );
 
     await client.query("COMMIT");
-
-    res.json({ liked, like_count: Number(count.rows[0].count) });
+    res.json({ liked, like_count: count.rows[0].count });
   } catch (error) {
     if (client) await client.query("ROLLBACK").catch(() => {});
     next(error);
   } finally {
     if (client) client.release();
+  }
+});
+
+// Add/change/remove a reaction.
+app.put("/api/posts/:id/reaction", requireAuth, async (req, res, next) => {
+  const postId = Number.parseInt(req.params.id, 10);
+  const userId = String(req.user.id);
+  const allowed = ["like", "love", "sad", "angry"];
+  const reaction = cleanText(req.body.reaction, 20).toLowerCase();
+
+  if (!Number.isSafeInteger(postId) || postId <= 0) {
+    return res.status(400).json({ error: "Invalid post ID." });
+  }
+
+  if (reaction && !allowed.includes(reaction)) {
+    return res.status(400).json({ error: "Invalid reaction." });
+  }
+
+  try {
+    const post = await pool.query(
+      "SELECT id, user_id FROM ft_posts WHERE id = $1",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    if (reaction) {
+      await pool.query(
+        `INSERT INTO ft_post_reactions (post_id, user_id, reaction)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (post_id, user_id)
+         DO UPDATE SET reaction = EXCLUDED.reaction, created_at = NOW()`,
+        [postId, userId, reaction]
+      );
+
+      if (post.rows[0].user_id !== userId) {
+        await pool.query(
+          `INSERT INTO ft_notifications
+           (recipient_id, actor_id, type, post_id, message)
+           VALUES ($1, $2, 'reaction', $3, $4)`,
+          [
+            post.rows[0].user_id, userId, postId,
+            `${req.user.username} reacted to your post.`
+          ]
+        );
+      }
+    } else {
+      await pool.query(
+        `DELETE FROM ft_post_reactions
+         WHERE post_id = $1 AND user_id = $2`,
+        [postId, userId]
+      );
+    }
+
+    const countsResult = await pool.query(
+      `SELECT reaction, COUNT(*)::int AS count
+       FROM ft_post_reactions WHERE post_id = $1 GROUP BY reaction`,
+      [postId]
+    );
+
+    const reaction_counts = { like: 0, love: 0, sad: 0, angry: 0 };
+    for (const row of countsResult.rows) {
+      reaction_counts[row.reaction] = row.count;
+    }
+
+    res.json({
+      success: true,
+      my_reaction: reaction || null,
+      reaction_counts,
+      like_count: reaction_counts.like
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Record a view. A user is counted once per post.
+app.post("/api/posts/:id/view", requireAuth, async (req, res, next) => {
+  const postId = Number.parseInt(req.params.id, 10);
+  const userId = String(req.user.id);
+
+  if (!Number.isSafeInteger(postId) || postId <= 0) {
+    return res.status(400).json({ error: "Invalid post ID." });
+  }
+
+  try {
+    const post = await pool.query(
+      "SELECT id FROM ft_posts WHERE id = $1",
+      [postId]
+    );
+
+    if (!post.rows.length) {
+      return res.status(404).json({ error: "Post not found." });
+    }
+
+    await pool.query(
+      `INSERT INTO ft_post_views (post_id, user_id)
+       VALUES ($1, $2)
+       ON CONFLICT (post_id, user_id)
+       DO UPDATE SET viewed_at = NOW()`,
+      [postId, userId]
+    );
+
+    const count = await pool.query(
+      `SELECT COUNT(*)::int AS view_count
+       FROM ft_post_views WHERE post_id = $1`,
+      [postId]
+    );
+
+    res.json({ success: true, view_count: count.rows[0].view_count });
+  } catch (error) {
+    next(error);
   }
 });
 
@@ -1329,7 +1328,6 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
 
   try {
     const postId = Number.parseInt(req.params.id, 10);
-
     if (!Number.isSafeInteger(postId) || postId <= 0) {
       return res.status(400).json({ error: "Invalid post ID." });
     }
@@ -1340,9 +1338,7 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
        FROM ft_comments c
        JOIN users u ON u.id::text = c.user_id
        LEFT JOIN ft_profiles p ON p.user_id = c.user_id
-       WHERE c.post_id = $1
-       ORDER BY c.id ASC
-       LIMIT 100`,
+       WHERE c.post_id = $1 ORDER BY c.id ASC LIMIT 100`,
       [postId]
     );
 
@@ -1352,7 +1348,7 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
   }
 });
 
-// Add a comment.
+// Add comment.
 app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   try {
     const postId = Number.parseInt(req.params.id, 10);
@@ -1365,8 +1361,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     }
 
     const post = await pool.query(
-      "SELECT user_id FROM ft_posts WHERE id = $1",
-      [postId]
+      "SELECT user_id FROM ft_posts WHERE id = $1", [postId]
     );
 
     if (!post.rows.length) {
@@ -1375,8 +1370,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
 
     const result = await pool.query(
       `INSERT INTO ft_comments (post_id, user_id, content)
-       VALUES ($1, $2, $3)
-       RETURNING *`,
+       VALUES ($1, $2, $3) RETURNING *`,
       [postId, String(req.user.id), content]
     );
 
@@ -1386,9 +1380,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
          (recipient_id, actor_id, type, post_id, message)
          VALUES ($1, $2, 'comment', $3, $4)`,
         [
-          post.rows[0].user_id,
-          String(req.user.id),
-          postId,
+          post.rows[0].user_id, String(req.user.id), postId,
           `${req.user.username} commented on your post.`
         ]
       );
@@ -1403,7 +1395,7 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   }
 });
 
-// Follow a user.
+// Follow.
 app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   try {
     const targetId = cleanText(req.params.id, 100);
@@ -1451,7 +1443,7 @@ app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   }
 });
 
-// Unfollow a user.
+// Unfollow.
 app.delete("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   try {
     const targetId = cleanText(req.params.id, 100);
@@ -1477,23 +1469,20 @@ app.delete("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   }
 });
 
-// List a user's followers.
+// Followers.
 app.get("/api/users/:id/followers", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
     const userId = cleanText(req.params.id, 100);
-
     const result = await pool.query(
       `SELECT u.id, u.username, p.display_name, p.avatar_url,
               f.created_at AS followed_at
        FROM ft_follows f
        JOIN users u ON u.id::text = f.follower_id
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
-       WHERE f.following_id = $1
-         AND u.account_status = 'active'
-       ORDER BY f.created_at DESC
-       LIMIT 200`,
+       WHERE f.following_id = $1 AND u.account_status = 'active'
+       ORDER BY f.created_at DESC LIMIT 200`,
       [userId]
     );
 
@@ -1503,23 +1492,20 @@ app.get("/api/users/:id/followers", async (req, res, next) => {
   }
 });
 
-// List accounts followed by a user.
+// Following.
 app.get("/api/users/:id/following", async (req, res, next) => {
   if (!authReady(res)) return;
 
   try {
     const userId = cleanText(req.params.id, 100);
-
     const result = await pool.query(
       `SELECT u.id, u.username, p.display_name, p.avatar_url,
               f.created_at AS followed_at
        FROM ft_follows f
        JOIN users u ON u.id::text = f.following_id
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
-       WHERE f.follower_id = $1
-         AND u.account_status = 'active'
-       ORDER BY f.created_at DESC
-       LIMIT 200`,
+       WHERE f.follower_id = $1 AND u.account_status = 'active'
+       ORDER BY f.created_at DESC LIMIT 200`,
       [userId]
     );
 
@@ -1542,8 +1528,7 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
     }
 
     const post = await pool.query(
-      "SELECT id FROM ft_posts WHERE id = $1",
-      [postId]
+      "SELECT id FROM ft_posts WHERE id = $1", [postId]
     );
 
     if (!post.rows.length) {
@@ -1569,16 +1554,14 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
   }
 });
 
-// Read a conversation.
+// Read conversation.
 app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
     const other = cleanText(req.params.userId, 100);
 
     if (!other || other === me) {
-      return res.status(400).json({
-        error: "Invalid conversation user."
-      });
+      return res.status(400).json({ error: "Invalid conversation user." });
     }
 
     const account = await pool.query(
@@ -1602,8 +1585,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
        FROM ft_messages
        WHERE (sender_id = $1 AND recipient_id = $2)
           OR (sender_id = $2 AND recipient_id = $1)
-       ORDER BY id DESC
-       LIMIT 100`,
+       ORDER BY id DESC LIMIT 100`,
       [me, other]
     );
 
@@ -1613,7 +1595,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   }
 });
 
-// Send a message.
+// Send message.
 app.post("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const recipientId = cleanText(req.body.recipient_id, 100);
@@ -1638,8 +1620,7 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
 
     const result = await pool.query(
       `INSERT INTO ft_messages (sender_id, recipient_id, content)
-       VALUES ($1, $2, $3)
-       RETURNING *`,
+       VALUES ($1, $2, $3) RETURNING *`,
       [senderId, recipientId, content]
     );
 
@@ -1663,7 +1644,6 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
 app.get("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
-
     const result = await pool.query(
       `WITH conversation_messages AS (
          SELECT *,
@@ -1679,7 +1659,7 @@ app.get("/api/messages", requireAuth, async (req, res, next) => {
          ORDER BY other_id, id DESC
        )
        SELECT l.*, u.username, p.display_name, p.avatar_url,
-         (SELECT COUNT(*) FROM ft_messages m
+         (SELECT COUNT(*)::int FROM ft_messages m
           WHERE m.sender_id = l.other_id
             AND m.recipient_id = $1
             AND m.read_at IS NULL) AS unread_count
@@ -1696,7 +1676,7 @@ app.get("/api/messages", requireAuth, async (req, res, next) => {
   }
 });
 
-// List notifications.
+// Notifications.
 app.get("/api/notifications", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
@@ -1704,20 +1684,19 @@ app.get("/api/notifications", requireAuth, async (req, res, next) => {
        FROM ft_notifications n
        LEFT JOIN users u ON u.id::text = n.actor_id
        WHERE n.recipient_id = $1
-       ORDER BY n.id DESC
-       LIMIT 100`,
+       ORDER BY n.id DESC LIMIT 100`,
       [String(req.user.id)]
     );
 
     const unread = await pool.query(
-      `SELECT COUNT(*) FROM ft_notifications
+      `SELECT COUNT(*)::int AS count FROM ft_notifications
        WHERE recipient_id = $1 AND read_at IS NULL`,
       [String(req.user.id)]
     );
 
     res.json({
       notifications: result.rows,
-      unread_count: Number(unread.rows[0].count)
+      unread_count: unread.rows[0].count
     });
   } catch (error) {
     next(error);
@@ -1780,12 +1759,12 @@ app.patch(
   }
 );
 
-// 404 handler.
+// 404.
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
 });
 
-// Error handler.
+// Error handling.
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
 
@@ -1801,10 +1780,7 @@ app.use((error, req, res, next) => {
     });
   }
 
-  if (
-    error.message &&
-    error.message.startsWith("Unsupported file type")
-  ) {
+  if (error.message && error.message.startsWith("Unsupported file type")) {
     return res.status(400).json({ error: error.message });
   }
 
@@ -1816,7 +1792,7 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: "Internal server error." });
 });
 
-// Start server.
+// Start.
 async function startServer() {
   try {
     if (pool) await initializeDatabase();
