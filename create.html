@@ -1,0 +1,303 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#10291f">
+<title>Create Post — FreeTube</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--bg:#10291f;--panel:#172f24;--panel2:#20392d;--green:#00e991;--text:#f6fff9;--muted:#a9bdb2;--border:rgba(255,255,255,.13);--red:#ff626b}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}button:disabled{opacity:.5}
+.app{max-width:650px;margin:auto;min-height:100dvh;padding-bottom:85px}
+header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:15px 17px;background:#10291ff5;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+.brand{font-size:25px;font-weight:900}.brand i,.brand span{color:var(--green)}
+.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--panel2);border:1px solid var(--border)}
+main{padding:16px}
+.page-title{font-size:22px;margin-bottom:6px}
+.subtitle{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:18px}
+.panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:17px;margin-bottom:14px}
+.user-row{display:flex;align-items:center;gap:11px;margin-bottom:16px}
+.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--panel2)}
+.user-name{font-size:15px;font-weight:bold}
+.user-sub{font-size:12px;color:var(--muted);margin-top:4px}
+textarea,input{width:100%;color:white;background:#10291f;border:1px solid var(--border);border-radius:11px;padding:13px;outline:none}
+textarea{resize:vertical;min-height:125px;line-height:1.5}
+textarea:focus,input:focus{border-color:var(--green)}
+.field-label{display:block;font-size:13px;color:var(--muted);margin:13px 0 7px}
+.upload-area{margin-top:13px;border:1px dashed #668373;border-radius:14px;min-height:155px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:#11271d}
+.upload-prompt{padding:22px;cursor:pointer;width:100%}
+.upload-prompt i{font-size:34px;color:var(--green);margin-bottom:12px}
+.upload-prompt strong{display:block;font-size:14px;margin-bottom:7px}
+.upload-prompt span{font-size:12px;color:var(--muted)}
+#preview{display:none;width:100%;position:relative}
+#preview img,#preview video{width:100%;max-height:400px;object-fit:contain;display:block;background:#000}
+.remove-media{margin:10px;padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:#3b2929;color:#ffd9d9}
+.file-info{font-size:12px;color:var(--muted);padding:10px;overflow-wrap:anywhere}
+.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.row button{flex:1}
+.primary,.secondary{padding:12px 15px;border-radius:10px;border:1px solid var(--border)}
+.primary{background:var(--green);color:#073421;font-weight:bold}
+.secondary{background:var(--panel2);color:white}
+.primary:disabled{background:#517565;color:#ddd}
+.notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:20;width:100%;max-width:650px;display:flex;justify-content:space-around;padding:9px 3px calc(9px + env(safe-area-inset-bottom));background:#10291ff7;border-top:1px solid var(--border)}
+.nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;color:var(--muted);font-size:11px}
+.nav-item i{font-size:21px}.nav-item.active{color:var(--green)}
+.toast{position:fixed;z-index:50;bottom:90px;left:50%;transform:translateX(-50%);display:none;background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;max-width:90%;font-size:13px}
+.toast.show{display:block}
+@media(min-width:651px){body{background:#091710}.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
+  <button class="icon-btn" onclick="go('home.html')" aria-label="Home"><i class="fa-solid fa-house"></i></button>
+</header>
+
+<main>
+  <h1 class="page-title">Create a post</h1>
+  <p class="subtitle">Share something with the FreeTube community.</p>
+
+  <section class="panel">
+    <div class="user-row">
+      <img id="avatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile">
+      <div>
+        <div id="username" class="user-name">FreeTube User</div>
+        <div class="user-sub"><i class="fa-solid fa-earth-americas"></i> Public post</div>
+      </div>
+    </div>
+
+    <form id="postForm">
+      <label class="field-label" for="content">What's on your mind?</label>
+      <textarea id="content" maxlength="5000" placeholder="Write a caption or a message..."></textarea>
+
+      <label class="field-label">Photo or video</label>
+      <div class="upload-area">
+        <label id="uploadPrompt" class="upload-prompt" for="mediaFile">
+          <i class="fa-solid fa-photo-film"></i>
+          <strong>Add photos or videos</strong>
+          <span>JPG, PNG, WEBP, GIF, MP4, WEBM or MOV · Max 50 MB</span>
+        </label>
+        <div id="preview">
+          <div id="previewMedia"></div>
+          <div id="fileInfo" class="file-info"></div>
+          <button type="button" class="remove-media" onclick="removeMedia()">
+            <i class="fa-solid fa-trash"></i> Remove media
+          </button>
+        </div>
+      </div>
+      <input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" hidden>
+
+      <p class="notice">Please share content you have the right to upload. Avoid private information and harmful content.</p>
+      <div class="row">
+        <button type="button" class="secondary" onclick="go('home.html')">Cancel</button>
+        <button id="publishButton" type="submit" class="primary"><i class="fa-solid fa-paper-plane"></i> Publish</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button class="nav-item" onclick="go('home.html')"><i class="fa-solid fa-house"></i><span>Home</span></button>
+  <button class="nav-item" onclick="go('discover.html')"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
+  <button class="nav-item active" onclick="go('create.html')"><i class="fa-solid fa-square-plus"></i><span>Create</span></button>
+  <button class="nav-item" onclick="go('notifications.html')"><i class="fa-solid fa-bell"></i><span>Alerts</span></button>
+  <button class="nav-item" onclick="go('profile.html')"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+</nav>
+</div>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script>
+"use strict";
+
+const API_BASE="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
+const MAX_FILE_SIZE=50*1024*1024;
+
+let selectedFile=null;
+let previewUrl=null;
+let toastTimer=null;
+
+function go(page){location.href=page}
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
+function showToast(message){
+  const el=document.getElementById("toast");
+  el.textContent=String(message||"Something went wrong.");
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove("show"),3200);
+}
+async function api(path,options={}){
+  const headers=new Headers(options.headers||{});
+  const t=getToken();
+  if(t)headers.set("Authorization","Bearer "+t);
+  const isForm=options.body instanceof FormData;
+  if(options.body&&!isForm&&!headers.has("Content-Type"))headers.set("Content-Type","application/json");
+
+  let response;
+  try{
+    response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"});
+  }catch(_){
+    throw new Error("Backend-এর সঙ্গে সংযোগ হচ্ছে না। আবার চেষ্টা করো।");
+  }
+
+  const raw=await response.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}catch(_){data={message:raw}}
+
+  if(response.status===401){
+    try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+    go("auth.html?mode=login");
+    throw new Error("Login session শেষ হয়েছে। আবার লগইন করো।");
+  }
+  if(!response.ok)throw new Error(data.message||data.error||("API error "+response.status));
+  return data;
+}
+
+async function loadUser(){
+  if(!getToken()){
+    go("auth.html?mode=login");
+    return;
+  }
+  try{
+    const data=await api("/auth/me");
+    const user=data.user||data;
+    document.getElementById("username").textContent=user.display_name||user.username||"FreeTube User";
+    document.getElementById("avatar").src=user.avatar_url||user.avatar||FALLBACK_AVATAR;
+  }catch(error){
+    showToast(error.message||"Could not load profile.");
+  }
+}
+
+function removeMedia(){
+  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
+  selectedFile=null;
+  document.getElementById("mediaFile").value="";
+  document.getElementById("previewMedia").replaceChildren();
+  document.getElementById("fileInfo").textContent="";
+  document.getElementById("preview").style.display="none";
+  document.getElementById("uploadPrompt").style.display="block";
+}
+
+document.getElementById("mediaFile").addEventListener("change",event=>{
+  const file=event.target.files&&event.target.files[0];
+  if(!file)return;
+
+  const allowed=[
+    "image/jpeg","image/png","image/webp","image/gif",
+    "video/mp4","video/webm","video/quicktime"
+  ];
+  if(!allowed.includes(file.type)){
+    showToast("Unsupported file type.");
+    removeMedia();
+    return;
+  }
+  if(file.size>MAX_FILE_SIZE){
+    showToast("File must be 50 MB or smaller.");
+    removeMedia();
+    return;
+  }
+
+  removeMedia();
+  selectedFile=file;
+  previewUrl=URL.createObjectURL(file);
+
+  const preview=document.getElementById("previewMedia");
+  if(file.type.startsWith("video/")){
+    const video=document.createElement("video");
+    video.src=previewUrl;
+    video.controls=true;
+    video.playsInline=true;
+    preview.appendChild(video);
+  }else{
+    const image=document.createElement("img");
+    image.src=previewUrl;
+    image.alt="Selected photo";
+    preview.appendChild(image);
+  }
+
+  document.getElementById("fileInfo").textContent=
+    file.name+" · "+(file.size/1024/1024).toFixed(2)+" MB";
+  document.getElementById("uploadPrompt").style.display="none";
+  document.getElementById("preview").style.display="block";
+});
+
+document.getElementById("postForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+
+  if(!getToken()){
+    go("auth.html?mode=login");
+    return;
+  }
+
+  const content=document.getElementById("content").value.trim();
+  if(!content&&!selectedFile){
+    showToast("Write something or select a photo/video first.");
+    return;
+  }
+
+  const button=document.getElementById("publishButton");
+  button.disabled=true;
+  button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
+
+  try{
+    let media=null;
+
+    if(selectedFile){
+      const formData=new FormData();
+      formData.append("file",selectedFile);
+
+      const uploadData=await api("/media/upload",{
+        method:"POST",
+        body:formData
+      });
+      media=uploadData.media||uploadData;
+      if(!media.url&&!media.secure_url){
+        throw new Error("Upload response-এ media URL পাওয়া যায়নি।");
+      }
+    }
+
+    const mediaUrl=media?(media.url||media.secure_url):"";
+    const resourceType=media?(media.resource_type||media.type||""):"";
+    const mediaType=selectedFile
+      ?(selectedFile.type.startsWith("video/")?"video":"image")
+      :"";
+
+    await api("/posts",{
+      method:"POST",
+      body:JSON.stringify({
+        content,
+        media_url:mediaUrl,
+        media_type:mediaType,
+        media_public_id:media?(media.public_id||""):""
+      })
+    });
+
+    showToast("Post published successfully!");
+    document.getElementById("content").value="";
+    removeMedia();
+
+    setTimeout(()=>go("home.html"),700);
+  }catch(error){
+    showToast(error.message||"Could not publish post.");
+  }finally{
+    button.disabled=false;
+    button.innerHTML='<i class="fa-solid fa-paper-plane"></i> Publish';
+  }
+});
+
+window.addEventListener("beforeunload",()=>{
+  if(previewUrl)URL.revokeObjectURL(previewUrl);
+});
+
+loadUser();
+</script>
+</body>
+</html>
