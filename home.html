@@ -1,148 +1,316 @@
+
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d3b22">
-<title>FreeTube</title>
+<meta name="theme-color" content="#103626">
+<title>FreeTube — Home</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
-:root{--bg:#101713;--panel:#1a2920;--border:#34483b;--green:#00e887;--red:#ff626b;--muted:#aab7ad}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial, sans-serif}
-body{background:linear-gradient(140deg,#0d3b22,#101713 45%,#3b111b);color:#fff;min-height:100vh}
-button,input,textarea,select{font:inherit}
-button{cursor:pointer;color:inherit;border:0}
-button:disabled{opacity:.55;cursor:wait}
-.app{max-width:520px;margin:auto;min-height:100vh;padding-bottom:76px;background:#10171355}
-header{position:sticky;top:0;z-index:10;background:#10291ef2;border-bottom:1px solid var(--border);padding:14px 16px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-size:23px;font-weight:900}.brand span,.brand i{color:var(--green)}
-.actions{display:flex;gap:8px}
-.icon-btn{width:38px;height:38px;border-radius:50%;background:#ffffff15;border:1px solid var(--border)}
-.composer{display:flex;align-items:center;gap:10px;padding:14px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
-.avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#294334}
-.fake-input{flex:1;border:1px solid var(--border);background:#ffffff0c;border-radius:25px;padding:12px;color:#c3cdc6}
-.stories{display:flex;gap:10px;overflow-x:auto;padding:13px;background:#ffffff05}
-.story{flex:0 0 100px;height:140px;border-radius:13px;overflow:hidden;position:relative;background:#263b2e}
-.story img{width:100%;height:100%;object-fit:cover;opacity:.75}
-.story span{position:absolute;bottom:8px;left:8px;font-size:11px;font-weight:bold}
-.feed{padding-top:10px}
-.post{background:var(--panel);border-block:1px solid var(--border);margin-bottom:10px}
-.post-head{padding:12px 14px;display:flex;align-items:center;gap:10px}
-.post-user{font-weight:bold;font-size:14px}.post-time{font-size:11px;color:var(--muted);margin-top:4px}
-.post-text{padding:0 14px 12px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.5}
-.media{background:#000;display:flex;justify-content:center;align-items:center}
-.media img,.media video{width:100%;max-height:480px;object-fit:contain}
-.stats{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;padding:10px 14px;color:var(--muted);font-size:11px;border-bottom:1px solid #ffffff12}
-.post-actions{display:flex;flex-wrap:wrap;justify-content:space-around;padding:5px}
-.post-actions button{background:none;padding:9px 7px;font-size:12px;color:#d3ddd5}
-.post-actions button:hover{background:#ffffff0c}
-.liked{color:var(--red)!important}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:20;width:100%;max-width:520px;display:flex;justify-content:space-around;padding:10px 4px calc(10px + env(safe-area-inset-bottom));background:#10291ef5;border-top:1px solid var(--border)}
-.bottom-nav button{background:none;color:#aab7ad;font-size:10px;display:flex;flex-direction:column;align-items:center;gap:5px}
-.bottom-nav i{font-size:18px}.bottom-nav .active{color:var(--green)}
-.screen{display:none;position:fixed;inset:0;z-index:30;overflow:auto;background:#101713;padding:18px 14px 90px}
-.screen.open{display:block}
-.panel{padding:15px;background:var(--panel);border:1px solid var(--border);border-radius:14px;margin:10px 0}
-.field{width:100%;padding:12px;margin:7px 0;background:#ffffff0b;border:1px solid var(--border);border-radius:9px;color:white}
-textarea.field{min-height:100px;resize:vertical}
-.btn{padding:10px 13px;background:#ffffff12;border:1px solid var(--border);border-radius:9px;color:#fff}
-.primary{background:#087a4a;border-color:#00a962}
-.danger{background:#79232b;border-color:#a8424c}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}.row>*{flex:1;min-width:0}
-.modal{display:none;position:fixed;inset:0;z-index:50;background:#000b;align-items:flex-end;justify-content:center;padding:10px}
-.modal.open{display:flex}
-.modal-content{width:100%;max-width:500px;max-height:88vh;overflow:auto;background:#17261d;border:1px solid var(--border);border-radius:18px;padding:16px}
-.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.comment{padding:10px 0;border-bottom:1px solid #ffffff15;font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
-.admin-card{padding:12px;margin:9px 0;background:#ffffff08;border:1px solid var(--border);border-radius:10px;overflow-wrap:anywhere}
-.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
-.stat{padding:12px;background:#ffffff0b;border-radius:9px;font-size:12px}
-.stat strong{display:block;color:var(--green);font-size:21px;margin-top:5px}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:100;background:#17261d;border:1px solid var(--border);padding:12px 16px;border-radius:10px;max-width:90%;display:none}
-.toast.show{display:block}
-.empty{text-align:center;color:var(--muted);padding:35px 15px;font-size:13px}
+:root{
+  --bg:#10291f;
+  --panel:#172f24;
+  --panel2:#20392d;
+  --green:#00e991;
+  --text:#f6fff9;
+  --muted:#a9bdb2;
+  --border:rgba(255,255,255,.12);
+  --red:#ff626b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
+button:disabled{opacity:.55;cursor:not-allowed}
 [hidden]{display:none!important}
-@media(min-width:700px){.app{box-shadow:0 0 30px #0005}.screen{padding-left:max(16px,calc((100vw - 500px)/2));padding-right:max(16px,calc((100vw - 500px)/2))}}
+.app{
+  max-width:650px;
+  margin:auto;
+  min-height:100dvh;
+  padding-bottom:90px;
+  background:var(--bg);
+}
+.topbar{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 18px;
+  background:rgba(16,41,31,.96);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.brand{font-size:26px;font-weight:900;letter-spacing:-1px}
+.brand i,.brand span{color:var(--green)}
+.top-actions{display:flex;gap:10px}
+.icon-btn{
+  width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;
+  background:var(--panel2);border:1px solid var(--border);
+}
+.create-box{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;background:var(--panel);
+  border-bottom:1px solid var(--border);
+}
+.avatar{
+  width:42px;height:42px;object-fit:cover;border-radius:50%;
+  background:var(--panel2);flex-shrink:0;
+}
+.fake-input{
+  flex:1;min-width:0;text-align:left;
+  padding:13px 15px;border-radius:28px;
+  color:var(--muted);background:var(--panel2);
+  border:1px solid var(--border);
+}
+.fake-input i{float:right;color:var(--green)}
+.stories{
+  display:flex;gap:10px;overflow-x:auto;
+  padding:13px 14px;background:#122d21;
+  scrollbar-width:none;border-bottom:1px solid var(--border);
+}
+.stories::-webkit-scrollbar{display:none}
+.story{
+  flex:0 0 100px;height:150px;position:relative;
+  overflow:hidden;border-radius:13px;
+  display:flex;align-items:flex-end;padding:9px;
+  background:linear-gradient(145deg,#24694b,#342c45);
+  border:1px solid var(--border);
+}
+.story img.cover{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;opacity:.75;
+}
+.story .story-avatar{
+  position:absolute;top:8px;left:8px;
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--green);object-fit:cover;
+}
+.story span{position:relative;z-index:1;font-size:12px;font-weight:bold}
+.story-create{
+  align-items:center;justify-content:center;flex-direction:column;
+  gap:12px;text-align:center;background:var(--panel2);
+}
+.story-create i{font-size:27px;color:var(--green)}
+#feed{padding-top:8px}
+.post{
+  background:var(--panel);margin-bottom:10px;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.post-header{
+  display:flex;align-items:center;gap:10px;
+  padding:13px 14px;
+}
+.post-user{flex:1;min-width:0}
+.post-name{font-size:15px;font-weight:700;overflow-wrap:anywhere}
+.post-time{font-size:12px;color:var(--muted);margin-top:4px}
+.post-menu{background:transparent;padding:10px;color:var(--muted)}
+.post-text{
+  padding:0 15px 13px;white-space:pre-wrap;
+  overflow-wrap:anywhere;line-height:1.5;font-size:15px;
+}
+.media{
+  width:100%;background:#000;display:flex;
+  align-items:center;justify-content:center;position:relative;
+}
+.media img,.media video{
+  width:100%;max-height:480px;object-fit:contain;display:block;
+}
+.media video{background:#000}
+.sound-btn{
+  position:absolute;right:12px;top:12px;
+  width:42px;height:42px;border-radius:50%;
+  background:#000b;border:1px solid #ffffff55;
+}
+.post-stats{
+  display:flex;justify-content:space-between;gap:8px;
+  padding:10px 14px;color:var(--muted);font-size:12px;
+  border-bottom:1px solid var(--border);flex-wrap:wrap;
+}
+.post-actions{
+  display:flex;align-items:center;justify-content:space-around;
+  padding:4px 2px;gap:2px;
+}
+.action{
+  flex:1;min-width:0;background:transparent;
+  padding:12px 3px;color:#d6e4dc;
+  font-size:12px;display:flex;gap:6px;
+  align-items:center;justify-content:center;
+}
+.action.liked{color:var(--green)}
+.action.delete{color:#ff9999}
+.ad-card{
+  margin:10px 0;padding:10px 8px;
+  text-align:center;background:#152c22;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+.ad-label{font-size:10px;color:var(--muted);margin-bottom:6px}
+.ad-slot{
+  width:320px;max-width:100%;min-height:50px;
+  margin:auto;display:flex;justify-content:center;
+  align-items:center;overflow:hidden;
+}
+.ad-slot iframe{max-width:100%;border:0}
+.bottom-nav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  z-index:30;width:100%;max-width:650px;
+  display:flex;justify-content:space-around;align-items:center;
+  padding:9px 3px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(16,41,31,.97);backdrop-filter:blur(14px);
+  border-top:1px solid var(--border);
+}
+.nav-item{
+  flex:1;min-width:0;display:flex;flex-direction:column;
+  align-items:center;gap:5px;background:transparent;
+  color:var(--muted);font-size:11px;
+}
+.nav-item i{font-size:21px}
+.nav-item.active{color:var(--green)}
+.loading,.empty{
+  padding:35px 18px;text-align:center;color:var(--muted);
+}
+.modal{
+  display:none;position:fixed;inset:0;z-index:60;
+  background:#000a;align-items:flex-end;justify-content:center;
+  padding:10px;
+}
+.modal.open{display:flex}
+.modal-content{
+  width:100%;max-width:600px;max-height:90dvh;overflow:auto;
+  background:#172f24;border:1px solid var(--border);
+  border-radius:20px;padding:17px;
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:15px;
+}
+.close-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--panel2);border:1px solid var(--border);
+}
+.field{
+  width:100%;margin:7px 0;padding:12px;
+  border:1px solid var(--border);border-radius:10px;
+  color:white;background:#10291f;outline:none;
+}
+textarea.field{min-height:110px;resize:vertical}
+.primary,.secondary{
+  padding:11px 14px;border-radius:10px;border:1px solid var(--border);
+}
+.primary{background:#00a96a;color:white;font-weight:bold}
+.secondary{background:var(--panel2);color:white}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.row>*{flex:1}
+.comment{
+  padding:10px 0;border-bottom:1px solid var(--border);
+  overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px;
+}
+.toast{
+  position:fixed;z-index:100;bottom:90px;left:50%;
+  transform:translateX(-50%);max-width:90%;
+  background:#263e32;border:1px solid var(--border);
+  padding:12px 16px;border-radius:12px;
+  display:none;font-size:13px;text-align:center;
+}
+.toast.show{display:block}
+@media(min-width:651px){
+  body{background:#0a1710}
+  .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+}
+@media(max-width:360px){
+  .brand{font-size:23px}
+  .action{font-size:10px;gap:4px}
+  .nav-item{font-size:10px}
+}
 </style>
 </head>
+
 <body>
 <div class="app">
-<header>
-  <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
-  <div class="actions">
-    <button id="adminButton" class="icon-btn" onclick="openAdmin()" title="Admin" hidden><i class="fa-solid fa-shield-halved"></i></button>
-    <button class="icon-btn" onclick="openInbox()" title="Messages"><i class="fa-brands fa-facebook-messenger"></i></button>
-  </div>
-</header>
-
-<div class="composer" onclick="openCreate()">
-  <img id="composerAvatar" class="avatar" src="https://placehold.co/100x100?text=FT" alt="Profile">
-  <div class="fake-input">What's on your mind? <i class="fa-solid fa-image" style="float:right;color:var(--green)"></i></div>
-</div>
-
-<div id="stories" class="stories">
-  <div class="story" onclick="openCreate()" style="display:grid;place-items:center;color:var(--green);font-size:24px">＋<span>Create post</span></div>
-  <div class="story"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=300" alt=""><span>Travel</span></div>
-  <div class="story"><img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=300" alt=""><span>Nature</span></div>
-</div>
-
-<main id="feed" class="feed"><div class="empty">Loading posts...</div></main>
-
-<nav class="bottom-nav">
-  <button class="active" onclick="showHome()"><i class="fa-solid fa-house"></i>Home</button>
-  <button onclick="openDiscover()"><i class="fa-solid fa-magnifying-glass"></i>Discover</button>
-  <button onclick="openCreate()"><i class="fa-solid fa-square-plus"></i>Create</button>
-  <button onclick="openNotifications()"><i class="fa-solid fa-bell"></i>Alerts</button>
-  <button onclick="openProfile()"><i class="fa-regular fa-user"></i>Profile</button>
-</nav>
-</div>
-
-<section id="discover" class="screen">
-  <div class="modal-head"><h2>Discover</h2><button class="btn" onclick="closeScreen('discover')">Close</button></div>
-  <div class="panel"><input id="searchInput" class="field" placeholder="Search posts or users" oninput="filterPosts(this.value)"><button class="btn" onclick="loadFeed()">Refresh feed</button></div>
-  <div id="searchResults"></div>
-</section>
-
-<div id="createModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-head"><h3>Create post</h3><button class="btn" onclick="closeModal('createModal')">✕</button></div>
-    <textarea id="postText" class="field" maxlength="5000" placeholder="What's on your mind?"></textarea>
-    <input id="postFile" class="field" type="file" accept="image/*,video/mp4,video/webm,video/quicktime">
-    <div id="filePreview"></div>
-    <div class="row"><button id="publishBtn" class="btn primary" onclick="publishPost()">Publish post</button></div>
-  </div>
-</div>
-
-<div id="commentsModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-head"><h3>Comments</h3><button class="btn" onclick="closeModal('commentsModal')">✕</button></div>
-    <div id="commentsList"></div>
-    <form id="commentForm" class="row"><input id="commentText" class="field" maxlength="2000" placeholder="Write a comment..." required><button class="btn primary">Send</button></form>
-  </div>
-</div>
-
-<div id="adminModal" class="modal">
-  <div class="modal-content">
-    <div class="modal-head"><h3><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</h3><button class="btn" onclick="closeModal('adminModal')">✕</button></div>
-    <div id="adminStats" class="panel">Loading...</div>
-    <div class="row">
-      <button class="btn" onclick="adminSection('reports')">Reports</button>
-      <button class="btn" onclick="adminSection('users')">Users</button>
-      <button class="btn" onclick="adminSection('posts')">Posts</button>
+  <header class="topbar">
+    <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
+    <div class="top-actions">
+      <button id="adminButton" class="icon-btn" hidden onclick="openAdmin()" aria-label="Admin">
+        <i class="fa-solid fa-shield-halved"></i>
+      </button>
+      <button class="icon-btn" onclick="go('inbox.html')" aria-label="Messages">
+        <i class="fa-brands fa-facebook-messenger"></i>
+      </button>
     </div>
-    <section id="reportsSection">
-      <select id="reportStatus" class="field" onchange="loadReports()"><option value="pending">Pending reports</option><option value="all">All reports</option><option value="reviewed">Reviewed</option><option value="dismissed">Dismissed</option></select>
-      <button class="btn" onclick="loadReports()">Refresh reports</button><div id="reportsList"></div>
-    </section>
-    <section id="usersSection" hidden>
-      <input id="userQuery" class="field" placeholder="Search username/email">
-      <select id="userStatus" class="field"><option value="all">All users</option><option value="active">Active</option><option value="blocked">Banned</option></select>
-      <button class="btn" onclick="loadAdminUsers()">Search users</button><div id="usersList"></div>
-    </section>
-    <section id="postsSection" hidden>
-      <button class="btn" onclick="loadAdminPosts()">Refresh posts</button><div id="adminPostsList"></div>
-    </section>
-  </div>
+  </header>
+
+  <section class="create-box">
+    <img id="composerAvatar" class="avatar"
+      src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Your avatar">
+    <button class="fake-input" onclick="goCreate()">
+      What's on your mind? <i class="fa-solid fa-photo-film"></i>
+    </button>
+  </section>
+
+  <section class="stories" aria-label="Stories">
+    <button class="story story-create" onclick="goCreate()">
+      <i class="fa-solid fa-circle-plus"></i><span>Create story</span>
+    </button>
+    <div class="story">
+      <img class="cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300" alt="">
+      <img class="story-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt="">
+      <span>Community</span>
+    </div>
+    <div class="story">
+      <img class="cover" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=300" alt="">
+      <img class="story-avatar" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100" alt="">
+      <span>Travel</span>
+    </div>
+    <div class="story">
+      <img class="cover" src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=300" alt="">
+      <img class="story-avatar" src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100" alt="">
+      <span>Moments</span>
+    </div>
+  </section>
+
+  <main id="feed"><div class="loading">Loading posts...</div></main>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-item active" onclick="go('home.html')">
+      <i class="fa-solid fa-house"></i><span>Home</span>
+    </button>
+    <button class="nav-item" onclick="go('discover.html')">
+      <i class="fa-solid fa-compass"></i><span>Discover</span>
+    </button>
+    <button class="nav-item" onclick="goCreate()">
+      <i class="fa-solid fa-square-plus"></i><span>Create</span>
+    </button>
+    <button class="nav-item" onclick="go('notifications.html')">
+      <i class="fa-solid fa-bell"></i><span>Alerts</span>
+    </button>
+    <button class="nav-item" onclick="go('profile.html')">
+      <i class="fa-regular fa-user"></i><span>Profile</span>
+    </button>
+  </nav>
+</div>
+
+<div id="commentModal" class="modal">
+  <section class="modal-content">
+    <div class="modal-head">
+      <h3>Comments</h3>
+      <button class="close-btn" onclick="closeModal('commentModal')" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="commentList"><div class="loading">Loading comments...</div></div>
+    <form id="commentForm">
+      <input id="commentInput" class="field" maxlength="2000" placeholder="Write a comment..." required>
+      <button class="primary" type="submit">Send comment</button>
+    </form>
+  </section>
 </div>
 
 <div id="toast" class="toast" role="status"></div>
@@ -150,213 +318,507 @@ textarea.field{min-height:100px;resize:vertical}
 <script>
 "use strict";
 
-const API_BASE="https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY="freetube_access_token";
-const FALLBACK_AVATAR="https://placehold.co/100x100/244b37/ffffff?text=FT";
-let currentUser=null;
-let posts=[];
-let activeCommentPost=null;
+/* FreeTube API settings */
+const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+const FALLBACK_AVATAR = "https://placehold.co/120x120/244b37/ffffff?text=FT";
 
-function getToken(){return localStorage.getItem(TOKEN_KEY)||""}
-function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function notify(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(notify.timer);notify.timer=setTimeout(()=>el.classList.remove("show"),2800)}
-function mustLogin(){if(!getToken()){location.href="auth.html?mode=login";return false}return true}
-function closeModal(id){document.getElementById(id).classList.remove("open")}
-function closeScreen(id){document.getElementById(id).classList.remove("open")}
-function openProfile(){if(mustLogin())location.href="profile.html"}
-function openInbox(){if(mustLogin())location.href="inbox.html"}
-function openNotifications(){if(mustLogin())location.href="notifications.html"}
-function showHome(){closeScreen("discover");document.querySelectorAll(".bottom-nav button").forEach(b=>b.classList.remove("active"));document.querySelector(".bottom-nav button").classList.add("active");renderPosts(posts)}
-function openDiscover(){document.getElementById("discover").classList.add("open")}
-function filterPosts(query){const q=query.toLowerCase().trim();renderPosts(posts.filter(p=>(p.content||"").toLowerCase().includes(q)||(p.username||"").toLowerCase().includes(q)))}
+/* Keep the existing Adsterra banner configuration */
+const ADSTERRA_KEY = "ab837cf0ea9c26ae43b7bc4e05a0b5de";
+const ADSTERRA_SCRIPT = "https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";
+const AD_EVERY_POSTS = 3;
 
-async function api(path,options={}){
- const headers={...(options.headers||{})};
- if(getToken())headers.Authorization="Bearer "+getToken();
- if(options.body&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
- let response;
- try{response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"})}
- catch(_){throw new Error("Server-এর সঙ্গে সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করুন।")}
- const data=await response.json().catch(()=>({}));
- if(response.status===401){localStorage.removeItem(TOKEN_KEY);location.href="auth.html?mode=login";throw new Error("সেশন শেষ হয়েছে, আবার লগইন করুন।")}
- if(!response.ok)throw new Error(data.error||data.message||"অনুরোধটি সম্পন্ন হয়নি।");
- return data;
+let currentUser = null;
+let videos = [];
+let activeCommentId = null;
+let toastTimer = null;
+
+function token(){
+  try{return localStorage.getItem(TOKEN_KEY)||"";}
+  catch(_){return "";}
 }
 
-function avatarOf(p){return p.avatar_url||p.avatar||p.profile_picture||FALLBACK_AVATAR}
-function normalize(p){
- const type=String(p.media_type||p.type||"").toLowerCase();
- return {...p,id:String(p.id),username:p.display_name||p.username||"FreeTube User",avatar:avatarOf(p),content:p.content||"",src:p.media_url||p.url||"",type:type==="video"||type==="mp4"||type==="webm"?"video":type==="image"||type==="photo"||type==="png"||type==="jpg"?"image":"",likes:Number(p.like_count||0),comments:Number(p.comment_count||0),views:Number(p.view_count||0),liked:p.liked_by_me===true,time:timeAgo(p.created_at)};
+function go(page){
+  location.href = page;
 }
-function timeAgo(date){if(!date)return"Just now";const n=Math.max(0,Date.now()-new Date(date).getTime());if(!Number.isFinite(n))return"Just now";if(n<60000)return"Just now";if(n<3600000)return Math.floor(n/60000)+"m ago";if(n<86400000)return Math.floor(n/3600000)+"h ago";return Math.floor(n/86400000)+"d ago"}
+
+function goCreate(){
+  if(!requireLogin())return;
+  go("create.html");
+}
+
+function requireLogin(){
+  if(token())return true;
+  location.href = "auth.html?mode=login";
+  return false;
+}
+
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[ch]);
+}
+
+function number(value){
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.max(0,n) : 0;
+}
+
+function formatCount(value){
+  return number(value).toLocaleString();
+}
+
+function showToast(message){
+  const el = document.getElementById("toast");
+  el.textContent = String(message || "Something went wrong.");
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>el.classList.remove("show"),3000);
+}
+
+async function api(path, options={}){
+  const headers = new Headers(options.headers || {});
+  const accessToken = token();
+
+  if(accessToken)headers.set("Authorization","Bearer "+accessToken);
+
+  const hasFormData = options.body instanceof FormData;
+  if(options.body && !hasFormData && !headers.has("Content-Type")){
+    headers.set("Content-Type","application/json");
+  }
+
+  let response;
+  try{
+    response = await fetch(API_BASE + path,{
+      ...options,
+      headers,
+      cache:"no-store"
+    });
+  }catch(_){
+    throw new Error("Backend-এর সঙ্গে সংযোগ হচ্ছে না। একটু পরে আবার চেষ্টা করো।");
+  }
+
+  const raw = await response.text();
+  let data = {};
+  try{data = raw ? JSON.parse(raw) : {};}
+  catch(_){data = {message:raw};}
+
+  if(response.status === 401){
+    try{localStorage.removeItem(TOKEN_KEY);}catch(_){}
+    location.href = "auth.html?mode=login";
+    throw new Error("Login session শেষ হয়েছে। আবার লগইন করো।");
+  }
+
+  if(!response.ok){
+    throw new Error(data.message || data.error || ("API error: "+response.status));
+  }
+
+  return data;
+}
 
 async function loadMe(){
- const data=await api("/auth/me");
- currentUser=data.user||data.profile||data.data?.user||data;
- const admin=String(currentUser.role||"").toLowerCase()==="admin";
- document.getElementById("adminButton").hidden=!admin;
- document.getElementById("stories").hidden=admin;
- const avatar=avatarOf(currentUser);
- document.getElementById("composerAvatar").src=avatar;
+  const data = await api("/auth/me");
+  currentUser = data.user || data;
+  const avatar = currentUser.avatar_url ||
+    currentUser.avatar || FALLBACK_AVATAR;
+
+  document.getElementById("composerAvatar").src = avatar;
+  document.getElementById("composerAvatar").onerror = function(){
+    this.onerror = null;
+    this.src = FALLBACK_AVATAR;
+  };
+
+  if(String(currentUser.role || "").toLowerCase() === "admin"){
+    document.getElementById("adminButton").hidden = false;
+  }
+}
+
+/* Convert backend post data into a consistent display shape. */
+function normalizePost(post){
+  const mediaUrl = post.media_url || post.mediaUrl || post.src || "";
+  let mediaType = String(post.media_type || post.type || "").toLowerCase();
+
+  if(!mediaType && mediaUrl){
+    mediaType = /\.(mp4|webm|mov|m4v)(\?|$)/i.test(mediaUrl) ? "video" : "image";
+  }
+  if(mediaType === "photo")mediaType = "image";
+
+  return {
+    id:String(post.id ?? post.post_id ?? ""),
+    userId:String(post.user_id ?? post.author_id ?? post.owner_id ?? ""),
+    username:post.display_name || post.username || post.author_name || "FreeTube User",
+    avatar:post.avatar_url || post.avatar || post.profile_picture || FALLBACK_AVATAR,
+    content:post.content || post.text || "",
+    src:mediaUrl,
+    type:mediaType,
+    likes:number(post.like_count ?? post.likes_count ?? post.likes),
+    comments:number(post.comment_count ?? post.comments_count ?? post.comments),
+    views:number(post.view_count ?? post.views_count ?? post.views),
+    liked:Boolean(post.liked ?? post.is_liked ?? post.user_liked),
+    createdAt:post.created_at || post.createdAt || post.time || ""
+  };
+}
+
+function formatTime(value){
+  if(!value)return "Recently";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime()))return String(value);
+  const diff = Math.max(0,Date.now()-date.getTime());
+  const mins = Math.floor(diff/60000);
+  if(mins<1)return "Just now";
+  if(mins<60)return mins+"m ago";
+  const hours = Math.floor(mins/60);
+  if(hours<24)return hours+"h ago";
+  const days = Math.floor(hours/24);
+  if(days<7)return days+"d ago";
+  return date.toLocaleDateString();
+}
+
+function isOwner(post){
+  return currentUser &&
+    String(currentUser.id ?? currentUser.user_id ?? "") === post.userId;
+}
+
+function isAdmin(){
+  return String(currentUser?.role || "").toLowerCase() === "admin";
+}
+
+/* Adsterra banner: inserted after every three posts. */
+function adBannerHTML(index){
+  return `
+    <aside class="ad-card" aria-label="Advertisement">
+      <div class="ad-label">ADVERTISEMENT</div>
+      <div class="ad-slot" id="ad-slot-${index}">
+        <span style="font-size:11px;color:var(--muted)">Ad loading…</span>
+      </div>
+    </aside>`;
+}
+
+function loadAdsterraBanner(slot){
+  if(!slot || slot.dataset.loaded === "1")return;
+  slot.dataset.loaded = "1";
+
+  const frame = document.createElement("iframe");
+  frame.title = "Advertisement";
+  frame.width = "320";
+  frame.height = "50";
+  frame.loading = "lazy";
+  frame.setAttribute("scrolling","no");
+  frame.setAttribute("frameborder","0");
+  frame.style.cssText = "width:320px;height:50px;max-width:100%;border:0;display:block";
+  slot.replaceChildren(frame);
+
+  frame.srcdoc =
+    '<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<style>html,body{margin:0;padding:0;width:320px;height:50px;overflow:hidden;background:transparent}</style>' +
+    '</head><body><script>var atOptions={key:"' + ADSTERRA_KEY +
+    '",format:"iframe",height:50,width:320,params:{}};<\\/script>' +
+    '<script src="' + ADSTERRA_SCRIPT + '"><\\/script></body></html>';
+}
+
+function setupAdSlots(){
+  document.querySelectorAll(".ad-slot").forEach(slot=>{
+    if("IntersectionObserver" in window){
+      const observer = new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            loadAdsterraBanner(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      },{rootMargin:"180px"});
+      observer.observe(slot);
+    }else{
+      loadAdsterraBanner(slot);
+    }
+  });
+}
+
+function renderFeed(){
+  const feed = document.getElementById("feed");
+
+  if(!videos.length){
+    feed.innerHTML = '<div class="empty">No posts yet. Be the first to share something!</div>';
+    return;
+  }
+
+  feed.innerHTML = videos.map((post,index)=>{
+    let media = "";
+
+    if(post.src && post.type === "video"){
+      media = `
+        <div class="media">
+          <video class="post-video" src="${esc(post.src)}" controls muted loop
+            playsinline webkit-playsinline preload="metadata"></video>
+          <button class="sound-btn" onclick="toggleSound(this)" aria-label="Toggle sound">
+            <i class="fa-solid fa-volume-xmark"></i>
+          </button>
+        </div>`;
+    }else if(post.src && post.type === "image"){
+      media = `
+        <div class="media">
+          <img src="${esc(post.src)}" alt="Post image" loading="lazy"
+            onerror="this.style.display='none'">
+        </div>`;
+    }
+
+    const deleteButton = (isOwner(post) || isAdmin())
+      ? `<button class="action delete" onclick="deletePost('${esc(post.id)}')">
+           <i class="fa-solid fa-trash"></i><span>Delete</span>
+         </button>`
+      : `<button class="action" onclick="reportPost('${esc(post.id)}')">
+           <i class="fa-regular fa-flag"></i><span>Report</span>
+         </button>`;
+
+    const card = `
+      <article class="post" id="post-${esc(post.id)}">
+        <header class="post-header">
+          <img class="avatar" src="${esc(post.avatar)}" alt=""
+            onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
+          <div class="post-user">
+            <div class="post-name">${esc(post.username)}</div>
+            <div class="post-time">${esc(formatTime(post.createdAt))} ·
+              <i class="fa-solid fa-earth-americas"></i>
+            </div>
+          </div>
+          <button class="post-menu" onclick="postOptions('${esc(post.id)}')" aria-label="Post options">
+            <i class="fa-solid fa-ellipsis"></i>
+          </button>
+        </header>
+        ${post.content ? `<div class="post-text">${esc(post.content)}</div>` : ""}
+        ${media}
+        <div class="post-stats">
+          <span><i class="fa-solid fa-thumbs-up"></i> ${formatCount(post.likes)} likes</span>
+          <span><i class="fa-regular fa-eye"></i> ${formatCount(post.views)} views</span>
+          <span>${formatCount(post.comments)} comments</span>
+        </div>
+        <div class="post-actions">
+          <button class="action ${post.liked ? "liked" : ""}" onclick="likePost('${esc(post.id)}')">
+            <i class="fa-solid fa-thumbs-up"></i><span>${post.liked ? "Liked" : "Like"}</span>
+          </button>
+          <button class="action" onclick="openComments('${esc(post.id)}')">
+            <i class="fa-regular fa-comment"></i><span>Comment</span>
+          </button>
+          <button class="action" onclick="sharePost('${esc(post.id)}')">
+            <i class="fa-solid fa-share"></i><span>Share</span>
+          </button>
+          ${deleteButton}
+        </div>
+      </article>`;
+
+    return card + (
+      (index+1) % AD_EVERY_POSTS === 0 && index < videos.length-1
+        ? adBannerHTML(index+1) : ""
+    );
+  }).join("");
+
+  setupAdSlots();
 }
 
 async function loadFeed(){
- const feed=document.getElementById("feed");
- if(String(currentUser?.role||"").toLowerCase()==="admin"){
-  posts=[];feed.innerHTML='<div class="empty">Admin mode: public feed hidden.<br><br><button class="btn" onclick="openAdmin()">Open Admin Dashboard</button><br><br><button class="btn primary" onclick="openCreate()">Create post</button></div>';return;
- }
- feed.innerHTML='<div class="empty">Loading posts...</div>';
- try{const data=await api("/posts?limit=30");posts=(data.posts||[]).map(normalize);renderPosts(posts)}
- catch(e){feed.innerHTML='<div class="empty">'+esc(e.message)+'<br><br><button class="btn" onclick="loadFeed()">Try again</button></div>'}
+  const feed = document.getElementById("feed");
+  feed.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Loading posts...</div>';
+
+  try{
+    const data = await api("/posts");
+    const posts = Array.isArray(data) ? data : (data.posts || data.items || []);
+    videos = posts.map(normalizePost).filter(post=>post.id);
+    renderFeed();
+  }catch(error){
+    feed.innerHTML = `
+      <div class="empty">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p style="margin:10px 0">${esc(error.message || "Could not load posts.")}</p>
+        <button class="secondary" onclick="loadFeed()">Retry connection</button>
+      </div>`;
+  }
 }
 
-function renderPosts(list){
- const feed=document.getElementById("feed");
- if(!list.length){feed.innerHTML='<div class="empty">এখনো কোনো পোস্ট নেই। প্রথম পোস্টটি তুমি দাও!</div>';return}
- feed.innerHTML=list.map(p=>{
-  let media="";
-  if(p.src&&p.type==="video")media='<div class="media"><video src="'+esc(p.src)+'" controls playsinline preload="metadata"></video></div>';
-  else if(p.src&&p.type==="image")media='<div class="media"><img src="'+esc(p.src)+'" alt="Post image" loading="lazy"></div>';
-  const mine=String(p.user_id??p.author_id??"")===String(currentUser?.id??"");
-  const admin=String(currentUser?.role||"").toLowerCase()==="admin";
-  return `<article class="post" id="post-${esc(p.id)}">
-   <div class="post-head"><img class="avatar" src="${esc(p.avatar)}" alt="Avatar" onerror="this.src='${FALLBACK_AVATAR}'"><div><div class="post-user">${esc(p.username)}</div><div class="post-time">${esc(p.time)}</div></div></div>
-   ${p.content?'<div class="post-text">'+esc(p.content)+'</div>':""}${media}
-   <div class="stats"><span><i class="fa-solid fa-thumbs-up"></i> ${p.likes} likes</span><span><i class="fa-regular fa-eye"></i> ${p.views} views</span><span>${p.comments} comments</span></div>
-   <div class="post-actions"><button class="${p.liked?"liked":""}" onclick="likePost('${esc(p.id)}')"><i class="fa-solid fa-thumbs-up"></i> ${p.liked?"Liked":"Like"}</button><button onclick="openComments('${esc(p.id)}')"><i class="fa-regular fa-comment"></i> Comment</button><button onclick="sharePost('${esc(p.id)}')"><i class="fa-solid fa-share"></i> Share</button>
-   ${mine||admin?`<button onclick="deletePost('${esc(p.id)}')"><i class="fa-solid fa-trash"></i> Delete</button>`:`<button onclick="reportPost('${esc(p.id)}')"><i class="fa-solid fa-flag"></i> Report</button>`}
-   </div></article>`;
- }).join("");
+function toggleSound(button){
+  const video = button.closest(".media")?.querySelector("video");
+  if(!video)return;
+  video.muted = !video.muted;
+  button.innerHTML = video.muted
+    ? '<i class="fa-solid fa-volume-xmark"></i>'
+    : '<i class="fa-solid fa-volume-high"></i>';
+}
+
+function postOptions(id){
+  const post = videos.find(item=>item.id===String(id));
+  if(!post)return;
+
+  if(isOwner(post) || isAdmin()){
+    if(confirm("Delete this post?"))deletePost(id);
+  }else{
+    reportPost(id);
+  }
 }
 
 async function likePost(id){
- if(!mustLogin())return;
- try{const data=await api("/posts/"+encodeURIComponent(id)+"/like",{method:"POST",body:JSON.stringify({})});const p=posts.find(x=>x.id===String(id));if(p){p.liked=!!data.liked;p.likes=Number(data.like_count??p.likes);renderPosts(posts)}}
- catch(e){notify(e.message)}
-}
-async function deletePost(id){
- if(!mustLogin()||!confirm("এই পোস্টটি স্থায়ীভাবে মুছে ফেলবেন?"))return;
- try{await api("/posts/"+encodeURIComponent(id),{method:"DELETE"});posts=posts.filter(p=>p.id!==String(id));renderPosts(posts);notify("পোস্ট মুছে ফেলা হয়েছে।")}
- catch(e){notify(e.message)}
-}
-async function reportPost(id){
- if(!mustLogin())return;
- const reason=prompt("পোস্টটি রিপোর্ট করার কারণ লিখুন:");
- if(!reason||reason.trim().length<3){if(reason!==null)notify("কমপক্ষে ৩ অক্ষরের কারণ লিখুন।");return}
- try{await api("/posts/"+encodeURIComponent(id)+"/report",{method:"POST",body:JSON.stringify({reason:reason.trim()})});notify("রিপোর্ট অ্যাডমিনের কাছে পাঠানো হয়েছে।")}
- catch(e){notify(e.message)}
-}
-async function openComments(id){
- activeCommentPost=String(id);document.getElementById("commentsModal").classList.add("open");
- const list=document.getElementById("commentsList");list.innerHTML='<div class="empty">Loading...</div>';
- try{const data=await api("/posts/"+encodeURIComponent(id)+"/comments");list.innerHTML=(data.comments||[]).map(c=>'<div class="comment"><b>'+esc(c.username||"User")+'</b><br>'+esc(c.content)+'</div>').join("")||'<div class="empty">কোনো কমেন্ট নেই।</div>'}
- catch(e){list.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
-}
-document.getElementById("commentForm").addEventListener("submit",async e=>{
- e.preventDefault();if(!mustLogin()||!activeCommentPost)return;
- const input=document.getElementById("commentText");const content=input.value.trim();if(!content)return;
- try{await api("/posts/"+encodeURIComponent(activeCommentPost)+"/comments",{method:"POST",body:JSON.stringify({content})});input.value="";await openComments(activeCommentPost);await loadFeed();notify("কমেন্ট যোগ হয়েছে।")}
- catch(err){notify(err.message)}
-});
+  if(!requireLogin())return;
 
-function openCreate(){if(!mustLogin())return;document.getElementById("postText").value="";document.getElementById("postFile").value="";document.getElementById("filePreview").innerHTML="";document.getElementById("createModal").classList.add("open")}
-async function publishPost(){
- if(!mustLogin())return;
- const btn=document.getElementById("publishBtn");const content=document.getElementById("postText").value.trim();const file=document.getElementById("postFile").files[0];
- if(!content&&!file){notify("লেখা বা ছবি/ভিডিও যোগ করুন।");return}
- if(file&&file.size>50*1024*1024){notify("ফাইলের আকার ৫০ MB-এর কম হতে হবে।");return}
- btn.disabled=true;btn.textContent="Publishing...";
- try{
-  let media=null;
-  if(file){const form=new FormData();form.append("file",file);const uploaded=await api("/media/upload",{method:"POST",body:form});media=uploaded.media;if(!media?.url)throw new Error("আপলোডের URL পাওয়া যায়নি।")}
-  await api("/posts",{method:"POST",body:JSON.stringify({content,media_url:media?.url||"",media_type:media?(media.resource_type==="video"?"video":"image"):"",media_public_id:media?.public_id||""})});
-  closeModal("createModal");await loadFeed();notify("পোস্ট প্রকাশ হয়েছে।");
- }catch(e){notify(e.message)}
- finally{btn.disabled=false;btn.textContent="Publish post"}
+  try{
+    const data = await api("/posts/"+encodeURIComponent(id)+"/like",{
+      method:"POST",body:JSON.stringify({})
+    });
+
+    const post = videos.find(item=>item.id===String(id));
+    if(post){
+      post.liked = Boolean(data.liked);
+      post.likes = number(data.like_count ?? data.likes_count ?? post.likes);
+      renderFeed();
+    }
+  }catch(error){
+    showToast(error.message);
+  }
 }
-document.getElementById("postFile").addEventListener("change",function(){
- const f=this.files[0],box=document.getElementById("filePreview");box.innerHTML="";
- if(!f)return;
- if(f.size>50*1024*1024){notify("ফাইল ৫০ MB-এর বেশি।");this.value="";return}
- if(f.type.startsWith("image/")){const img=document.createElement("img");img.src=URL.createObjectURL(f);img.style.cssText="width:100%;max-height:300px;object-fit:contain";box.appendChild(img)}
- else if(f.type.startsWith("video/")){const video=document.createElement("video");video.src=URL.createObjectURL(f);video.controls=true;video.style.cssText="width:100%;max-height:300px";box.appendChild(video)}
- else{notify("সমর্থিত ছবি বা ভিডিও নির্বাচন করুন।");this.value=""}
-});
+
+async function deletePost(id){
+  if(!requireLogin())return;
+  if(!confirm("Delete this post? This cannot be undone."))return;
+
+  try{
+    await api("/posts/"+encodeURIComponent(id),{method:"DELETE"});
+    videos = videos.filter(post=>post.id!==String(id));
+    renderFeed();
+    showToast("Post deleted.");
+  }catch(error){
+    showToast(error.message || "Could not delete post.");
+  }
+}
+
+async function reportPost(id){
+  if(!requireLogin())return;
+
+  const reason = prompt("Why are you reporting this post?");
+  if(reason === null)return;
+  if(reason.trim().length < 3){
+    showToast("Please enter a reason for the report.");
+    return;
+  }
+
+  try{
+    await api("/posts/"+encodeURIComponent(id)+"/report",{
+      method:"POST",
+      body:JSON.stringify({reason:reason.trim()})
+    });
+    showToast("Report sent to Admin.");
+  }catch(error){
+    showToast(error.message || "Could not submit report.");
+  }
+}
 
 async function sharePost(id){
- const p=posts.find(x=>x.id===String(id));const url=location.href.split("#")[0]+"#post-"+encodeURIComponent(id);
- try{if(navigator.share)await navigator.share({title:"FreeTube",text:p?.content||"FreeTube post",url});else{await navigator.clipboard.writeText(url);notify("লিংক কপি হয়েছে।")}}
- catch(e){if(e.name!=="AbortError")notify("শেয়ার করা যায়নি।")}
+  const post = videos.find(item=>item.id===String(id));
+  if(!post)return;
+
+  const url = location.origin + location.pathname + "#post-" + encodeURIComponent(id);
+
+  try{
+    if(navigator.share){
+      await navigator.share({
+        title:"FreeTube — "+post.username,
+        text:post.content || "Watch this post on FreeTube",
+        url
+      });
+    }else if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(url);
+      showToast("Post link copied.");
+    }else{
+      prompt("Copy this post link:",url);
+    }
+  }catch(error){
+    if(error.name !== "AbortError")showToast("Unable to share post.");
+  }
 }
 
-function adminSection(name){
- for(const n of ["reports","users","posts"])document.getElementById(n+"Section").hidden=n!==name;
- if(name==="reports")loadReports();if(name==="users")loadAdminUsers();if(name==="posts")loadAdminPosts();
+async function openComments(id){
+  if(!requireLogin())return;
+
+  activeCommentId = String(id);
+  document.getElementById("commentList").innerHTML =
+    '<div class="loading">Loading comments...</div>';
+  document.getElementById("commentInput").value = "";
+  document.getElementById("commentModal").classList.add("open");
+
+  try{
+    const data = await api("/posts/"+encodeURIComponent(id)+"/comments");
+    const comments = data.comments || [];
+
+    document.getElementById("commentList").innerHTML = comments.length
+      ? comments.map(comment=>`
+          <div class="comment">
+            <strong>${esc(comment.display_name || comment.username || "User")}</strong>
+            <div>${esc(comment.content || comment.text || "")}</div>
+          </div>`).join("")
+      : '<div class="empty">No comments yet.</div>';
+  }catch(error){
+    document.getElementById("commentList").innerHTML =
+      `<div class="empty">${esc(error.message)}</div>`;
+  }
 }
-async function openAdmin(){
- if(!mustLogin())return;
- if(String(currentUser?.role||"").toLowerCase()!=="admin"){notify("Admin access required.");return}
- document.getElementById("adminModal").classList.add("open");
- await Promise.all([loadAdminStats(),loadReports()]);
+
+document.getElementById("commentForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(!requireLogin() || !activeCommentId)return;
+
+  const input = document.getElementById("commentInput");
+  const content = input.value.trim();
+  if(!content)return;
+
+  const button = event.submitter;
+  if(button)button.disabled = true;
+
+  try{
+    await api("/posts/"+encodeURIComponent(activeCommentId)+"/comments",{
+      method:"POST",body:JSON.stringify({content})
+    });
+    const post = videos.find(item=>item.id===activeCommentId);
+    if(post)post.comments++;
+    input.value = "";
+    await openComments(activeCommentId);
+    renderFeed();
+    showToast("Comment added.");
+  }catch(error){
+    showToast(error.message || "Could not add comment.");
+  }finally{
+    if(button)button.disabled = false;
+  }
+});
+
+function closeModal(id){
+  document.getElementById(id)?.classList.remove("open");
 }
-async function loadAdminStats(){
- const el=document.getElementById("adminStats");
- try{const d=await api("/admin/dashboard");const s=d.stats||{};el.innerHTML='<div class="stats-grid">'+[['Total users',s.total_users],['Active users',s.active_users],['Banned users',s.blocked_users],['Total posts',s.total_posts],['Pending reports',s.pending_reports]].map(([k,v])=>'<div class="stat">'+k+'<strong>'+Number(v||0)+'</strong></div>').join("")+'</div>'}
- catch(e){el.textContent=e.message}
-}
-async function loadReports(){
- const list=document.getElementById("reportsList");list.innerHTML='<div class="empty">Loading reports...</div>';
- try{
-  const status=document.getElementById("reportStatus").value;
-  const d=await api("/admin/reports?status="+encodeURIComponent(status));const reports=d.reports||[];
-  if(!reports.length){list.innerHTML='<div class="empty">কোনো রিপোর্ট নেই।</div>';return}
-  list.innerHTML=reports.map(r=>{
-   const media=r.media_url?(r.media_type==="video"?'<video controls style="width:100%;max-height:260px" src="'+esc(r.media_url)+'"></video>':'<img style="width:100%;max-height:260px;object-fit:contain" src="'+esc(r.media_url)+'" alt="Reported media">'):"";
-   const pending=r.status==="pending";
-   return '<div class="admin-card"><b>Report #'+esc(r.report_id)+'</b> · '+esc(r.status)+'<p style="margin:8px 0">কারণ: '+esc(r.reason)+'</p><p style="font-size:12px;color:var(--muted)">Reporter: '+esc(r.reporter_username||r.reporter_id)+' · Post owner: '+esc(r.author_username||r.post_owner_id)+'</p><p style="white-space:pre-wrap;margin:8px 0">'+esc(r.content||"")+'</p>'+media+'<div class="row">'+(pending?'<button class="btn primary" onclick="reviewReport(\''+esc(r.report_id)+'\',\'approve\')">Reviewed / Okay</button><button class="btn" onclick="reviewReport(\''+esc(r.report_id)+'\',\'dismiss\')">Dismiss</button>':"")+'<button class="btn danger" onclick="adminDeletePost(\''+esc(r.post_id)+'\')">Delete post</button></div></div>';
-  }).join("");
- }catch(e){list.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
-}
-async function reviewReport(id,action){
- if(!confirm(action==="approve"?"রিপোর্টটি রিভিউ করে পোস্ট ঠিক আছে বলে চিহ্নিত করবেন?":"রিপোর্টটি বাতিল করবেন?"))return;
- try{await api("/admin/reports/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({action})});notify("রিপোর্ট আপডেট হয়েছে।");await loadReports();await loadAdminStats()}
- catch(e){notify(e.message)}
-}
-async function adminDeletePost(id){
- if(!confirm("পোস্টটি স্থায়ীভাবে মুছে ফেলবেন?"))return;
- try{await api("/posts/"+encodeURIComponent(id),{method:"DELETE"});posts=posts.filter(p=>p.id!==String(id));renderPosts(posts);notify("পোস্ট মুছে ফেলা হয়েছে।");await loadReports();await loadAdminPosts()}
- catch(e){notify(e.message)}
-}
-async function loadAdminUsers(){
- const list=document.getElementById("usersList");list.innerHTML='<div class="empty">Loading users...</div>';
- try{
-  const q=document.getElementById("userQuery").value.trim(),status=document.getElementById("userStatus").value;
-  const d=await api("/admin/users?q="+encodeURIComponent(q)+"&status="+encodeURIComponent(status));const users=d.users||[];
-  if(!users.length){list.innerHTML='<div class="empty">কোনো ইউজার নেই।</div>';return}
-  list.innerHTML=users.map(u=>{
-   const self=String(u.id)===String(currentUser.id),admin=String(u.role||"").toLowerCase()==="admin",banned=String(u.account_status||"").toLowerCase()!=="active";
-   return '<div class="admin-card"><b>'+esc(u.display_name||u.username)+'</b><div style="font-size:12px;color:var(--muted)">@'+esc(u.username)+' · '+esc(u.email||"")+'</div><p style="margin-top:6px;font-size:12px">Role: '+esc(u.role)+' · Status: '+esc(u.account_status)+'</p>'+(!self&&!admin?'<div class="row"><button class="btn '+(banned?'primary':'danger')+'" onclick="changeUserStatus(\''+esc(u.id)+'\',\''+(banned?'unban':'ban')+'\')">'+(banned?'Unban user':'Ban user')+'</button></div>':"")+'</div>';
-  }).join("");
- }catch(e){list.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
-}
-async function changeUserStatus(id,action){
- if(!confirm(action==="ban"?"এই ইউজারকে ব্যান করবেন?":"এই ইউজারের ব্যান তুলে দেবেন?"))return;
- try{await api("/admin/users/"+encodeURIComponent(id)+"/status",{method:"PATCH",body:JSON.stringify({action})});notify("ইউজার স্ট্যাটাস আপডেট হয়েছে।");await loadAdminUsers();await loadAdminStats()}
- catch(e){notify(e.message)}
-}
-async function loadAdminPosts(){
- const list=document.getElementById("adminPostsList");list.innerHTML='<div class="empty">Loading posts...</div>';
- try{
-  const d=await api("/admin/posts");const arr=d.posts||[];
-  list.innerHTML=arr.length?arr.map(p=>'<div class="admin-card"><b>Post #'+esc(p.id)+' · @'+esc(p.username||p.user_id)+'</b><p style="margin:8px 0;white-space:pre-wrap">'+esc(p.content||"[Media post]")+'</p><div class="row"><button class="btn danger" onclick="adminDeletePost(\''+esc(p.id)+'\')">Delete post</button></div></div>').join(""):'<div class="empty">কোনো পোস্ট নেই।</div>';
- }catch(e){list.innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+
+function openAdmin(){
+  if(!requireLogin())return;
+  if(!isAdmin()){
+    showToast("Admin access required.");
+    return;
+  }
+  go("admin.html");
 }
 
 async function initialize(){
- if(!getToken()){location.href="auth.html?mode=login";return}
- try{await loadMe();await loadFeed()}
- catch(e){notify(e.message)}
+  if(!token()){
+    location.replace("auth.html?mode=login");
+    return;
+  }
+
+  try{
+    await loadMe();
+    await loadFeed();
+  }catch(error){
+    showToast(error.message || "Unable to initialize FreeTube.");
+  }
 }
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){
+    document.querySelectorAll(".post-video").forEach(video=>video.pause());
+  }
+});
+
 initialize();
 </script>
 </body>
