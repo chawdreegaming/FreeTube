@@ -64,11 +64,13 @@ input[type=file]{display:none}
 .status{font-size:13px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
 .status.error{color:#ffb3b3}.status.success{color:var(--green)}
 .post-card{padding:14px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
-.post-card img,.post-card video{width:100%;max-height:360px;object-fit:contain;margin-top:10px;border-radius:10px}
+.post-card img.post-media,.post-card video.post-media{display:block;width:100%;max-height:400px;object-fit:contain;margin-top:10px;border-radius:10px;background:#0003}
 .post-author{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer}
 .post-author img{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .post-author strong{font-size:14px}
 .post-author:hover strong{color:var(--green)}
+.post-content{font-size:15px;line-height:1.6;white-space:pre-wrap;margin:8px 0}
+.post-metadata{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
 .hidden{display:none!important}
 @media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
 </style>
@@ -221,8 +223,8 @@ function notify(message){
 
 async function apiRequest(path,options={}){
   const headers={...(options.headers||{})};
-  const savedToken=getToken();
-  if(savedToken)headers.Authorization="Bearer "+savedToken;
+  const token=getToken();
+  if(token)headers.Authorization="Bearer "+token;
 
   if(options.body!==undefined&&!(options.body instanceof FormData)){
     headers["Content-Type"]="application/json";
@@ -230,9 +232,7 @@ async function apiRequest(path,options={}){
 
   let response;
   try{
-    response=await fetch(API_BASE_URL+path,{
-      ...options,headers,cache:"no-store"
-    });
+    response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"});
   }catch{
     throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
   }
@@ -265,10 +265,6 @@ function extractProfile(data){
   return data||{};
 }
 
-/*
-  Null values from the API should not accidentally erase useful cached values
-  on the owner's own profile. The local cache is never used for another user.
-*/
 function normalizeProfile(user={},profile={},stats={},local={}){
   const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url);
   const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl,local.cover_url);
@@ -304,12 +300,9 @@ function setImageSource(image,url,fallback){
 
 function formatBirthday(value){
   if(!value)return "Not added";
-  const date=String(value).slice(0,10);
-  const parsed=new Date(date+"T00:00:00Z");
+  const parsed=new Date(String(value).slice(0,10)+"T00:00:00Z");
   if(Number.isNaN(parsed.getTime()))return String(value);
-  return parsed.toLocaleDateString("en-US",{
-    year:"numeric",month:"long",day:"numeric",timeZone:"UTC"
-  });
+  return parsed.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"});
 }
 
 function renderProfile(p){
@@ -380,10 +373,8 @@ async function loadProfile(){
     const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
 
     const requestedUsername=targetUsername;
-    const clearlyOwnByUsername=!requestedUsername||
-      requestedUsername.toLowerCase()===myUsername.toLowerCase();
+    const clearlyOwnByUsername=!requestedUsername||requestedUsername.toLowerCase()===myUsername.toLowerCase();
     const clearlyOwnById=Boolean(targetUserId&&myId&&targetUserId===myId);
-
     isOwnProfile=clearlyOwnById||(!targetUserId&&clearlyOwnByUsername);
 
     if(isOwnProfile){
@@ -397,17 +388,11 @@ async function loadProfile(){
         username:serverProfile.username||currentUser.username||myUsername
       };
     }else{
-      if(!requestedUsername){
-        throw new Error("This profile link is missing a username. Open the profile again from the feed.");
-      }
+      if(!requestedUsername)throw new Error("This profile link is missing a username. Open the profile again from the feed.");
 
       const data=await apiRequest("/profile/"+encodeURIComponent(requestedUsername));
-      const apiProfile=data.profile&&typeof data.profile==="object"
-        ?data.profile
-        :(data.data?.profile&&typeof data.data.profile==="object"?data.data.profile:{});
-      const apiUser=data.user&&typeof data.user==="object"
-        ?data.user
-        :(data.data?.user&&typeof data.data.user==="object"?data.data.user:{});
+      const apiProfile=data.profile&&typeof data.profile==="object"?data.profile:(data.data?.profile||{});
+      const apiUser=data.user&&typeof data.user==="object"?data.user:(data.data?.user||{});
 
       serverProfile={...apiUser,...apiProfile};
       serverStats=data.stats||data.data?.stats||{};
@@ -416,30 +401,17 @@ async function loadProfile(){
       const returnedUsername=String(apiProfile.username??apiUser.username??requestedUsername).replace(/^@/,"").trim();
 
       if(returnedUsername.toLowerCase()!==requestedUsername.toLowerCase()){
-        throw new Error("The server returned a different username. Please retry or open the profile from the feed.");
+        throw new Error("The server returned a different username. Please retry.");
       }
 
-      viewedUser={
-        ...apiUser,
-        ...apiProfile,
-        id:returnedId,
-        username:returnedUsername
-      };
+      viewedUser={...apiUser,...apiProfile,id:returnedId,username:returnedUsername};
+      if(!returnedId)throw new Error("The server did not return this user's ID.");
 
-      if(!returnedId){
-        throw new Error("The server did not return this user's ID. Please check the backend profile endpoint.");
-      }
-
-      isOwnProfile=Boolean(
-        (myId&&returnedId===myId)||
-        returnedUsername.toLowerCase()===myUsername.toLowerCase()
-      );
+      isOwnProfile=Boolean((myId&&returnedId===myId)||returnedUsername.toLowerCase()===myUsername.toLowerCase());
     }
 
     const local=isOwnProfile?getProfile():{};
     const p=normalizeProfile(viewedUser,serverProfile,serverStats,local);
-    if(!p.handle&&!isOwnProfile)p.handle=requestedUsername;
-
     viewedUser={...viewedUser,...p};
     if(isOwnProfile)saveLocalProfile({...local,...p});
 
@@ -488,6 +460,7 @@ async function toggleFollow(){
       viewedUser={...viewedUser,...serverProfile};
       renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats));
     }
+
     updateFollowButton();
     notify(followingThisUser?"You are now following this user.":"You unfollowed this user.");
   }catch(error){
@@ -519,8 +492,8 @@ function openUserProfile(username,userId){
 
 function openEditModal(){
   if(!isOwnProfile)return notify("You can only edit your own profile.");
-
   const p=normalizeProfile(viewedUser||{},serverProfile,serverStats,getProfile());
+
   document.getElementById("editName").value=p.name==="User"?"":p.name;
   document.getElementById("editBio").value=p.bio;
   document.getElementById("editCity").value=p.city;
@@ -541,14 +514,8 @@ document.addEventListener("click",event=>{
 });
 
 document.getElementById("menuToggle").addEventListener("click",toggleProfileMenu);
-document.getElementById("menuEdit").addEventListener("click",()=>{
-  closeProfileMenu();
-  openEditModal();
-});
-document.getElementById("menuSettings").addEventListener("click",()=>{
-  closeProfileMenu();
-  notify("Settings page is not available yet.");
-});
+document.getElementById("menuEdit").addEventListener("click",()=>{closeProfileMenu();openEditModal()});
+document.getElementById("menuSettings").addEventListener("click",()=>{closeProfileMenu();notify("Settings page is not available yet.")});
 document.getElementById("editButton").addEventListener("click",openEditModal);
 document.getElementById("homeButton").addEventListener("click",()=>location.href="home.html");
 document.getElementById("dashboardButton").addEventListener("click",()=>notify("Dashboard is not connected yet."));
@@ -601,18 +568,16 @@ document.getElementById("editForm").addEventListener("submit",async event=>{
       cover_url:old.cover_url||""
     };
 
-    const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
-    });
-
+    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
     const saved=extractProfile(result);
+
     serverProfile={...serverProfile,...payload,...saved};
     viewedUser={...viewedUser,...serverProfile};
 
     const normalized=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
     saveLocalProfile({...local,...normalized});
     renderProfile(normalized);
+
     status.textContent="Profile saved.";
     status.className="status success";
     closeModal("editModal");
@@ -635,6 +600,7 @@ async function uploadProfileImage(file){
 
   const form=new FormData();
   form.append("file",file);
+
   const result=await apiRequest("/media/upload",{method:"POST",body:form});
   const media=result.media||result.data?.media||result;
   const url=media.url||media.secure_url;
@@ -650,9 +616,7 @@ async function changeProfileImage(file,type){
   if(!isOwnProfile)return notify("You cannot change another user's image.");
   if(!getToken())return notify("Please log in first.");
 
-  const status=document.getElementById("sessionStatus");
   setStatus("Uploading image...");
-
   const avatarInput=document.getElementById("avatarInput");
   const coverInput=document.getElementById("coverInput");
   avatarInput.disabled=true;
@@ -675,12 +639,9 @@ async function changeProfileImage(file,type){
       cover_url:type==="cover"?url:old.cover_url
     };
 
-    const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
-    });
-
+    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
     const saved=extractProfile(result);
+
     serverProfile={...serverProfile,...payload,...saved};
     viewedUser={...viewedUser,...serverProfile};
 
@@ -704,6 +665,7 @@ document.getElementById("avatarInput").addEventListener("change",function(){
   this.value="";
   changeProfileImage(file,"avatar");
 });
+
 document.getElementById("coverInput").addEventListener("change",function(){
   const file=this.files[0];
   this.value="";
@@ -724,29 +686,40 @@ function postUserId(post){
 
 async function loadPostsForViewedUser(){
   const container=document.getElementById("myPosts");
+  const countElement=document.getElementById("postCount");
+
   container.textContent="Loading posts...";
-  document.getElementById("postCount").textContent="Loading...";
+  countElement.textContent="Loading...";
 
   try{
     const data=await apiRequest("/posts?limit=50");
-    const posts=Array.isArray(data)?data:(data.posts||data.data?.posts||[]);
-    const viewedId=String(viewedUser?.id??viewedUser?.user_id??"");
-    const viewedName=String(viewedUser?.username||viewedUser?.handle||targetUsername||"").replace(/^@/,"").toLowerCase();
+
+    const posts=Array.isArray(data)
+      ?data
+      :Array.isArray(data.posts)
+        ?data.posts
+        :Array.isArray(data.data?.posts)
+          ?data.data.posts
+          :[];
+
+    const viewedId=String(
+      viewedUser?.id??viewedUser?.user_id??serverProfile?.id??serverProfile?.user_id??""
+    ).trim();
+
+    const viewedName=String(
+      viewedUser?.username??viewedUser?.handle??serverProfile?.username??targetUsername??""
+    ).replace(/^@/,"").trim().toLowerCase();
 
     const filtered=posts.filter(post=>{
-      const postId=String(postUserId(post)??"");
-      const postName=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
+      const postId=String(postUserId(post)??"").trim();
+      const postName=String(postUsername(post)||"").replace(/^@/,"").trim().toLowerCase();
 
-      /*
-        Prefer exact user IDs. Use username only if the post does not provide
-        an ID; this prevents posts from a different account appearing here.
-      */
-      if(viewedId&&postId)return postId===viewedId;
-      if(!postId&&viewedName&&postName)return postName===viewedName;
-      return false;
+      // Use IDs whenever both are available; otherwise use usernames.
+      if(viewedId&&postId)return viewedId===postId;
+      return Boolean(viewedName&&postName&&viewedName===postName);
     });
 
-    document.getElementById("postCount").textContent=filtered.length+(filtered.length===1?" post":" posts");
+    countElement.textContent=filtered.length+(filtered.length===1?" post":" posts");
     container.replaceChildren();
 
     if(!filtered.length){
@@ -758,40 +731,54 @@ async function loadPostsForViewedUser(){
       const card=document.createElement("article");
       card.className="post-card";
 
-      const authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
       const authorData=postAuthor(post);
+      const authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
+
       const author=document.createElement("div");
       author.className="post-author";
 
       const avatar=document.createElement("img");
       avatar.alt="Profile picture";
-      setImageSource(avatar,firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url,viewedUser?.avatar_url),DEFAULT_AVATAR);
+      setImageSource(
+        avatar,
+        firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),
+        DEFAULT_AVATAR
+      );
 
       const name=document.createElement("strong");
       name.textContent=firstNonEmpty(post.display_name,authorData.display_name,authorData.name,authorName);
       author.append(avatar,name);
-      author.addEventListener("click",()=>openUserProfile(authorName,postUserId(post)));
+
+      author.addEventListener("click",()=>{
+        openUserProfile(authorName,postUserId(post));
+      });
+
       card.appendChild(author);
 
-      const content=firstNonEmpty(post.content,post.text,post.caption);
-      if(content){
+      const content=String(firstNonEmpty(post.content,post.text,post.caption)||"");
+      if(content.trim()){
         const text=document.createElement("p");
+        text.className="post-content";
         text.textContent=content;
         card.appendChild(text);
       }
 
-      const url=firstNonEmpty(post.media_url,post.image_url,post.video_url);
+      const mediaUrl=String(firstNonEmpty(post.media_url,post.image_url,post.video_url)||"").trim();
       const mediaType=String(post.media_type||post.type||"").toLowerCase();
-      if(url){
-        const looksLikeVideo=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
-        const media=document.createElement(looksLikeVideo?"video":"img");
-        media.src=url;
-        media.alt="Post media";
-        if(looksLikeVideo){
+
+      if(mediaUrl){
+        const isVideo=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(mediaUrl);
+        const media=document.createElement(isVideo?"video":"img");
+        media.className="post-media";
+        media.src=mediaUrl;
+        media.alt=isVideo?"Post video":"Post image";
+
+        if(isVideo){
           media.controls=true;
           media.playsInline=true;
           media.preload="metadata";
         }else{
+          media.loading="lazy";
           media.onerror=()=>{
             media.onerror=null;
             media.alt="Post image could not be loaded.";
@@ -799,6 +786,24 @@ async function loadPostsForViewedUser(){
         }
         card.appendChild(media);
       }
+
+      const metadata=document.createElement("div");
+      metadata.className="post-metadata muted";
+
+      const likes=document.createElement("span");
+      likes.innerHTML='<i class="fa-regular fa-heart"></i> ';
+      likes.append(document.createTextNode(String(Number(post.like_count)||0)));
+
+      const comments=document.createElement("span");
+      comments.innerHTML='<i class="fa-regular fa-comment"></i> ';
+      comments.append(document.createTextNode(String(Number(post.comment_count)||0)));
+
+      const views=document.createElement("span");
+      views.innerHTML='<i class="fa-regular fa-eye"></i> ';
+      views.append(document.createTextNode(String(Number(post.view_count)||0)));
+
+      metadata.append(likes,comments,views);
+      card.appendChild(metadata);
 
       if(post.created_at){
         const date=document.createElement("p");
@@ -808,11 +813,12 @@ async function loadPostsForViewedUser(){
         date.textContent=Number.isNaN(parsedDate.getTime())?String(post.created_at):parsedDate.toLocaleString();
         card.appendChild(date);
       }
+
       container.appendChild(card);
     });
   }catch(error){
     console.error("Posts load error:",error);
-    document.getElementById("postCount").textContent="Posts unavailable";
+    countElement.textContent="Posts unavailable";
     container.textContent="Could not load posts: "+error.message;
   }
 }
