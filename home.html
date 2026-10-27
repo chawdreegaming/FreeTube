@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,6 +25,10 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .story>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.story:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,#000b)}.story span{position:relative;z-index:1;font-size:11px;font-weight:700;text-shadow:0 1px 4px #000}
 .story.create{justify-content:center;align-items:center;flex-direction:column;gap:9px;text-align:center;background:#ffffff0a;cursor:pointer}.story.create:after{display:none}.story.create i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#07351f;font-size:18px}
 .feed{padding-top:8px}.post-card{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
+.ad-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:10px 0;padding:10px 8px;background:rgba(19,45,31,.84);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;min-height:76px}
+.ad-label{font-size:9px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase}
+.ad-slot{width:320px;max-width:100%;min-height:50px;display:flex;justify-content:center;align-items:center;overflow:hidden}
+.ad-slot iframe{max-width:100%}
 .post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
 .post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 .post-author{font-size:14px;font-weight:700;overflow-wrap:anywhere}.post-time{font-size:11px;color:var(--muted);margin-top:4px}
@@ -125,6 +130,10 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 const API_BASE="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
+const ADSTERRA_KEY="ab837cf0ea9c26ae43b7bc4e05a0b5de";
+const ADSTERRA_SCRIPT="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";
+const AD_EVERY_POSTS=5;
+
 const REACTIONS={
   like:{label:"Like",emoji:"👍",className:"selected"},
   love:{label:"Love",emoji:"❤️",className:"reaction-love"},
@@ -334,6 +343,63 @@ async function loadFeed(){
   }
 }
 
+/* Adsterra banner: one 320x50 ad slot after every five posts. */
+function adBannerHTML(index){
+  return '<aside class="ad-card" aria-label="Advertisement">'+
+    '<div class="ad-label">Advertisement</div>'+
+    '<div class="ad-slot" id="ad-slot-'+index+'"><span style="font-size:10px;color:var(--muted)">Ad loading…</span></div>'+
+    '</aside>';
+}
+
+/*
+ * The publisher script runs inside an isolated iframe so it does not
+ * overwrite FreeTube's page-level JavaScript variables.
+ */
+function loadAdsterraBanner(slot){
+  if(!slot||slot.dataset.adLoaded==="1")return;
+  slot.dataset.adLoaded="1";
+  slot.innerHTML="";
+
+  const frame=document.createElement("iframe");
+  frame.title="Advertisement";
+  frame.width="320";
+  frame.height="50";
+  frame.setAttribute("scrolling","no");
+  frame.setAttribute("frameborder","0");
+  frame.setAttribute("loading","lazy");
+  frame.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox");
+  frame.style.cssText="width:320px;height:50px;max-width:100%;border:0;overflow:hidden;display:block";
+  slot.appendChild(frame);
+
+  const doc=frame.contentDocument;
+  if(!doc){
+    slot.textContent="Advertisement unavailable";
+    return;
+  }
+
+  doc.open();
+  doc.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;width:320px;height:50px;overflow:hidden;background:transparent"><script>var atOptions={\\'key\\':\\''+ADSTERRA_KEY+'\\',\\'format\\':\\'iframe\\',\\'height\\':50,\\'width\\':320,\\'params\\':{}};<\\/script><script src="'+ADSTERRA_SCRIPT+'"><\\/script></body></html>');
+  doc.close();
+}
+
+function setupAdSlots(){
+  document.querySelectorAll(".ad-slot").forEach(slot=>{
+    if("IntersectionObserver" in window){
+      const observer=new IntersectionObserver(entries=>{
+        entries.forEach(entry=>{
+          if(entry.isIntersecting){
+            loadAdsterraBanner(entry.target);
+            observer.unobserve(entry.target);
+          }
+        });
+      },{rootMargin:"200px"});
+      observer.observe(slot);
+    }else{
+      loadAdsterraBanner(slot);
+    }
+  });
+}
+
 function reactionButtonHTML(v){
   const key=v.myReaction&&REACTIONS[v.myReaction]?v.myReaction:null;
   const label=key?REACTIONS[key].label:"Like";
@@ -357,7 +423,9 @@ function render(list=videos){
     return;
   }
 
-  feed.innerHTML=list.map(v=>{
+  let html="";
+
+  list.forEach((v,index)=>{
     let media="";
 
     if(v.type==="video"&&v.src){
@@ -374,7 +442,7 @@ function render(list=videos){
       (c.angry?'<span class="reaction-emoji">😡</span>':"")+
       '<span>'+total+'</span>';
 
-    return '<article class="post-card" data-id="'+esc(v.id)+'">'+
+    html+='<article class="post-card" data-id="'+esc(v.id)+'">'+
       '<div class="post-header"><div class="post-user-info">'+
       '<img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(v.avatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'">'+
       '<div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div>'+
@@ -382,10 +450,16 @@ function render(list=videos){
       (v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':"")+media+
       '<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div>'+
       '<div class="post-actions-bar">'+reactionButtonHTML(v)+'<button class="post-action-btn" onclick="comments(\''+esc(v.id)+'\')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost(\''+esc(v.id)+'\')"><i class="fa-solid fa-share"></i> Share</button></div></article>';
-  }).join("");
 
+    if((index+1)%AD_EVERY_POSTS===0&&index<list.length-1){
+      html+=adBannerHTML(index+1);
+    }
+  });
+
+  feed.innerHTML=html;
   setupVideoAutoplay();
   setupPostViewObserver();
+  setupAdSlots();
 }
 
 function updateOnePost(post){
@@ -505,7 +579,6 @@ async function chooseReaction(event,id,reaction){
   setTimeout(()=>{holdTriggered=false},250);
 }
 
-/* Fixed: clicking the currently selected reaction removes it on the server too. */
 async function reactToPost(id,reaction){
   const post=videos.find(v=>v.id===String(id));
   if(!post||!REACTIONS[reaction])return;
