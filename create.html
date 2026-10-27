@@ -14,7 +14,6 @@
   --text:#fff;
   --muted:#d1d9d4;
   --border:rgba(255,255,255,.15);
-  --glass:rgba(30,31,34,.60);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;background:#173d30}
@@ -32,178 +31,122 @@ button:disabled{opacity:.45;cursor:not-allowed}
   max-width:650px;
   min-height:100dvh;
   margin:auto;
-  padding-bottom:20px;
   display:flex;
   flex-direction:column;
-  background:rgba(20,27,29,.18);
+  background:rgba(20,27,29,.15);
 }
 .topbar{
   position:sticky;top:0;z-index:10;
   display:grid;
-  grid-template-columns:52px 1fr 88px;
-  align-items:center;
-  gap:8px;
-  padding:calc(10px + env(safe-area-inset-top)) 15px 12px;
-  background:rgba(30,30,34,.65);
+  grid-template-columns:48px 1fr 80px;
+  align-items:center;gap:8px;
+  padding:calc(8px + env(safe-area-inset-top)) 13px 10px;
+  background:rgba(30,30,34,.58);
   backdrop-filter:blur(22px);
   -webkit-backdrop-filter:blur(22px);
   border-bottom:1px solid var(--border);
 }
 .close-btn{
-  width:44px;height:44px;
+  width:42px;height:42px;
   display:grid;place-items:center;
   border:0;border-radius:50%;
   background:transparent;font-size:25px;
 }
-.page-title{
-  text-align:center;
-  font-size:21px;font-weight:750;
-}
+.page-title{text-align:center;font-size:21px;font-weight:750}
 .next-btn{
-  min-width:80px;
-  padding:12px 17px;
-  border:0;border-radius:14px;
+  min-width:76px;padding:11px 14px;
+  border:0;border-radius:13px;
   background:linear-gradient(120deg,#ff5369,#00bd78);
   color:#fff;font-weight:bold;
 }
-.next-btn:disabled{
-  background:rgba(255,255,255,.13);
-  color:#a7aaa9;
-}
+.next-btn:disabled{background:rgba(255,255,255,.13);color:#a7aaa9}
 main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  padding:20px 18px 16px;
+  flex:1;display:flex;flex-direction:column;
+  padding:18px 17px 12px;
 }
-.user-row{
-  display:flex;align-items:center;gap:13px;
-  margin:7px 0 22px;
-}
+.user-row{display:flex;align-items:center;gap:12px;margin:5px 0 20px}
 .avatar{
-  width:66px;height:66px;
-  object-fit:cover;border-radius:50%;
-  border:2px solid rgba(255,255,255,.20);
+  width:64px;height:64px;object-fit:cover;border-radius:50%;
+  border:2px solid rgba(255,255,255,.2);
   background:rgba(255,255,255,.08);
 }
-.user-name{
-  font-size:20px;font-weight:750;
-  overflow-wrap:anywhere;
-}
+.user-name{font-size:20px;font-weight:750;overflow-wrap:anywhere}
 .user-sub{font-size:12px;color:var(--muted);margin-top:6px}
 .options{
-  display:flex;gap:9px;
-  overflow-x:auto;scrollbar-width:none;
-  margin-bottom:25px;padding-bottom:2px;
+  display:flex;gap:8px;overflow-x:auto;
+  scrollbar-width:none;margin-bottom:22px;padding-bottom:2px;
 }
 .options::-webkit-scrollbar,.media-options::-webkit-scrollbar{display:none}
 .pill{
-  flex-shrink:0;
-  display:flex;align-items:center;gap:9px;
-  padding:10px 15px;
-  border:1px solid var(--border);
-  border-radius:28px;
-  background:rgba(255,255,255,.10);
-  backdrop-filter:blur(12px);
-  font-size:14px;font-weight:650;
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:9px 13px;border:1px solid var(--border);
+  border-radius:28px;background:rgba(255,255,255,.1);
+  backdrop-filter:blur(12px);font-size:13px;font-weight:650;
 }
-.pill i{font-size:16px}
-.pill.selected{
-  border-color:rgba(0,245,155,.55);
-  background:rgba(0,245,155,.12);
-}
-.caption-wrap{position:relative}
+.pill i{font-size:15px}
 #content{
-  display:block;
-  width:100%;
-  min-height:190px;
-  flex:1;
-  resize:none;
-  outline:none;
-  border:0;
-  background:transparent;
-  color:white;
-  font-size:25px;
-  line-height:1.5;
-  padding:8px 0 18px;
+  display:block;width:100%;min-height:180px;flex:1;
+  resize:none;outline:none;border:0;background:transparent;
+  color:white;font-size:24px;line-height:1.5;padding:6px 0 15px;
 }
-#content::placeholder{color:rgba(255,255,255,.68)}
-#content:focus{outline:none}
-.media-area{margin-top:auto;padding-top:18px}
+#content::placeholder{color:rgba(255,255,255,.7)}
+.media-area{margin-top:auto;padding-top:14px}
 #preview{
-  display:none;
-  position:relative;
-  margin-bottom:14px;
-  padding:8px;
-  border:1px solid var(--border);
-  border-radius:17px;
-  background:rgba(25,30,32,.52);
+  display:none;margin-bottom:12px;padding:8px;
+  border:1px solid var(--border);border-radius:15px;
+  background:rgba(25,30,32,.5);
 }
 #previewMedia img,#previewMedia video{
-  width:100%;max-height:330px;
-  object-fit:contain;display:block;
-  border-radius:10px;background:#000;
+  width:100%;max-height:300px;object-fit:contain;
+  display:block;border-radius:10px;background:#000;
 }
-.file-info{
-  font-size:12px;color:var(--muted);
-  overflow-wrap:anywhere;padding:9px 3px 3px;
-}
+.file-info{font-size:12px;color:var(--muted);overflow-wrap:anywhere;padding:9px 3px}
 .remove-media{
-  margin-top:7px;
-  padding:8px 12px;border-radius:10px;
-  border:1px solid var(--border);
-  background:rgba(255,83,105,.17);
+  margin-top:6px;padding:8px 11px;border-radius:9px;
+  border:1px solid var(--border);background:rgba(255,83,105,.17);
 }
 .media-options{
-  display:flex;gap:12px;
-  overflow-x:auto;scrollbar-width:none;
-  padding:8px 0 12px;
+  display:flex;gap:10px;overflow-x:auto;
+  scrollbar-width:none;padding:6px 0 12px;
 }
 .media-card{
-  flex:0 0 118px;min-height:112px;
+  flex:0 0 92px;min-height:82px;
   display:flex;flex-direction:column;
-  justify-content:center;align-items:center;gap:12px;
-  border-radius:20px;
-  border:1px solid var(--border);
-  background:rgba(255,255,255,.10);
-  box-shadow:0 6px 18px rgba(0,0,0,.09);
-  font-size:14px;font-weight:700;
+  justify-content:center;align-items:center;gap:8px;
+  border-radius:15px;border:1px solid var(--border);
+  background:rgba(255,255,255,.11);
+  box-shadow:0 5px 14px rgba(0,0,0,.08);
+  font-size:12px;font-weight:700;
 }
-.media-card i{font-size:27px;color:#fff}
+.media-card i{font-size:22px;color:#fff}
 .media-card:active{transform:scale(.97)}
 .media-card input{display:none}
 .bottom-settings{
   position:sticky;bottom:0;
-  padding:13px 15px calc(12px + env(safe-area-inset-bottom));
-  background:rgba(30,30,34,.60);
+  padding:12px 15px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(30,30,34,.58);
   backdrop-filter:blur(22px);
   -webkit-backdrop-filter:blur(22px);
   border-top:1px solid var(--border);
 }
-.setting-row{
-  display:flex;gap:9px;overflow-x:auto;
-  scrollbar-width:none;
-}
+.setting-row{display:flex;gap:9px;overflow-x:auto;scrollbar-width:none}
 .setting-pill{
-  flex-shrink:0;
-  display:flex;align-items:center;gap:8px;
-  padding:11px 15px;border-radius:28px;
+  flex-shrink:0;display:flex;align-items:center;gap:8px;
+  padding:10px 14px;border-radius:28px;
   border:1px solid var(--border);
   background:rgba(255,255,255,.11);
   font-size:14px;font-weight:650;
 }
-.setting-pill i{font-size:17px}
+.setting-pill i{font-size:16px}
 .setting-pill.active{
   background:rgba(0,245,155,.14);
   border-color:rgba(0,245,155,.45);
 }
 .toast{
   display:none;position:fixed;z-index:50;
-  bottom:95px;left:50%;transform:translateX(-50%);
-  max-width:90%;padding:12px 16px;
-  border-radius:12px;
-  border:1px solid var(--border);
-  background:rgba(28,35,34,.96);
+  bottom:25px;left:50%;transform:translateX(-50%);
+  max-width:90%;padding:12px 16px;border-radius:12px;
+  border:1px solid var(--border);background:rgba(28,35,34,.96);
   font-size:13px;text-align:center;
 }
 .toast.show{display:block}
@@ -214,15 +157,11 @@ main{
 }
 .modal.open{display:flex}
 .modal-box{
-  width:100%;max-width:500px;
-  padding:20px;border-radius:22px;
+  width:100%;max-width:500px;padding:20px;border-radius:22px;
   background:linear-gradient(145deg,#67213e,#154c36);
   border:1px solid var(--border);
 }
-.modal-head{
-  display:flex;align-items:center;justify-content:space-between;
-  margin-bottom:16px;
-}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
 .modal-head h3{font-size:19px}
 .modal-close{
   width:36px;height:36px;border-radius:50%;
@@ -230,9 +169,8 @@ main{
 }
 .modal-box p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:15px}
 .modal-box select{
-  width:100%;padding:13px;border-radius:12px;
-  color:white;background:#26352f;border:1px solid var(--border);
-  margin-bottom:14px;
+  width:100%;padding:13px;border-radius:12px;color:white;
+  background:#26352f;border:1px solid var(--border);margin-bottom:14px;
 }
 .publish-btn{
   width:100%;padding:14px;border:0;border-radius:12px;
@@ -244,18 +182,18 @@ main{
   .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
 }
 @media(max-width:370px){
-  .topbar{grid-template-columns:42px 1fr 75px;padding-left:10px;padding-right:10px}
+  .topbar{grid-template-columns:40px 1fr 70px;padding-left:9px;padding-right:9px}
   .page-title{font-size:19px}
-  .next-btn{min-width:70px;padding:11px}
-  main{padding-left:14px;padding-right:14px}
+  .next-btn{min-width:66px;padding:10px}
+  main{padding-left:13px;padding-right:13px}
   #content{font-size:22px}
+  .media-card{flex-basis:84px;min-height:76px}
 }
 </style>
 </head>
 
 <body>
 <div class="app">
-
 <header class="topbar">
   <button class="close-btn" onclick="cancelPost()" aria-label="Close">
     <i class="fa-solid fa-xmark"></i>
@@ -275,21 +213,19 @@ main{
   </div>
 
   <div class="options">
-    <button class="pill" type="button" onclick="showToast('Music attachment is not configured yet.')">
+    <button class="pill" type="button" onclick="showToast('Music attachment is not available yet.')">
       <i class="fa-solid fa-music"></i> Music
     </button>
-    <button class="pill" type="button" onclick="showToast('Tag/collaborate is not configured yet.')">
+    <button class="pill" type="button" onclick="showToast('Tag/collaborate is not available yet.')">
       <i class="fa-solid fa-user-plus"></i> Tag/collaborate
     </button>
-    <button class="pill" type="button" onclick="showToast('Location sharing is not configured yet.')">
+    <button class="pill" type="button" onclick="showToast('Location sharing is not available yet.')">
       <i class="fa-solid fa-location-dot"></i> Location
     </button>
   </div>
 
-  <div class="caption-wrap">
-    <textarea id="content" maxlength="5000"
-      placeholder="What's on your mind?" aria-label="Post caption"></textarea>
-  </div>
+  <textarea id="content" maxlength="5000"
+    placeholder="What's on your mind?" aria-label="Post caption"></textarea>
 
   <div id="preview">
     <div id="previewMedia"></div>
@@ -302,23 +238,15 @@ main{
   <div class="media-area">
     <div class="media-options">
       <label class="media-card" for="mediaFile">
-        <i class="fa-regular fa-image"></i>
-        <span>Gallery</span>
+        <i class="fa-regular fa-image"></i><span>Gallery</span>
       </label>
-      <button class="media-card" type="button" onclick="showToast('GIF selection is not configured yet.')">
-        <i class="fa-regular fa-file-video"></i>
-        <span>GIF</span>
+      <button class="media-card" type="button" onclick="showToast('GIF selection is not available yet.')">
+        <i class="fa-solid fa-file-image"></i><span>GIF</span>
       </button>
       <button class="media-card" type="button" onclick="showToast('Live video is not available yet.')">
-        <i class="fa-solid fa-video"></i>
-        <span>Live</span>
-      </button>
-      <button class="media-card" type="button" onclick="showToast('Background selection is not configured yet.')">
-        <i class="fa-solid fa-palette"></i>
-        <span>Background</span>
+        <i class="fa-solid fa-video"></i><span>Live</span>
       </button>
     </div>
-
     <input id="mediaFile" type="file"
       accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
       hidden>
@@ -327,18 +255,10 @@ main{
 
 <footer class="bottom-settings">
   <div class="setting-row">
-    <button id="audienceButton" class="setting-pill" type="button" onclick="openAudience()">
+    <button id="audienceButton" class="setting-pill active" type="button" onclick="openAudience()">
       <i class="fa-solid fa-earth-americas"></i>
       <span id="audienceLabel">Public</span>
       <i class="fa-solid fa-chevron-down" style="font-size:11px"></i>
-    </button>
-    <button id="instagramButton" class="setting-pill" type="button" onclick="toggleOption('instagram')">
-      <i class="fa-brands fa-instagram"></i>
-      <span id="instagramLabel">Off</span>
-    </button>
-    <button id="threadsButton" class="setting-pill" type="button" onclick="toggleOption('threads')">
-      <i class="fa-brands fa-threads"></i>
-      <span id="threadsLabel">Off</span>
     </button>
   </div>
 </footer>
@@ -391,8 +311,6 @@ let selectedFile=null;
 let previewUrl=null;
 let toastTimer=null;
 let audience="public";
-let instagram=false;
-let threads=false;
 let publishing=false;
 
 function go(page){location.href=page}
@@ -432,9 +350,7 @@ async function api(path,options={}){
 
   let response;
   try{
-    response=await fetch(API_BASE+path,{
-      ...options,headers,cache:"no-store"
-    });
+    response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"});
   }catch(_){
     throw new Error("Backend-এর সঙ্গে সংযোগ হচ্ছে না। আবার চেষ্টা করো।");
   }
@@ -475,8 +391,7 @@ async function loadUser(){
 
 function updateNextButton(){
   const hasContent=document.getElementById("content").value.trim().length>0;
-  const hasMedia=Boolean(selectedFile);
-  document.getElementById("nextButton").disabled=!(hasContent||hasMedia);
+  document.getElementById("nextButton").disabled=!(hasContent||Boolean(selectedFile));
 }
 document.getElementById("content").addEventListener("input",updateNextButton);
 
@@ -546,33 +461,14 @@ function closeAudience(){
 }
 function saveAudience(){
   audience=document.getElementById("audienceSelect").value;
-  const labels={
-    public:"Public",
-    followers:"Followers",
-    private:"Only me"
-  };
+  const labels={public:"Public",followers:"Followers",private:"Only me"};
   document.getElementById("audienceLabel").textContent=labels[audience];
-  document.getElementById("audienceButton").classList.add("active");
   closeAudience();
-}
-function toggleOption(name){
-  if(name==="instagram"){
-    instagram=!instagram;
-    document.getElementById("instagramLabel").textContent=instagram?"On":"Off";
-    document.getElementById("instagramButton").classList.toggle("active",instagram);
-    if(instagram)showToast("Instagram sharing UI enabled. External publishing is not connected.");
-  }else{
-    threads=!threads;
-    document.getElementById("threadsLabel").textContent=threads?"On":"Off";
-    document.getElementById("threadsButton").classList.toggle("active",threads);
-    if(threads)showToast("Threads sharing UI enabled. External publishing is not connected.");
-  }
 }
 
 function openPublish(){
   if(!requireLogin())return;
-  const content=document.getElementById("content").value.trim();
-  if(!content&&!selectedFile){
+  if(!document.getElementById("content").value.trim()&&!selectedFile){
     showToast("Write something or choose media first.");
     return;
   }
@@ -603,11 +499,7 @@ async function publishPost(){
     if(selectedFile){
       const formData=new FormData();
       formData.append("file",selectedFile);
-
-      const uploadData=await api("/media/upload",{
-        method:"POST",
-        body:formData
-      });
+      const uploadData=await api("/media/upload",{method:"POST",body:formData});
       media=uploadData.media||uploadData;
 
       if(!media.url&&!media.secure_url){
@@ -620,20 +512,14 @@ async function publishPost(){
       ?(selectedFile.type.startsWith("video/")?"video":"image")
       :"";
 
-    const payload={
-      content,
-      media_url:mediaUrl,
-      media_type:mediaType,
-      media_public_id:media?(media.public_id||""):""
-    };
-
-    /*
-      Audience selection is currently local UI only.
-      Send it only after your backend supports an audience field.
-    */
     await api("/posts",{
       method:"POST",
-      body:JSON.stringify(payload)
+      body:JSON.stringify({
+        content,
+        media_url:mediaUrl,
+        media_type:mediaType,
+        media_public_id:media?(media.public_id||""):""
+      })
     });
 
     closePublish();
