@@ -1,39 +1,38 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d3b22">
+<meta name="theme-color" content="#242526">
 <title>FreeTube - Profile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--green:#00ff88;--border:rgba(255,255,255,.17);--panel:rgba(255,255,255,.08);--muted:rgba(255,255,255,.65)}
+:root{--green:#00ff88;--border:rgba(255,255,255,.15);--panel:rgba(255,255,255,.08);--muted:#b0b3b8;--drawer:#242526}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff}
-button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit}
+body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:white}
+body.drawer-open{overflow:hidden}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit;text-decoration:none}
 .app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:85px}
 .cover-container{height:200px;position:relative;background:#24382e}
 .cover-photo{width:100%;height:100%;object-fit:cover}
 .cover-upload-btn{position:absolute;right:68px;bottom:12px;background:#111c;padding:10px 12px;border-radius:9px;font-size:12px;cursor:pointer}
 .menu-row{position:absolute;top:12px;right:12px;z-index:30}
-.menu-button{width:44px;height:44px;border:1px solid var(--border);border-radius:50%;background:#101a;color:white;font-size:20px}
-.menu-dropdown{display:none;position:absolute;right:0;top:51px;width:190px;padding:7px;background:#14251c;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 25px #0006}
-.menu-dropdown.open{display:block}
-.menu-dropdown button{display:block;width:100%;padding:13px;text-align:left;background:transparent;border:0;border-radius:8px;color:white;font-size:14px}
-.menu-dropdown button:active{background:#ffffff18}
+.menu-button{width:48px;height:48px;border:1px solid var(--border);border-radius:50%;background:#101a;color:white;font-size:27px;display:grid;place-items:center}
+.menu-button i{font-size:25px}
 .profile-header-section{text-align:center;padding:0 16px 20px;border-bottom:1px solid var(--border)}
 .avatar-container{width:104px;height:104px;margin:-50px auto 12px;position:relative}
 .avatar{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid #133a26;background:#111}
 .avatar-upload-btn{position:absolute;bottom:0;right:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#15291e;border:2px solid #133a26;cursor:pointer}
 .profile-name{font-size:25px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
-.profile-name.clickable,.avatar.clickable{cursor:pointer}
+.profile-name.clickable{cursor:pointer}
 .profile-name.clickable:hover{color:var(--green)}
 .verified-badge{color:var(--green);font-size:16px}
 .handle-text{font-size:14px;color:var(--muted);margin-top:6px}
 .follow-stats{font-size:14px;font-weight:bold;margin:12px 0}
 .bio-text{font-size:15px;line-height:1.6;margin:12px 0;overflow-wrap:anywhere;white-space:pre-wrap}
 .action-row{display:flex;gap:8px;margin-top:16px}
-.btn{flex:1;border:1px solid var(--border);border-radius:12px;padding:12px 7px;color:#fff;font-size:13px;font-weight:bold;background:#ffffff12;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn{flex:1;border:1px solid var(--border);border-radius:12px;padding:12px 7px;color:white;font-size:13px;font-weight:bold;background:#ffffff12;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn-primary{background:linear-gradient(135deg,#00b074,#008253);border:0}
 .btn-icon{flex:0 0 48px}
 .btn:disabled{opacity:.55;cursor:wait}
@@ -44,7 +43,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}a{color:i
 .muted{font-size:13px;color:var(--muted);line-height:1.5}
 .inline-edit{background:none;border:0;color:white;padding:4px;font-size:17px}
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;min-height:64px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:rgba(13,59,34,.97);border-top:1px solid var(--border);backdrop-filter:blur(15px);z-index:25}
-.nav-item{min-width:48px;background:none;border:0;color:#ffffffa6;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;text-decoration:none}
+.nav-item{min-width:48px;background:none;border:0;color:#ffffffa6;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}
 .nav-item i{font-size:19px}.nav-item.active{color:var(--green)}
 input[type=file]{display:none}
 .modal{display:none;position:fixed;inset:0;z-index:100;background:#101713;overflow-y:auto;padding-bottom:30px}
@@ -68,11 +67,42 @@ input[type=file]{display:none}
 .post-author{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer}
 .post-author img{width:36px;height:36px;border-radius:50%;object-fit:cover}
 .post-author strong{font-size:14px}
-.post-author:hover strong{color:var(--green)}
 .post-content{font-size:15px;line-height:1.6;white-space:pre-wrap;margin:8px 0}
 .post-metadata{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
 .hidden{display:none!important}
-@media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
+
+/* Right-side drawer */
+.drawer-overlay{position:fixed;inset:0;background:#0009;z-index:80;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.drawer-overlay.open{opacity:1;visibility:visible}
+.side-drawer{position:fixed;z-index:90;top:0;right:0;width:min(88%,370px);height:100dvh;background:var(--drawer);color:#f5f6f7;transform:translateX(105%);transition:transform .28s ease;display:flex;flex-direction:column;box-shadow:-8px 0 30px #0004;padding-bottom:env(safe-area-inset-bottom)}
+.side-drawer.open{transform:translateX(0)}
+.drawer-header{min-height:76px;padding:14px 18px;display:flex;align-items:center;gap:13px;border-bottom:1px solid #ffffff12}
+.drawer-back{border:0;background:none;font-size:24px;width:30px;text-align:left}
+.drawer-heading{font-size:20px;font-weight:750;flex:1}
+.drawer-close{background:none;border:0;font-size:23px;padding:7px}
+.drawer-user{padding:15px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #ffffff12}
+.drawer-user img{width:42px;height:42px;border-radius:50%;object-fit:cover;background:#333}
+.drawer-user-name{font-weight:bold;font-size:15px}
+.drawer-user-handle{font-size:12px;color:#b0b3b8;margin-top:4px}
+.drawer-content{overflow-y:auto;padding:8px 0 20px}
+.drawer-section-title{padding:13px 22px 8px;color:#b0b3b8;font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:.7px}
+.drawer-item{width:100%;min-height:53px;padding:12px 22px;display:flex;align-items:center;gap:17px;background:none;border:0;text-align:left;font-size:16px;font-weight:500;color:#f5f6f7}
+.drawer-item i{width:25px;text-align:center;font-size:21px}
+.drawer-item:active,.drawer-item:hover{background:#ffffff12}
+.drawer-item .chevron{margin-left:auto;font-size:13px;color:#b0b3b8}
+.drawer-divider{height:1px;background:#ffffff16;margin:8px 16px}
+.drawer-note{font-size:12px;color:#b0b3b8;padding:14px 22px;line-height:1.5}
+.drawer-subpage{display:none;position:fixed;inset:0;z-index:110;background:var(--drawer);overflow-y:auto;padding-bottom:25px}
+.drawer-subpage.open{display:block}
+.subpage-row{display:flex;align-items:center;gap:15px;padding:17px 20px;border-bottom:1px solid #ffffff12}
+.subpage-row i{width:24px;color:#ddd}
+.subpage-row span{flex:1}
+.switch{width:46px;height:26px;border-radius:20px;border:0;background:#666;position:relative;flex-shrink:0}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:white;transition:transform .2s}
+.switch.on{background:#00a86b}
+.switch.on:after{transform:translateX(20px)}
+.drawer-field{width:100%;margin-top:10px;padding:12px;border-radius:9px;border:1px solid #555;background:#303134;color:white}
+@media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}.side-drawer{width:90%}}
 </style>
 </head>
 <body>
@@ -80,11 +110,7 @@ input[type=file]{display:none}
 <section class="cover-container">
   <img id="coverPhoto" class="cover-photo" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
   <div class="menu-row">
-    <button class="menu-button" id="menuToggle" aria-label="Profile menu"><i class="fa-solid fa-ellipsis"></i></button>
-    <div class="menu-dropdown" id="profileMenu">
-      <button id="menuEdit"><i class="fa-solid fa-user-pen"></i> Edit profile</button>
-      <button id="menuSettings"><i class="fa-solid fa-gear"></i> Settings</button>
-    </div>
+    <button class="menu-button" id="menuToggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
   </div>
   <label for="coverInput" class="cover-upload-btn" id="coverUploadLabel"><i class="fa-solid fa-camera"></i> Edit cover</label>
   <input type="file" id="coverInput" accept="image/jpeg,image/png,image/webp,image/gif">
@@ -96,15 +122,9 @@ input[type=file]{display:none}
     <label for="avatarInput" class="avatar-upload-btn" id="avatarUploadLabel" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
     <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif">
   </div>
-  <div class="profile-name" id="profileNameRow">
-    <span id="username">User</span>
-    <i class="fa-solid fa-circle-check verified-badge hidden" id="verifiedBadge"></i>
-  </div>
+  <div class="profile-name" id="profileNameRow"><span id="username">User</span><i class="fa-solid fa-circle-check verified-badge hidden" id="verifiedBadge"></i></div>
   <div id="handle" class="handle-text">@username</div>
-  <div class="follow-stats">
-    <span id="followersCount">0</span> followers ·
-    <span id="followingCount">0</span> following
-  </div>
+  <div class="follow-stats"><span id="followersCount">0</span> followers · <span id="followingCount">0</span> following</div>
   <p class="bio-text" id="bioText">Welcome to my FreeTube profile!</p>
   <div class="action-row" id="ownActions">
     <button class="btn btn-primary" id="dashboardButton"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
@@ -120,18 +140,14 @@ input[type=file]{display:none}
 </section>
 
 <section class="panel">
-  <div class="panel-title">Personal details
-    <button class="inline-edit own-edit" data-edit aria-label="Edit personal details"><i class="fa-solid fa-pen"></i></button>
-  </div>
+  <div class="panel-title">Personal details<button class="inline-edit own-edit" data-edit aria-label="Edit personal details"><i class="fa-solid fa-pen"></i></button></div>
   <div class="detail-item"><i class="fa-solid fa-location-dot"></i><span>Lives in <strong id="cityText">Not added</strong></span></div>
   <div class="detail-item"><i class="fa-solid fa-house"></i><span>From <strong id="homeText">Not added</strong></span></div>
   <div class="detail-item"><i class="fa-solid fa-cake-candles"></i><span>Birthday <strong id="birthdayText">Not added</strong></span></div>
 </section>
 
 <section class="panel">
-  <div class="panel-title">Work &amp; Education
-    <button class="inline-edit own-edit" data-edit aria-label="Edit work and education"><i class="fa-solid fa-pen"></i></button>
-  </div>
+  <div class="panel-title">Work &amp; Education<button class="inline-edit own-edit" data-edit aria-label="Edit work and education"><i class="fa-solid fa-pen"></i></button></div>
   <div class="detail-item"><i class="fa-solid fa-briefcase"></i><span><strong id="workText">Not added</strong><br><span class="muted">Work</span></span></div>
   <div class="detail-item"><i class="fa-solid fa-graduation-cap"></i><span><strong id="educationText">Not added</strong><br><span class="muted">Education</span></span></div>
 </section>
@@ -149,6 +165,48 @@ input[type=file]{display:none}
   <a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
   <a class="nav-item active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
 </nav>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="side-drawer" id="sideDrawer" aria-hidden="true">
+  <header class="drawer-header">
+    <button class="drawer-back" id="drawerBack" aria-label="Close menu"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="drawer-heading" id="drawerHeading">Menu</div>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu"><i class="fa-solid fa-xmark"></i></button>
+  </header>
+  <div class="drawer-user">
+    <img id="drawerAvatar" src="https://placehold.co/100x100/244b37/ffffff?text=FT" alt="Profile">
+    <div><div class="drawer-user-name" id="drawerUserName">FreeTube</div><div class="drawer-user-handle" id="drawerUserHandle">@FreeTube</div></div>
+  </div>
+  <div class="drawer-content">
+    <div class="drawer-section-title">Settings and privacy</div>
+    <button class="drawer-item" data-page="settings"><i class="fa-solid fa-user-gear"></i><span>Settings</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="privacy"><i class="fa-solid fa-lock"></i><span>Privacy Center</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="time"><i class="fa-regular fa-clock"></i><span>Time management</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="devices"><i class="fa-solid fa-mobile-screen-button"></i><span>Device requests</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="ads"><i class="fa-solid fa-rectangle-ad"></i><span>Your Ad Activity</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="payments"><i class="fa-regular fa-credit-card"></i><span>Orders and payments</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="links"><i class="fa-solid fa-link"></i><span>Link history</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" id="darkModeButton"><i class="fa-regular fa-moon"></i><span>Dark mode</span><button class="switch" id="darkModeSwitch" type="button" aria-label="Toggle dark mode"></button></button>
+    <button class="drawer-item" data-page="language"><i class="fa-solid fa-globe"></i><span>Language</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="editprofile"><i class="fa-solid fa-user-pen"></i><span>Edit profile</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <div class="drawer-divider"></div>
+    <div class="drawer-section-title">Help and support</div>
+    <button class="drawer-item" data-page="scam"><i class="fa-solid fa-shield-halved"></i><span>Scam Protection Center</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="support"><i class="fa-solid fa-life-ring"></i><span>Support</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="report"><i class="fa-regular fa-flag"></i><span>Report a problem</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <button class="drawer-item" data-page="terms"><i class="fa-solid fa-book"></i><span>Terms and Policies</span><i class="fa-solid fa-chevron-right chevron"></i></button>
+    <div class="drawer-note">FreeTube · Settings and support</div>
+  </div>
+</aside>
+
+<div class="drawer-subpage" id="drawerSubpage">
+  <header class="drawer-header">
+    <button class="drawer-back" id="subpageBack" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="drawer-heading" id="subpageTitle">Settings</div>
+    <button class="drawer-close" id="subpageClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+  </header>
+  <div id="subpageContent"></div>
+</div>
 
 <div class="modal" id="editModal">
   <header class="modal-header">
@@ -173,102 +231,34 @@ input[type=file]{display:none}
 
 <script>
 "use strict";
-
 const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const PROFILE_KEY="freetube_profile_data";
 const DEFAULT_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
 const DEFAULT_COVER="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800";
-
-let toastTimer=null;
-let currentUser=null;
-let viewedUser=null;
-let serverProfile={};
-let serverStats={};
-let loadingProfile=false;
-let isOwnProfile=true;
-let followingThisUser=false;
-
+let toastTimer=null,currentUser=null,viewedUser=null,serverProfile={},serverStats={},loadingProfile=false,isOwnProfile=true,followingThisUser=false;
 const queryParams=new URLSearchParams(location.search);
 const targetUsername=String(queryParams.get("username")||"").replace(/^@/,"").trim();
 const targetUserId=String(queryParams.get("userId")||"").trim();
 
-function getToken(){
-  try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}
-}
-
-function getProfile(){
-  try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{};}
-  catch{return {};}
-}
-
-function saveLocalProfile(profile){
-  try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile));}
-  catch(error){console.warn("Local profile cache could not be saved.",error);}
-}
-
-function setStatus(message,type=""){
-  const el=document.getElementById("sessionStatus");
-  el.textContent=message;
-  el.className="status"+(type?" "+type:"");
-}
-
-function notify(message){
-  const el=document.getElementById("toast");
-  el.textContent=message;
-  el.style.display="block";
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.style.display="none",3000);
-}
-
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||""}catch{return ""}}
+function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{}}catch{return {}}}
+function saveLocalProfile(profile){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}catch(e){console.warn(e)}}
+function notify(message){const el=document.getElementById("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",3000)}
+function setStatus(message,type=""){const el=document.getElementById("sessionStatus");el.textContent=message;el.className="status"+(type?" "+type:"")}
 async function apiRequest(path,options={}){
-  const headers={...(options.headers||{})};
-  const token=getToken();
-  if(token)headers.Authorization="Bearer "+token;
-
-  if(options.body!==undefined&&!(options.body instanceof FormData)){
-    headers["Content-Type"]="application/json";
-  }
-
-  let response;
-  try{
-    response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"});
-  }catch{
-    throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
-  }
-
-  let data={};
-  try{data=await response.json();}catch{}
-
-  if(!response.ok){
-    const error=new Error(data.error||data.message||("HTTP "+response.status));
-    error.status=response.status;
-    throw error;
-  }
+  const headers={...(options.headers||{})};const token=getToken();if(token)headers.Authorization="Bearer "+token;
+  if(options.body!==undefined&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
+  let response;try{response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"})}catch{throw new Error("Cannot connect to FreeTube server. Check your internet connection.")}
+  let data={};try{data=await response.json()}catch{}
+  if(!response.ok){const e=new Error(data.error||data.message||("HTTP "+response.status));e.status=response.status;throw e}
   return data;
 }
-
-function firstNonEmpty(...values){
-  for(const value of values){
-    if(value!==undefined&&value!==null&&String(value).trim()!==""){
-      return value;
-    }
-  }
-  return "";
-}
-
-function extractProfile(data){
-  if(data?.profile&&typeof data.profile==="object")return data.profile;
-  if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;
-  if(data?.user&&typeof data.user==="object")return data.user;
-  if(data?.data&&typeof data.data==="object")return data.data;
-  return data||{};
-}
-
+function firstNonEmpty(...values){for(const v of values)if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;return ""}
+function extractProfile(data){if(data?.profile&&typeof data.profile==="object")return data.profile;if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;if(data?.user&&typeof data.user==="object")return data.user;if(data?.data&&typeof data.data==="object")return data.data;return data||{}}
 function normalizeProfile(user={},profile={},stats={},local={}){
   const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url);
   const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl,local.cover_url);
-
   return {
     id:String(firstNonEmpty(profile.id,profile.user_id,user.id,user.user_id)||""),
     name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle,local.name)||"User"),
@@ -281,30 +271,18 @@ function normalizeProfile(user={},profile={},stats={},local={}){
     education:String(firstNonEmpty(profile.education,user.education,local.education)||""),
     followers:Number(firstNonEmpty(stats.followers,stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
     following:Number(firstNonEmpty(stats.following,stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
-    avatar_url:avatar||"",
-    cover_url:cover||""
+    avatar_url:avatar||"",cover_url:cover||""
   };
 }
-
 function setImageSource(image,url,fallback){
-  image.onerror=null;
-  image.src=fallback;
-  if(typeof url==="string"&&url.trim()){
-    image.onerror=()=>{
-      image.onerror=null;
-      image.src=fallback;
-    };
-    image.src=url.trim();
-  }
+  image.onerror=null;image.src=fallback;
+  if(typeof url==="string"&&url.trim()){image.onerror=()=>{image.onerror=null;image.src=fallback};image.src=url.trim()}
 }
-
 function formatBirthday(value){
-  if(!value)return "Not added";
-  const parsed=new Date(String(value).slice(0,10)+"T00:00:00Z");
+  if(!value)return "Not added";const parsed=new Date(String(value).slice(0,10)+"T00:00:00Z");
   if(Number.isNaN(parsed.getTime()))return String(value);
   return parsed.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"});
 }
-
 function renderProfile(p){
   document.getElementById("username").textContent=p.name||"User";
   document.getElementById("handle").textContent=p.handle?"@"+String(p.handle).replace(/^@/,""):"@username";
@@ -318,204 +296,105 @@ function renderProfile(p){
   document.getElementById("followingCount").textContent=Number(p.following)||0;
   setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
   setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER);
+  setImageSource(document.getElementById("drawerAvatar"),p.avatar_url,DEFAULT_AVATAR);
+  document.getElementById("drawerUserName").textContent=p.name||"FreeTube";
+  document.getElementById("drawerUserHandle").textContent="@"+(p.handle||"username");
 }
-
 function setOwnProfileUI(own){
   isOwnProfile=own;
   document.getElementById("ownActions").classList.toggle("hidden",!own);
   document.getElementById("otherActions").classList.toggle("hidden",own);
-  document.querySelectorAll(".own-edit").forEach(el=>el.classList.toggle("hidden",!own));
+  document.querySelectorAll(".own-edit").forEach(e=>e.classList.toggle("hidden",!own));
   document.getElementById("avatarUploadLabel").classList.toggle("hidden",!own);
   document.getElementById("coverUploadLabel").classList.toggle("hidden",!own);
-  document.getElementById("menuEdit").classList.toggle("hidden",!own);
-
   const nav=document.getElementById("profileNavLink");
-  if(own){
-    nav.href="profile.html";
-  }else{
-    const params=new URLSearchParams();
-    if(viewedUser?.username)params.set("username",viewedUser.username);
-    if(viewedUser?.id)params.set("userId",viewedUser.id);
-    nav.href="profile.html?"+params.toString();
-  }
+  if(own)nav.href="profile.html";
+  else{const p=new URLSearchParams();if(viewedUser?.username)p.set("username",viewedUser.username);if(viewedUser?.id)p.set("userId",viewedUser.id);nav.href="profile.html?"+p.toString()}
 }
-
-function updateFollowButton(){
-  const button=document.getElementById("followButton");
-  button.innerHTML=followingThisUser
-    ?'<i class="fa-solid fa-user-check"></i> Following'
-    :'<i class="fa-solid fa-user-plus"></i> Follow';
-  button.setAttribute("aria-pressed",String(followingThisUser));
-}
-
+function updateFollowButton(){const b=document.getElementById("followButton");b.innerHTML=followingThisUser?'<i class="fa-solid fa-user-check"></i> Following':'<i class="fa-solid fa-user-plus"></i> Follow';b.setAttribute("aria-pressed",String(followingThisUser))}
 function applyClickableProfileName(){
-  const row=document.getElementById("profileNameRow");
-  row.classList.toggle("clickable",!isOwnProfile);
-  row.onclick=()=>{
-    if(!isOwnProfile&&viewedUser?.username){
-      openUserProfile(viewedUser.username,viewedUser.id);
-    }
-  };
+  const row=document.getElementById("profileNameRow");row.classList.toggle("clickable",!isOwnProfile);
+  row.onclick=()=>{if(!isOwnProfile&&viewedUser?.username)openUserProfile(viewedUser.username,viewedUser.id)};
 }
-
 async function loadProfile(){
-  if(loadingProfile)return;
-  loadingProfile=true;
-  document.getElementById("retrySessionButton").style.display="none";
-  setStatus("Connecting to FreeTube...");
-
+  if(loadingProfile)return;loadingProfile=true;document.getElementById("retrySessionButton").style.display="none";setStatus("Connecting to FreeTube...");
   try{
     if(!getToken())throw new Error("Please log in to view profiles.");
-
     const meData=await apiRequest("/auth/me");
     currentUser=meData.user||meData.profile||meData.data?.user||meData.data||meData;
     const myId=String(currentUser.id??currentUser.user_id??"");
     const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
-
-    const requestedUsername=targetUsername;
-    const clearlyOwnByUsername=!requestedUsername||requestedUsername.toLowerCase()===myUsername.toLowerCase();
+    const clearlyOwnByUsername=!targetUsername||targetUsername.toLowerCase()===myUsername.toLowerCase();
     const clearlyOwnById=Boolean(targetUserId&&myId&&targetUserId===myId);
     isOwnProfile=clearlyOwnById||(!targetUserId&&clearlyOwnByUsername);
-
     if(isOwnProfile){
-      const data=await apiRequest("/profile");
-      serverProfile=extractProfile(data);
-      serverStats=data.stats||data.data?.stats||{};
-      viewedUser={
-        ...currentUser,
-        ...serverProfile,
-        id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),
-        username:serverProfile.username||currentUser.username||myUsername
-      };
+      const data=await apiRequest("/profile");serverProfile=extractProfile(data);serverStats=data.stats||data.data?.stats||{};
+      viewedUser={...currentUser,...serverProfile,id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),username:serverProfile.username||currentUser.username||myUsername};
     }else{
-      if(!requestedUsername)throw new Error("This profile link is missing a username. Open the profile again from the feed.");
-
-      const data=await apiRequest("/profile/"+encodeURIComponent(requestedUsername));
+      if(!targetUsername)throw new Error("This profile link is missing a username. Open the profile again from the feed.");
+      const data=await apiRequest("/profile/"+encodeURIComponent(targetUsername));
       const apiProfile=data.profile&&typeof data.profile==="object"?data.profile:(data.data?.profile||{});
       const apiUser=data.user&&typeof data.user==="object"?data.user:(data.data?.user||{});
-
-      serverProfile={...apiUser,...apiProfile};
-      serverStats=data.stats||data.data?.stats||{};
-
+      serverProfile={...apiUser,...apiProfile};serverStats=data.stats||data.data?.stats||{};
       const returnedId=String(apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??"");
-      const returnedUsername=String(apiProfile.username??apiUser.username??requestedUsername).replace(/^@/,"").trim();
-
-      if(returnedUsername.toLowerCase()!==requestedUsername.toLowerCase()){
-        throw new Error("The server returned a different username. Please retry.");
-      }
-
+      const returnedUsername=String(apiProfile.username??apiUser.username??targetUsername).replace(/^@/,"").trim();
+      if(returnedUsername.toLowerCase()!==targetUsername.toLowerCase())throw new Error("The server returned a different username. Please retry.");
       viewedUser={...apiUser,...apiProfile,id:returnedId,username:returnedUsername};
       if(!returnedId)throw new Error("The server did not return this user's ID.");
-
       isOwnProfile=Boolean((myId&&returnedId===myId)||returnedUsername.toLowerCase()===myUsername.toLowerCase());
     }
-
     const local=isOwnProfile?getProfile():{};
     const p=normalizeProfile(viewedUser,serverProfile,serverStats,local);
-    viewedUser={...viewedUser,...p};
-    if(isOwnProfile)saveLocalProfile({...local,...p});
-
-    renderProfile(p);
-    setOwnProfileUI(isOwnProfile);
-
-    if(!isOwnProfile){
-      followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);
-      updateFollowButton();
-    }
-
-    applyClickableProfileName();
-    setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
+    viewedUser={...viewedUser,...p};if(isOwnProfile)saveLocalProfile({...local,...p});
+    renderProfile(p);setOwnProfileUI(isOwnProfile);
+    if(!isOwnProfile){followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);updateFollowButton()}
+    applyClickableProfileName();setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
     await loadPostsForViewedUser();
   }catch(error){
-    console.error("Profile loading failed:",error);
-    setStatus(error.message||"Could not load profile.","error");
+    console.error("Profile loading failed:",error);setStatus(error.message||"Could not load profile.","error");
     document.getElementById("retrySessionButton").style.display="block";
     document.getElementById("myPosts").textContent="Profile or posts could not be loaded.";
     document.getElementById("postCount").textContent="Unavailable";
-  }finally{
-    loadingProfile=false;
-  }
+  }finally{loadingProfile=false}
 }
-
 async function toggleFollow(){
   if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");
   if(!getToken())return notify("Please log in first.");
-
   const userId=String(viewedUser.id??viewedUser.user_id??serverProfile.user_id??"");
   if(!userId)return notify("The profile API did not provide a user ID.");
-
-  const button=document.getElementById("followButton");
-  button.disabled=true;
-
+  const button=document.getElementById("followButton");button.disabled=true;
   try{
-    const method=followingThisUser?"DELETE":"POST";
-    const result=await apiRequest("/users/"+encodeURIComponent(userId)+"/follow",{method});
+    const result=await apiRequest("/users/"+encodeURIComponent(userId)+"/follow",{method:followingThisUser?"DELETE":"POST"});
     const nextState=typeof result.following==="boolean"?result.following:!followingThisUser;
-
     if(nextState!==followingThisUser){
-      followingThisUser=nextState;
-      serverProfile.is_following=nextState;
+      followingThisUser=nextState;serverProfile.is_following=nextState;
       serverProfile.followers_count=Math.max(0,Number(serverProfile.followers_count||0)+(nextState?1:-1));
-      serverStats.followers=serverProfile.followers_count;
-      viewedUser={...viewedUser,...serverProfile};
+      serverStats.followers=serverProfile.followers_count;viewedUser={...viewedUser,...serverProfile};
       renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats));
     }
-
-    updateFollowButton();
-    notify(followingThisUser?"You are now following this user.":"You unfollowed this user.");
-  }catch(error){
-    notify("Follow failed: "+error.message);
-  }finally{
-    button.disabled=false;
-  }
+    updateFollowButton();notify(followingThisUser?"You are now following this user.":"You unfollowed this user.");
+  }catch(error){notify("Follow failed: "+error.message)}finally{button.disabled=false}
 }
-
 function openMessage(){
-  if(!viewedUser)return;
-  const username=String(viewedUser.username||viewedUser.handle||"").replace(/^@/,"");
-  const id=viewedUser.id??viewedUser.user_id;
-  const params=new URLSearchParams();
-  if(id!==undefined&&id!==null&&String(id))params.set("user_id",String(id));
-  if(username)params.set("username",username);
-  location.href="inbox.html?"+params.toString();
+  if(!viewedUser)return;const username=String(viewedUser.username||viewedUser.handle||"").replace(/^@/,"");const id=viewedUser.id??viewedUser.user_id;
+  const p=new URLSearchParams();if(id!==undefined&&id!==null&&String(id))p.set("user_id",String(id));if(username)p.set("username",username);
+  location.href="inbox.html?"+p.toString();
 }
-
 function openUserProfile(username,userId){
-  const name=String(username||"").replace(/^@/,"").trim();
-  const id=String(userId||"").trim();
-  if(!name&&!id)return;
-  const params=new URLSearchParams();
-  if(name)params.set("username",name);
-  if(id)params.set("userId",id);
-  location.href="profile.html?"+params.toString();
+  const name=String(username||"").replace(/^@/,"").trim(),id=String(userId||"").trim();if(!name&&!id)return;
+  const p=new URLSearchParams();if(name)p.set("username",name);if(id)p.set("userId",id);location.href="profile.html?"+p.toString();
 }
-
 function openEditModal(){
   if(!isOwnProfile)return notify("You can only edit your own profile.");
   const p=normalizeProfile(viewedUser||{},serverProfile,serverStats,getProfile());
-
   document.getElementById("editName").value=p.name==="User"?"":p.name;
-  document.getElementById("editBio").value=p.bio;
-  document.getElementById("editCity").value=p.city;
-  document.getElementById("editHome").value=p.home;
-  document.getElementById("editBirthday").value=p.birthday;
-  document.getElementById("editWork").value=p.work;
-  document.getElementById("editEducation").value=p.education;
-  document.getElementById("editStatus").textContent="";
-  document.getElementById("editModal").classList.add("open");
+  document.getElementById("editBio").value=p.bio;document.getElementById("editCity").value=p.city;
+  document.getElementById("editHome").value=p.home;document.getElementById("editBirthday").value=p.birthday;
+  document.getElementById("editWork").value=p.work;document.getElementById("editEducation").value=p.education;
+  document.getElementById("editStatus").textContent="";document.getElementById("editModal").classList.add("open");
 }
-
 function closeModal(id){document.getElementById(id).classList.remove("open")}
-function toggleProfileMenu(){document.getElementById("profileMenu").classList.toggle("open")}
-function closeProfileMenu(){document.getElementById("profileMenu").classList.remove("open")}
 
-document.addEventListener("click",event=>{
-  if(!event.target.closest(".menu-row"))closeProfileMenu();
-});
-
-document.getElementById("menuToggle").addEventListener("click",toggleProfileMenu);
-document.getElementById("menuEdit").addEventListener("click",()=>{closeProfileMenu();openEditModal()});
-document.getElementById("menuSettings").addEventListener("click",()=>{closeProfileMenu();notify("Settings page is not available yet.")});
 document.getElementById("editButton").addEventListener("click",openEditModal);
 document.getElementById("homeButton").addEventListener("click",()=>location.href="home.html");
 document.getElementById("dashboardButton").addEventListener("click",()=>notify("Dashboard is not connected yet."));
@@ -523,308 +402,186 @@ document.getElementById("followButton").addEventListener("click",toggleFollow);
 document.getElementById("messageButton").addEventListener("click",openMessage);
 document.getElementById("retrySessionButton").addEventListener("click",loadProfile);
 document.getElementById("closeEdit").addEventListener("click",()=>closeModal("editModal"));
-document.querySelectorAll("[data-edit]").forEach(button=>button.addEventListener("click",openEditModal));
+document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",openEditModal));
 
 document.getElementById("editForm").addEventListener("submit",async event=>{
-  event.preventDefault();
-  if(!isOwnProfile)return;
-
-  const button=document.getElementById("saveProfileButton");
-  const status=document.getElementById("editStatus");
-  const oldText=button.textContent;
-  button.disabled=true;
-  button.textContent="Saving...";
-
-  const local=getProfile();
-  const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
-  const p={
-    name:document.getElementById("editName").value.trim(),
-    bio:document.getElementById("editBio").value.trim(),
-    city:document.getElementById("editCity").value.trim(),
-    home:document.getElementById("editHome").value.trim(),
-    birthday:document.getElementById("editBirthday").value,
-    work:document.getElementById("editWork").value.trim(),
-    education:document.getElementById("editEducation").value.trim()
-  };
-
-  if(!p.name){
-    status.textContent="Please enter your name.";
-    status.className="status error";
-    button.disabled=false;
-    button.textContent=oldText;
-    return;
-  }
-
+  event.preventDefault();if(!isOwnProfile)return;
+  const button=document.getElementById("saveProfileButton"),status=document.getElementById("editStatus"),oldText=button.textContent;
+  button.disabled=true;button.textContent="Saving...";
+  const local=getProfile(),old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
+  const p={name:document.getElementById("editName").value.trim(),bio:document.getElementById("editBio").value.trim(),city:document.getElementById("editCity").value.trim(),home:document.getElementById("editHome").value.trim(),birthday:document.getElementById("editBirthday").value,work:document.getElementById("editWork").value.trim(),education:document.getElementById("editEducation").value.trim()};
+  if(!p.name){status.textContent="Please enter your name.";status.className="status error";button.disabled=false;button.textContent=oldText;return}
   try{
-    const payload={
-      display_name:p.name,
-      bio:p.bio,
-      city:p.city,
-      home:p.home,
-      birthday:p.birthday||null,
-      work:p.work,
-      education:p.education,
-      avatar_url:old.avatar_url||"",
-      cover_url:old.cover_url||""
-    };
-
-    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
-    const saved=extractProfile(result);
-
-    serverProfile={...serverProfile,...payload,...saved};
-    viewedUser={...viewedUser,...serverProfile};
-
+    const payload={display_name:p.name,bio:p.bio,city:p.city,home:p.home,birthday:p.birthday||null,work:p.work,education:p.education,avatar_url:old.avatar_url||"",cover_url:old.cover_url||""};
+    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});const saved=extractProfile(result);
+    serverProfile={...serverProfile,...payload,...saved};viewedUser={...viewedUser,...serverProfile};
     const normalized=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
-    saveLocalProfile({...local,...normalized});
-    renderProfile(normalized);
-
-    status.textContent="Profile saved.";
-    status.className="status success";
-    closeModal("editModal");
-    setStatus("Profile saved successfully.","success");
-    notify("Profile updated.");
-  }catch(error){
-    console.error("Profile save failed:",error);
-    status.textContent="Save failed: "+error.message;
-    status.className="status error";
-  }finally{
-    button.disabled=false;
-    button.textContent=oldText;
-  }
+    saveLocalProfile({...local,...normalized});renderProfile(normalized);
+    status.textContent="Profile saved.";status.className="status success";closeModal("editModal");setStatus("Profile saved successfully.","success");notify("Profile updated.");
+  }catch(error){console.error(error);status.textContent="Save failed: "+error.message;status.className="status error"}
+  finally{button.disabled=false;button.textContent=oldText}
 });
 
 async function uploadProfileImage(file){
   if(!file)throw new Error("Please choose an image.");
   if(!file.type.startsWith("image/"))throw new Error("Choose an image file.");
   if(file.size>5*1024*1024)throw new Error("Image must be smaller than 5 MB.");
-
-  const form=new FormData();
-  form.append("file",file);
-
+  const form=new FormData();form.append("file",file);
   const result=await apiRequest("/media/upload",{method:"POST",body:form});
-  const media=result.media||result.data?.media||result;
-  const url=media.url||media.secure_url;
-
-  if(!url||!/^https:\/\//i.test(String(url))){
-    throw new Error("The upload API did not return an HTTPS image URL.");
-  }
+  const media=result.media||result.data?.media||result,url=media.url||media.secure_url;
+  if(!url||!/^https:\/\//i.test(String(url)))throw new Error("The upload API did not return an HTTPS image URL.");
   return String(url);
 }
-
 async function changeProfileImage(file,type){
-  if(!file)return;
-  if(!isOwnProfile)return notify("You cannot change another user's image.");
-  if(!getToken())return notify("Please log in first.");
-
+  if(!file)return;if(!isOwnProfile)return notify("You cannot change another user's image.");if(!getToken())return notify("Please log in first.");
   setStatus("Uploading image...");
-  const avatarInput=document.getElementById("avatarInput");
-  const coverInput=document.getElementById("coverInput");
-  avatarInput.disabled=true;
-  coverInput.disabled=true;
-
+  const ai=document.getElementById("avatarInput"),ci=document.getElementById("coverInput");ai.disabled=true;ci.disabled=true;
   try{
-    const url=await uploadProfileImage(file);
-    const local=getProfile();
-    const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
-
-    const payload={
-      display_name:old.name==="User"?(currentUser?.username||""):old.name,
-      bio:old.bio,
-      city:old.city,
-      home:old.home,
-      birthday:old.birthday||null,
-      work:old.work,
-      education:old.education,
-      avatar_url:type==="avatar"?url:old.avatar_url,
-      cover_url:type==="cover"?url:old.cover_url
-    };
-
-    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
-    const saved=extractProfile(result);
-
-    serverProfile={...serverProfile,...payload,...saved};
-    viewedUser={...viewedUser,...serverProfile};
-
-    const p=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
-    saveLocalProfile({...local,...p});
-    renderProfile(p);
-    setStatus("Image saved successfully.","success");
-    notify(type==="avatar"?"Profile photo updated.":"Cover photo updated.");
-  }catch(error){
-    console.error("Image upload failed:",error);
-    setStatus(error.message,"error");
-    notify("Image upload failed: "+error.message);
-  }finally{
-    avatarInput.disabled=false;
-    coverInput.disabled=false;
-  }
+    const url=await uploadProfileImage(file),local=getProfile(),old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
+    const payload={display_name:old.name==="User"?(currentUser?.username||""):old.name,bio:old.bio,city:old.city,home:old.home,birthday:old.birthday||null,work:old.work,education:old.education,avatar_url:type==="avatar"?url:old.avatar_url,cover_url:type==="cover"?url:old.cover_url};
+    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)}),saved=extractProfile(result);
+    serverProfile={...serverProfile,...payload,...saved};viewedUser={...viewedUser,...serverProfile};
+    const p=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);saveLocalProfile({...local,...p});renderProfile(p);
+    setStatus("Image saved successfully.","success");notify(type==="avatar"?"Profile photo updated.":"Cover photo updated.");
+  }catch(error){console.error(error);setStatus(error.message,"error");notify("Image upload failed: "+error.message)}
+  finally{ai.disabled=false;ci.disabled=false}
 }
-
-document.getElementById("avatarInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
-  changeProfileImage(file,"avatar");
-});
-
-document.getElementById("coverInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
-  changeProfileImage(file,"cover");
-});
+document.getElementById("avatarInput").addEventListener("change",function(){const file=this.files[0];this.value="";changeProfileImage(file,"avatar")});
+document.getElementById("coverInput").addEventListener("change",function(){const file=this.files[0];this.value="";changeProfileImage(file,"cover")});
 
 function postAuthor(post){return post.user||post.author||post.owner||{}}
-
-function postUsername(post){
-  const author=postAuthor(post);
-  return firstNonEmpty(post.username,post.author_username,post.user_username,author.username,author.handle);
-}
-
-function postUserId(post){
-  const author=postAuthor(post);
-  return post.user_id??post.author_id??post.owner_id??author.id??author.user_id??null;
-}
-
+function postUsername(post){const a=postAuthor(post);return firstNonEmpty(post.username,post.author_username,post.user_username,a.username,a.handle)}
+function postUserId(post){const a=postAuthor(post);return post.user_id??post.author_id??post.owner_id??a.id??a.user_id??null}
 async function loadPostsForViewedUser(){
-  const container=document.getElementById("myPosts");
-  const countElement=document.getElementById("postCount");
-
-  container.textContent="Loading posts...";
-  countElement.textContent="Loading...";
-
+  const container=document.getElementById("myPosts"),count=document.getElementById("postCount");
+  container.textContent="Loading posts...";count.textContent="Loading...";
   try{
     const data=await apiRequest("/posts?limit=50");
-
-    const posts=Array.isArray(data)
-      ?data
-      :Array.isArray(data.posts)
-        ?data.posts
-        :Array.isArray(data.data?.posts)
-          ?data.data.posts
-          :[];
-
-    const viewedId=String(
-      viewedUser?.id??viewedUser?.user_id??serverProfile?.id??serverProfile?.user_id??""
-    ).trim();
-
-    const viewedName=String(
-      viewedUser?.username??viewedUser?.handle??serverProfile?.username??targetUsername??""
-    ).replace(/^@/,"").trim().toLowerCase();
-
+    const posts=Array.isArray(data)?data:Array.isArray(data.posts)?data.posts:Array.isArray(data.data?.posts)?data.data.posts:[];
+    const viewedId=String(viewedUser?.id??viewedUser?.user_id??serverProfile?.id??serverProfile?.user_id??"").trim();
+    const viewedName=String(viewedUser?.username??viewedUser?.handle??serverProfile?.username??targetUsername??"").replace(/^@/,"").trim().toLowerCase();
     const filtered=posts.filter(post=>{
-      const postId=String(postUserId(post)??"").trim();
-      const postName=String(postUsername(post)||"").replace(/^@/,"").trim().toLowerCase();
-
-      // Use IDs whenever both are available; otherwise use usernames.
-      if(viewedId&&postId)return viewedId===postId;
-      return Boolean(viewedName&&postName&&viewedName===postName);
+      const id=String(postUserId(post)??"").trim(),name=String(postUsername(post)||"").replace(/^@/,"").trim().toLowerCase();
+      if(viewedId&&id)return viewedId===id;
+      return Boolean(viewedName&&name&&viewedName===name);
     });
-
-    countElement.textContent=filtered.length+(filtered.length===1?" post":" posts");
-    container.replaceChildren();
-
-    if(!filtered.length){
-      container.textContent="No posts found for this user.";
-      return;
-    }
-
+    count.textContent=filtered.length+(filtered.length===1?" post":" posts");container.replaceChildren();
+    if(!filtered.length){container.textContent="No posts found for this user.";return}
     filtered.forEach(post=>{
-      const card=document.createElement("article");
-      card.className="post-card";
-
-      const authorData=postAuthor(post);
-      const authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
-
-      const author=document.createElement("div");
-      author.className="post-author";
-
-      const avatar=document.createElement("img");
-      avatar.alt="Profile picture";
-      setImageSource(
-        avatar,
-        firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),
-        DEFAULT_AVATAR
-      );
-
-      const name=document.createElement("strong");
-      name.textContent=firstNonEmpty(post.display_name,authorData.display_name,authorData.name,authorName);
-      author.append(avatar,name);
-
-      author.addEventListener("click",()=>{
-        openUserProfile(authorName,postUserId(post));
-      });
-
-      card.appendChild(author);
-
+      const card=document.createElement("article");card.className="post-card";
+      const authorData=postAuthor(post),authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
+      const author=document.createElement("div");author.className="post-author";
+      const avatar=document.createElement("img");avatar.alt="Profile picture";
+      setImageSource(avatar,firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),DEFAULT_AVATAR);
+      const name=document.createElement("strong");name.textContent=firstNonEmpty(post.display_name,authorData.display_name,authorData.name,authorName);
+      author.append(avatar,name);author.addEventListener("click",()=>openUserProfile(authorName,postUserId(post)));card.appendChild(author);
       const content=String(firstNonEmpty(post.content,post.text,post.caption)||"");
-      if(content.trim()){
-        const text=document.createElement("p");
-        text.className="post-content";
-        text.textContent=content;
-        card.appendChild(text);
-      }
-
-      const mediaUrl=String(firstNonEmpty(post.media_url,post.image_url,post.video_url)||"").trim();
-      const mediaType=String(post.media_type||post.type||"").toLowerCase();
-
+      if(content.trim()){const text=document.createElement("p");text.className="post-content";text.textContent=content;card.appendChild(text)}
+      const mediaUrl=String(firstNonEmpty(post.media_url,post.image_url,post.video_url)||"").trim(),mediaType=String(post.media_type||post.type||"").toLowerCase();
       if(mediaUrl){
-        const isVideo=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(mediaUrl);
-        const media=document.createElement(isVideo?"video":"img");
-        media.className="post-media";
-        media.src=mediaUrl;
-        media.alt=isVideo?"Post video":"Post image";
-
-        if(isVideo){
-          media.controls=true;
-          media.playsInline=true;
-          media.preload="metadata";
-        }else{
-          media.loading="lazy";
-          media.onerror=()=>{
-            media.onerror=null;
-            media.alt="Post image could not be loaded.";
-          };
-        }
+        const video=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(mediaUrl);
+        const media=document.createElement(video?"video":"img");media.className="post-media";media.src=mediaUrl;media.alt=video?"Post video":"Post image";
+        if(video){media.controls=true;media.playsInline=true;media.preload="metadata"}else{media.loading="lazy";media.onerror=()=>{media.onerror=null;media.alt="Post image could not be loaded"}}
         card.appendChild(media);
       }
-
-      const metadata=document.createElement("div");
-      metadata.className="post-metadata muted";
-
-      const likes=document.createElement("span");
-      likes.innerHTML='<i class="fa-regular fa-heart"></i> ';
-      likes.append(document.createTextNode(String(Number(post.like_count)||0)));
-
-      const comments=document.createElement("span");
-      comments.innerHTML='<i class="fa-regular fa-comment"></i> ';
-      comments.append(document.createTextNode(String(Number(post.comment_count)||0)));
-
-      const views=document.createElement("span");
-      views.innerHTML='<i class="fa-regular fa-eye"></i> ';
-      views.append(document.createTextNode(String(Number(post.view_count)||0)));
-
-      metadata.append(likes,comments,views);
+      const metadata=document.createElement("div");metadata.className="post-metadata muted";
+      [["fa-regular fa-heart",post.like_count],["fa-regular fa-comment",post.comment_count],["fa-regular fa-eye",post.view_count]].forEach(([icon,value])=>{const span=document.createElement("span"),i=document.createElement("i");i.className=icon;span.append(i,document.createTextNode(" "+(Number(value)||0)));metadata.appendChild(span)});
       card.appendChild(metadata);
-
-      if(post.created_at){
-        const date=document.createElement("p");
-        date.className="muted";
-        date.style.marginTop="8px";
-        const parsedDate=new Date(post.created_at);
-        date.textContent=Number.isNaN(parsedDate.getTime())?String(post.created_at):parsedDate.toLocaleString();
-        card.appendChild(date);
-      }
-
+      if(post.created_at){const date=document.createElement("p");date.className="muted";date.style.marginTop="8px";const parsed=new Date(post.created_at);date.textContent=Number.isNaN(parsed.getTime())?String(post.created_at):parsed.toLocaleString();card.appendChild(date)}
       container.appendChild(card);
     });
-  }catch(error){
-    console.error("Posts load error:",error);
-    countElement.textContent="Posts unavailable";
-    container.textContent="Could not load posts: "+error.message;
+  }catch(error){console.error(error);count.textContent="Posts unavailable";container.textContent="Could not load posts: "+error.message}
+}
+
+/* Right-side menu and settings pages */
+const drawer=document.getElementById("sideDrawer"),overlay=document.getElementById("drawerOverlay"),subpage=document.getElementById("drawerSubpage");
+function openDrawer(){drawer.classList.add("open");overlay.classList.add("open");drawer.setAttribute("aria-hidden","false");document.body.classList.add("drawer-open");document.getElementById("menuToggle").setAttribute("aria-expanded","true")}
+function closeDrawer(){drawer.classList.remove("open");overlay.classList.remove("open");drawer.setAttribute("aria-hidden","true");document.body.classList.remove("drawer-open");document.getElementById("menuToggle").setAttribute("aria-expanded","false")}
+function closeSubpage(){subpage.classList.remove("open")}
+document.getElementById("menuToggle").addEventListener("click",openDrawer);
+document.getElementById("drawerClose").addEventListener("click",closeDrawer);
+document.getElementById("drawerBack").addEventListener("click",closeDrawer);
+overlay.addEventListener("click",closeDrawer);
+document.getElementById("subpageBack").addEventListener("click",closeSubpage);
+document.getElementById("subpageClose").addEventListener("click",closeSubpage);
+
+function showSubpage(key){
+  const pages={
+    settings:{title:"Settings",html:'<button class="drawer-item" data-action="editprofile"><i class="fa-solid fa-user-pen"></i><span>Edit profile information</span></button><button class="drawer-item" data-action="language"><i class="fa-solid fa-globe"></i><span>Language</span></button><button class="drawer-item" data-action="darkmode"><i class="fa-regular fa-moon"></i><span>Appearance and dark mode</span></button><p class="drawer-note">Account settings are stored on this device unless connected to your FreeTube account.</p>'},
+    privacy:{title:"Privacy Center",html:'<div class="subpage-row"><i class="fa-solid fa-lock"></i><span>Keep your password private and never share your login token.</span></div><div class="subpage-row"><i class="fa-solid fa-user-shield"></i><span>Review the information you choose to share on your public profile.</span></div>'},
+    time:{title:"Time management",html:'<div class="subpage-row"><i class="fa-regular fa-clock"></i><span>Daily reminder</span><button class="switch" id="timeReminderSwitch" type="button" aria-label="Daily reminder"></button></div><p class="drawer-note">This is a local reminder setting. It does not track your activity on the server.</p>'},
+    devices:{title:"Device requests",html:'<div class="subpage-row"><i class="fa-solid fa-mobile-screen-button"></i><span>No device requests are available in this version.</span></div>'},
+    ads:{title:"Your Ad Activity",html:'<div class="subpage-row"><i class="fa-solid fa-rectangle-ad"></i><span>Ad activity is not available in this version of FreeTube.</span></div>'},
+    payments:{title:"Orders and payments",html:'<div class="subpage-row"><i class="fa-regular fa-credit-card"></i><span>Payments are not available in this version of FreeTube.</span></div>'},
+    links:{title:"Link history",html:'<div class="subpage-row"><i class="fa-solid fa-link"></i><span>Link history is not recorded by this page.</span></div>'},
+    language:{title:"Language",html:'<div class="subpage-row"><i class="fa-solid fa-globe"></i><span>Choose language</span></div><label class="drawer-note" for="languageSelect">Language preference</label><select class="drawer-field" id="languageSelect"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select><button class="primary-button" id="saveLanguageButton" style="margin:18px;width:calc(100% - 36px)">Save language</button>'},
+    editprofile:{title:"Edit profile",html:'<div class="subpage-row"><i class="fa-solid fa-user-pen"></i><span>Update your name, bio and personal details.</span></div><button class="primary-button" id="openEditFromSettings" style="margin:18px;width:calc(100% - 36px)">Edit profile</button>'},
+    scam:{title:"Scam Protection Center",html:'<div class="subpage-row"><i class="fa-solid fa-shield-halved"></i><span>Protect your account. Never share your password, verification code, or access token.</span></div>'},
+    support:{title:"Help and support",html:'<div class="subpage-row"><i class="fa-solid fa-life-ring"></i><span>For help, use Report a problem to describe what happened.</span></div><div class="subpage-row"><i class="fa-solid fa-circle-info"></i><span>FreeTube support tools are being developed.</span></div>'},
+    report:{title:"Report a problem",html:'<form id="reportForm" style="padding:18px"><label for="reportText">Describe the problem</label><textarea id="reportText" class="drawer-field" rows="5" maxlength="1500" required placeholder="Tell us what went wrong..."></textarea><button class="primary-button" type="submit">Prepare report</button><p class="drawer-note" id="reportStatus">This prepares a report on your device; it does not automatically send it to a server.</p></form>'},
+    terms:{title:"Terms and Policies",html:'<div class="subpage-row"><i class="fa-solid fa-book"></i><span>Use FreeTube respectfully. Do not post unlawful, harmful, or deceptive content.</span></div><div class="subpage-row"><i class="fa-solid fa-shield-halved"></i><span>Respect other users’ privacy and intellectual property.</span></div><p class="drawer-note">These are basic in-app guidelines, not a substitute for published legal terms.</p>'}
+  };
+  const page=pages[key]||pages.settings;
+  document.getElementById("subpageTitle").textContent=page.title;
+  document.getElementById("subpageContent").innerHTML=page.html;
+  closeDrawer();subpage.classList.add("open");
+  if(key==="editprofile"){
+    const b=document.getElementById("openEditFromSettings");
+    b.addEventListener("click",()=>{closeSubpage();openEditModal()});
+  }
+  if(key==="language"){
+    const select=document.getElementById("languageSelect");
+    try{select.value=localStorage.getItem("freetube_language")||"en"}catch{}
+    document.getElementById("saveLanguageButton").addEventListener("click",()=>{
+      try{localStorage.setItem("freetube_language",select.value)}catch{}
+      notify(select.value==="bn"?"ভাষার পছন্দ সংরক্ষণ করা হয়েছে।":"Language preference saved.");
+      closeSubpage();
+    });
+  }
+  if(key==="report"){
+    document.getElementById("reportForm").addEventListener("submit",e=>{
+      e.preventDefault();
+      const message=document.getElementById("reportText").value.trim();
+      if(!message)return;
+      const subject=encodeURIComponent("FreeTube problem report");
+      const body=encodeURIComponent(message+"\n\nUsername: "+(viewedUser?.username||"Unknown")+"\nPage: "+location.href);
+      document.getElementById("reportStatus").textContent="Your report is ready. If you have a support email, send this text to that address.";
+      notify("Report prepared.");
+    });
+  }
+  if(key==="time"){
+    const sw=document.getElementById("timeReminderSwitch");
+    try{sw.classList.toggle("on",localStorage.getItem("freetube_time_reminder")==="on")}catch{}
+    sw.addEventListener("click",()=>{sw.classList.toggle("on");try{localStorage.setItem("freetube_time_reminder",sw.classList.contains("on")?"on":"off")}catch{}});
   }
 }
+document.querySelectorAll(".drawer-item[data-page]").forEach(button=>button.addEventListener("click",()=>showSubpage(button.dataset.page)));
+document.getElementById("darkModeButton").addEventListener("click",toggleDarkMode);
+document.getElementById("darkModeSwitch").addEventListener("click",event=>{event.stopPropagation();toggleDarkMode()});
+function toggleDarkMode(){
+  const enabled=!document.body.classList.contains("force-dark");
+  document.body.classList.toggle("force-dark",enabled);
+  document.getElementById("darkModeSwitch").classList.toggle("on",enabled);
+  try{localStorage.setItem("freetube_dark_mode",enabled?"on":"off")}catch{}
+  notify(enabled?"Dark mode enabled.":"Dark mode disabled.");
+}
+document.getElementById("subpageContent").addEventListener("click",event=>{
+  const button=event.target.closest("[data-action]");if(!button)return;
+  if(button.dataset.action==="editprofile"){closeSubpage();openEditModal()}
+  if(button.dataset.action==="language")showSubpage("language");
+  if(button.dataset.action==="darkmode")toggleDarkMode();
+});
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){closeDrawer();closeSubpage();closeModal("editModal")}
+});
 
 window.addEventListener("DOMContentLoaded",()=>{
   if(targetUsername)document.title="FreeTube - @"+targetUsername;
+  try{
+    if(localStorage.getItem("freetube_dark_mode")==="on"){
+      document.body.classList.add("force-dark");document.getElementById("darkModeSwitch").classList.add("on");
+    }
+  }catch{}
   loadProfile();
 });
 </script>
