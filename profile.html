@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#0d3b22">
 <title>FreeTube - Profile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
 :root{--green:#00ff88;--border:rgba(255,255,255,.17);--panel:rgba(255,255,255,.08);--muted:rgba(255,255,255,.65)}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
@@ -74,13 +73,10 @@ input[type=file]{display:none}
 @media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
 </style>
 </head>
-
 <body>
 <div class="app">
-
 <section class="cover-container">
   <img id="coverPhoto" class="cover-photo" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
-
   <div class="menu-row">
     <button class="menu-button" id="menuToggle" aria-label="Profile menu"><i class="fa-solid fa-ellipsis"></i></button>
     <div class="menu-dropdown" id="profileMenu">
@@ -88,7 +84,6 @@ input[type=file]{display:none}
       <button id="menuSettings"><i class="fa-solid fa-gear"></i> Settings</button>
     </div>
   </div>
-
   <label for="coverInput" class="cover-upload-btn" id="coverUploadLabel"><i class="fa-solid fa-camera"></i> Edit cover</label>
   <input type="file" id="coverInput" accept="image/jpeg,image/png,image/webp,image/gif">
 </section>
@@ -99,31 +94,25 @@ input[type=file]{display:none}
     <label for="avatarInput" class="avatar-upload-btn" id="avatarUploadLabel" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
     <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif">
   </div>
-
   <div class="profile-name" id="profileNameRow">
     <span id="username">User</span>
     <i class="fa-solid fa-circle-check verified-badge hidden" id="verifiedBadge"></i>
   </div>
   <div id="handle" class="handle-text">@username</div>
-
   <div class="follow-stats">
     <span id="followersCount">0</span> followers ·
     <span id="followingCount">0</span> following
   </div>
-
   <p class="bio-text" id="bioText">Welcome to my FreeTube profile!</p>
-
   <div class="action-row" id="ownActions">
     <button class="btn btn-primary" id="dashboardButton"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
     <button class="btn" id="homeButton"><i class="fa-solid fa-house"></i> Home</button>
     <button class="btn btn-icon" id="editButton" aria-label="Edit profile"><i class="fa-solid fa-pen"></i></button>
   </div>
-
   <div class="action-row hidden" id="otherActions">
     <button class="btn btn-primary" id="followButton"><i class="fa-solid fa-user-plus"></i> Follow</button>
     <button class="btn" id="messageButton"><i class="fa-solid fa-envelope"></i> Message</button>
   </div>
-
   <p class="status" id="sessionStatus">Loading profile...</p>
   <button class="btn" id="retrySessionButton" style="display:none;width:100%;margin-top:10px">Retry connection</button>
 </section>
@@ -178,7 +167,6 @@ input[type=file]{display:none}
     </form>
   </div>
 </div>
-
 <div id="toast" class="toast" role="status"></div>
 
 <script>
@@ -187,35 +175,29 @@ input[type=file]{display:none}
 const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const PROFILE_KEY="freetube_profile_data";
-const DEFAULT_AVATAR="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250";
+const DEFAULT_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
 const DEFAULT_COVER="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800";
 
 let toastTimer=null;
 let currentUser=null;
 let viewedUser=null;
 let serverProfile={};
+let serverStats={};
 let loadingProfile=false;
 let isOwnProfile=true;
 let followingThisUser=false;
 
 const queryParams=new URLSearchParams(location.search);
 const targetUsername=String(queryParams.get("username")||"").replace(/^@/,"").trim();
-
-const defaults={
-  name:"",handle:"",bio:"No bio added yet.",
-  city:"",home:"",birthday:"",work:"",education:"",
-  followers:0,following:0,avatar_url:"",cover_url:""
-};
+const targetUserId=String(queryParams.get("userId")||"").trim();
 
 function getToken(){
-  try{return localStorage.getItem(TOKEN_KEY);}
-  catch{return null;}
+  try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}
 }
 
 function getProfile(){
-  try{
-    return {...defaults,...JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")};
-  }catch{return {...defaults};}
+  try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{};}
+  catch{return {};}
 }
 
 function saveLocalProfile(profile){
@@ -239,17 +221,20 @@ function notify(message){
 
 async function apiRequest(path,options={}){
   const headers={...(options.headers||{})};
-  const token=getToken();
-
-  if(token)headers.Authorization="Bearer "+token;
-
-  if(options.body!==undefined && !(options.body instanceof FormData)){
+  const savedToken=getToken();
+  if(savedToken)headers.Authorization="Bearer "+savedToken;
+  if(options.body!==undefined&&!(options.body instanceof FormData)){
     headers["Content-Type"]="application/json";
   }
 
-  const response=await fetch(API_BASE_URL+path,{
-    ...options,headers,cache:"no-store"
-  });
+  let response;
+  try{
+    response=await fetch(API_BASE_URL+path,{
+      ...options,headers,cache:"no-store"
+    });
+  }catch{
+    throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
+  }
 
   let data={};
   try{data=await response.json();}catch{}
@@ -259,7 +244,6 @@ async function apiRequest(path,options={}){
     error.status=response.status;
     throw error;
   }
-
   return data;
 }
 
@@ -272,26 +256,30 @@ function firstNonEmpty(...values){
   return "";
 }
 
-function normalizeProfile(user={},profile={}){
-  const avatar=firstNonEmpty(profile.avatar_url,user.avatar_url);
-  const cover=firstNonEmpty(profile.cover_url,user.cover_url);
+function extractProfile(data){
+  if(data?.profile&&typeof data.profile==="object")return data.profile;
+  if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;
+  if(data?.user&&typeof data.user==="object")return data.user;
+  if(data?.data&&typeof data.data==="object")return data.data;
+  return data||{};
+}
+
+function normalizeProfile(user={},profile={},stats={}){
+  const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl);
+  const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl);
 
   return {
-    id:firstNonEmpty(profile.id,user.id,profile.user_id,user.user_id),
-    name:firstNonEmpty(
-      profile.display_name,profile.full_name,user.display_name,
-      user.full_name,user.name,profile.username,user.username,user.handle
-    )||"User",
-    handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle)||"").replace(/^@/,""),
-    bio:firstNonEmpty(profile.bio,user.bio)||"No bio added yet.",
-    city:firstNonEmpty(profile.city,user.city,profile.location,user.location),
-    home:firstNonEmpty(profile.home,user.home),
-    birthday:firstNonEmpty(profile.birthday,user.birthday)
-      ?String(firstNonEmpty(profile.birthday,user.birthday)).slice(0,10):"",
-    work:firstNonEmpty(profile.work,user.work),
-    education:firstNonEmpty(profile.education,user.education),
-    followers:Number(firstNonEmpty(profile.followers_count,profile.followers,user.followers_count,user.followers)||0),
-    following:Number(firstNonEmpty(profile.following_count,profile.following,user.following_count,user.following)||0),
+    id:String(firstNonEmpty(profile.id,profile.user_id,user.id,user.user_id)||""),
+    name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle)||"User"),
+    handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle,targetUsername)||"").replace(/^@/,""),
+    bio:String(firstNonEmpty(profile.bio,user.bio)||""),
+    city:String(firstNonEmpty(profile.city,user.city,profile.location,user.location)||""),
+    home:String(firstNonEmpty(profile.home,user.home)||""),
+    birthday:firstNonEmpty(profile.birthday,user.birthday)?String(firstNonEmpty(profile.birthday,user.birthday)).slice(0,10):"",
+    work:String(firstNonEmpty(profile.work,user.work)||""),
+    education:String(firstNonEmpty(profile.education,user.education)||""),
+    followers:Number(firstNonEmpty(stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
+    following:Number(firstNonEmpty(stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
     avatar_url:avatar||"",
     cover_url:cover||""
   };
@@ -300,30 +288,13 @@ function normalizeProfile(user={},profile={}){
 function setImageSource(image,url,fallback){
   image.onerror=null;
   image.src=fallback;
-
-  if(url&&typeof url==="string"){
+  if(typeof url==="string"&&url.trim()){
     image.onerror=()=>{
       image.onerror=null;
       image.src=fallback;
     };
-    image.src=url;
+    image.src=url.trim();
   }
-}
-
-function renderProfile(p){
-  document.getElementById("username").textContent=p.name||"User";
-  document.getElementById("handle").textContent=p.handle?"@"+String(p.handle).replace(/^@/,""):"@username";
-  document.getElementById("bioText").textContent=p.bio||"No bio added yet.";
-  document.getElementById("cityText").textContent=p.city||"Not added";
-  document.getElementById("homeText").textContent=p.home||"Not added";
-  document.getElementById("birthdayText").textContent=formatBirthday(p.birthday);
-  document.getElementById("workText").textContent=p.work||"Not added";
-  document.getElementById("educationText").textContent=p.education||"Not added";
-  document.getElementById("followersCount").textContent=Number(p.followers)||0;
-  document.getElementById("followingCount").textContent=Number(p.following)||0;
-
-  setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
-  setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER);
 }
 
 function formatBirthday(value){
@@ -338,6 +309,21 @@ function formatBirthday(value){
   });
 }
 
+function renderProfile(p){
+  document.getElementById("username").textContent=p.name||"User";
+  document.getElementById("handle").textContent=p.handle?"@"+String(p.handle).replace(/^@/,""):"@username";
+  document.getElementById("bioText").textContent=p.bio||"No bio added yet.";
+  document.getElementById("cityText").textContent=p.city||"Not added";
+  document.getElementById("homeText").textContent=p.home||"Not added";
+  document.getElementById("birthdayText").textContent=formatBirthday(p.birthday);
+  document.getElementById("workText").textContent=p.work||"Not added";
+  document.getElementById("educationText").textContent=p.education||"Not added";
+  document.getElementById("followersCount").textContent=Number(p.followers)||0;
+  document.getElementById("followingCount").textContent=Number(p.following)||0;
+  setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
+  setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER);
+}
+
 function setOwnProfileUI(own){
   isOwnProfile=own;
   document.getElementById("ownActions").classList.toggle("hidden",!own);
@@ -346,96 +332,15 @@ function setOwnProfileUI(own){
   document.getElementById("avatarUploadLabel").classList.toggle("hidden",!own);
   document.getElementById("coverUploadLabel").classList.toggle("hidden",!own);
   document.getElementById("menuEdit").classList.toggle("hidden",!own);
-  document.getElementById("profileNavLink").href=own
-    ?"profile.html"
-    :"profile.html?username="+encodeURIComponent(viewedUser?.username||targetUsername);
-}
 
-function extractProfile(data){
-  if(data?.profile&&typeof data.profile==="object")return data.profile;
-  if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;
-  if(data?.user&&typeof data.user==="object")return data.user;
-  if(data?.data&&typeof data.data==="object")return data.data;
-  return data||{};
-}
-
-async function loadProfile(){
-  if(loadingProfile)return;
-  loadingProfile=true;
-
-  document.getElementById("retrySessionButton").style.display="none";
-  setStatus("Connecting to FreeTube...");
-
-  try{
-    if(!getToken())throw new Error("Please log in to view profiles.");
-
-    const meData=await apiRequest("/auth/me");
-    currentUser=meData.user||meData.data?.user||meData;
-
-    const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
-    const requested=targetUsername;
-
-    isOwnProfile=!requested||requested.toLowerCase()===myUsername.toLowerCase();
-
-    if(isOwnProfile){
-      const data=await apiRequest("/profile");
-      serverProfile=extractProfile(data);
-
-      viewedUser={
-        ...currentUser,
-        ...serverProfile,
-        id:serverProfile.id??serverProfile.user_id??currentUser.id,
-        username:serverProfile.username||currentUser.username
-      };
-    }else{
-      const data=await apiRequest("/profile/"+encodeURIComponent(requested));
-      serverProfile=extractProfile(data);
-
-      const apiUser=data.user&&typeof data.user==="object"?data.user:{};
-
-      viewedUser={
-        ...apiUser,
-        ...serverProfile,
-        id:serverProfile.id??serverProfile.user_id??apiUser.id??apiUser.user_id,
-        username:serverProfile.username||apiUser.username||requested,
-        avatar_url:firstNonEmpty(serverProfile.avatar_url,apiUser.avatar_url),
-        cover_url:firstNonEmpty(serverProfile.cover_url,apiUser.cover_url)
-      };
-
-      // Never replace the requested person's public profile with the viewer's local profile.
-      isOwnProfile=false;
-    }
-
-    const p=normalizeProfile(viewedUser,serverProfile);
-
-    if(!p.handle&&!isOwnProfile){
-      p.handle=requested;
-      viewedUser.username=requested;
-    }
-
-    if(isOwnProfile){
-      saveLocalProfile({...getProfile(),...p});
-    }
-
-    renderProfile(p);
-    setOwnProfileUI(isOwnProfile);
-
-    if(!isOwnProfile){
-      followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following);
-      updateFollowButton();
-    }
-
-    applyClickableProfileName();
-    setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
-
-    await loadPostsForViewedUser();
-  }catch(error){
-    console.error("Profile loading failed:",error);
-    setStatus(error.message||"Could not load profile.","error");
-    document.getElementById("retrySessionButton").style.display="flex";
-    document.getElementById("myPosts").textContent="Profile or posts could not be loaded.";
-  }finally{
-    loadingProfile=false;
+  const nav=document.getElementById("profileNavLink");
+  if(own){
+    nav.href="profile.html";
+  }else{
+    const params=new URLSearchParams();
+    if(viewedUser?.username)params.set("username",viewedUser.username);
+    if(viewedUser?.id)params.set("userId",viewedUser.id);
+    nav.href="profile.html?"+params.toString();
   }
 }
 
@@ -447,14 +352,126 @@ function updateFollowButton(){
   button.setAttribute("aria-pressed",String(followingThisUser));
 }
 
+function applyClickableProfileName(){
+  const row=document.getElementById("profileNameRow");
+  row.classList.toggle("clickable",!isOwnProfile);
+  row.onclick=()=>{
+    if(!isOwnProfile&&viewedUser?.username){
+      openUserProfile(viewedUser.username,viewedUser.id);
+    }
+  };
+}
+
+async function loadProfile(){
+  if(loadingProfile)return;
+  loadingProfile=true;
+  document.getElementById("retrySessionButton").style.display="none";
+  setStatus("Connecting to FreeTube...");
+
+  try{
+    if(!getToken())throw new Error("Please log in to view profiles.");
+
+    const meData=await apiRequest("/auth/me");
+    currentUser=meData.user||meData.profile||meData.data?.user||meData.data||meData;
+    const myId=String(currentUser.id??currentUser.user_id??"");
+    const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
+
+    // If a userId is present, it takes precedence over the username.
+    // A different userId must never silently fall back to the viewer's profile.
+    isOwnProfile=targetUserId
+      ? Boolean(myId&&targetUserId===myId)
+      : (!targetUsername||targetUsername.toLowerCase()===myUsername.toLowerCase());
+
+    if(isOwnProfile){
+      const data=await apiRequest("/profile");
+      serverProfile=data.profile||data.data?.profile||data.user||data.data||data;
+      serverStats=data.stats||data.data?.stats||{};
+      viewedUser={
+        ...currentUser,
+        ...serverProfile,
+        id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),
+        username:serverProfile.username||currentUser.username||myUsername,
+        avatar_url:firstNonEmpty(serverProfile.avatar_url,currentUser.avatar_url),
+        cover_url:firstNonEmpty(serverProfile.cover_url,currentUser.cover_url)
+      };
+    }else{
+      if(!targetUsername){
+        throw new Error("This profile URL has a userId but no username. Open the profile again from the feed.");
+      }
+
+      const data=await apiRequest("/profile/"+encodeURIComponent(targetUsername));
+      const apiProfile=data.profile&&typeof data.profile==="object"?data.profile:{};
+      const apiUser=data.user&&typeof data.user==="object"?data.user:{};
+      serverProfile={...apiProfile,...apiProfile};
+      serverStats=data.stats||data.data?.stats||{};
+
+      const returnedId=String(
+        apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??""
+      );
+
+      if(targetUserId&&returnedId&&returnedId!==targetUserId){
+        throw new Error("The server returned a different user's profile. The profile ID and username do not match.");
+      }
+
+      if(targetUserId&&!returnedId){
+        throw new Error("The server did not return a user ID, so this profile cannot be verified safely. Check the backend profile API.");
+      }
+
+      viewedUser={
+        ...apiUser,
+        ...apiProfile,
+        id:returnedId,
+        username:apiProfile.username||apiUser.username||targetUsername,
+        avatar_url:firstNonEmpty(apiProfile.avatar_url,apiUser.avatar_url),
+        cover_url:firstNonEmpty(apiProfile.cover_url,apiUser.cover_url),
+        bio:firstNonEmpty(apiProfile.bio,apiUser.bio),
+        city:firstNonEmpty(apiProfile.city,apiUser.city),
+        home:firstNonEmpty(apiProfile.home,apiUser.home),
+        birthday:firstNonEmpty(apiProfile.birthday,apiUser.birthday),
+        work:firstNonEmpty(apiProfile.work,apiUser.work),
+        education:firstNonEmpty(apiProfile.education,apiUser.education)
+      };
+
+      if(!returnedId){
+        throw new Error("The server did not return this user's ID. Please check the backend profile endpoint.");
+      }
+    }
+
+    const p=normalizeProfile(viewedUser,serverProfile,serverStats);
+
+    if(!p.handle&&!isOwnProfile)p.handle=targetUsername;
+    if(isOwnProfile)saveLocalProfile({...getProfile(),...p});
+
+    renderProfile(p);
+    setOwnProfileUI(isOwnProfile);
+
+    if(!isOwnProfile){
+      followingThisUser=Boolean(
+        serverProfile.is_following??viewedUser.is_following??serverStats.is_following
+      );
+      updateFollowButton();
+    }
+
+    applyClickableProfileName();
+    setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
+    await loadPostsForViewedUser();
+  }catch(error){
+    console.error("Profile loading failed:",error);
+    setStatus(error.message||"Could not load profile.","error");
+    document.getElementById("retrySessionButton").style.display="block";
+    document.getElementById("myPosts").textContent="Profile or posts could not be loaded.";
+    document.getElementById("postCount").textContent="Unavailable";
+  }finally{
+    loadingProfile=false;
+  }
+}
+
 async function toggleFollow(){
   if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");
   if(!getToken())return notify("Please log in first.");
 
-  const userId=viewedUser.id??viewedUser.user_id??serverProfile.user_id;
-  if(userId===undefined||userId===null||String(userId)===""){
-    return notify("The profile API did not provide a user ID.");
-  }
+  const userId=String(viewedUser.id??viewedUser.user_id??serverProfile.user_id??"");
+  if(!userId)return notify("The profile API did not provide a user ID.");
 
   const button=document.getElementById("followButton");
   button.disabled=true;
@@ -467,15 +484,10 @@ async function toggleFollow(){
     if(nextState!==followingThisUser){
       followingThisUser=nextState;
       serverProfile.is_following=nextState;
-      serverProfile.followers_count=Math.max(
-        0,Number(serverProfile.followers_count||0)+(nextState?1:-1)
-      );
-
-      const p=normalizeProfile(viewedUser,serverProfile);
+      serverProfile.followers_count=Math.max(0,Number(serverProfile.followers_count||0)+(nextState?1:-1));
       viewedUser={...viewedUser,...serverProfile};
-      renderProfile(p);
+      renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats));
     }
-
     updateFollowButton();
     notify(followingThisUser?"You are now following this user.":"You unfollowed this user.");
   }catch(error){
@@ -490,33 +502,28 @@ function openMessage(){
   const username=String(viewedUser.username||viewedUser.handle||"").replace(/^@/,"");
   const id=viewedUser.id??viewedUser.user_id;
   const params=new URLSearchParams();
-  if(id!==undefined&&id!==null)params.set("user_id",id);
+  if(id!==undefined&&id!==null&&String(id))params.set("user_id",String(id));
   if(username)params.set("username",username);
   location.href="inbox.html?"+params.toString();
 }
 
-function openUserProfile(username){
+function openUserProfile(username,userId){
   const name=String(username||"").replace(/^@/,"").trim();
-  if(!name)return;
-  location.href="profile.html?username="+encodeURIComponent(name);
-}
-
-function applyClickableProfileName(){
-  const row=document.getElementById("profileNameRow");
-  row.classList.toggle("clickable",!isOwnProfile);
-  row.onclick=()=>{
-    if(!isOwnProfile&&viewedUser?.username)openUserProfile(viewedUser.username);
-  };
+  const id=String(userId||"").trim();
+  if(!name&&!id)return;
+  const params=new URLSearchParams();
+  if(name)params.set("username",name);
+  if(id)params.set("userId",id);
+  location.href="profile.html?"+params.toString();
 }
 
 function openEditModal(){
   if(!isOwnProfile)return notify("You can only edit your own profile.");
 
-  const p=normalizeProfile(viewedUser||{},serverProfile);
+  const p=normalizeProfile(viewedUser||{},serverProfile,serverStats);
   const local=getProfile();
-
   document.getElementById("editName").value=p.name==="User"?(local.name||""):p.name;
-  document.getElementById("editBio").value=p.bio==="No bio added yet."?(local.bio||""):p.bio;
+  document.getElementById("editBio").value=p.bio||local.bio||"";
   document.getElementById("editCity").value=p.city||local.city||"";
   document.getElementById("editHome").value=p.home||local.home||"";
   document.getElementById("editBirthday").value=p.birthday||local.birthday||"";
@@ -526,17 +533,9 @@ function openEditModal(){
   document.getElementById("editModal").classList.add("open");
 }
 
-function closeModal(id){
-  document.getElementById(id).classList.remove("open");
-}
-
-function toggleProfileMenu(){
-  document.getElementById("profileMenu").classList.toggle("open");
-}
-
-function closeProfileMenu(){
-  document.getElementById("profileMenu").classList.remove("open");
-}
+function closeModal(id){document.getElementById(id).classList.remove("open")}
+function toggleProfileMenu(){document.getElementById("profileMenu").classList.toggle("open")}
+function closeProfileMenu(){document.getElementById("profileMenu").classList.remove("open")}
 
 document.addEventListener("click",event=>{
   if(!event.target.closest(".menu-row"))closeProfileMenu();
@@ -592,21 +591,16 @@ document.getElementById("editForm").addEventListener("submit",async event=>{
     const result=await apiRequest("/profile",{
       method:"PUT",
       body:JSON.stringify({
-        display_name:p.name,
-        bio:p.bio,
-        city:p.city,
-        home:p.home,
-        birthday:p.birthday,
-        work:p.work,
-        education:p.education,
+        display_name:p.name,bio:p.bio,city:p.city,home:p.home,
+        birthday:p.birthday,work:p.work,education:p.education,
         avatar_url:serverProfile.avatar_url||"",
         cover_url:serverProfile.cover_url||""
       })
     });
 
-    serverProfile=result.profile||{...serverProfile,...p};
+    serverProfile=result.profile||{...serverProfile,...p,display_name:p.name};
     viewedUser={...viewedUser,...serverProfile};
-    const normalized=normalizeProfile(viewedUser,serverProfile);
+    const normalized=normalizeProfile(viewedUser,serverProfile,serverStats);
     saveLocalProfile({...getProfile(),...normalized});
     renderProfile(normalized);
     status.textContent="Profile saved.";
@@ -629,11 +623,9 @@ async function uploadProfileImage(file){
 
   const form=new FormData();
   form.append("file",file);
-
   const result=await apiRequest("/media/upload",{method:"POST",body:form});
   const media=result.media||result.data?.media||result;
   const url=media.url||media.secure_url;
-
   if(!url||!String(url).startsWith("https://")){
     throw new Error("The upload API did not return an HTTPS image URL.");
   }
@@ -644,13 +636,11 @@ async function changeProfileImage(file,type){
   if(!file)return;
   if(!isOwnProfile)return notify("You cannot change another user's image.");
   if(!getToken())return notify("Please log in first.");
-
   setStatus("Uploading image...");
 
   try{
     const url=await uploadProfileImage(file);
     const local=getProfile();
-
     const payload={
       display_name:serverProfile.display_name||local.name||currentUser?.username||"",
       bio:serverProfile.bio??local.bio??"",
@@ -664,17 +654,13 @@ async function changeProfileImage(file,type){
     };
 
     const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
+      method:"PUT",body:JSON.stringify(payload)
     });
-
     serverProfile=result.profile||{...serverProfile,...payload};
     viewedUser={...viewedUser,...serverProfile};
-
-    const p=normalizeProfile(viewedUser,serverProfile);
+    const p=normalizeProfile(viewedUser,serverProfile,serverStats);
     saveLocalProfile({...getProfile(),...p});
     renderProfile(p);
-
     setStatus("Image saved.","success");
     notify("Profile image updated.");
   }catch(error){
@@ -684,41 +670,24 @@ async function changeProfileImage(file,type){
 }
 
 document.getElementById("avatarInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
+  const file=this.files[0];this.value="";
   changeProfileImage(file,"avatar");
 });
-
 document.getElementById("coverInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
+  const file=this.files[0];this.value="";
   changeProfileImage(file,"cover");
 });
 
-function postAuthor(post){
-  return post.user||post.author||post.owner||{};
-}
+function postAuthor(post){return post.user||post.author||post.owner||{}}
 
 function postUsername(post){
   const author=postAuthor(post);
-  return firstNonEmpty(
-    post.username,post.author_username,post.user_username,
-    author.username,author.handle
-  );
+  return firstNonEmpty(post.username,post.author_username,post.user_username,author.username,author.handle);
 }
 
 function postUserId(post){
   const author=postAuthor(post);
   return post.user_id??post.author_id??post.owner_id??author.id??author.user_id??null;
-}
-
-function isSamePostOwner(post,viewedId,viewedName){
-  const id=String(postUserId(post)??"");
-  const username=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
-
-  // Prefer IDs when both sides have them. Otherwise compare usernames.
-  if(viewedId&&id)return id===viewedId;
-  return Boolean(viewedName&&username&&viewedName===username);
 }
 
 async function loadPostsForViewedUser(){
@@ -729,18 +698,18 @@ async function loadPostsForViewedUser(){
   try{
     const data=await apiRequest("/posts?limit=50");
     const posts=Array.isArray(data)?data:(data.posts||data.data?.posts||[]);
+    const viewedId=String(viewedUser?.id??viewedUser?.user_id??"");
+    const viewedName=String(viewedUser?.username||viewedUser?.handle||targetUsername||"").replace(/^@/,"").toLowerCase();
 
-    const viewedId=String(
-      viewedUser?.id??viewedUser?.user_id??serverProfile.user_id??""
-    );
-    const viewedName=String(
-      viewedUser?.username||viewedUser?.handle||targetUsername||""
-    ).replace(/^@/,"").toLowerCase();
+    // Prefer the stable user ID. Use username only when a post has no ID.
+    const filtered=posts.filter(post=>{
+      const postId=String(postUserId(post)??"");
+      const postName=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
+      if(viewedId&&postId)return postId===viewedId;
+      return Boolean(viewedName&&postName&&postName===viewedName);
+    });
 
-    const filtered=posts.filter(post=>isSamePostOwner(post,viewedId,viewedName));
-
-    document.getElementById("postCount").textContent=
-      filtered.length+(filtered.length===1?" post":" posts");
+    document.getElementById("postCount").textContent=filtered.length+(filtered.length===1?" post":" posts");
     container.replaceChildren();
 
     if(!filtered.length){
@@ -752,26 +721,19 @@ async function loadPostsForViewedUser(){
       const card=document.createElement("article");
       card.className="post-card";
 
-      const authorName=postUsername(post)||viewedName||"User";
+      const authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
       const authorData=postAuthor(post);
       const author=document.createElement("div");
       author.className="post-author";
 
       const avatar=document.createElement("img");
-      avatar.alt="";
-      setImageSource(
-        avatar,
-        firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),
-        DEFAULT_AVATAR
-      );
+      avatar.alt="Profile picture";
+      setImageSource(avatar,firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url,viewedUser?.avatar_url),DEFAULT_AVATAR);
 
       const name=document.createElement("strong");
-      name.textContent=firstNonEmpty(
-        post.display_name,authorData.display_name,authorData.name,authorName
-      );
-
+      name.textContent=firstNonEmpty(post.display_name,authorData.display_name,authorData.name,authorName);
       author.append(avatar,name);
-      author.addEventListener("click",()=>openUserProfile(authorName));
+      author.addEventListener("click",()=>openUserProfile(authorName,postUserId(post)));
       card.appendChild(author);
 
       const content=firstNonEmpty(post.content,post.text,post.caption);
@@ -783,16 +745,11 @@ async function loadPostsForViewedUser(){
 
       const url=firstNonEmpty(post.media_url,post.image_url,post.video_url);
       const mediaType=String(post.media_type||post.type||"").toLowerCase();
-
       if(url){
-        const looksLikeVideo=
-          mediaType.includes("video")||
-          /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
-
+        const looksLikeVideo=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
         const media=document.createElement(looksLikeVideo?"video":"img");
         media.src=url;
         media.alt="Post media";
-
         if(looksLikeVideo){
           media.controls=true;
           media.playsInline=true;
@@ -803,7 +760,6 @@ async function loadPostsForViewedUser(){
             media.alt="Post image could not be loaded.";
           };
         }
-
         card.appendChild(media);
       }
 
@@ -812,12 +768,9 @@ async function loadPostsForViewedUser(){
         date.className="muted";
         date.style.marginTop="8px";
         const parsedDate=new Date(post.created_at);
-        date.textContent=Number.isNaN(parsedDate.getTime())
-          ?String(post.created_at)
-          :parsedDate.toLocaleString();
+        date.textContent=Number.isNaN(parsedDate.getTime())?String(post.created_at):parsedDate.toLocaleString();
         card.appendChild(date);
       }
-
       container.appendChild(card);
     });
   }catch(error){
