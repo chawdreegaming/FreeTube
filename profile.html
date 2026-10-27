@@ -223,6 +223,7 @@ async function apiRequest(path,options={}){
   const headers={...(options.headers||{})};
   const savedToken=getToken();
   if(savedToken)headers.Authorization="Bearer "+savedToken;
+
   if(options.body!==undefined&&!(options.body instanceof FormData)){
     headers["Content-Type"]="application/json";
   }
@@ -264,20 +265,24 @@ function extractProfile(data){
   return data||{};
 }
 
-function normalizeProfile(user={},profile={},stats={}){
-  const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl);
-  const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl);
+/*
+  Null values from the API should not accidentally erase useful cached values
+  on the owner's own profile. The local cache is never used for another user.
+*/
+function normalizeProfile(user={},profile={},stats={},local={}){
+  const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url);
+  const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl,local.cover_url);
 
   return {
     id:String(firstNonEmpty(profile.id,profile.user_id,user.id,user.user_id)||""),
-    name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle)||"User"),
+    name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle,local.name)||"User"),
     handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle,targetUsername)||"").replace(/^@/,""),
-    bio:String(firstNonEmpty(profile.bio,user.bio)||""),
-    city:String(firstNonEmpty(profile.city,user.city,profile.location,user.location)||""),
-    home:String(firstNonEmpty(profile.home,user.home)||""),
-    birthday:firstNonEmpty(profile.birthday,user.birthday)?String(firstNonEmpty(profile.birthday,user.birthday)).slice(0,10):"",
-    work:String(firstNonEmpty(profile.work,user.work)||""),
-    education:String(firstNonEmpty(profile.education,user.education)||""),
+    bio:String(firstNonEmpty(profile.bio,user.bio,local.bio)||""),
+    city:String(firstNonEmpty(profile.city,user.city,profile.location,user.location,local.city)||""),
+    home:String(firstNonEmpty(profile.home,user.home,local.home)||""),
+    birthday:firstNonEmpty(profile.birthday,user.birthday,local.birthday)?String(firstNonEmpty(profile.birthday,user.birthday,local.birthday)).slice(0,10):"",
+    work:String(firstNonEmpty(profile.work,user.work,local.work)||""),
+    education:String(firstNonEmpty(profile.education,user.education,local.education)||""),
     followers:Number(firstNonEmpty(stats.followers,stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
     following:Number(firstNonEmpty(stats.following,stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
     avatar_url:avatar||"",
@@ -374,12 +379,6 @@ async function loadProfile(){
     const myId=String(currentUser.id??currentUser.user_id??"");
     const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
 
-    /*
-      Username determines which account is requested.
-      userId is retained for navigation and follow actions, but a stale or
-      mismatched URL userId must not cause the page to silently show the
-      logged-in user's profile.
-    */
     const requestedUsername=targetUsername;
     const clearlyOwnByUsername=!requestedUsername||
       requestedUsername.toLowerCase()===myUsername.toLowerCase();
@@ -389,15 +388,13 @@ async function loadProfile(){
 
     if(isOwnProfile){
       const data=await apiRequest("/profile");
-      serverProfile=data.profile||data.data?.profile||data.user||data.data||data;
+      serverProfile=extractProfile(data);
       serverStats=data.stats||data.data?.stats||{};
       viewedUser={
         ...currentUser,
         ...serverProfile,
         id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),
-        username:serverProfile.username||currentUser.username||myUsername,
-        avatar_url:firstNonEmpty(serverProfile.avatar_url,currentUser.avatar_url),
-        cover_url:firstNonEmpty(serverProfile.cover_url,currentUser.cover_url)
+        username:serverProfile.username||currentUser.username||myUsername
       };
     }else{
       if(!requestedUsername){
@@ -407,22 +404,16 @@ async function loadProfile(){
       const data=await apiRequest("/profile/"+encodeURIComponent(requestedUsername));
       const apiProfile=data.profile&&typeof data.profile==="object"
         ?data.profile
-        :(data.data?.profile&&typeof data.data.profile==="object"
-          ?data.data.profile:{});
+        :(data.data?.profile&&typeof data.data.profile==="object"?data.data.profile:{});
       const apiUser=data.user&&typeof data.user==="object"
         ?data.user
-        :(data.data?.user&&typeof data.data.user==="object"
-          ?data.data.user:{});
+        :(data.data?.user&&typeof data.data.user==="object"?data.data.user:{});
 
       serverProfile={...apiUser,...apiProfile};
       serverStats=data.stats||data.data?.stats||{};
 
-      const returnedId=String(
-        apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??""
-      );
-      const returnedUsername=String(
-        apiProfile.username??apiUser.username??requestedUsername
-      ).replace(/^@/,"").trim();
+      const returnedId=String(apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??"");
+      const returnedUsername=String(apiProfile.username??apiUser.username??requestedUsername).replace(/^@/,"").trim();
 
       if(returnedUsername.toLowerCase()!==requestedUsername.toLowerCase()){
         throw new Error("The server returned a different username. Please retry or open the profile from the feed.");
@@ -432,41 +423,31 @@ async function loadProfile(){
         ...apiUser,
         ...apiProfile,
         id:returnedId,
-        username:returnedUsername,
-        avatar_url:firstNonEmpty(apiProfile.avatar_url,apiUser.avatar_url),
-        cover_url:firstNonEmpty(apiProfile.cover_url,apiUser.cover_url),
-        bio:firstNonEmpty(apiProfile.bio,apiUser.bio),
-        city:firstNonEmpty(apiProfile.city,apiUser.city),
-        home:firstNonEmpty(apiProfile.home,apiUser.home),
-        birthday:firstNonEmpty(apiProfile.birthday,apiUser.birthday),
-        work:firstNonEmpty(apiProfile.work,apiUser.work),
-        education:firstNonEmpty(apiProfile.education,apiUser.education)
+        username:returnedUsername
       };
 
       if(!returnedId){
         throw new Error("The server did not return this user's ID. Please check the backend profile endpoint.");
       }
 
-      // If the username identifies the logged-in account, it is our profile.
-      // This avoids a stale userId query parameter forcing a false public view.
       isOwnProfile=Boolean(
         (myId&&returnedId===myId)||
         returnedUsername.toLowerCase()===myUsername.toLowerCase()
       );
     }
 
-    const p=normalizeProfile(viewedUser,serverProfile,serverStats);
+    const local=isOwnProfile?getProfile():{};
+    const p=normalizeProfile(viewedUser,serverProfile,serverStats,local);
     if(!p.handle&&!isOwnProfile)p.handle=requestedUsername;
 
-    if(isOwnProfile)saveLocalProfile({...getProfile(),...p});
+    viewedUser={...viewedUser,...p};
+    if(isOwnProfile)saveLocalProfile({...local,...p});
 
     renderProfile(p);
     setOwnProfileUI(isOwnProfile);
 
     if(!isOwnProfile){
-      followingThisUser=Boolean(
-        serverProfile.is_following??viewedUser.is_following??serverStats.is_following
-      );
+      followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);
       updateFollowButton();
     }
 
@@ -539,15 +520,14 @@ function openUserProfile(username,userId){
 function openEditModal(){
   if(!isOwnProfile)return notify("You can only edit your own profile.");
 
-  const p=normalizeProfile(viewedUser||{},serverProfile,serverStats);
-  const local=getProfile();
-  document.getElementById("editName").value=p.name==="User"?(local.name||""):p.name;
-  document.getElementById("editBio").value=p.bio||local.bio||"";
-  document.getElementById("editCity").value=p.city||local.city||"";
-  document.getElementById("editHome").value=p.home||local.home||"";
-  document.getElementById("editBirthday").value=p.birthday||local.birthday||"";
-  document.getElementById("editWork").value=p.work||local.work||"";
-  document.getElementById("editEducation").value=p.education||local.education||"";
+  const p=normalizeProfile(viewedUser||{},serverProfile,serverStats,getProfile());
+  document.getElementById("editName").value=p.name==="User"?"":p.name;
+  document.getElementById("editBio").value=p.bio;
+  document.getElementById("editCity").value=p.city;
+  document.getElementById("editHome").value=p.home;
+  document.getElementById("editBirthday").value=p.birthday;
+  document.getElementById("editWork").value=p.work;
+  document.getElementById("editEducation").value=p.education;
   document.getElementById("editStatus").textContent="";
   document.getElementById("editModal").classList.add("open");
 }
@@ -588,6 +568,8 @@ document.getElementById("editForm").addEventListener("submit",async event=>{
   button.disabled=true;
   button.textContent="Saving...";
 
+  const local=getProfile();
+  const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
   const p={
     name:document.getElementById("editName").value.trim(),
     bio:document.getElementById("editBio").value.trim(),
@@ -607,27 +589,38 @@ document.getElementById("editForm").addEventListener("submit",async event=>{
   }
 
   try{
+    const payload={
+      display_name:p.name,
+      bio:p.bio,
+      city:p.city,
+      home:p.home,
+      birthday:p.birthday||null,
+      work:p.work,
+      education:p.education,
+      avatar_url:old.avatar_url||"",
+      cover_url:old.cover_url||""
+    };
+
     const result=await apiRequest("/profile",{
       method:"PUT",
-      body:JSON.stringify({
-        display_name:p.name,bio:p.bio,city:p.city,home:p.home,
-        birthday:p.birthday,work:p.work,education:p.education,
-        avatar_url:serverProfile.avatar_url||"",
-        cover_url:serverProfile.cover_url||""
-      })
+      body:JSON.stringify(payload)
     });
 
-    serverProfile=result.profile||{...serverProfile,...p,display_name:p.name};
+    const saved=extractProfile(result);
+    serverProfile={...serverProfile,...payload,...saved};
     viewedUser={...viewedUser,...serverProfile};
-    const normalized=normalizeProfile(viewedUser,serverProfile,serverStats);
-    saveLocalProfile({...getProfile(),...normalized});
+
+    const normalized=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
+    saveLocalProfile({...local,...normalized});
     renderProfile(normalized);
     status.textContent="Profile saved.";
     status.className="status success";
     closeModal("editModal");
+    setStatus("Profile saved successfully.","success");
     notify("Profile updated.");
   }catch(error){
-    status.textContent=error.message;
+    console.error("Profile save failed:",error);
+    status.textContent="Save failed: "+error.message;
     status.className="status error";
   }finally{
     button.disabled=false;
@@ -645,55 +638,75 @@ async function uploadProfileImage(file){
   const result=await apiRequest("/media/upload",{method:"POST",body:form});
   const media=result.media||result.data?.media||result;
   const url=media.url||media.secure_url;
-  if(!url||!String(url).startsWith("https://")){
+
+  if(!url||!/^https:\/\//i.test(String(url))){
     throw new Error("The upload API did not return an HTTPS image URL.");
   }
-  return url;
+  return String(url);
 }
 
 async function changeProfileImage(file,type){
   if(!file)return;
   if(!isOwnProfile)return notify("You cannot change another user's image.");
   if(!getToken())return notify("Please log in first.");
+
+  const status=document.getElementById("sessionStatus");
   setStatus("Uploading image...");
+
+  const avatarInput=document.getElementById("avatarInput");
+  const coverInput=document.getElementById("coverInput");
+  avatarInput.disabled=true;
+  coverInput.disabled=true;
 
   try{
     const url=await uploadProfileImage(file);
     const local=getProfile();
+    const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
+
     const payload={
-      display_name:serverProfile.display_name||local.name||currentUser?.username||"",
-      bio:serverProfile.bio??local.bio??"",
-      city:serverProfile.city??local.city??"",
-      home:serverProfile.home??local.home??"",
-      birthday:serverProfile.birthday?String(serverProfile.birthday).slice(0,10):(local.birthday||""),
-      work:serverProfile.work??local.work??"",
-      education:serverProfile.education??local.education??"",
-      avatar_url:type==="avatar"?url:(serverProfile.avatar_url||""),
-      cover_url:type==="cover"?url:(serverProfile.cover_url||"")
+      display_name:old.name==="User"?(currentUser?.username||""):old.name,
+      bio:old.bio,
+      city:old.city,
+      home:old.home,
+      birthday:old.birthday||null,
+      work:old.work,
+      education:old.education,
+      avatar_url:type==="avatar"?url:old.avatar_url,
+      cover_url:type==="cover"?url:old.cover_url
     };
 
     const result=await apiRequest("/profile",{
-      method:"PUT",body:JSON.stringify(payload)
+      method:"PUT",
+      body:JSON.stringify(payload)
     });
-    serverProfile=result.profile||{...serverProfile,...payload};
+
+    const saved=extractProfile(result);
+    serverProfile={...serverProfile,...payload,...saved};
     viewedUser={...viewedUser,...serverProfile};
-    const p=normalizeProfile(viewedUser,serverProfile,serverStats);
-    saveLocalProfile({...getProfile(),...p});
+
+    const p=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
+    saveLocalProfile({...local,...p});
     renderProfile(p);
-    setStatus("Image saved.","success");
-    notify("Profile image updated.");
+    setStatus("Image saved successfully.","success");
+    notify(type==="avatar"?"Profile photo updated.":"Cover photo updated.");
   }catch(error){
+    console.error("Image upload failed:",error);
     setStatus(error.message,"error");
     notify("Image upload failed: "+error.message);
+  }finally{
+    avatarInput.disabled=false;
+    coverInput.disabled=false;
   }
 }
 
 document.getElementById("avatarInput").addEventListener("change",function(){
-  const file=this.files[0];this.value="";
+  const file=this.files[0];
+  this.value="";
   changeProfileImage(file,"avatar");
 });
 document.getElementById("coverInput").addEventListener("change",function(){
-  const file=this.files[0];this.value="";
+  const file=this.files[0];
+  this.value="";
   changeProfileImage(file,"cover");
 });
 
@@ -724,10 +737,12 @@ async function loadPostsForViewedUser(){
       const postId=String(postUserId(post)??"");
       const postName=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
 
-      // The backend's feed uses ft_posts.user_id, which maps to users.id.
-      // Match by ID when possible, with username as a compatibility fallback.
-      if(viewedId&&postId&&postId===viewedId)return true;
-      if(viewedName&&postName&&postName===viewedName)return true;
+      /*
+        Prefer exact user IDs. Use username only if the post does not provide
+        an ID; this prevents posts from a different account appearing here.
+      */
+      if(viewedId&&postId)return postId===viewedId;
+      if(!postId&&viewedName&&postName)return postName===viewedName;
       return false;
     });
 
