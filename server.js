@@ -1,3 +1,4 @@
+
 require("dotenv").config();
 
 const express = require("express");
@@ -17,7 +18,9 @@ app.disable("x-powered-by");
 app.use(helmet());
 
 const allowedOrigins = (process.env.FRONTEND_ORIGIN || "")
-  .split(",").map(x => x.trim()).filter(Boolean);
+  .split(",")
+  .map(origin => origin.trim())
+  .filter(Boolean);
 
 app.use(cors({
   origin(origin, callback) {
@@ -39,12 +42,15 @@ const pool = process.env.DATABASE_URL
       connectionTimeoutMillis: 10000,
       idleTimeoutMillis: 30000,
       ssl: process.env.DATABASE_SSL === "false"
-        ? false : { rejectUnauthorized: false }
+        ? false
+        : { rejectUnauthorized: false }
     })
   : null;
 
 if (pool) {
-  pool.on("error", e => console.error("Database pool error:", e.message));
+  pool.on("error", error => {
+    console.error("Database pool error:", error.message);
+  });
 }
 
 const cloudinaryConfigured = Boolean(
@@ -64,49 +70,78 @@ if (cloudinaryConfigured) {
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024, files: 1 },
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+    files: 1
+  },
   fileFilter(req, file, callback) {
     const allowed = [
-      "image/jpeg", "image/png", "image/webp", "image/gif",
-      "video/mp4", "video/webm", "video/quicktime"
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "video/mp4",
+      "video/webm",
+      "video/quicktime"
     ];
+
     if (!allowed.includes(file.mimetype)) {
-      return callback(new Error(
-        "Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM."
-      ));
+      return callback(
+        new Error(
+          "Unsupported file type. Use JPG, PNG, WEBP, GIF, MP4 or WEBM."
+        )
+      );
     }
+
     callback(null, true);
   }
 });
 
 function authReady(res) {
   if (!pool) {
-    res.status(503).json({ error: "Database is not configured." });
+    res.status(503).json({
+      error: "Database is not configured."
+    });
     return false;
   }
-  if (!process.env.JWT_SECRET ||
-      Buffer.byteLength(process.env.JWT_SECRET, "utf8") < 32) {
+
+  if (
+    !process.env.JWT_SECRET ||
+    Buffer.byteLength(process.env.JWT_SECRET, "utf8") < 32
+  ) {
     res.status(503).json({
       error: "Authentication is not configured on the server."
     });
     return false;
   }
+
   return true;
 }
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
-  return scryptAsync(password, salt, 64)
-    .then(key => `scrypt$${salt}$${key.toString("hex")}`);
+
+  return scryptAsync(password, salt, 64).then(
+    key => `scrypt$${salt}$${key.toString("hex")}`
+  );
 }
 
 async function verifyPassword(password, storedHash) {
   try {
     const parts = String(storedHash).split("$");
-    if (parts.length !== 3 || parts[0] !== "scrypt") return false;
+
+    if (parts.length !== 3 || parts[0] !== "scrypt") {
+      return false;
+    }
+
     const storedKey = Buffer.from(parts[2], "hex");
-    if (storedKey.length !== 64) return false;
+
+    if (storedKey.length !== 64) {
+      return false;
+    }
+
     const derivedKey = await scryptAsync(password, parts[1], 64);
+
     return crypto.timingSafeEqual(storedKey, derivedKey);
   } catch (_) {
     return false;
@@ -115,6 +150,7 @@ async function verifyPassword(password, storedHash) {
 
 function createToken(user) {
   const now = Math.floor(Date.now() / 1000);
+
   const payload = {
     sub: String(user.id),
     username: user.username,
@@ -122,38 +158,65 @@ function createToken(user) {
     iat: now,
     exp: now + 60 * 60 * 24 * 7
   };
-  const encoded = Buffer.from(JSON.stringify(payload)).toString("base64url");
-  const signature = crypto.createHmac("sha256", process.env.JWT_SECRET)
-    .update(encoded).digest("base64url");
+
+  const encoded = Buffer
+    .from(JSON.stringify(payload))
+    .toString("base64url");
+
+  const signature = crypto
+    .createHmac("sha256", process.env.JWT_SECRET)
+    .update(encoded)
+    .digest("base64url");
+
   return `${encoded}.${signature}`;
 }
 
 function verifyToken(token) {
-  if (typeof token !== "string" || token.length > 4096) return null;
+  if (typeof token !== "string" || token.length > 4096) {
+    return null;
+  }
+
   const parts = token.split(".");
-  if (parts.length !== 2) return null;
+
+  if (parts.length !== 2) {
+    return null;
+  }
 
   const [encoded, supplied] = parts;
-  const expected = crypto.createHmac("sha256", process.env.JWT_SECRET)
-    .update(encoded).digest();
+
+  const expected = crypto
+    .createHmac("sha256", process.env.JWT_SECRET)
+    .update(encoded)
+    .digest();
 
   let actual;
+
   try {
     actual = Buffer.from(supplied, "base64url");
   } catch (_) {
     return null;
   }
 
-  if (actual.length !== expected.length ||
-      !crypto.timingSafeEqual(actual, expected)) return null;
+  if (
+    actual.length !== expected.length ||
+    !crypto.timingSafeEqual(actual, expected)
+  ) {
+    return null;
+  }
 
   try {
     const payload = JSON.parse(
       Buffer.from(encoded, "base64url").toString("utf8")
     );
-    if (!payload.sub ||
-        !Number.isInteger(payload.exp) ||
-        payload.exp <= Math.floor(Date.now() / 1000)) return null;
+
+    if (
+      !payload.sub ||
+      !Number.isInteger(payload.exp) ||
+      payload.exp <= Math.floor(Date.now() / 1000)
+    ) {
+      return null;
+    }
+
     return payload;
   } catch (_) {
     return null;
@@ -162,13 +225,18 @@ function verifyToken(token) {
 
 async function requireAuth(req, res, next) {
   if (!authReady(res)) return;
+
   const match = (req.get("authorization") || "")
     .match(/^Bearer\s+(.+)$/i);
+
   if (!match) {
-    return res.status(401).json({ error: "Authentication required." });
+    return res.status(401).json({
+      error: "Authentication required."
+    });
   }
 
   const payload = verifyToken(match[1]);
+
   if (!payload) {
     return res.status(401).json({
       error: "Invalid or expired access token."
@@ -178,15 +246,24 @@ async function requireAuth(req, res, next) {
   try {
     const result = await pool.query(
       `SELECT id, username, email, role, account_status, created_at
-       FROM users WHERE id::text = $1 LIMIT 1`,
+       FROM users
+       WHERE id::text = $1
+       LIMIT 1`,
       [String(payload.sub)]
     );
+
     if (!result.rows.length) {
-      return res.status(401).json({ error: "Account not found." });
+      return res.status(401).json({
+        error: "Account not found."
+      });
     }
+
     if (result.rows[0].account_status !== "active") {
-      return res.status(403).json({ error: "This account is not active." });
+      return res.status(403).json({
+        error: "This account is not active."
+      });
     }
+
     req.user = result.rows[0];
     next();
   } catch (error) {
@@ -203,13 +280,16 @@ function makeUsernameBase(fullName) {
   let username = String(fullName || "")
     .normalize("NFKD")
     .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase().trim()
+    .toLowerCase()
+    .trim()
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "")
     .replace(/_+/g, "_")
     .slice(0, 40)
     .replace(/_+$/g, "");
+
   if (username.length < 3) username = "user";
+
   return username;
 }
 
@@ -227,6 +307,7 @@ function publicUser(user) {
 function isCloudinaryUrl(value) {
   try {
     const parsed = new URL(value);
+
     return parsed.protocol === "https:" &&
       parsed.hostname === "res.cloudinary.com" &&
       parsed.pathname.split("/").filter(Boolean).length >= 3;
@@ -239,58 +320,72 @@ function checkFileSignature(buffer, mimetype) {
   if (!buffer || buffer.length < 12) return false;
 
   if (mimetype === "image/jpeg") {
-    return buffer[0] === 0xff && buffer[1] === 0xd8 &&
+    return buffer[0] === 0xff &&
+      buffer[1] === 0xd8 &&
       buffer[2] === 0xff;
   }
+
   if (mimetype === "image/png") {
     return buffer.subarray(0, 8).equals(
       Buffer.from([137, 80, 78, 71, 13, 10, 26, 10])
     );
   }
+
   if (mimetype === "image/gif") {
     return ["GIF87a", "GIF89a"].includes(
       buffer.subarray(0, 6).toString("ascii")
     );
   }
+
   if (mimetype === "image/webp") {
     return buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
       buffer.subarray(8, 12).toString("ascii") === "WEBP";
   }
-  if (mimetype === "video/mp4" || mimetype === "video/quicktime") {
+
+  if (
+    mimetype === "video/mp4" ||
+    mimetype === "video/quicktime"
+  ) {
     return buffer.subarray(4, 8).toString("ascii") === "ftyp";
   }
+
   if (mimetype === "video/webm") {
     return buffer.subarray(0, 4).equals(
       Buffer.from([0x1a, 0x45, 0xdf, 0xa3])
     );
   }
+
   return false;
 }
 
 function sendCloudinaryUpload(buffer, mimetype) {
   return new Promise((resolve, reject) => {
-    const resourceType = mimetype.startsWith("video/") ? "video" : "image";
-    const stream = cloudinary.uploader.upload_stream({
-      folder: "freetube",
-      resource_type: resourceType
-    }, (error, result) => {
-      if (error) return reject(error);
-      resolve({
-        url: result.secure_url,
-        public_id: result.public_id,
-        resource_type: result.resource_type,
-        bytes: result.bytes
-      });
-    });
+    const resourceType = mimetype.startsWith("video/")
+      ? "video"
+      : "image";
+
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: "freetube",
+        resource_type: resourceType
+      },
+      (error, result) => {
+        if (error) return reject(error);
+
+        resolve({
+          url: result.secure_url,
+          public_id: result.public_id,
+          resource_type: result.resource_type,
+          bytes: result.bytes
+        });
+      }
+    );
+
     stream.end(buffer);
   });
 }
 
-/*
- * DATABASE
- * Old tables are kept. The reactions table stores one reaction per
- * post/user. Existing likes are copied into the new table as "like".
- */
+// Initialize tables and add new profile fields without deleting existing data.
 async function initializeDatabase() {
   if (!pool) return;
 
@@ -301,8 +396,28 @@ async function initializeDatabase() {
       bio VARCHAR(500),
       avatar_url TEXT,
       cover_url TEXT,
+      city VARCHAR(120),
+      home VARCHAR(200),
+      birthday DATE,
+      work VARCHAR(200),
+      education VARCHAR(200),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    ALTER TABLE ft_profiles
+      ADD COLUMN IF NOT EXISTS city VARCHAR(120);
+
+    ALTER TABLE ft_profiles
+      ADD COLUMN IF NOT EXISTS home VARCHAR(200);
+
+    ALTER TABLE ft_profiles
+      ADD COLUMN IF NOT EXISTS birthday DATE;
+
+    ALTER TABLE ft_profiles
+      ADD COLUMN IF NOT EXISTS work VARCHAR(200);
+
+    ALTER TABLE ft_profiles
+      ADD COLUMN IF NOT EXISTS education VARCHAR(200);
 
     CREATE TABLE IF NOT EXISTS ft_posts (
       id BIGSERIAL PRIMARY KEY,
@@ -315,25 +430,17 @@ async function initializeDatabase() {
     );
 
     CREATE TABLE IF NOT EXISTS ft_likes (
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (post_id, user_id)
-    );
-
-    CREATE TABLE IF NOT EXISTS ft_post_reactions (
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
-      user_id TEXT NOT NULL,
-      reaction VARCHAR(10) NOT NULL
-        CHECK (reaction IN ('like', 'love', 'sad', 'angry')),
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (post_id, user_id)
     );
 
     CREATE TABLE IF NOT EXISTS ft_comments (
       id BIGSERIAL PRIMARY KEY,
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
       user_id TEXT NOT NULL,
       content VARCHAR(2000) NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -369,7 +476,8 @@ async function initializeDatabase() {
 
     CREATE TABLE IF NOT EXISTS ft_post_reports (
       id BIGSERIAL PRIMARY KEY,
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      post_id BIGINT NOT NULL
+        REFERENCES ft_posts(id) ON DELETE CASCADE,
       reporter_id TEXT NOT NULL,
       reason VARCHAR(500) NOT NULL,
       status VARCHAR(20) NOT NULL DEFAULT 'pending'
@@ -378,48 +486,34 @@ async function initializeDatabase() {
       UNIQUE (post_id, reporter_id)
     );
 
-    CREATE TABLE IF NOT EXISTS ft_post_views (
-      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
-      user_id TEXT NOT NULL,
-      view_day DATE NOT NULL DEFAULT CURRENT_DATE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (post_id, user_id, view_day)
-    );
-
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
+
     CREATE INDEX IF NOT EXISTS ft_posts_user_idx
       ON ft_posts(user_id, created_at DESC);
+
     CREATE INDEX IF NOT EXISTS ft_comments_post_idx
       ON ft_comments(post_id, created_at);
+
     CREATE INDEX IF NOT EXISTS ft_messages_pair_idx
       ON ft_messages(sender_id, recipient_id, created_at);
+
     CREATE INDEX IF NOT EXISTS ft_notifications_recipient_idx
       ON ft_notifications(recipient_id, created_at DESC);
+
     CREATE INDEX IF NOT EXISTS ft_follows_following_idx
       ON ft_follows(following_id);
-    CREATE INDEX IF NOT EXISTS ft_post_views_post_idx
-      ON ft_post_views(post_id);
-    CREATE INDEX IF NOT EXISTS ft_post_reactions_post_idx
-      ON ft_post_reactions(post_id);
-  `);
-
-  // Migrate old likes once: an existing reaction takes precedence.
-  await pool.query(`
-    INSERT INTO ft_post_reactions (post_id, user_id, reaction)
-    SELECT l.post_id, l.user_id, 'like'
-    FROM ft_likes l
-    ON CONFLICT (post_id, user_id) DO NOTHING
   `);
 
   console.log("FreeTube database initialized.");
 }
 
+// Health endpoints.
 app.get("/", (req, res) => {
   res.json({
     name: "FreeTube Backend API",
     status: "running",
-    version: "4.0.0"
+    version: "3.1.0"
   });
 });
 
@@ -432,7 +526,10 @@ app.get("/api/health", (req, res) => {
 });
 
 app.get("/api/health/database", async (req, res, next) => {
-  if (!pool) return res.status(503).json({ status: "not_configured" });
+  if (!pool) {
+    return res.status(503).json({ status: "not_configured" });
+  }
+
   try {
     await pool.query("SELECT 1");
     res.json({ status: "connected" });
@@ -448,18 +545,16 @@ app.get("/api", (req, res) => {
       "POST /api/auth/register",
       "POST /api/auth/login",
       "GET /api/auth/me",
+      "GET /api/profile",
       "GET /api/profile/:username",
       "PUT /api/profile",
       "GET /api/users/search?q=username",
       "POST /api/media/upload",
       "GET /api/posts",
       "POST /api/posts",
-      "POST /api/posts/:id/view",
       "PUT /api/posts/:id",
       "DELETE /api/posts/:id",
       "POST /api/posts/:id/like",
-      "PUT /api/posts/:id/reaction",
-      "DELETE /api/posts/:id/reaction",
       "GET /api/posts/:id/comments",
       "POST /api/posts/:id/comments",
       "POST /api/posts/:id/report",
@@ -477,28 +572,37 @@ app.get("/api", (req, res) => {
   });
 });
 
-/* REGISTER */
+// Registration.
 app.post("/api/auth/register", async (req, res, next) => {
   if (!authReady(res)) return;
+
   let client;
 
   try {
     const fullName = cleanText(
-      req.body.full_name || req.body.fullName || req.body.name, 80
+      req.body.full_name || req.body.fullName || req.body.name,
+      80
     );
+
     const email = cleanText(req.body.email, 255).toLowerCase();
     const password = typeof req.body.password === "string"
-      ? req.body.password : "";
+      ? req.body.password
+      : "";
 
     if (fullName.length < 2) {
       return res.status(400).json({
         error: "Full name must contain at least 2 characters."
       });
     }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return res.status(400).json({ error: "Enter a valid email address." });
+      return res.status(400).json({
+        error: "Enter a valid email address."
+      });
     }
+
     const passwordBytes = Buffer.byteLength(password, "utf8");
+
     if (passwordBytes < 8 || passwordBytes > 128) {
       return res.status(400).json({
         error: "Password must be 8-128 bytes long."
@@ -507,15 +611,22 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     const baseUsername = makeUsernameBase(fullName);
     const passwordHash = await hashPassword(password);
+
     client = await pool.connect();
     await client.query("BEGIN");
-    await client.query("SELECT pg_advisory_xact_lock(hashtext($1))",
-      [baseUsername]);
+
+    await client.query(
+      "SELECT pg_advisory_xact_lock(hashtext($1))",
+      [baseUsername]
+    );
 
     const existingEmail = await client.query(
-      "SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1",
+      `SELECT id FROM users
+       WHERE LOWER(email) = LOWER($1)
+       LIMIT 1`,
       [email]
     );
+
     if (existingEmail.rows.length) {
       await client.query("ROLLBACK");
       return res.status(409).json({
@@ -524,10 +635,14 @@ app.post("/api/auth/register", async (req, res, next) => {
     }
 
     let user = null;
+
     for (let attempt = 0; attempt < 100; attempt++) {
       const suffix = attempt === 0 ? "" : String(attempt + 1);
-      const username = baseUsername.slice(0, 50 - suffix.length) + suffix;
+      const username =
+        baseUsername.slice(0, 50 - suffix.length) + suffix;
+
       await client.query("SAVEPOINT username_attempt");
+
       try {
         const result = await client.query(
           `INSERT INTO users
@@ -536,17 +651,24 @@ app.post("/api/auth/register", async (req, res, next) => {
            RETURNING id, username, email, role, account_status, created_at`,
           [username, email, passwordHash]
         );
+
         user = result.rows[0];
+
         await client.query("RELEASE SAVEPOINT username_attempt");
         break;
       } catch (error) {
         await client.query("ROLLBACK TO SAVEPOINT username_attempt");
         await client.query("RELEASE SAVEPOINT username_attempt");
+
         if (error.code !== "23505") throw error;
+
         const duplicateEmail = await client.query(
-          "SELECT id FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1",
+          `SELECT id FROM users
+           WHERE LOWER(email) = LOWER($1)
+           LIMIT 1`,
           [email]
         );
+
         if (duplicateEmail.rows.length) {
           await client.query("ROLLBACK");
           return res.status(409).json({
@@ -565,15 +687,20 @@ app.post("/api/auth/register", async (req, res, next) => {
 
     await client.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
+       VALUES ($1, $2)
+       ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), fullName]
     );
+
     await client.query("COMMIT");
 
     res.status(201).json({
       message: "Account created successfully.",
       token: createToken(user),
-      user: { ...publicUser(user), display_name: fullName }
+      user: {
+        ...publicUser(user),
+        display_name: fullName
+      }
     });
   } catch (error) {
     if (client) await client.query("ROLLBACK").catch(() => {});
@@ -583,15 +710,19 @@ app.post("/api/auth/register", async (req, res, next) => {
   }
 });
 
-/* LOGIN */
+// Login using email or username.
 app.post("/api/auth/login", async (req, res, next) => {
   if (!authReady(res)) return;
+
   try {
     const identifier = cleanText(
-      req.body.identifier || req.body.email || req.body.username, 255
+      req.body.identifier || req.body.email || req.body.username,
+      255
     );
+
     const password = typeof req.body.password === "string"
-      ? req.body.password : "";
+      ? req.body.password
+      : "";
 
     if (!identifier || !password) {
       return res.status(400).json({
@@ -608,6 +739,7 @@ app.post("/api/auth/login", async (req, res, next) => {
        LIMIT 1`,
       [identifier]
     );
+
     const user = result.rows[0];
 
     if (!user || !(await verifyPassword(password, user.password_hash))) {
@@ -615,15 +747,20 @@ app.post("/api/auth/login", async (req, res, next) => {
         error: "Invalid username/email or password."
       });
     }
+
     if (user.account_status !== "active") {
-      return res.status(403).json({ error: "This account is not active." });
+      return res.status(403).json({
+        error: "This account is not active."
+      });
     }
 
     await pool.query(
       `INSERT INTO ft_profiles (user_id, display_name)
-       VALUES ($1, $2) ON CONFLICT (user_id) DO NOTHING`,
+       VALUES ($1, $2)
+       ON CONFLICT (user_id) DO NOTHING`,
       [String(user.id), user.username]
     );
+
     res.json({
       message: "Login successful.",
       token: createToken(user),
@@ -638,10 +775,11 @@ app.get("/api/auth/me", requireAuth, (req, res) => {
   res.json({ user: publicUser(req.user) });
 });
 
-/* SEARCH USERS */
+// Search active users.
 app.get("/api/users/search", requireAuth, async (req, res, next) => {
   try {
     const q = cleanText(req.query.q, 50);
+
     if (q.length < 2) return res.json({ users: [] });
 
     const result = await pool.query(
@@ -651,57 +789,120 @@ app.get("/api/users/search", requireAuth, async (req, res, next) => {
        WHERE u.account_status = 'active'
          AND u.id::text <> $1
          AND LOWER(u.username) LIKE LOWER($2)
-       ORDER BY u.username LIMIT 20`,
+       ORDER BY u.username
+       LIMIT 20`,
       [String(req.user.id), `%${q}%`]
     );
+
     res.json({ users: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* READ PROFILE */
-app.get("/api/profile/:username", async (req, res, next) => {
-  if (!authReady(res)) return;
+// Read your own profile.
+app.get("/api/profile", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
+      `SELECT u.id, u.username, u.email, u.role, u.created_at,
+              p.display_name, p.bio, p.avatar_url, p.cover_url,
+              p.city, p.home, p.birthday, p.work, p.education,
+              p.updated_at
+       FROM users u
+       LEFT JOIN ft_profiles p ON p.user_id = u.id::text
+       WHERE u.id::text = $1
+       LIMIT 1`,
+      [String(req.user.id)]
+    );
+
+    if (!result.rows.length) {
+      return res.status(404).json({ error: "Profile not found." });
+    }
+
+    res.json({ profile: result.rows[0] });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Read a public profile, including follow status.
+app.get("/api/profile/:username", async (req, res, next) => {
+  if (!authReady(res)) return;
+
+  try {
+    const username = cleanText(req.params.username, 50);
+    const authMatch = (req.get("authorization") || "")
+      .match(/^Bearer\s+(.+)$/i);
+    const payload = authMatch ? verifyToken(authMatch[1]) : null;
+    const viewerId = payload ? String(payload.sub) : "";
+
+    const result = await pool.query(
       `SELECT u.id, u.username, p.display_name, p.bio,
-              p.avatar_url, p.cover_url, p.updated_at
+              p.avatar_url, p.cover_url, p.city, p.home,
+              p.birthday, p.work, p.education, p.updated_at
        FROM users u
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
        WHERE LOWER(u.username) = LOWER($1)
-         AND u.account_status = 'active' LIMIT 1`,
-      [cleanText(req.params.username, 50)]
+         AND u.account_status = 'active'
+       LIMIT 1`,
+      [username]
     );
+
     if (!result.rows.length) {
       return res.status(404).json({ error: "User not found." });
     }
 
     const profile = result.rows[0];
     const userId = String(profile.id);
-    const stats = await pool.query(
-      `SELECT
-         (SELECT COUNT(*) FROM ft_posts WHERE user_id = $1) AS posts,
-         (SELECT COUNT(*) FROM ft_post_reactions r
-          JOIN ft_posts p ON p.id = r.post_id
-          WHERE p.user_id = $1) AS likes,
-         (SELECT COUNT(*) FROM ft_follows WHERE following_id = $1) AS followers,
-         (SELECT COUNT(*) FROM ft_follows WHERE follower_id = $1) AS following`,
-      [userId]
-    );
-    res.json({ profile, stats: stats.rows[0] });
+
+    const [statsResult, followResult] = await Promise.all([
+      pool.query(
+        `SELECT
+           (SELECT COUNT(*) FROM ft_posts
+            WHERE user_id = $1) AS posts,
+           (SELECT COUNT(*) FROM ft_likes l
+            JOIN ft_posts p ON p.id = l.post_id
+            WHERE p.user_id = $1) AS likes,
+           (SELECT COUNT(*) FROM ft_follows
+            WHERE following_id = $1) AS followers,
+           (SELECT COUNT(*) FROM ft_follows
+            WHERE follower_id = $1) AS following`,
+        [userId]
+      ),
+      viewerId && viewerId !== userId
+        ? pool.query(
+            `SELECT 1 FROM ft_follows
+             WHERE follower_id = $1 AND following_id = $2`,
+            [viewerId, userId]
+          )
+        : Promise.resolve({ rows: [] })
+    ]);
+
+    profile.is_following = Boolean(followResult.rows.length);
+    profile.is_own_profile = Boolean(viewerId && viewerId === userId);
+
+    res.json({
+      profile,
+      user: profile,
+      stats: statsResult.rows[0]
+    });
   } catch (error) {
     next(error);
   }
 });
 
-/* UPDATE PROFILE */
+// Update profile. Fields not provided are preserved.
 app.put("/api/profile", requireAuth, async (req, res, next) => {
   try {
     const displayName = cleanText(req.body.display_name, 80);
     const bio = cleanText(req.body.bio, 500);
     const avatarUrl = cleanText(req.body.avatar_url, 2000);
     const coverUrl = cleanText(req.body.cover_url, 2000);
+    const city = cleanText(req.body.city, 120);
+    const home = cleanText(req.body.home, 200);
+    const work = cleanText(req.body.work, 200);
+    const education = cleanText(req.body.education, 200);
+    const birthdayInput = cleanText(req.body.birthday, 10);
 
     for (const url of [avatarUrl, coverUrl]) {
       if (url && !isCloudinaryUrl(url)) {
@@ -711,32 +912,126 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
       }
     }
 
+    let birthday = null;
+
+    if (birthdayInput) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(birthdayInput)) {
+        return res.status(400).json({
+          error: "Birthday must use YYYY-MM-DD format."
+        });
+      }
+
+      const parsed = new Date(`${birthdayInput}T00:00:00.000Z`);
+
+      if (
+        Number.isNaN(parsed.getTime()) ||
+        parsed.toISOString().slice(0, 10) !== birthdayInput
+      ) {
+        return res.status(400).json({
+          error: "Enter a valid birthday."
+        });
+      }
+
+      if (birthdayInput > new Date().toISOString().slice(0, 10)) {
+        return res.status(400).json({
+          error: "Birthday cannot be in the future."
+        });
+      }
+
+      birthday = birthdayInput;
+    }
+
+    // Keep existing values when the client omits a field.
     const result = await pool.query(
       `INSERT INTO ft_profiles
-       (user_id, display_name, bio, avatar_url, cover_url, updated_at)
-       VALUES ($1, $2, $3, $4, $5, NOW())
+       (user_id, display_name, bio, avatar_url, cover_url,
+        city, home, birthday, work, education, updated_at)
+       VALUES (
+         $1,
+         COALESCE(NULLIF($2, ''), $3),
+         $4,
+         NULLIF($5, ''),
+         NULLIF($6, ''),
+         $7,
+         $8,
+         $9::date,
+         $10,
+         $11,
+         NOW()
+       )
        ON CONFLICT (user_id) DO UPDATE SET
-         display_name = EXCLUDED.display_name,
-         bio = EXCLUDED.bio,
-         avatar_url = EXCLUDED.avatar_url,
-         cover_url = EXCLUDED.cover_url,
+         display_name = CASE
+           WHEN $12::boolean THEN EXCLUDED.display_name
+           ELSE ft_profiles.display_name
+         END,
+         bio = CASE
+           WHEN $13::boolean THEN EXCLUDED.bio
+           ELSE ft_profiles.bio
+         END,
+         avatar_url = CASE
+           WHEN $14::boolean THEN EXCLUDED.avatar_url
+           ELSE ft_profiles.avatar_url
+         END,
+         cover_url = CASE
+           WHEN $15::boolean THEN EXCLUDED.cover_url
+           ELSE ft_profiles.cover_url
+         END,
+         city = CASE
+           WHEN $16::boolean THEN EXCLUDED.city
+           ELSE ft_profiles.city
+         END,
+         home = CASE
+           WHEN $17::boolean THEN EXCLUDED.home
+           ELSE ft_profiles.home
+         END,
+         birthday = CASE
+           WHEN $18::boolean THEN EXCLUDED.birthday
+           ELSE ft_profiles.birthday
+         END,
+         work = CASE
+           WHEN $19::boolean THEN EXCLUDED.work
+           ELSE ft_profiles.work
+         END,
+         education = CASE
+           WHEN $20::boolean THEN EXCLUDED.education
+           ELSE ft_profiles.education
+         END,
          updated_at = NOW()
        RETURNING *`,
       [
         String(req.user.id),
-        displayName || req.user.username,
+        displayName,
+        req.user.username,
         bio,
-        avatarUrl || null,
-        coverUrl || null
+        avatarUrl,
+        coverUrl,
+        city,
+        home,
+        birthday,
+        work,
+        education,
+        Object.prototype.hasOwnProperty.call(req.body, "display_name"),
+        Object.prototype.hasOwnProperty.call(req.body, "bio"),
+        Object.prototype.hasOwnProperty.call(req.body, "avatar_url"),
+        Object.prototype.hasOwnProperty.call(req.body, "cover_url"),
+        Object.prototype.hasOwnProperty.call(req.body, "city"),
+        Object.prototype.hasOwnProperty.call(req.body, "home"),
+        Object.prototype.hasOwnProperty.call(req.body, "birthday"),
+        Object.prototype.hasOwnProperty.call(req.body, "work"),
+        Object.prototype.hasOwnProperty.call(req.body, "education")
       ]
     );
-    res.json({ message: "Profile updated.", profile: result.rows[0] });
+
+    res.json({
+      message: "Profile updated.",
+      profile: result.rows[0]
+    });
   } catch (error) {
     next(error);
   }
 });
 
-/* UPLOAD MEDIA */
+// Upload image or video.
 app.post(
   "/api/media/upload",
   requireAuth,
@@ -761,14 +1056,18 @@ app.post(
           error: 'Choose a file using the "file" field.'
         });
       }
+
       if (!checkFileSignature(req.file.buffer, req.file.mimetype)) {
         return res.status(400).json({
           error: "File content does not match its declared type."
         });
       }
+
       const media = await sendCloudinaryUpload(
-        req.file.buffer, req.file.mimetype
+        req.file.buffer,
+        req.file.mimetype
       );
+
       res.status(201).json({ media });
     } catch (error) {
       next(error);
@@ -776,7 +1075,7 @@ app.post(
   }
 );
 
-/* CREATE POST */
+// Create a post.
 app.post("/api/posts", requireAuth, async (req, res, next) => {
   try {
     const content = cleanText(req.body.content, 5000);
@@ -789,11 +1088,13 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
         error: "Write something or attach media to create a post."
       });
     }
+
     if (mediaUrl && !isCloudinaryUrl(mediaUrl)) {
       return res.status(400).json({
         error: "Post media must use a valid Cloudinary HTTPS URL."
       });
     }
+
     if (mediaType && !["image", "video"].includes(mediaType)) {
       return res.status(400).json({ error: "Invalid media type." });
     }
@@ -801,7 +1102,8 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
     const result = await pool.query(
       `INSERT INTO ft_posts
        (user_id, content, media_url, media_type, media_public_id)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING *`,
       [
         String(req.user.id),
         content,
@@ -810,70 +1112,26 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
         mediaPublicId || null
       ]
     );
+
     res.status(201).json({
       message: "Post created.",
-      post: {
-        ...result.rows[0],
-        like_count: 0,
-        comment_count: 0,
-        view_count: 0,
-        reaction_counts: { like: 0, love: 0, sad: 0, angry: 0 },
-        my_reaction: null
-      }
+      post: result.rows[0]
     });
   } catch (error) {
     next(error);
   }
 });
 
-/* RECORD VIEW: one per user/post/day */
-app.post("/api/posts/:id/view", requireAuth, async (req, res, next) => {
-  try {
-    const postId = Number.parseInt(req.params.id, 10);
-    const userId = String(req.user.id);
-    if (!Number.isSafeInteger(postId) || postId <= 0) {
-      return res.status(400).json({ error: "Invalid post ID." });
-    }
-
-    const post = await pool.query(
-      "SELECT id FROM ft_posts WHERE id = $1", [postId]
-    );
-    if (!post.rows.length) {
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    const inserted = await pool.query(
-      `INSERT INTO ft_post_views (post_id, user_id, view_day)
-       VALUES ($1, $2, CURRENT_DATE)
-       ON CONFLICT (post_id, user_id, view_day) DO NOTHING
-       RETURNING post_id`,
-      [postId, userId]
-    );
-    const countResult = await pool.query(
-      "SELECT COUNT(*) AS view_count FROM ft_post_views WHERE post_id = $1",
-      [postId]
-    );
-    res.json({
-      post_id: String(postId),
-      viewed_today: inserted.rowCount > 0,
-      view_count: Number(countResult.rows[0].view_count)
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-/*
- * FEED
- * reaction_counts is an object with like/love/sad/angry totals.
- * my_reaction identifies the current user's reaction.
- */
+// Feed.
 app.get("/api/posts", async (req, res, next) => {
   if (!authReady(res)) return;
+
   try {
     const limit = Math.min(
-      50, Math.max(1, Number.parseInt(req.query.limit, 10) || 20)
+      50,
+      Math.max(1, Number.parseInt(req.query.limit, 10) || 20)
     );
+
     const before = Number.parseInt(req.query.before, 10);
     const match = (req.headers.authorization || "")
       .match(/^Bearer\s+(.+)$/i);
@@ -881,41 +1139,17 @@ app.get("/api/posts", async (req, res, next) => {
     const viewerId = payload ? String(payload.sub) : "";
 
     const result = await pool.query(
-      `SELECT
-         p.id, p.user_id, p.content, p.media_url, p.media_type,
-         p.created_at, u.username, pr.display_name, pr.avatar_url,
-
-         (SELECT COUNT(*) FROM ft_post_reactions r
-          WHERE r.post_id = p.id AND r.reaction = 'like') AS like_count,
-
-         (SELECT COUNT(*) FROM ft_comments c
-          WHERE c.post_id = p.id) AS comment_count,
-
-         (SELECT COUNT(*) FROM ft_post_views v
-          WHERE v.post_id = p.id) AS view_count,
-
-         json_build_object(
-           'like', (SELECT COUNT(*) FROM ft_post_reactions r
-                    WHERE r.post_id = p.id AND r.reaction = 'like'),
-           'love', (SELECT COUNT(*) FROM ft_post_reactions r
-                    WHERE r.post_id = p.id AND r.reaction = 'love'),
-           'sad', (SELECT COUNT(*) FROM ft_post_reactions r
-                   WHERE r.post_id = p.id AND r.reaction = 'sad'),
-           'angry', (SELECT COUNT(*) FROM ft_post_reactions r
-                     WHERE r.post_id = p.id AND r.reaction = 'angry')
-         ) AS reaction_counts,
-
-         (SELECT r.reaction FROM ft_post_reactions r
-          WHERE r.post_id = p.id AND r.user_id = $2
-          LIMIT 1) AS my_reaction,
-
-         EXISTS (
-           SELECT 1 FROM ft_post_reactions r
-           WHERE r.post_id = p.id
-             AND r.user_id = $2
-             AND r.reaction = 'like'
-         ) AS liked_by_me
-
+      `SELECT p.id, p.user_id, p.content, p.media_url, p.media_type,
+              p.created_at, u.username,
+              pr.display_name, pr.avatar_url,
+              (SELECT COUNT(*) FROM ft_likes l
+               WHERE l.post_id = p.id) AS like_count,
+              (SELECT COUNT(*) FROM ft_comments c
+               WHERE c.post_id = p.id) AS comment_count,
+              EXISTS (
+                SELECT 1 FROM ft_likes l
+                WHERE l.post_id = p.id AND l.user_id = $2
+              ) AS liked_by_me
        FROM ft_posts p
        JOIN users u ON u.id::text = p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id = p.user_id
@@ -929,13 +1163,14 @@ app.get("/api/posts", async (req, res, next) => {
         limit
       ]
     );
+
     res.json({ posts: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* EDIT OWN POST */
+// Edit your own post.
 app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
@@ -946,249 +1181,81 @@ app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
     if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(400).json({ error: "Invalid post ID." });
     }
+
     if (!content && !mediaUrl) {
       return res.status(400).json({
         error: "A post must contain text or media."
       });
     }
+
     if (mediaUrl && !isCloudinaryUrl(mediaUrl)) {
       return res.status(400).json({
         error: "Post media must use a valid Cloudinary HTTPS URL."
       });
     }
+
     if (mediaType && !["image", "video"].includes(mediaType)) {
       return res.status(400).json({ error: "Invalid media type." });
     }
 
     const result = await pool.query(
-      `UPDATE ft_posts SET content = $1, media_url = $2, media_type = $3
-       WHERE id = $4 AND user_id = $5 RETURNING *`,
-      [content, mediaUrl || null, mediaType || null,
-       id, String(req.user.id)]
+      `UPDATE ft_posts
+       SET content = $1, media_url = $2, media_type = $3
+       WHERE id = $4 AND user_id = $5
+       RETURNING *`,
+      [content, mediaUrl || null, mediaType || null, id, String(req.user.id)]
     );
+
     if (!result.rows.length) {
       return res.status(404).json({
         error: "Post not found or you do not own this post."
       });
     }
+
     res.json({ message: "Post updated.", post: result.rows[0] });
   } catch (error) {
     next(error);
   }
 });
 
-/* DELETE OWN POST */
+// Delete your own post.
 app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
+
     if (!Number.isSafeInteger(id) || id <= 0) {
       return res.status(400).json({ error: "Invalid post ID." });
     }
 
     const result = await pool.query(
       `DELETE FROM ft_posts
-       WHERE id = $1 AND user_id = $2 RETURNING id`,
+       WHERE id = $1 AND user_id = $2
+       RETURNING id`,
       [id, String(req.user.id)]
     );
+
     if (!result.rows.length) {
       return res.status(404).json({
         error: "Post not found or you do not own this post."
       });
     }
+
     res.json({ message: "Post deleted.", id: result.rows[0].id });
   } catch (error) {
     next(error);
   }
 });
 
-/*
- * SET OR CHANGE REACTION
- * Body: {"reaction":"like"} / love / sad / angry
- * Same reaction again removes the reaction.
- */
-app.put("/api/posts/:id/reaction", requireAuth, async (req, res, next) => {
-  const postId = Number.parseInt(req.params.id, 10);
-  const userId = String(req.user.id);
-  const reaction = cleanText(req.body.reaction, 10).toLowerCase();
-  const valid = ["like", "love", "sad", "angry"];
-
-  if (!Number.isSafeInteger(postId) || postId <= 0) {
-    return res.status(400).json({ error: "Invalid post ID." });
-  }
-  if (!valid.includes(reaction)) {
-    return res.status(400).json({
-      error: "Reaction must be like, love, sad or angry."
-    });
-  }
-
-  let client;
-  try {
-    client = await pool.connect();
-    await client.query("BEGIN");
-
-    const post = await client.query(
-      "SELECT id, user_id FROM ft_posts WHERE id = $1 FOR UPDATE",
-      [postId]
-    );
-    if (!post.rows.length) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ error: "Post not found." });
-    }
-
-    const existing = await client.query(
-      `SELECT reaction FROM ft_post_reactions
-       WHERE post_id = $1 AND user_id = $2 FOR UPDATE`,
-      [postId, userId]
-    );
-
-    let myReaction = reaction;
-
-    if (existing.rows.length && existing.rows[0].reaction === reaction) {
-      await client.query(
-        "DELETE FROM ft_post_reactions WHERE post_id = $1 AND user_id = $2",
-        [postId, userId]
-      );
-      myReaction = null;
-    } else {
-      await client.query(
-        `INSERT INTO ft_post_reactions
-         (post_id, user_id, reaction, created_at, updated_at)
-         VALUES ($1, $2, $3, NOW(), NOW())
-         ON CONFLICT (post_id, user_id) DO UPDATE SET
-           reaction = EXCLUDED.reaction,
-           updated_at = NOW()`,
-        [postId, userId, reaction]
-      );
-    }
-
-    /*
-     * Keep the legacy ft_likes table in sync with the Like reaction.
-     * Other reactions are not counted as likes in the legacy table.
-     */
-    if (myReaction === "like") {
-      await client.query(
-        `INSERT INTO ft_likes (post_id, user_id)
-         VALUES ($1, $2) ON CONFLICT (post_id, user_id) DO NOTHING`,
-        [postId, userId]
-      );
-    } else {
-      await client.query(
-        "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
-        [postId, userId]
-      );
-    }
-
-    if (myReaction && post.rows[0].user_id !== userId) {
-      await client.query(
-        `INSERT INTO ft_notifications
-         (recipient_id, actor_id, type, post_id, message)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [
-          post.rows[0].user_id,
-          userId,
-          "reaction",
-          postId,
-          `${req.user.username} reacted ${myReaction} to your post.`
-        ]
-      );
-    }
-
-    const countsResult = await client.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE reaction = 'like') AS likes,
-         COUNT(*) FILTER (WHERE reaction = 'love') AS loves,
-         COUNT(*) FILTER (WHERE reaction = 'sad') AS sads,
-         COUNT(*) FILTER (WHERE reaction = 'angry') AS angries
-       FROM ft_post_reactions WHERE post_id = $1`,
-      [postId]
-    );
-
-    await client.query("COMMIT");
-    const c = countsResult.rows[0];
-
-    res.json({
-      post_id: String(postId),
-      my_reaction: myReaction,
-      liked: myReaction === "like",
-      like_count: Number(c.likes),
-      reaction_counts: {
-        like: Number(c.likes),
-        love: Number(c.loves),
-        sad: Number(c.sads),
-        angry: Number(c.angries)
-      }
-    });
-  } catch (error) {
-    if (client) await client.query("ROLLBACK").catch(() => {});
-    next(error);
-  } finally {
-    if (client) client.release();
-  }
-});
-
-/* REMOVE REACTION */
-app.delete("/api/posts/:id/reaction", requireAuth, async (req, res, next) => {
-  const postId = Number.parseInt(req.params.id, 10);
-  if (!Number.isSafeInteger(postId) || postId <= 0) {
-    return res.status(400).json({ error: "Invalid post ID." });
-  }
-
-  let client;
-  try {
-    client = await pool.connect();
-    await client.query("BEGIN");
-
-    const result = await client.query(
-      `DELETE FROM ft_post_reactions
-       WHERE post_id = $1 AND user_id = $2 RETURNING reaction`,
-      [postId, String(req.user.id)]
-    );
-
-    await client.query(
-      "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
-      [postId, String(req.user.id)]
-    );
-
-    const countsResult = await client.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE reaction = 'like') AS likes,
-         COUNT(*) FILTER (WHERE reaction = 'love') AS loves,
-         COUNT(*) FILTER (WHERE reaction = 'sad') AS sads,
-         COUNT(*) FILTER (WHERE reaction = 'angry') AS angries
-       FROM ft_post_reactions WHERE post_id = $1`,
-      [postId]
-    );
-
-    await client.query("COMMIT");
-    const c = countsResult.rows[0];
-    res.json({
-      removed: result.rowCount > 0,
-      my_reaction: null,
-      liked: false,
-      like_count: Number(c.likes),
-      reaction_counts: {
-        like: Number(c.likes),
-        love: Number(c.loves),
-        sad: Number(c.sads),
-        angry: Number(c.angries)
-      }
-    });
-  } catch (error) {
-    if (client) await client.query("ROLLBACK").catch(() => {});
-    next(error);
-  } finally {
-    if (client) client.release();
-  }
-});
-
-/* LEGACY LIKE ENDPOINT */
+// Toggle like.
 app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   const postId = Number.parseInt(req.params.id, 10);
+
   if (!Number.isSafeInteger(postId) || postId <= 0) {
     return res.status(400).json({ error: "Invalid post ID." });
   }
 
   let client;
+
   try {
     client = await pool.connect();
     await client.query("BEGIN");
@@ -1197,24 +1264,22 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
       "SELECT id, user_id FROM ft_posts WHERE id = $1 FOR UPDATE",
       [postId]
     );
+
     if (!post.rows.length) {
       await client.query("ROLLBACK");
       return res.status(404).json({ error: "Post not found." });
     }
 
     const userId = String(req.user.id);
+
     const existing = await client.query(
-      `SELECT reaction FROM ft_post_reactions
-       WHERE post_id = $1 AND user_id = $2 FOR UPDATE`,
+      "SELECT 1 FROM ft_likes WHERE post_id = $1 AND user_id = $2",
       [postId, userId]
     );
 
     let liked;
-    if (existing.rows.length && existing.rows[0].reaction === "like") {
-      await client.query(
-        "DELETE FROM ft_post_reactions WHERE post_id = $1 AND user_id = $2",
-        [postId, userId]
-      );
+
+    if (existing.rows.length) {
       await client.query(
         "DELETE FROM ft_likes WHERE post_id = $1 AND user_id = $2",
         [postId, userId]
@@ -1222,16 +1287,7 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
       liked = false;
     } else {
       await client.query(
-        `INSERT INTO ft_post_reactions
-         (post_id, user_id, reaction, created_at, updated_at)
-         VALUES ($1, $2, 'like', NOW(), NOW())
-         ON CONFLICT (post_id, user_id) DO UPDATE SET
-           reaction = 'like', updated_at = NOW()`,
-        [postId, userId]
-      );
-      await client.query(
-        `INSERT INTO ft_likes (post_id, user_id)
-         VALUES ($1, $2) ON CONFLICT (post_id, user_id) DO NOTHING`,
+        "INSERT INTO ft_likes (post_id, user_id) VALUES ($1, $2)",
         [postId, userId]
       );
       liked = true;
@@ -1242,36 +1298,23 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
            (recipient_id, actor_id, type, post_id, message)
            VALUES ($1, $2, 'like', $3, $4)`,
           [
-            post.rows[0].user_id, userId, postId,
+            post.rows[0].user_id,
+            userId,
+            postId,
             `${req.user.username} liked your post.`
           ]
         );
       }
     }
 
-    const countsResult = await client.query(
-      `SELECT
-         COUNT(*) FILTER (WHERE reaction = 'like') AS likes,
-         COUNT(*) FILTER (WHERE reaction = 'love') AS loves,
-         COUNT(*) FILTER (WHERE reaction = 'sad') AS sads,
-         COUNT(*) FILTER (WHERE reaction = 'angry') AS angries
-       FROM ft_post_reactions WHERE post_id = $1`,
+    const count = await client.query(
+      "SELECT COUNT(*) FROM ft_likes WHERE post_id = $1",
       [postId]
     );
-    await client.query("COMMIT");
-    const c = countsResult.rows[0];
 
-    res.json({
-      liked,
-      my_reaction: liked ? "like" : null,
-      like_count: Number(c.likes),
-      reaction_counts: {
-        like: Number(c.likes),
-        love: Number(c.loves),
-        sad: Number(c.sads),
-        angry: Number(c.angries)
-      }
-    });
+    await client.query("COMMIT");
+
+    res.json({ liked, like_count: Number(count.rows[0].count) });
   } catch (error) {
     if (client) await client.query("ROLLBACK").catch(() => {});
     next(error);
@@ -1280,34 +1323,41 @@ app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   }
 });
 
-/* GET COMMENTS */
+// Read comments.
 app.get("/api/posts/:id/comments", async (req, res, next) => {
   if (!authReady(res)) return;
+
   try {
     const postId = Number.parseInt(req.params.id, 10);
+
     if (!Number.isSafeInteger(postId) || postId <= 0) {
       return res.status(400).json({ error: "Invalid post ID." });
     }
+
     const result = await pool.query(
       `SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
               u.username, p.avatar_url
        FROM ft_comments c
        JOIN users u ON u.id::text = c.user_id
        LEFT JOIN ft_profiles p ON p.user_id = c.user_id
-       WHERE c.post_id = $1 ORDER BY c.id ASC LIMIT 100`,
+       WHERE c.post_id = $1
+       ORDER BY c.id ASC
+       LIMIT 100`,
       [postId]
     );
+
     res.json({ comments: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* ADD COMMENT */
+// Add a comment.
 app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   try {
     const postId = Number.parseInt(req.params.id, 10);
     const content = cleanText(req.body.content, 2000);
+
     if (!Number.isSafeInteger(postId) || postId <= 0 || !content) {
       return res.status(400).json({
         error: "A valid post ID and comment are required."
@@ -1315,26 +1365,30 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
     }
 
     const post = await pool.query(
-      "SELECT user_id FROM ft_posts WHERE id = $1", [postId]
+      "SELECT user_id FROM ft_posts WHERE id = $1",
+      [postId]
     );
+
     if (!post.rows.length) {
       return res.status(404).json({ error: "Post not found." });
     }
 
-    const userId = String(req.user.id);
     const result = await pool.query(
       `INSERT INTO ft_comments (post_id, user_id, content)
-       VALUES ($1, $2, $3) RETURNING *`,
-      [postId, userId, content]
+       VALUES ($1, $2, $3)
+       RETURNING *`,
+      [postId, String(req.user.id), content]
     );
 
-    if (post.rows[0].user_id !== userId) {
+    if (post.rows[0].user_id !== String(req.user.id)) {
       await pool.query(
         `INSERT INTO ft_notifications
          (recipient_id, actor_id, type, post_id, message)
          VALUES ($1, $2, 'comment', $3, $4)`,
         [
-          post.rows[0].user_id, userId, postId,
+          post.rows[0].user_id,
+          String(req.user.id),
+          postId,
           `${req.user.username} commented on your post.`
         ]
       );
@@ -1349,13 +1403,16 @@ app.post("/api/posts/:id/comments", requireAuth, async (req, res, next) => {
   }
 });
 
-/* FOLLOW */
+// Follow a user.
 app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   try {
     const targetId = cleanText(req.params.id, 100);
     const myId = String(req.user.id);
+
     if (!targetId || targetId === myId) {
-      return res.status(400).json({ error: "You cannot follow yourself." });
+      return res.status(400).json({
+        error: "You cannot follow yourself."
+      });
     }
 
     const target = await pool.query(
@@ -1363,6 +1420,7 @@ app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
        WHERE id::text = $1 AND account_status = 'active'`,
       [targetId]
     );
+
     if (!target.rows.length) {
       return res.status(404).json({ error: "User not found." });
     }
@@ -1393,16 +1451,23 @@ app.post("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   }
 });
 
-/* UNFOLLOW */
+// Unfollow a user.
 app.delete("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   try {
     const targetId = cleanText(req.params.id, 100);
+    const myId = String(req.user.id);
+
+    if (!targetId || targetId === myId) {
+      return res.status(400).json({ error: "Invalid user ID." });
+    }
+
     const result = await pool.query(
       `DELETE FROM ft_follows
        WHERE follower_id = $1 AND following_id = $2
        RETURNING follower_id`,
-      [String(req.user.id), targetId]
+      [myId, targetId]
     );
+
     res.json({
       following: false,
       unfollowed: result.rowCount > 0
@@ -1412,53 +1477,64 @@ app.delete("/api/users/:id/follow", requireAuth, async (req, res, next) => {
   }
 });
 
-/* FOLLOWERS */
+// List a user's followers.
 app.get("/api/users/:id/followers", async (req, res, next) => {
   if (!authReady(res)) return;
+
   try {
     const userId = cleanText(req.params.id, 100);
+
     const result = await pool.query(
       `SELECT u.id, u.username, p.display_name, p.avatar_url,
               f.created_at AS followed_at
        FROM ft_follows f
        JOIN users u ON u.id::text = f.follower_id
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
-       WHERE f.following_id = $1 AND u.account_status = 'active'
-       ORDER BY f.created_at DESC LIMIT 200`,
+       WHERE f.following_id = $1
+         AND u.account_status = 'active'
+       ORDER BY f.created_at DESC
+       LIMIT 200`,
       [userId]
     );
+
     res.json({ followers: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* FOLLOWING */
+// List accounts followed by a user.
 app.get("/api/users/:id/following", async (req, res, next) => {
   if (!authReady(res)) return;
+
   try {
     const userId = cleanText(req.params.id, 100);
+
     const result = await pool.query(
       `SELECT u.id, u.username, p.display_name, p.avatar_url,
               f.created_at AS followed_at
        FROM ft_follows f
        JOIN users u ON u.id::text = f.following_id
        LEFT JOIN ft_profiles p ON p.user_id = u.id::text
-       WHERE f.follower_id = $1 AND u.account_status = 'active'
-       ORDER BY f.created_at DESC LIMIT 200`,
+       WHERE f.follower_id = $1
+         AND u.account_status = 'active'
+       ORDER BY f.created_at DESC
+       LIMIT 200`,
       [userId]
     );
+
     res.json({ following: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* REPORT POST */
+// Report a post.
 app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
   try {
     const postId = Number.parseInt(req.params.id, 10);
     const reason = cleanText(req.body.reason, 500);
+
     if (!Number.isSafeInteger(postId) || postId <= 0 || !reason) {
       return res.status(400).json({
         error: "A valid post ID and report reason are required."
@@ -1466,8 +1542,10 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
     }
 
     const post = await pool.query(
-      "SELECT id FROM ft_posts WHERE id = $1", [postId]
+      "SELECT id FROM ft_posts WHERE id = $1",
+      [postId]
     );
+
     if (!post.rows.length) {
       return res.status(404).json({ error: "Post not found." });
     }
@@ -1479,6 +1557,7 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
        RETURNING id`,
       [postId, String(req.user.id), reason]
     );
+
     res.status(201).json({
       message: result.rowCount
         ? "Report submitted for review."
@@ -1490,13 +1569,16 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
   }
 });
 
-/* READ CONVERSATION */
+// Read a conversation.
 app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
     const other = cleanText(req.params.userId, 100);
+
     if (!other || other === me) {
-      return res.status(400).json({ error: "Invalid conversation user." });
+      return res.status(400).json({
+        error: "Invalid conversation user."
+      });
     }
 
     const account = await pool.query(
@@ -1504,6 +1586,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
        WHERE id::text = $1 AND account_status = 'active'`,
       [other]
     );
+
     if (!account.rows.length) {
       return res.status(404).json({ error: "User not found." });
     }
@@ -1519,16 +1602,18 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
        FROM ft_messages
        WHERE (sender_id = $1 AND recipient_id = $2)
           OR (sender_id = $2 AND recipient_id = $1)
-       ORDER BY id DESC LIMIT 100`,
+       ORDER BY id DESC
+       LIMIT 100`,
       [me, other]
     );
+
     res.json({ messages: result.rows.reverse() });
   } catch (error) {
     next(error);
   }
 });
 
-/* SEND MESSAGE */
+// Send a message.
 app.post("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const recipientId = cleanText(req.body.recipient_id, 100);
@@ -1546,13 +1631,15 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
        WHERE id::text = $1 AND account_status = 'active'`,
       [recipientId]
     );
+
     if (!recipient.rows.length) {
       return res.status(404).json({ error: "Recipient not found." });
     }
 
     const result = await pool.query(
       `INSERT INTO ft_messages (sender_id, recipient_id, content)
-       VALUES ($1, $2, $3) RETURNING *`,
+       VALUES ($1, $2, $3)
+       RETURNING *`,
       [senderId, recipientId, content]
     );
 
@@ -1562,21 +1649,28 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
        VALUES ($1, $2, 'message', $3)`,
       [recipientId, senderId, `New message from ${req.user.username}.`]
     );
-    res.status(201).json({ message: "Message sent.", item: result.rows[0] });
+
+    res.status(201).json({
+      message: "Message sent.",
+      item: result.rows[0]
+    });
   } catch (error) {
     next(error);
   }
 });
 
-/* LIST CONVERSATIONS */
+// List conversations.
 app.get("/api/messages", requireAuth, async (req, res, next) => {
   try {
     const me = String(req.user.id);
+
     const result = await pool.query(
       `WITH conversation_messages AS (
          SELECT *,
-           CASE WHEN sender_id = $1 THEN recipient_id ELSE sender_id END AS other_id
-         FROM ft_messages WHERE sender_id = $1 OR recipient_id = $1
+           CASE WHEN sender_id = $1 THEN recipient_id ELSE sender_id END
+             AS other_id
+         FROM ft_messages
+         WHERE sender_id = $1 OR recipient_id = $1
        ),
        latest AS (
          SELECT DISTINCT ON (other_id)
@@ -1595,29 +1689,32 @@ app.get("/api/messages", requireAuth, async (req, res, next) => {
        ORDER BY l.id DESC`,
       [me]
     );
+
     res.json({ conversations: result.rows });
   } catch (error) {
     next(error);
   }
 });
 
-/* NOTIFICATIONS */
+// List notifications.
 app.get("/api/notifications", requireAuth, async (req, res, next) => {
   try {
-    const userId = String(req.user.id);
     const result = await pool.query(
       `SELECT n.*, u.username AS actor_username
        FROM ft_notifications n
        LEFT JOIN users u ON u.id::text = n.actor_id
        WHERE n.recipient_id = $1
-       ORDER BY n.id DESC LIMIT 100`,
-      [userId]
+       ORDER BY n.id DESC
+       LIMIT 100`,
+      [String(req.user.id)]
     );
+
     const unread = await pool.query(
       `SELECT COUNT(*) FROM ft_notifications
        WHERE recipient_id = $1 AND read_at IS NULL`,
-      [userId]
+      [String(req.user.id)]
     );
+
     res.json({
       notifications: result.rows,
       unread_count: Number(unread.rows[0].count)
@@ -1627,25 +1724,33 @@ app.get("/api/notifications", requireAuth, async (req, res, next) => {
   }
 });
 
-/* MARK ONE NOTIFICATION READ */
+// Mark one notification as read.
 app.patch(
   "/api/notifications/:id/read",
   requireAuth,
   async (req, res, next) => {
     try {
       const id = Number.parseInt(req.params.id, 10);
+
       if (!Number.isSafeInteger(id) || id <= 0) {
-        return res.status(400).json({ error: "Invalid notification ID." });
+        return res.status(400).json({
+          error: "Invalid notification ID."
+        });
       }
+
       const result = await pool.query(
         `UPDATE ft_notifications SET read_at = NOW()
          WHERE id = $1 AND recipient_id = $2
          RETURNING id, read_at`,
         [id, String(req.user.id)]
       );
+
       if (!result.rows.length) {
-        return res.status(404).json({ error: "Notification not found." });
+        return res.status(404).json({
+          error: "Notification not found."
+        });
       }
+
       res.json({ notification: result.rows[0] });
     } catch (error) {
       next(error);
@@ -1653,7 +1758,7 @@ app.patch(
   }
 );
 
-/* MARK ALL NOTIFICATIONS READ */
+// Mark all notifications as read.
 app.patch(
   "/api/notifications/read-all",
   requireAuth,
@@ -1664,6 +1769,7 @@ app.patch(
          WHERE recipient_id = $1 AND read_at IS NULL`,
         [String(req.user.id)]
       );
+
       res.json({
         message: "Notifications marked as read.",
         updated: result.rowCount
@@ -1674,12 +1780,12 @@ app.patch(
   }
 );
 
-/* 404 */
+// 404 handler.
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
 });
 
-/* ERROR HANDLER */
+// Error handler.
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
 
@@ -1695,8 +1801,10 @@ app.use((error, req, res, next) => {
     });
   }
 
-  if (error.message &&
-      error.message.startsWith("Unsupported file type")) {
+  if (
+    error.message &&
+    error.message.startsWith("Unsupported file type")
+  ) {
     return res.status(400).json({ error: error.message });
   }
 
@@ -1704,13 +1812,15 @@ app.use((error, req, res, next) => {
     code: error.code,
     message: error.message
   });
+
   res.status(500).json({ error: "Internal server error." });
 });
 
-/* START */
+// Start server.
 async function startServer() {
   try {
     if (pool) await initializeDatabase();
+
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`FreeTube API listening on port ${PORT}`);
     });
