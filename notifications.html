@@ -11,23 +11,22 @@
 :root{
   --bg:#10291f;
   --panel:#172f24;
-  --panel2:#20392d;
   --green:#00e991;
-  --red:#ff626b;
+  --red:#ff5369;
   --text:#f6fff9;
   --muted:#a9bdb2;
   --border:rgba(255,255,255,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{min-height:100%;background:var(--bg)}
+html,body{min-height:100%;background:var(--bg)}
 body{
-  min-height:100vh;
-  color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
   background:linear-gradient(145deg,#65172f 0%,#35233a 35%,#123e2b 70%,#007b48 100%);
   background-attachment:fixed;
 }
-button{font:inherit;cursor:pointer;color:inherit}
+button,a{font:inherit}
+button{cursor:pointer;color:inherit}
 .app{
   max-width:650px;
   min-height:100dvh;
@@ -36,58 +35,27 @@ button{font:inherit;cursor:pointer;color:inherit}
   background:rgba(16,41,31,.18);
 }
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  gap:12px;
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:12px;
   padding:calc(12px + env(safe-area-inset-top)) 16px 14px;
-  background:rgba(25,28,29,.78);
+  background:rgba(30,30,33,.80);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
 .menu-btn,.search-btn{
-  width:38px;height:42px;
-  flex-shrink:0;
+  flex-shrink:0;width:38px;height:42px;
   display:grid;place-items:center;
-  border:0;background:transparent;
-  font-size:23px;
+  background:transparent;border:0;font-size:23px;
 }
 .topbar h1{
-  flex:1;
-  min-width:0;
+  flex:1;min-width:0;
   font-size:clamp(23px,6vw,34px);
-  font-weight:850;
-  letter-spacing:-.7px;
+  font-weight:850;letter-spacing:-.7px;
 }
-.search-btn{font-size:22px}
-.brand{
-  display:none;
-  font-weight:900;
-  font-size:22px;
-}
-.brand i,.brand span{color:var(--green)}
-.header-actions{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.mark-all{
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:9px 10px;
-  background:rgba(255,255,255,.08);
-  font-size:11px;
-  font-weight:700;
-  white-space:nowrap;
-}
-.mark-all:disabled{opacity:.4}
 .search-panel{
-  display:none;
-  padding:12px 15px;
-  background:rgba(23,47,36,.8);
+  display:none;padding:12px 15px;
+  background:rgba(23,47,36,.85);
   border-bottom:1px solid var(--border);
 }
 .search-panel.open{display:block}
@@ -96,191 +64,122 @@ button{font:inherit;cursor:pointer;color:inherit}
   padding:0 12px;
   border:1px solid var(--border);
   border-radius:14px;
-  background:rgba(10,35,25,.5);
+  background:rgba(10,35,25,.55);
 }
 .search-box i{color:var(--green)}
 .search-box input{
-  width:100%;min-width:0;
-  padding:13px 0;
-  color:white;background:transparent;
-  border:0;outline:0;
+  width:100%;min-width:0;padding:13px 0;
+  background:transparent;border:0;outline:0;color:#fff;
 }
 .search-box input::placeholder{color:var(--muted)}
 .section-title{
   padding:14px 16px;
-  font-size:20px;
-  font-weight:800;
-  background:rgba(24,28,28,.56);
+  font-size:20px;font-weight:850;
+  background:rgba(24,28,28,.65);
   border-bottom:1px solid rgba(255,255,255,.04);
 }
 .notification-list{padding:0}
 .notification{
-  position:relative;
-  display:flex;
-  align-items:flex-start;
-  gap:12px;
-  padding:15px 15px 17px;
-  background:rgba(31,48,61,.84);
-  border-bottom:1px solid rgba(255,255,255,.035);
-  transition:background .2s;
+  display:flex;align-items:flex-start;gap:12px;
+  padding:16px 15px 18px;
+  background:rgba(31,48,61,.88);
+  border-bottom:1px solid rgba(255,255,255,.04);
 }
-.notification.unread{
-  background:rgba(36,57,70,.94);
-}
-.avatar-wrap{
-  position:relative;
-  width:62px;height:62px;
-  flex-shrink:0;
-}
+.notification.unread{background:rgba(36,57,70,.96)}
+.avatar-wrap{position:relative;flex-shrink:0;width:62px;height:62px}
 .avatar{
-  width:62px;height:62px;
-  display:block;
-  object-fit:cover;
-  border-radius:50%;
-  background:var(--panel2);
-  border:1px solid rgba(255,255,255,.12);
+  display:block;width:62px;height:62px;
+  object-fit:cover;border-radius:50%;
+  background:#20392d;
+  border:1px solid rgba(255,255,255,.15);
+}
+.avatar-fallback{
+  display:grid;place-items:center;
+  width:62px;height:62px;border-radius:50%;
+  background:linear-gradient(140deg,#164d39,#263d54);
+  color:#fff;font-size:25px;
 }
 .action-badge{
-  position:absolute;
-  right:-3px;bottom:-2px;
-  width:29px;height:29px;
+  position:absolute;right:-3px;bottom:-2px;
+  width:30px;height:30px;
   display:grid;place-items:center;
-  border:2px solid rgba(31,48,61,.95);
-  border-radius:50%;
-  background:#168dff;
-  color:#fff;
-  font-size:13px;
+  border:2px solid #243946;border-radius:50%;
+  background:#269b48;color:#fff;font-size:14px;
 }
-.action-badge.comment,.action-badge.follow,.action-badge.like{
-  background:#269b48;
-}
-.action-badge.birthday{background:#d747a7}
-.action-badge.story{background:#168dff}
-.notification-body{
-  flex:1;
-  min-width:0;
-  padding-top:1px;
-}
+.action-badge.like{background:#168dff}
+.action-badge.love{background:#e52e55}
+.action-badge.comment{background:#269b48}
+.action-badge.follow{background:#269b48}
+.action-badge.message{background:#168dff}
+.action-badge.other{background:#6d7480}
+.notification-body{flex:1;min-width:0;padding-top:1px}
 .message{
-  font-size:15px;
-  line-height:1.48;
-  overflow-wrap:anywhere;
-  color:#f6f8fb;
+  font-size:16px;line-height:1.48;
+  overflow-wrap:anywhere;color:#f6f8fb;
 }
-.user-name{
-  font-weight:850;
+.user-name,.action-name{
+  font-weight:900;
   color:#fff;
 }
-.action-name{
-  font-weight:850;
-  color:#fff;
-}
-.time{
-  margin-top:5px;
-  color:#b6c0c9;
-  font-size:13px;
-}
+.time{margin-top:5px;color:#b6c0c9;font-size:14px}
 .notification-actions{
-  flex-shrink:0;
-  display:flex;
-  align-items:center;
-  gap:8px;
+  flex-shrink:0;display:flex;align-items:center;gap:5px;
 }
 .more-btn,.read-btn{
   width:28px;height:28px;
   display:grid;place-items:center;
-  border:0;
-  background:transparent;
-  color:#e0e7ed;
-  border-radius:50%;
+  border:0;border-radius:50%;
+  background:transparent;color:#e0e7ed;
 }
 .more-btn{font-size:16px}
-.read-btn{font-size:13px;color:var(--green)}
+.read-btn{color:var(--green);font-size:14px}
 .more-btn:active,.read-btn:active{background:rgba(255,255,255,.12)}
 .empty-state,.loading-state{
-  text-align:center;
-  padding:50px 20px;
-  color:var(--muted);
-  line-height:1.8;
+  padding:42px 18px;text-align:center;
+  color:var(--muted);line-height:1.8;
 }
 .empty-state>i,.loading-state>i{
-  font-size:38px;
-  margin-bottom:12px;
-  color:var(--green);
+  color:var(--green);font-size:35px;margin-bottom:12px;
 }
-.empty-state h2{
-  color:var(--text);
-  font-size:19px;
-  margin-bottom:5px;
-}
+.empty-state h2{color:#fff;font-size:19px;margin-bottom:6px}
 .primary-btn,.secondary-btn{
-  margin-top:15px;
-  padding:11px 17px;
-  border-radius:11px;
-  border:1px solid var(--border);
-  font-weight:700;
+  margin-top:14px;padding:11px 17px;
+  border:1px solid var(--border);border-radius:11px;
+  font-weight:750;
 }
-.primary-btn{
-  background:linear-gradient(110deg,var(--red),#00bd78);
-  color:white;
-}
-.secondary-btn{background:var(--panel2)}
+.primary-btn{background:linear-gradient(110deg,var(--red),#00bd78)}
+.secondary-btn{background:#20392d}
 .bottom-nav{
-  position:fixed;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  z-index:30;
-  width:100%;
-  max-width:650px;
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  z-index:30;width:100%;max-width:650px;
+  display:flex;align-items:center;justify-content:space-around;
   padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,41,31,.60);
+  background:rgba(16,41,31,.65);
   backdrop-filter:blur(22px);
   -webkit-backdrop-filter:blur(22px);
   border-top:1px solid rgba(255,255,255,.15);
 }
 .nav-item{
   flex:1;min-width:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-  gap:5px;
-  color:var(--muted);
-  text-decoration:none;
-  font-size:11px;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:5px;
+  color:var(--muted);text-decoration:none;font-size:11px;
 }
 .nav-item i{font-size:21px}
 .nav-item.active{color:var(--green)}
-.nav-item.active i{filter:drop-shadow(0 0 5px rgba(0,233,145,.35))}
 .toast{
-  position:fixed;
-  left:50%;bottom:90px;
-  transform:translateX(-50%);
-  z-index:60;
-  display:none;
-  max-width:90%;
-  padding:12px 16px;
-  border:1px solid var(--border);
-  border-radius:12px;
-  background:rgba(23,47,36,.97);
-  font-size:13px;
-  text-align:center;
+  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
+  z-index:60;display:none;max-width:90%;
+  padding:12px 16px;border:1px solid var(--border);
+  border-radius:12px;background:rgba(23,47,36,.97);
+  font-size:13px;text-align:center;
 }
 .toast.show{display:block}
-@media(min-width:500px){
-  .brand{display:block}
-  .topbar h1{font-size:27px}
-  .avatar-wrap,.avatar{width:58px;height:58px}
-  .message{font-size:15px}
-}
 @media(max-width:380px){
   .topbar{gap:7px;padding-left:10px;padding-right:10px}
   .topbar h1{font-size:23px}
-  .mark-all{padding:8px;font-size:10px}
   .notification{padding:13px 10px;gap:9px}
-  .avatar-wrap,.avatar{width:50px;height:50px}
+  .avatar-wrap,.avatar,.avatar-fallback{width:50px;height:50px}
   .action-badge{width:25px;height:25px;font-size:11px}
   .message{font-size:14px}
   .section-title{font-size:18px}
@@ -292,20 +191,13 @@ button{font:inherit;cursor:pointer;color:inherit}
 <div class="app">
 
 <header class="topbar">
-  <button class="menu-btn" id="menuButton" type="button" aria-label="Open menu">
+  <button class="menu-btn" id="menuButton" aria-label="Open settings">
     <i class="fa-solid fa-bars"></i>
   </button>
-
   <h1>Notifications</h1>
-
-  <div class="header-actions">
-    <button class="search-btn" id="searchToggle" type="button" aria-label="Search notifications">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </button>
-    <button class="mark-all" id="markAllBtn" type="button" hidden>
-      <i class="fa-solid fa-check-double"></i>
-    </button>
-  </div>
+  <button class="search-btn" id="searchToggle" aria-label="Search notifications">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
 </header>
 
 <section class="search-panel" id="searchPanel">
@@ -332,23 +224,18 @@ button{font:inherit;cursor:pointer;color:inherit}
 
 <nav class="bottom-nav" aria-label="Main navigation">
   <a class="nav-item" href="home.html">
-    <i class="fa-solid fa-house"></i>
-    <span>Home</span>
+    <i class="fa-solid fa-house"></i><span>Home</span>
   </a>
   <a class="nav-item" href="discover.html">
-    <i class="fa-solid fa-compass"></i>
-    <span>Pulse</span>
+    <i class="fa-solid fa-compass"></i><span>Pulse</span>
   </a>
   <a class="nav-item active" href="notifications.html" aria-current="page">
-    <i class="fa-solid fa-bell"></i>
-    <span>Notifications</span>
+    <i class="fa-solid fa-bell"></i><span>Notifications</span>
   </a>
   <a class="nav-item" href="profile.html">
-    <i class="fa-regular fa-user"></i>
-    <span>Profile</span>
+    <i class="fa-regular fa-user"></i><span>Profile</span>
   </a>
 </nav>
-
 </div>
 
 <div id="toast" class="toast" role="status"></div>
@@ -364,7 +251,6 @@ const earlierList=document.getElementById("earlierList");
 const searchPanel=document.getElementById("searchPanel");
 const searchInput=document.getElementById("searchInput");
 const toast=document.getElementById("toast");
-const markAllBtn=document.getElementById("markAllBtn");
 
 let notifications=[];
 let loading=false;
@@ -376,9 +262,9 @@ function getToken(){
 }
 
 function escapeHTML(value){
-  return String(value??"").replace(/[&<>"']/g,char=>({
+  return String(value??"").replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[char]);
+  })[c]);
 }
 
 function showToast(message){
@@ -388,27 +274,80 @@ function showToast(message){
   toastTimer=setTimeout(()=>toast.classList.remove("show"),2800);
 }
 
-function iconFor(type){
-  const value=String(type||"").toLowerCase();
-  if(value.includes("comment")||value.includes("mention"))return "fa-comment";
-  if(value.includes("like"))return "fa-heart";
-  if(value.includes("react"))return "fa-face-smile";
-  if(value.includes("follow"))return "fa-user-plus";
-  if(value.includes("story"))return "fa-book-open";
-  if(value.includes("birthday"))return "fa-cake-candles";
-  if(value.includes("message"))return "fa-comment-dots";
-  if(value.includes("post"))return "fa-image";
-  return "fa-bell";
+function getActor(item){
+  return String(
+    item.actor_display_name ||
+    item.actor_username ||
+    item.username ||
+    item.display_name ||
+    item.sender_name ||
+    ""
+  ).trim();
 }
 
-function actionClass(type){
-  const value=String(type||"").toLowerCase();
-  if(value.includes("comment")||value.includes("mention"))return "comment";
-  if(value.includes("follow"))return "follow";
-  if(value.includes("like")||value.includes("react"))return "like";
-  if(value.includes("story"))return "story";
-  if(value.includes("birthday"))return "birthday";
-  return "";
+/*
+  Determine the exact action from the notification type and message.
+  Love reactions are recognized if the backend sends a love-specific type
+  or a message explicitly describing a love reaction.
+*/
+function getAction(item){
+  const type=String(item.type||item.notification_type||"").toLowerCase();
+  const message=String(item.message||"").toLowerCase();
+  const combined=type+" "+message;
+
+  if(/\blove\b|\bloved\b|\bhearts?\b/.test(combined) &&
+     /(react|reaction|love|heart)/.test(combined)){
+    return "love";
+  }
+
+  if(type.includes("comment") || type.includes("mention") ||
+     /\bcommented\b|\bcomment\b|\bmentioned you\b/.test(message)){
+    return "comment";
+  }
+
+  if(type.includes("like") || /\bliked your post\b/.test(message)){
+    return "like";
+  }
+
+  if(type.includes("follow") || /\bstarted following\b|\bfollowed you\b/.test(message)){
+    return "follow";
+  }
+
+  if(type.includes("message") || /\bnew message\b|\bsent you a message\b/.test(message)){
+    return "message";
+  }
+
+  if(type.includes("story") || message.includes("story")){
+    return "story";
+  }
+
+  return "other";
+}
+
+function actionIcon(action){
+  const icons={
+    comment:"fa-comment",
+    like:"fa-thumbs-up",
+    love:"fa-heart",
+    follow:"fa-user-plus",
+    message:"fa-comment-dots",
+    story:"fa-book-open",
+    other:"fa-bell"
+  };
+  return icons[action]||icons.other;
+}
+
+function actionLabel(action){
+  const labels={
+    comment:"Comment",
+    like:"Like",
+    love:"Love",
+    follow:"Following",
+    message:"Message",
+    story:"Story",
+    other:"Notification"
+  };
+  return labels[action]||labels.other;
 }
 
 function timeAgo(value){
@@ -430,101 +369,87 @@ function timeAgo(value){
 }
 
 /*
- * Prefer explicit API fields for the actor and action.
- * When the backend supplies only a plain message, highlight the
- * first name and known action words without changing the stored message.
- */
+  Prefer the API message, but bold the actor's name and action words.
+  If no message exists, construct one from the known notification type.
+*/
 function buildMessage(item){
-  const actor=
-    item.actor_name||
-    item.display_name||
-    item.username||
-    item.sender_name||
-    item.full_name||
-    "";
+  const actor=getActor(item);
+  const action=getAction(item);
+  const raw=String(item.message||item.body||"");
 
-  const action=String(
-    item.action||
-    item.verb||
-    item.type||
-    item.notification_type||
-    ""
-  ).toLowerCase();
+  if(!raw){
+    const phrases={
+      comment:"commented on your post.",
+      like:"liked your post.",
+      love:"reacted love to your post.",
+      follow:"started following you.",
+      message:"sent you a message.",
+      story:"added to their story.",
+      other:"sent you a notification."
+    };
+    return (actor
+      ?'<strong class="user-name">'+escapeHTML(actor)+'</strong> '
+      :"")+
+      '<strong class="action-name">'+escapeHTML(phrases[action])+'</strong>';
+  }
 
-  const rawMessage=String(item.message||item.body||"");
-  let safeMessage=escapeHTML(rawMessage);
+  let output=escapeHTML(raw);
 
+  // Highlight the username returned by the API.
   if(actor){
-    const safeActor=escapeHTML(actor);
-    const escapedActor=safeActor.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-    safeMessage=safeMessage.replace(
-      new RegExp(escapedActor,"ig"),
+    const escaped=escapeHTML(actor).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+    output=output.replace(
+      new RegExp(escaped,"ig"),
       match=>'<strong class="user-name">'+match+"</strong>"
     );
   }
 
-  safeMessage=safeMessage.replace(
-    /\b(commented|comment|comments|liked|like|likes|reacted|react|reaction|reactions|followed|following|follows|started following|mentioned|replied|shared)\b/gi,
-    match=>'<strong class="action-name">'+match+"</strong>"
-  );
+  // Highlight action phrases, including phrases such as "reacted love".
+  const phrases=[
+    /\bstarted following\b/gi,
+    /\breacted love\b/gi,
+    /\breacted like\b/gi,
+    /\breacted\b/gi,
+    /\bcommented\b/gi,
+    /\bcomment\b/gi,
+    /\bmentioned\b/gi,
+    /\bliked\b/gi,
+    /\blike\b/gi,
+    /\bfollowing\b/gi,
+    /\bfollowed\b/gi,
+    /\blove\b/gi,
+    /\bshared\b/gi,
+    /\breplied\b/gi,
+    /\bsent you a message\b/gi
+  ];
 
-  if(!rawMessage&&actor){
-    const actions={
-      like:' liked your post.',
-      liked:' liked your post.',
-      reaction:' reacted to your post.',
-      react:' reacted to your post.',
-      comment:' commented on your post.',
-      commented:' commented on your post.',
-      follow:' started following you.',
-      followed:' started following you.',
-      following:' started following you.',
-      mention:' mentioned you in a comment.',
-      mentioned:' mentioned you in a comment.',
-      message:' sent you a message.',
-      story:' added to their story.',
-      post:' created a post.'
-    };
-    const phrase=actions[action]||" sent you a notification.";
-    safeMessage='<strong class="user-name">'+escapeHTML(actor)+'</strong>'+escapeHTML(phrase);
+  for(const regex of phrases){
+    output=output.replace(regex,match=>{
+      if(match.includes('class="action-name"'))return match;
+      return '<strong class="action-name">'+match+"</strong>";
+    });
   }
 
-  return safeMessage||"You have a new notification.";
+  return output;
 }
 
 function normalize(item,index){
-  const type=String(
-    item.type||item.notification_type||item.action||"notification"
-  ).toLowerCase();
-
-  const actor=
-    item.actor||
-    item.sender||
-    item.user||
-    item.from_user||
-    {};
-
-  const avatar=
-    item.actor_avatar||
-    item.avatar_url||
-    item.avatar||
-    item.profile_picture||
-    actor.avatar_url||
-    actor.avatar||
-    "";
-
+  const actorObject=item.actor||item.sender||item.user||{};
   return {
     id:String(item.id??item.notification_id??index),
-    type,
-    actorName:
-      item.actor_name||
-      item.display_name||
-      item.username||
-      item.sender_name||
-      actor.display_name||
-      actor.username||
+    type:String(item.type||item.notification_type||"notification").toLowerCase(),
+    actorName:getActor(item)||String(
+      actorObject.display_name||actorObject.username||""
+    ),
+    avatar:
+      item.actor_avatar_url||
+      item.actor_avatar||
+      item.avatar_url||
+      item.avatar||
+      item.profile_picture||
+      actorObject.avatar_url||
+      actorObject.avatar||
       "",
-    avatar,
     message:item.message||item.body||"",
     created:item.created_at||item.createdAt||item.time||"",
     read:Boolean(item.read_at||item.is_read===true||item.read===true),
@@ -533,17 +458,19 @@ function normalize(item,index){
 }
 
 function renderItem(item){
-  const icon=iconFor(item.type);
-  const badge=actionClass(item.type);
-  const avatar=item.avatar
-    ?'<img class="avatar" src="'+escapeHTML(item.avatar)+'" alt="" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.hidden=false"><span class="avatar-fallback" hidden><i class="fa-solid fa-user"></i></span>'
-    :'<span class="avatar avatar-fallback"><i class="fa-solid fa-user"></i></span>';
+  const action=getAction(item);
+  const icon=actionIcon(action);
+  const avatarHTML=item.avatar
+    ?'<img class="avatar" src="'+escapeHTML(item.avatar)+
+      '" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">'+
+      '<span class="avatar-fallback" hidden><i class="fa-solid fa-user"></i></span>'
+    :'<span class="avatar-fallback"><i class="fa-solid fa-user"></i></span>';
 
   return `
     <article class="notification ${item.read?"":"unread"}" data-id="${escapeHTML(item.id)}">
       <div class="avatar-wrap">
-        ${avatar}
-        <span class="action-badge ${badge}">
+        ${avatarHTML}
+        <span class="action-badge ${action}" title="${escapeHTML(actionLabel(action))}">
           <i class="fa-solid ${icon}"></i>
         </span>
       </div>
@@ -554,11 +481,13 @@ function renderItem(item){
       </div>
 
       <div class="notification-actions">
-        <button class="more-btn" type="button" data-more="${escapeHTML(item.id)}" aria-label="Notification options">
+        <button class="more-btn" type="button"
+          data-more="${escapeHTML(item.id)}" aria-label="Notification options">
           <i class="fa-solid fa-ellipsis"></i>
         </button>
         ${item.read?"":`
-          <button class="read-btn" type="button" data-read="${escapeHTML(item.id)}" aria-label="Mark as read">
+          <button class="read-btn" type="button"
+            data-read="${escapeHTML(item.id)}" aria-label="Mark as read">
             <i class="fa-solid fa-check"></i>
           </button>
         `}
@@ -569,26 +498,23 @@ function renderItem(item){
 
 function render(){
   const query=searchInput.value.trim().toLowerCase();
+
   const filtered=notifications.filter(item=>{
-    if(!query)return true;
-    const haystack=[
+    const text=[
       item.actorName,
       item.message,
-      item.type
+      item.type,
+      getAction(item)
     ].join(" ").toLowerCase();
-    return haystack.includes(query);
+    return !query||text.includes(query);
   });
-
-  const unread=notifications.filter(item=>!item.read).length;
-  markAllBtn.hidden=unread===0;
-  markAllBtn.disabled=unread===0;
 
   const newItems=filtered.filter(item=>!item.read);
   const earlierItems=filtered.filter(item=>item.read);
 
   newList.innerHTML=newItems.length
     ?newItems.map(renderItem).join("")
-    :'<div class="empty-state">No new notifications.</div>';
+    :'<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><br><h2>No new notifications</h2></div>';
 
   earlierList.innerHTML=earlierItems.length
     ?earlierItems.map(renderItem).join("")
@@ -602,12 +528,8 @@ function render(){
     button.addEventListener("click",()=>{
       const item=notifications.find(n=>n.id===button.dataset.more);
       if(!item)return;
-
-      if(!item.read){
-        markOneAsRead(item.id);
-      }else{
-        showToast("This notification is already read.");
-      }
+      if(!item.read)markOneAsRead(item.id);
+      else showToast("This notification is already read.");
     });
   });
 }
@@ -632,7 +554,7 @@ async function apiRequest(path,options={}){
       cache:"no-store"
     });
   }catch(_){
-    throw new Error("Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করো।");
+    throw new Error("Backend-এ সংযোগ হচ্ছে না। ইন্টারনেট পরীক্ষা করো।");
   }
 
   const raw=await response.text();
@@ -645,21 +567,22 @@ async function apiRequest(path,options={}){
     error.status=response.status;
     throw error;
   }
-
   return data;
 }
 
-function showError(title,description,buttonText){
+function showError(title,description,login=false){
   newList.innerHTML=`
     <div class="empty-state">
       <i class="fa-solid fa-triangle-exclamation"></i>
       <h2>${escapeHTML(title)}</h2>
       <p>${escapeHTML(description)}</p>
-      <button class="primary-btn" id="retryBtn">${escapeHTML(buttonText||"Try again")}</button>
-    </div>
-  `;
+      <button class="primary-btn" id="retryBtn">${login?"Login":"Try again"}</button>
+    </div>`;
   earlierList.innerHTML="";
-  document.getElementById("retryBtn").addEventListener("click",loadNotifications);
+  document.getElementById("retryBtn").addEventListener("click",()=>{
+    if(login)location.href="auth.html?mode=login";
+    else loadNotifications();
+  });
 }
 
 async function loadNotifications(){
@@ -671,14 +594,7 @@ async function loadNotifications(){
 
   try{
     if(!getToken()){
-      showError(
-        "Please log in",
-        "Log in to your FreeTube account to view notifications.",
-        "Login"
-      );
-      document.getElementById("retryBtn").onclick=()=>{
-        location.href="auth.html?mode=login";
-      };
+      showError("Please log in","Log in to view your notifications.",true);
       return;
     }
 
@@ -689,25 +605,12 @@ async function loadNotifications(){
 
     notifications=items.map(normalize);
     render();
-
   }catch(error){
     console.error("Notification loading failed:",error);
-
     if(error.status===401||error.message==="LOGIN_REQUIRED"){
-      showError(
-        "Login required",
-        "Your login session may have expired. Please log in again.",
-        "Login"
-      );
-      document.getElementById("retryBtn").onclick=()=>{
-        location.href="auth.html?mode=login";
-      };
+      showError("Login required","Your login session may have expired.",true);
     }else{
-      showError(
-        "Could not load notifications",
-        error.message||"Please try again.",
-        "Try again"
-      );
+      showError("Could not load notifications",error.message||"Please try again.");
     }
   }finally{
     loading=false;
@@ -716,7 +619,6 @@ async function loadNotifications(){
 
 async function markOneAsRead(id){
   if(!id)return;
-
   const item=notifications.find(n=>n.id===String(id));
   if(!item||item.read)return;
 
@@ -725,7 +627,6 @@ async function markOneAsRead(id){
       "/notifications/"+encodeURIComponent(id)+"/read",
       {method:"PATCH"}
     );
-
     item.read=true;
     item.original.read_at=new Date().toISOString();
     render();
@@ -735,24 +636,19 @@ async function markOneAsRead(id){
 }
 
 async function markAllAsRead(){
-  if(loading||markAllBtn.disabled)return;
-
-  markAllBtn.disabled=true;
+  if(loading||!notifications.some(item=>!item.read))return;
 
   try{
     await apiRequest("/notifications/read-all",{method:"PATCH"});
-
     const now=new Date().toISOString();
     notifications.forEach(item=>{
       item.read=true;
       item.original.read_at=item.original.read_at||now;
     });
-
     render();
     showToast("All notifications marked as read.");
   }catch(error){
     showToast("Could not mark notifications as read: "+error.message);
-    markAllBtn.disabled=false;
   }
 }
 
@@ -762,16 +658,15 @@ document.getElementById("menuButton").addEventListener("click",()=>{
 
 document.getElementById("searchToggle").addEventListener("click",()=>{
   searchPanel.classList.toggle("open");
-  if(searchPanel.classList.contains("open"))searchInput.focus();
-  else{
+  if(searchPanel.classList.contains("open")){
+    searchInput.focus();
+  }else{
     searchInput.value="";
     render();
   }
 });
 
 searchInput.addEventListener("input",render);
-markAllBtn.addEventListener("click",markAllAsRead);
-
 loadNotifications();
 </script>
 </body>
