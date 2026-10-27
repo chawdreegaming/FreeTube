@@ -4,8 +4,11 @@ package com.freetube.app;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
@@ -14,14 +17,28 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+
 public class MainActivity extends Activity {
+
     private static final String HOME_URL =
             "https://chawdreegaming.github.io/FreeTube/";
 
+    // Google official test banner ID
+    private static final String BANNER_AD_UNIT_ID =
+            "ca-app-pub-3940256099942544/9214589741";
+
     private WebView webView;
+    private AdView adView;
     private ValueCallback<Uri[]> fileCallback;
+
     private static final int FILE_CHOOSER_REQUEST = 1201;
 
     @Override
@@ -31,9 +48,24 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(0xFF251D2D);
         getWindow().setNavigationBarColor(0xFF191A20);
 
+        LinearLayout root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setBackgroundColor(0xFF191A20);
+
         webView = new WebView(this);
         webView.setBackgroundColor(0xFF191A20);
-        setContentView(webView);
+
+        root.addView(webView, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
+
+        FrameLayout adContainer = new FrameLayout(this);
+        adContainer.setBackgroundColor(Color.WHITE);
+
+        root.addView(adContainer, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        setContentView(root);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -93,8 +125,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        webView.setDownloadListener(
-                new DownloadListener() {
+        webView.setDownloadListener(new DownloadListener() {
             @Override
             public void onDownloadStart(
                     String url, String userAgent,
@@ -117,6 +148,33 @@ public class MainActivity extends Activity {
         } else {
             webView.loadUrl(HOME_URL);
         }
+
+        MobileAds.initialize(this, initializationStatus -> {
+            runOnUiThread(() -> {
+                if (isFinishing() || isDestroyed()
+                        || adContainer.getParent() == null) {
+                    return;
+                }
+
+                adView = new AdView(MainActivity.this);
+                adView.setAdUnitId(BANNER_AD_UNIT_ID);
+
+                int widthPixels = getResources()
+                        .getDisplayMetrics().widthPixels;
+                float density = getResources()
+                        .getDisplayMetrics().density;
+                int adWidth = (int) (widthPixels / density);
+
+                adView.setAdSize(
+                        AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+                                MainActivity.this, adWidth));
+
+                adContainer.addView(adView);
+
+                AdRequest request = new AdRequest.Builder().build();
+                adView.loadAd(request);
+            });
+        });
     }
 
     private boolean openUrl(Uri uri) {
@@ -201,6 +259,11 @@ public class MainActivity extends Activity {
         if (fileCallback != null) {
             fileCallback.onReceiveValue(null);
             fileCallback = null;
+        }
+
+        if (adView != null) {
+            adView.destroy();
+            adView = null;
         }
 
         if (webView != null) {
