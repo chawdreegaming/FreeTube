@@ -7,1560 +7,331 @@
 <meta name="theme-color" content="#16382b">
 <title>FreeTube - Profile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
-:root {
-  --green:#00ff88;
-  --border:rgba(255,255,255,.17);
-  --panel:rgba(255,255,255,.09);
-  --muted:#b0b3b8;
-  --glass:rgba(22,29,27,.58);
-}
-* {
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Arial,sans-serif;
-  -webkit-tap-highlight-color:transparent;
-}
-body {
-  min-height:100vh;
-  background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);
-  background-attachment:fixed;
-  color:#fff;
-}
-body.drawer-open {overflow:hidden}
-button,input,textarea,select {font:inherit}
-button {cursor:pointer;color:inherit}
-a {color:inherit;text-decoration:none}
-.app {
-  max-width:480px;
-  margin:auto;
-  min-height:100dvh;
-  padding-bottom:90px;
-}
-.cover-container {
-  height:200px;
-  position:relative;
-  background:#24382e;
-}
-.cover-photo {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-.cover-upload-btn {
-  position:absolute;
-  right:68px;
-  bottom:12px;
-  background:#111c;
-  padding:10px 12px;
-  border-radius:9px;
-  font-size:12px;
-  cursor:pointer;
-}
-.menu-row {
-  position:absolute;
-  top:12px;
-  right:12px;
-  z-index:30;
-}
-.menu-button {
-  width:48px;
-  height:48px;
-  border:1px solid var(--border);
-  border-radius:50%;
-  background:rgba(10,20,15,.45);
-  backdrop-filter:blur(12px);
-  -webkit-backdrop-filter:blur(12px);
-  color:white;
-  font-size:25px;
-  display:grid;
-  place-items:center;
-}
-.profile-header-section {
-  text-align:center;
-  padding:0 16px 20px;
-  border-bottom:1px solid var(--border);
-}
-.avatar-container {
-  width:104px;
-  height:104px;
-  margin:-50px auto 12px;
-  position:relative;
-}
-.avatar {
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  border-radius:50%;
-  border:4px solid #133a26;
-  background:#111;
-}
-.avatar-upload-btn {
-  position:absolute;
-  bottom:0;
-  right:0;
-  width:34px;
-  height:34px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:#15291e;
-  border:2px solid #133a26;
-  cursor:pointer;
-}
-.profile-name {
-  font-size:25px;
-  font-weight:800;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
-.profile-name.clickable {cursor:pointer}
-.profile-name.clickable:hover {color:var(--green)}
-.verified-badge {color:var(--green);font-size:16px}
-.handle-text {font-size:14px;color:var(--muted);margin-top:6px}
-.follow-stats {font-size:14px;font-weight:bold;margin:12px 0}
-.bio-text {
-  font-size:15px;
-  line-height:1.6;
-  margin:12px 0;
-  overflow-wrap:anywhere;
-  white-space:pre-wrap;
-}
-.action-row {display:flex;gap:8px;margin-top:16px}
-.btn {
-  flex:1;
-  border:1px solid var(--border);
-  border-radius:12px;
-  padding:12px 7px;
-  color:#fff;
-  font-size:13px;
-  font-weight:bold;
-  background:#ffffff12;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-}
-.btn-primary {
-  background:linear-gradient(135deg,#00b074,#008253);
-  border:0;
-}
-.btn-icon {flex:0 0 48px}
-.btn:disabled {opacity:.55;cursor:wait}
-.panel {
-  background:var(--panel);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:18px;
-  margin:14px 14px 0;
-  box-shadow:0 8px 25px #0002;
-}
-.panel-title {
-  font-size:17px;
-  font-weight:bold;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:15px;
-}
-.detail-item {
-  display:flex;
-  gap:13px;
-  align-items:flex-start;
-  margin:17px 0;
-  font-size:14px;
-  line-height:1.5;
-  overflow-wrap:anywhere;
-}
-.detail-item i {
-  width:22px;
-  text-align:center;
-  color:var(--muted);
-  margin-top:2px;
-}
-.muted {font-size:13px;color:var(--muted);line-height:1.5}
-.inline-edit {background:none;border:0;color:white;padding:4px;font-size:17px}
-.bottom-nav {
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  width:100%;
-  max-width:480px;
-  min-height:64px;
-  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
-  display:flex;
-  align-items:center;
-  justify-content:space-around;
-  background:rgba(13,59,34,.82);
-  border-top:1px solid var(--border);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
-  z-index:25;
-}
-.nav-item {
-  min-width:48px;
-  background:none;
-  border:0;
-  color:#ffffffa6;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:5px;
-  font-size:11px;
-}
-.nav-item i {font-size:19px}
-.nav-item.active {color:var(--green)}
-input[type=file] {display:none}
-.modal {
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:100;
-  background:#101713;
-  overflow-y:auto;
-  padding-bottom:30px;
-}
-.modal.open {display:block}
-.modal-header {
-  height:58px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 16px;
-  border-bottom:1px solid var(--border);
-  position:sticky;
-  top:0;
-  background:#101713;
-  z-index:2;
-}
-.modal-header h2 {font-size:18px}
-.close-btn {background:none;border:0;color:white;font-size:23px}
-.modal-content {max-width:480px;margin:auto;padding:18px}
-.field {display:block;margin:16px 0;font-size:14px;color:#ddd}
-.field input,.field textarea {
-  display:block;
-  width:100%;
-  margin-top:8px;
-  border:1px solid var(--border);
-  background:#ffffff0d;
-  border-radius:10px;
-  padding:13px;
-  color:white;
-  outline:none;
-}
-.field input[type=date] {color-scheme:dark}
-.field textarea {min-height:100px;resize:vertical}
-.field input:focus,.field textarea:focus {border-color:var(--green)}
-.primary-button {
-  width:100%;
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  background:linear-gradient(135deg,#00b074,#008253);
-  color:white;
-  font-weight:bold;
-  margin-top:10px;
-}
-.primary-button:disabled {opacity:.6}
-.toast {
-  position:fixed;
-  z-index:200;
-  bottom:82px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#151d18;
-  border:1px solid var(--border);
-  padding:12px 16px;
-  border-radius:10px;
-  font-size:13px;
-  display:none;
-  width:max-content;
-  max-width:90%;
-  text-align:center;
-}
-.status {font-size:13px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
-.status.error {color:#ffb3b3}
-.status.success {color:var(--green)}
-.post-card {padding:14px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
-.post-card img.post-media,.post-card video.post-media {
-  display:block;
-  width:100%;
-  max-height:400px;
-  object-fit:contain;
-  margin-top:10px;
-  border-radius:10px;
-  background:#0003;
-}
-.post-author {display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer}
-.post-author img {width:36px;height:36px;border-radius:50%;object-fit:cover}
-.post-author strong {font-size:14px}
-.post-content {font-size:15px;line-height:1.6;white-space:pre-wrap;margin:8px 0}
-.post-metadata {display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
-.hidden {display:none!important}
-
-/* Transparent right-side menu */
-.drawer-overlay {
-  position:fixed;
-  inset:0;
-  z-index:80;
-  background:rgba(0,0,0,.30);
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .25s,visibility .25s;
-  backdrop-filter:blur(2px);
-  -webkit-backdrop-filter:blur(2px);
-}
-.drawer-overlay.open {opacity:1;visibility:visible}
-.side-drawer {
-  position:fixed;
-  z-index:90;
-  top:0;
-  right:0;
-  width:min(88%,370px);
-  height:100dvh;
-  height:100vh;
-  height:100dvh;
-  background:rgba(35,38,39,.60);
-  color:#f5f6f7;
-  backdrop-filter:blur(28px) saturate(135%);
-  -webkit-backdrop-filter:blur(28px) saturate(135%);
-  border-left:1px solid rgba(255,255,255,.14);
-  transform:translateX(105%);
-  transition:transform .28s ease;
-  display:flex;
-  flex-direction:column;
-  box-shadow:-8px 0 30px #0003;
-  padding-bottom:env(safe-area-inset-bottom);
-}
-.side-drawer.open {transform:translateX(0)}
-.drawer-header {
-  min-height:76px;
-  padding:14px 18px;
-  display:flex;
-  align-items:center;
-  gap:13px;
-  border-bottom:1px solid #ffffff20;
-  flex-shrink:0;
-}
-.drawer-back {border:0;background:none;font-size:24px;width:30px;text-align:left}
-.drawer-heading {font-size:20px;font-weight:750;flex:1}
-.drawer-close {background:none;border:0;font-size:23px;padding:7px}
-.drawer-user {
-  padding:15px 20px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  border-bottom:1px solid #ffffff20;
-  flex-shrink:0;
-}
-.drawer-user img {
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  object-fit:cover;
-  background:#333;
-  border:1px solid #ffffff35;
-}
-.drawer-user-name {font-weight:bold;font-size:15px}
-.drawer-user-handle {font-size:12px;color:#d0d2d5;margin-top:4px}
-.drawer-content {overflow-y:auto;padding:8px 0 12px;flex:1;min-height:0}
-.drawer-section-title {
-  padding:13px 22px 8px;
-  color:#d0d2d5;
-  font-size:12px;
-  font-weight:bold;
-  text-transform:uppercase;
-  letter-spacing:.7px;
-}
-.drawer-item {
-  width:100%;
-  min-height:53px;
-  padding:12px 22px;
-  display:flex;
-  align-items:center;
-  gap:17px;
-  background:transparent;
-  border:0;
-  text-align:left;
-  font-size:16px;
-  font-weight:500;
-  color:#fff;
-}
-.drawer-item i {width:25px;text-align:center;font-size:21px}
-.drawer-item:active,.drawer-item:hover {background:#ffffff16}
-.drawer-item .chevron {margin-left:auto;font-size:13px;color:#d0d2d5}
-.drawer-divider {height:1px;background:#ffffff24;margin:8px 16px}
-.drawer-note {font-size:12px;color:#d0d2d5;padding:14px 22px;line-height:1.5}
-.drawer-footer {
-  flex-shrink:0;
-  padding:12px 16px calc(12px + env(safe-area-inset-bottom));
-  border-top:1px solid #ffffff25;
-  background:rgba(15,20,18,.20);
-}
-.logout-button {
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  padding:14px;
-  border:1px solid rgba(255,100,100,.42);
-  border-radius:12px;
-  background:rgba(180,35,45,.30);
-  color:#fff;
-  font-size:15px;
-  font-weight:bold;
-}
-.logout-button i {color:#ffaaaa}
-.logout-button:active {background:rgba(180,35,45,.55)}
-.drawer-subpage {
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:110;
-  background:rgba(30,34,33,.83);
-  backdrop-filter:blur(28px);
-  -webkit-backdrop-filter:blur(28px);
-  overflow-y:auto;
-  padding-bottom:25px;
-}
-.drawer-subpage.open {display:block}
-.subpage-row {
-  display:flex;
-  align-items:center;
-  gap:15px;
-  padding:17px 20px;
-  border-bottom:1px solid #ffffff20;
-}
-.subpage-row i {width:24px;color:#eee}
-.subpage-row span {flex:1}
-.drawer-field {
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  border-radius:9px;
-  border:1px solid #ffffff35;
-  background:rgba(0,0,0,.2);
-  color:white;
-}
-.drawer-field option {background:#242526;color:#fff}
-.confirm-box {
-  position:fixed;
-  inset:0;
-  z-index:150;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:22px;
-  background:rgba(0,0,0,.48);
-  backdrop-filter:blur(5px);
-  -webkit-backdrop-filter:blur(5px);
-}
-.confirm-box.open {display:flex}
-.confirm-card {
-  width:100%;
-  max-width:360px;
-  padding:22px;
-  border:1px solid #ffffff2b;
-  border-radius:18px;
-  background:rgba(35,39,38,.94);
-  box-shadow:0 15px 45px #0006;
-}
-.confirm-card h3 {font-size:20px;margin-bottom:10px}
-.confirm-card p {color:#ddd;line-height:1.5;font-size:14px}
-.confirm-actions {display:flex;gap:10px;margin-top:22px}
-.confirm-actions button {
-  flex:1;
-  padding:12px;
-  border-radius:10px;
-  border:1px solid #ffffff30;
-  background:#ffffff10;
-}
-.confirm-actions .confirm-logout {background:#b52b35;border-color:#b52b35}
-@media(max-width:350px) {
-  .btn {font-size:11px}
-  .nav-item {min-width:42px}
-  .nav-item span {font-size:10px}
-  .side-drawer {width:90%}
-}
+:root{--green:#00ff88;--border:rgba(255,255,255,.17);--panel:rgba(255,255,255,.09);--muted:#b0b3b8}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff}
+button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit;text-decoration:none}
+.app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:90px}
+.cover-container{height:200px;position:relative;background:#24382e}
+.cover-photo{width:100%;height:100%;object-fit:cover}
+.menu-row{position:absolute;top:12px;right:12px}
+.menu-button{width:48px;height:48px;border:1px solid var(--border);border-radius:50%;background:#111c;backdrop-filter:blur(12px);color:white;font-size:25px;display:grid;place-items:center}
+.cover-upload-btn{position:absolute;right:68px;bottom:12px;background:#111c;padding:10px 12px;border-radius:9px;font-size:12px;cursor:pointer}
+input[type=file]{display:none}
+.profile-header-section{text-align:center;padding:0 16px 20px;border-bottom:1px solid var(--border)}
+.avatar-container{width:104px;height:104px;margin:-50px auto 12px;position:relative}
+.avatar{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid #133a26;background:#111}
+.avatar-upload-btn{position:absolute;bottom:0;right:0;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#15291e;border:2px solid #133a26;cursor:pointer}
+.profile-name{font-size:25px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:8px}
+.verified-badge{color:var(--green);font-size:16px}
+.handle-text{font-size:14px;color:var(--muted);margin-top:6px}
+.follow-stats{font-size:14px;font-weight:bold;margin:12px 0}
+.bio-text{font-size:15px;line-height:1.6;margin:12px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.action-row{display:flex;gap:8px;margin-top:16px}
+.btn{flex:1;border:1px solid var(--border);border-radius:12px;padding:12px 7px;color:#fff;font-size:13px;font-weight:bold;background:#ffffff12;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-primary{background:linear-gradient(135deg,#00b074,#008253);border:0}
+.btn-icon{flex:0 0 48px}
+.btn:disabled{opacity:.55;cursor:wait}
+.panel{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:18px;padding:18px;margin:14px 14px 0;box-shadow:0 8px 25px #0002}
+.panel-title{font-size:17px;font-weight:bold;display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}
+.detail-item{display:flex;gap:13px;align-items:flex-start;margin:17px 0;font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.detail-item i{width:22px;text-align:center;color:var(--muted);margin-top:2px}
+.muted{font-size:13px;color:var(--muted);line-height:1.5}
+.inline-edit{background:none;border:0;color:white;padding:4px;font-size:17px}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;min-height:64px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:rgba(13,59,34,.9);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:25}
+.nav-item{min-width:48px;background:none;border:0;color:#ffffffa6;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}
+.nav-item i{font-size:19px}.nav-item.active{color:var(--green)}
+.modal{display:none;position:fixed;inset:0;z-index:100;background:#101713;overflow-y:auto;padding-bottom:30px}
+.modal.open{display:block}
+.modal-header{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#101713;z-index:2}
+.modal-header h2{font-size:18px}.close-btn{background:none;border:0;color:white;font-size:23px}
+.modal-content{max-width:480px;margin:auto;padding:18px}
+.field{display:block;margin:16px 0;font-size:14px;color:#ddd}
+.field input,.field textarea{display:block;width:100%;margin-top:8px;border:1px solid var(--border);background:#ffffff0d;border-radius:10px;padding:13px;color:white;outline:none}
+.field input[type=date]{color-scheme:dark}.field textarea{min-height:100px;resize:vertical}
+.primary-button{width:100%;padding:14px;border:0;border-radius:10px;background:linear-gradient(135deg,#00b074,#008253);color:white;font-weight:bold;margin-top:10px}
+.toast{position:fixed;z-index:200;bottom:82px;left:50%;transform:translateX(-50%);background:#151d18;border:1px solid var(--border);padding:12px 16px;border-radius:10px;font-size:13px;display:none;width:max-content;max-width:90%;text-align:center}
+.status{font-size:13px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}.status.error{color:#ffb3b3}.status.success{color:var(--green)}
+.post-card{padding:14px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
+.post-card img.post-media,.post-card video.post-media{display:block;width:100%;max-height:400px;object-fit:contain;margin-top:10px;border-radius:10px;background:#0003}
+.post-author{display:flex;align-items:center;gap:9px;margin-bottom:10px;cursor:pointer}
+.post-author img{width:36px;height:36px;border-radius:50%;object-fit:cover}
+.post-content{font-size:15px;line-height:1.6;white-space:pre-wrap;margin:8px 0}
+.post-metadata{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px}
+.hidden{display:none!important}
+@media(max-width:350px){.btn{font-size:11px}.nav-item{min-width:42px}.nav-item span{font-size:10px}}
 </style>
 </head>
-
 <body>
 <div class="app">
-  <section class="cover-container">
-    <img id="coverPhoto" class="cover-photo"
-      src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800"
-      alt="Cover photo">
+<section class="cover-container">
+<img id="coverPhoto" class="cover-photo" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
+<div class="menu-row">
+<button class="menu-button" id="menuToggle" aria-label="Open settings" title="Settings"><i class="fa-solid fa-bars"></i></button>
+</div>
+<label for="coverInput" class="cover-upload-btn" id="coverUploadLabel"><i class="fa-solid fa-camera"></i> Edit cover</label>
+<input type="file" id="coverInput" accept="image/jpeg,image/png,image/webp,image/gif">
+</section>
 
-    <div class="menu-row">
-      <button class="menu-button" id="menuToggle" aria-label="Open menu" aria-expanded="false">
-        <i class="fa-solid fa-bars"></i>
-      </button>
-    </div>
+<section class="profile-header-section">
+<div class="avatar-container">
+<img id="profileAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile photo">
+<label for="avatarInput" class="avatar-upload-btn" id="avatarUploadLabel" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
+<input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif">
+</div>
+<div class="profile-name" id="profileNameRow"><span id="username">User</span><i class="fa-solid fa-circle-check verified-badge hidden" id="verifiedBadge"></i></div>
+<div id="handle" class="handle-text">@username</div>
+<div class="follow-stats"><span id="followersCount">0</span> followers · <span id="followingCount">0</span> following</div>
+<p class="bio-text" id="bioText">Welcome to my FreeTube profile!</p>
+<div class="action-row" id="ownActions">
+<button class="btn btn-primary" id="dashboardButton"><i class="fa-solid fa-chart-line"></i> Dashboard</button>
+<button class="btn" id="homeButton"><i class="fa-solid fa-house"></i> Home</button>
+<button class="btn btn-icon" id="editButton" aria-label="Edit profile"><i class="fa-solid fa-pen"></i></button>
+</div>
+<div class="action-row hidden" id="otherActions">
+<button class="btn btn-primary" id="followButton"><i class="fa-solid fa-user-plus"></i> Follow</button>
+<button class="btn" id="messageButton"><i class="fa-solid fa-envelope"></i> Message</button>
+</div>
+<p class="status" id="sessionStatus">Loading profile...</p>
+<button class="btn" id="retrySessionButton" style="display:none;width:100%;margin-top:10px">Retry connection</button>
+</section>
 
-    <label for="coverInput" class="cover-upload-btn" id="coverUploadLabel">
-      <i class="fa-solid fa-camera"></i> Edit cover
-    </label>
-    <input type="file" id="coverInput" accept="image/jpeg,image/png,image/webp,image/gif">
-  </section>
-
-  <section class="profile-header-section">
-    <div class="avatar-container">
-      <img id="profileAvatar" class="avatar"
-        src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile photo">
-      <label for="avatarInput" class="avatar-upload-btn" id="avatarUploadLabel" aria-label="Change profile photo">
-        <i class="fa-solid fa-camera"></i>
-      </label>
-      <input type="file" id="avatarInput" accept="image/jpeg,image/png,image/webp,image/gif">
-    </div>
-
-    <div class="profile-name" id="profileNameRow">
-      <span id="username">User</span>
-      <i class="fa-solid fa-circle-check verified-badge hidden" id="verifiedBadge"></i>
-    </div>
-    <div id="handle" class="handle-text">@username</div>
-
-    <div class="follow-stats">
-      <span id="followersCount">0</span> followers ·
-      <span id="followingCount">0</span> following
-    </div>
-
-    <p class="bio-text" id="bioText">Welcome to my FreeTube profile!</p>
-
-    <div class="action-row" id="ownActions">
-      <button class="btn btn-primary" id="dashboardButton">
-        <i class="fa-solid fa-chart-line"></i> Dashboard
-      </button>
-      <button class="btn" id="homeButton">
-        <i class="fa-solid fa-house"></i> Home
-      </button>
-      <button class="btn btn-icon" id="editButton" aria-label="Edit profile">
-        <i class="fa-solid fa-pen"></i>
-      </button>
-    </div>
-
-    <div class="action-row hidden" id="otherActions">
-      <button class="btn btn-primary" id="followButton">
-        <i class="fa-solid fa-user-plus"></i> Follow
-      </button>
-      <button class="btn" id="messageButton">
-        <i class="fa-solid fa-envelope"></i> Message
-      </button>
-    </div>
-
-    <p class="status" id="sessionStatus">Loading profile...</p>
-    <button class="btn" id="retrySessionButton" style="display:none;width:100%;margin-top:10px">
-      Retry connection
-    </button>
-  </section>
-
-  <section class="panel">
-    <div class="panel-title">
-      Personal details
-      <button class="inline-edit own-edit" data-edit aria-label="Edit personal details">
-        <i class="fa-solid fa-pen"></i>
-      </button>
-    </div>
-    <div class="detail-item"><i class="fa-solid fa-location-dot"></i><span>Lives in <strong id="cityText">Not added</strong></span></div>
-    <div class="detail-item"><i class="fa-solid fa-house"></i><span>From <strong id="homeText">Not added</strong></span></div>
-    <div class="detail-item"><i class="fa-solid fa-cake-candles"></i><span>Birthday <strong id="birthdayText">Not added</strong></span></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-title">
-      Work &amp; Education
-      <button class="inline-edit own-edit" data-edit aria-label="Edit work and education">
-        <i class="fa-solid fa-pen"></i>
-      </button>
-    </div>
-    <div class="detail-item"><i class="fa-solid fa-briefcase"></i><span><strong id="workText">Not added</strong><br><span class="muted">Work</span></span></div>
-    <div class="detail-item"><i class="fa-solid fa-graduation-cap"></i><span><strong id="educationText">Not added</strong><br><span class="muted">Education</span></span></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-title">Posts <span id="postCount" class="muted">0 posts</span></div>
-    <div id="myPosts" class="muted">Loading posts...</div>
-  </section>
+<section class="panel">
+<div class="panel-title">Personal details <button class="inline-edit own-edit" data-edit aria-label="Edit personal details"><i class="fa-solid fa-pen"></i></button></div>
+<div class="detail-item"><i class="fa-solid fa-location-dot"></i><span>Lives in <strong id="cityText">Not added</strong></span></div>
+<div class="detail-item"><i class="fa-solid fa-house"></i><span>From <strong id="homeText">Not added</strong></span></div>
+<div class="detail-item"><i class="fa-solid fa-cake-candles"></i><span>Birthday <strong id="birthdayText">Not added</strong></span></div>
+</section>
+<section class="panel">
+<div class="panel-title">Work &amp; Education <button class="inline-edit own-edit" data-edit aria-label="Edit work and education"><i class="fa-solid fa-pen"></i></button></div>
+<div class="detail-item"><i class="fa-solid fa-briefcase"></i><span><strong id="workText">Not added</strong><br><span class="muted">Work</span></span></div>
+<div class="detail-item"><i class="fa-solid fa-graduation-cap"></i><span><strong id="educationText">Not added</strong><br><span class="muted">Education</span></span></div>
+</section>
+<section class="panel">
+<div class="panel-title">Posts <span id="postCount" class="muted">0 posts</span></div>
+<div id="myPosts" class="muted">Loading posts...</div>
+</section>
 </div>
 
 <nav class="bottom-nav">
-  <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a class="nav-item" href="home.html#discover"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
-  <a class="nav-item" href="home.html#create"><i class="fa-solid fa-square-plus"></i><span>Create</span></a>
-  <a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-  <a class="nav-item active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+<a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+<a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
+<a class="nav-item" href="create.html"><i class="fa-solid fa-square-plus"></i><span>Create</span></a>
+<a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+<a class="nav-item active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
 </nav>
 
-<div class="drawer-overlay" id="drawerOverlay"></div>
-
-<aside class="side-drawer" id="sideDrawer" aria-hidden="true">
-  <header class="drawer-header">
-    <button class="drawer-back" id="drawerBack" aria-label="Close menu">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
-    <div class="drawer-heading">Menu</div>
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
-      <i class="fa-solid fa-xmark"></i>
-    </button>
-  </header>
-
-  <div class="drawer-user">
-    <img id="drawerAvatar" src="https://placehold.co/100x100/244b37/ffffff?text=FT" alt="Profile">
-    <div>
-      <div class="drawer-user-name" id="drawerUserName">FreeTube</div>
-      <div class="drawer-user-handle" id="drawerUserHandle">@freetube</div>
-    </div>
-  </div>
-
-  <div class="drawer-content">
-    <div class="drawer-section-title">Settings and privacy</div>
-
-    <button class="drawer-item" data-page="settings"><i class="fa-solid fa-user-gear"></i><span>Settings</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="privacy"><i class="fa-solid fa-lock"></i><span>Privacy Center</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="time"><i class="fa-regular fa-clock"></i><span>Time management</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="devices"><i class="fa-solid fa-mobile-screen-button"></i><span>Device requests</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="ads"><i class="fa-solid fa-rectangle-ad"></i><span>Your Ad Activity</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="payments"><i class="fa-regular fa-credit-card"></i><span>Orders and payments</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="links"><i class="fa-solid fa-link"></i><span>Link history</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="language"><i class="fa-solid fa-globe"></i><span>Language</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="editprofile"><i class="fa-solid fa-user-pen"></i><span>Edit profile</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-
-    <div class="drawer-divider"></div>
-    <div class="drawer-section-title">Help and support</div>
-
-    <button class="drawer-item" data-page="scam"><i class="fa-solid fa-shield-halved"></i><span>Scam Protection Center</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="support"><i class="fa-solid fa-life-ring"></i><span>Support</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="report"><i class="fa-regular fa-flag"></i><span>Report a problem</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-    <button class="drawer-item" data-page="terms"><i class="fa-solid fa-book"></i><span>Terms and Policies</span><i class="fa-solid fa-chevron-right chevron"></i></button>
-
-    <div class="drawer-note">FreeTube · Settings and support</div>
-  </div>
-
-  <footer class="drawer-footer">
-    <button class="logout-button" id="logoutButton">
-      <i class="fa-solid fa-right-from-bracket"></i>
-      <span>Log out</span>
-    </button>
-  </footer>
-</aside>
-
-<div class="drawer-subpage" id="drawerSubpage">
-  <header class="drawer-header">
-    <button class="drawer-back" id="subpageBack" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
-    <div class="drawer-heading" id="subpageTitle">Settings</div>
-    <button class="drawer-close" id="subpageClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-  </header>
-  <div id="subpageContent"></div>
-</div>
-
-<div class="confirm-box" id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
-  <div class="confirm-card">
-    <h3 id="logoutTitle">Log out of FreeTube?</h3>
-    <p>Are you sure you want to log out of this account on this device?</p>
-    <div class="confirm-actions">
-      <button id="cancelLogout">Cancel</button>
-      <button class="confirm-logout" id="confirmLogout">Log out</button>
-    </div>
-    <p class="status" id="logoutStatus" role="status"></p>
-  </div>
-</div>
-
 <div class="modal" id="editModal">
-  <header class="modal-header">
-    <button class="close-btn" id="closeEdit" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-    <h2>Edit profile</h2><span></span>
-  </header>
-  <div class="modal-content">
-    <form id="editForm">
-      <label class="field">Full name<input id="editName" maxlength="80" required></label>
-      <label class="field">Bio<textarea id="editBio" maxlength="500" placeholder="Tell people about yourself"></textarea></label>
-      <label class="field">Lives in<input id="editCity" maxlength="120"></label>
-      <label class="field">From<input id="editHome" maxlength="200"></label>
-      <label class="field">Birthday<input id="editBirthday" type="date" max="9999-12-31"></label>
-      <label class="field">Work<input id="editWork" maxlength="200"></label>
-      <label class="field">Education<input id="editEducation" maxlength="200"></label>
-      <button class="primary-button" id="saveProfileButton" type="submit">Save profile</button>
-      <p class="status" id="editStatus" role="status"></p>
-    </form>
-  </div>
+<header class="modal-header"><button class="close-btn" id="closeEdit" aria-label="Close"><i class="fa-solid fa-xmark"></i></button><h2>Edit profile</h2><span></span></header>
+<div class="modal-content">
+<form id="editForm">
+<label class="field">Full name<input id="editName" maxlength="80" required></label>
+<label class="field">Bio<textarea id="editBio" maxlength="500" placeholder="Tell people about yourself"></textarea></label>
+<label class="field">Lives in<input id="editCity" maxlength="120"></label>
+<label class="field">From<input id="editHome" maxlength="200"></label>
+<label class="field">Birthday<input id="editBirthday" type="date" max="9999-12-31"></label>
+<label class="field">Work<input id="editWork" maxlength="200"></label>
+<label class="field">Education<input id="editEducation" maxlength="200"></label>
+<button class="primary-button" id="saveProfileButton" type="submit">Save profile</button>
+<p class="status" id="editStatus" role="status"></p>
+</form>
 </div>
-
+</div>
 <div id="toast" class="toast" role="status"></div>
 
 <script>
 "use strict";
-
 const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const PROFILE_KEY="freetube_profile_data";
 const DEFAULT_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
 const DEFAULT_COVER="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800";
-
-let toastTimer=null;
-let currentUser=null;
-let viewedUser=null;
-let serverProfile={};
-let serverStats={};
-let loadingProfile=false;
-let isOwnProfile=true;
-let followingThisUser=false;
-
+let toastTimer=null,currentUser=null,viewedUser=null,serverProfile={},serverStats={},loadingProfile=false,isOwnProfile=true,followingThisUser=false;
 const queryParams=new URLSearchParams(location.search);
 const targetUsername=String(queryParams.get("username")||"").replace(/^@/,"").trim();
 const targetUserId=String(queryParams.get("userId")||"").trim();
 
-function getToken(){
-  try{return localStorage.getItem(TOKEN_KEY)||""}
-  catch{return ""}
-}
-
-function getProfile(){
-  try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{}}
-  catch{return {}}
-}
-
-function saveLocalProfile(profile){
-  try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}
-  catch(error){console.warn("Profile cache could not be saved.",error)}
-}
-
-function notify(message){
-  const el=document.getElementById("toast");
-  el.textContent=message;
-  el.style.display="block";
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.style.display="none",3000);
-}
-
-function setStatus(message,type=""){
-  const el=document.getElementById("sessionStatus");
-  el.textContent=message;
-  el.className="status"+(type?" "+type:"");
-}
-
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||""}catch{return ""}}
+function getProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{}}catch{return {}}}
+function saveLocalProfile(p){try{localStorage.setItem(PROFILE_KEY,JSON.stringify(p))}catch(e){console.warn(e)}}
+function notify(message){const el=document.getElementById("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",3000)}
+function setStatus(message,type=""){const el=document.getElementById("sessionStatus");el.textContent=message;el.className="status"+(type?" "+type:"")}
 async function apiRequest(path,options={}){
-  const headers={...(options.headers||{})};
-  const token=getToken();
-  if(token)headers.Authorization="Bearer "+token;
-
-  if(options.body!==undefined&&!(options.body instanceof FormData)){
-    headers["Content-Type"]="application/json";
-  }
-
-  let response;
-  try{
-    response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"});
-  }catch{
-    throw new Error("Cannot connect to FreeTube server. Check your internet connection.");
-  }
-
-  let data={};
-  try{data=await response.json()}catch{}
-
-  if(!response.ok){
-    const error=new Error(data.error||data.message||("HTTP "+response.status));
-    error.status=response.status;
-    throw error;
-  }
-  return data;
+ const headers={...(options.headers||{})},token=getToken();if(token)headers.Authorization="Bearer "+token;
+ if(options.body!==undefined&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
+ let response;try{response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"})}catch{throw new Error("Cannot connect to FreeTube server. Check your internet connection.")}
+ let data={};try{data=await response.json()}catch{}
+ if(!response.ok){const e=new Error(data.error||data.message||("HTTP "+response.status));e.status=response.status;throw e}return data
 }
-
-function firstNonEmpty(...values){
-  for(const value of values){
-    if(value!==undefined&&value!==null&&String(value).trim()!=="")return value;
-  }
-  return "";
-}
-
-function extractProfile(data){
-  if(data?.profile&&typeof data.profile==="object")return data.profile;
-  if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;
-  if(data?.user&&typeof data.user==="object")return data.user;
-  if(data?.data&&typeof data.data==="object")return data.data;
-  return data||{};
-}
-
+function firstNonEmpty(...values){for(const v of values)if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;return ""}
+function extractProfile(d){if(d?.profile&&typeof d.profile==="object")return d.profile;if(d?.data?.profile&&typeof d.data.profile==="object")return d.data.profile;if(d?.user&&typeof d.user==="object")return d.user;if(d?.data&&typeof d.data==="object")return d.data;return d||{}}
 function normalizeProfile(user={},profile={},stats={},local={}){
-  const avatar=firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url);
-  const cover=firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl,local.cover_url);
-
-  return {
-    id:String(firstNonEmpty(profile.id,profile.user_id,user.id,user.user_id)||""),
-    name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle,local.name)||"User"),
-    handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle,targetUsername)||"").replace(/^@/,""),
-    bio:String(firstNonEmpty(profile.bio,user.bio,local.bio)||""),
-    city:String(firstNonEmpty(profile.city,user.city,profile.location,user.location,local.city)||""),
-    home:String(firstNonEmpty(profile.home,user.home,local.home)||""),
-    birthday:firstNonEmpty(profile.birthday,user.birthday,local.birthday)?String(firstNonEmpty(profile.birthday,user.birthday,local.birthday)).slice(0,10):"",
-    work:String(firstNonEmpty(profile.work,user.work,local.work)||""),
-    education:String(firstNonEmpty(profile.education,user.education,local.education)||""),
-    followers:Number(firstNonEmpty(stats.followers,stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
-    following:Number(firstNonEmpty(stats.following,stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
-    avatar_url:avatar||"",
-    cover_url:cover||""
-  };
+ return{
+ id:String(firstNonEmpty(profile.id,profile.user_id,user.id,user.user_id)||""),
+ name:String(firstNonEmpty(profile.display_name,profile.full_name,profile.fullName,user.display_name,user.full_name,user.fullName,user.name,profile.username,user.username,user.handle,local.name)||"User"),
+ handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle,targetUsername)||"").replace(/^@/,""),
+ bio:String(firstNonEmpty(profile.bio,user.bio,local.bio)||""),
+ city:String(firstNonEmpty(profile.city,user.city,profile.location,user.location,local.city)||""),
+ home:String(firstNonEmpty(profile.home,user.home,local.home)||""),
+ birthday:firstNonEmpty(profile.birthday,user.birthday,local.birthday)?String(firstNonEmpty(profile.birthday,user.birthday,local.birthday)).slice(0,10):"",
+ work:String(firstNonEmpty(profile.work,user.work,local.work)||""),
+ education:String(firstNonEmpty(profile.education,user.education,local.education)||""),
+ followers:Number(firstNonEmpty(stats.followers,stats.followers_count,stats.follower_count,profile.followers_count,profile.follower_count,profile.followers,user.followers_count,user.follower_count,user.followers)||0),
+ following:Number(firstNonEmpty(stats.following,stats.following_count,profile.following_count,profile.following,user.following_count,user.following)||0),
+ avatar_url:firstNonEmpty(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url)||"",
+ cover_url:firstNonEmpty(profile.cover_url,profile.coverUrl,user.cover_url,user.coverUrl,local.cover_url)||""
+ }
 }
-
-function setImageSource(image,url,fallback){
-  image.onerror=null;
-  image.src=fallback;
-  if(typeof url==="string"&&url.trim()){
-    image.onerror=()=>{
-      image.onerror=null;
-      image.src=fallback;
-    };
-    image.src=url.trim();
-  }
-}
-
-function formatBirthday(value){
-  if(!value)return "Not added";
-  const parsed=new Date(String(value).slice(0,10)+"T00:00:00Z");
-  if(Number.isNaN(parsed.getTime()))return String(value);
-  return parsed.toLocaleDateString("en-US",{
-    year:"numeric",month:"long",day:"numeric",timeZone:"UTC"
-  });
-}
-
+function setImageSource(img,url,fallback){img.onerror=null;img.src=fallback;if(typeof url==="string"&&url.trim()){img.onerror=()=>{img.onerror=null;img.src=fallback};img.src=url.trim()}}
+function formatBirthday(v){if(!v)return"Not added";const d=new Date(String(v).slice(0,10)+"T00:00:00Z");return Number.isNaN(d.getTime())?String(v):d.toLocaleDateString("en-US",{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"})}
 function renderProfile(p){
-  document.getElementById("username").textContent=p.name||"User";
-  document.getElementById("handle").textContent=p.handle?"@"+String(p.handle).replace(/^@/,""):"@username";
-  document.getElementById("bioText").textContent=p.bio||"No bio added yet.";
-  document.getElementById("cityText").textContent=p.city||"Not added";
-  document.getElementById("homeText").textContent=p.home||"Not added";
-  document.getElementById("birthdayText").textContent=formatBirthday(p.birthday);
-  document.getElementById("workText").textContent=p.work||"Not added";
-  document.getElementById("educationText").textContent=p.education||"Not added";
-  document.getElementById("followersCount").textContent=Number(p.followers)||0;
-  document.getElementById("followingCount").textContent=Number(p.following)||0;
-
-  setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
-  setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER);
-  setImageSource(document.getElementById("drawerAvatar"),p.avatar_url,DEFAULT_AVATAR);
-
-  document.getElementById("drawerUserName").textContent=p.name||"FreeTube";
-  document.getElementById("drawerUserHandle").textContent="@"+(p.handle||"username");
+ document.getElementById("username").textContent=p.name||"User";
+ document.getElementById("handle").textContent=p.handle?"@"+String(p.handle).replace(/^@/,""):"@username";
+ document.getElementById("bioText").textContent=p.bio||"No bio added yet.";
+ document.getElementById("cityText").textContent=p.city||"Not added";
+ document.getElementById("homeText").textContent=p.home||"Not added";
+ document.getElementById("birthdayText").textContent=formatBirthday(p.birthday);
+ document.getElementById("workText").textContent=p.work||"Not added";
+ document.getElementById("educationText").textContent=p.education||"Not added";
+ document.getElementById("followersCount").textContent=Number(p.followers)||0;
+ document.getElementById("followingCount").textContent=Number(p.following)||0;
+ setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
+ setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER)
 }
-
 function setOwnProfileUI(own){
-  isOwnProfile=own;
-  document.getElementById("ownActions").classList.toggle("hidden",!own);
-  document.getElementById("otherActions").classList.toggle("hidden",own);
-  document.querySelectorAll(".own-edit").forEach(el=>el.classList.toggle("hidden",!own));
-  document.getElementById("avatarUploadLabel").classList.toggle("hidden",!own);
-  document.getElementById("coverUploadLabel").classList.toggle("hidden",!own);
-
-  const nav=document.getElementById("profileNavLink");
-  if(own){
-    nav.href="profile.html";
-  }else{
-    const params=new URLSearchParams();
-    if(viewedUser?.username)params.set("username",viewedUser.username);
-    if(viewedUser?.id)params.set("userId",viewedUser.id);
-    nav.href="profile.html?"+params.toString();
-  }
+ isOwnProfile=own;document.getElementById("ownActions").classList.toggle("hidden",!own);
+ document.getElementById("otherActions").classList.toggle("hidden",own);
+ document.querySelectorAll(".own-edit").forEach(e=>e.classList.toggle("hidden",!own));
+ document.getElementById("avatarUploadLabel").classList.toggle("hidden",!own);
+ document.getElementById("coverUploadLabel").classList.toggle("hidden",!own)
 }
-
-function updateFollowButton(){
-  const button=document.getElementById("followButton");
-  button.innerHTML=followingThisUser
-    ?'<i class="fa-solid fa-user-check"></i> Following'
-    :'<i class="fa-solid fa-user-plus"></i> Follow';
-  button.setAttribute("aria-pressed",String(followingThisUser));
-}
-
-function applyClickableProfileName(){
-  const row=document.getElementById("profileNameRow");
-  row.classList.toggle("clickable",!isOwnProfile);
-  row.onclick=()=>{
-    if(!isOwnProfile&&viewedUser?.username){
-      openUserProfile(viewedUser.username,viewedUser.id);
-    }
-  };
-}
-
+function updateFollowButton(){const b=document.getElementById("followButton");b.innerHTML=followingThisUser?'<i class="fa-solid fa-user-check"></i> Following':'<i class="fa-solid fa-user-plus"></i> Follow';b.setAttribute("aria-pressed",String(followingThisUser))}
 async function loadProfile(){
-  if(loadingProfile)return;
-  loadingProfile=true;
-  document.getElementById("retrySessionButton").style.display="none";
-  setStatus("Connecting to FreeTube...");
-
-  try{
-    if(!getToken())throw new Error("Please log in to view profiles.");
-
-    const meData=await apiRequest("/auth/me");
-    currentUser=meData.user||meData.profile||meData.data?.user||meData.data||meData;
-
-    const myId=String(currentUser.id??currentUser.user_id??"");
-    const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
-
-    const clearlyOwnByUsername=!targetUsername||targetUsername.toLowerCase()===myUsername.toLowerCase();
-    const clearlyOwnById=Boolean(targetUserId&&myId&&targetUserId===myId);
-    isOwnProfile=clearlyOwnById||(!targetUserId&&clearlyOwnByUsername);
-
-    if(isOwnProfile){
-      const data=await apiRequest("/profile");
-      serverProfile=extractProfile(data);
-      serverStats=data.stats||data.data?.stats||{};
-
-      viewedUser={
-        ...currentUser,
-        ...serverProfile,
-        id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),
-        username:serverProfile.username||currentUser.username||myUsername
-      };
-    }else{
-      if(!targetUsername)throw new Error("This profile link is missing a username. Open the profile again from the feed.");
-
-      const data=await apiRequest("/profile/"+encodeURIComponent(targetUsername));
-      const apiProfile=data.profile&&typeof data.profile==="object"?data.profile:(data.data?.profile||{});
-      const apiUser=data.user&&typeof data.user==="object"?data.user:(data.data?.user||{});
-
-      serverProfile={...apiUser,...apiProfile};
-      serverStats=data.stats||data.data?.stats||{};
-
-      const returnedId=String(apiProfile.id??apiProfile.user_id??apiUser.id??apiUser.user_id??"");
-      const returnedUsername=String(apiProfile.username??apiUser.username??targetUsername).replace(/^@/,"").trim();
-
-      if(returnedUsername.toLowerCase()!==targetUsername.toLowerCase()){
-        throw new Error("The server returned a different username. Please retry.");
-      }
-
-      viewedUser={...apiUser,...apiProfile,id:returnedId,username:returnedUsername};
-      if(!returnedId)throw new Error("The server did not return this user's ID.");
-
-      isOwnProfile=Boolean((myId&&returnedId===myId)||returnedUsername.toLowerCase()===myUsername.toLowerCase());
-    }
-
-    const local=isOwnProfile?getProfile():{};
-    const p=normalizeProfile(viewedUser,serverProfile,serverStats,local);
-
-    viewedUser={...viewedUser,...p};
-    if(isOwnProfile)saveLocalProfile({...local,...p});
-
-    renderProfile(p);
-    setOwnProfileUI(isOwnProfile);
-
-    if(!isOwnProfile){
-      followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);
-      updateFollowButton();
-    }
-
-    applyClickableProfileName();
-    setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
-    await loadPostsForViewedUser();
-  }catch(error){
-    console.error("Profile loading failed:",error);
-    setStatus(error.message||"Could not load profile.","error");
-    document.getElementById("retrySessionButton").style.display="block";
-    document.getElementById("myPosts").textContent="Profile or posts could not be loaded.";
-    document.getElementById("postCount").textContent="Unavailable";
-  }finally{
-    loadingProfile=false;
+ if(loadingProfile)return;loadingProfile=true;document.getElementById("retrySessionButton").style.display="none";setStatus("Connecting to FreeTube...");
+ try{
+  if(!getToken())throw new Error("Please log in to view profiles.");
+  const meData=await apiRequest("/auth/me");currentUser=meData.user||meData.profile||meData.data?.user||meData.data||meData;
+  const myId=String(currentUser.id??currentUser.user_id??""),myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
+  const ownByUsername=!targetUsername||targetUsername.toLowerCase()===myUsername.toLowerCase();
+  const ownById=Boolean(targetUserId&&myId&&targetUserId===myId);
+  isOwnProfile=ownById||(!targetUserId&&ownByUsername);
+  if(isOwnProfile){
+   const data=await apiRequest("/profile");serverProfile=extractProfile(data);serverStats=data.stats||data.data?.stats||{};
+   viewedUser={...currentUser,...serverProfile,id:String(serverProfile.id??serverProfile.user_id??currentUser.id??currentUser.user_id??""),username:serverProfile.username||currentUser.username||myUsername}
+  }else{
+   if(!targetUsername)throw new Error("This profile link is missing a username.");
+   const data=await apiRequest("/profile/"+encodeURIComponent(targetUsername));
+   serverProfile={...(data.user||data.data?.user||{}),...(data.profile||data.data?.profile||{})};serverStats=data.stats||data.data?.stats||{};
+   const returnedId=String(serverProfile.id??serverProfile.user_id??""),returnedUsername=String(serverProfile.username||targetUsername).replace(/^@/,"").trim();
+   if(returnedUsername.toLowerCase()!==targetUsername.toLowerCase())throw new Error("The server returned a different username.");
+   viewedUser={...serverProfile,id:returnedId,username:returnedUsername};if(!returnedId)throw new Error("The server did not return this user's ID.");
+   isOwnProfile=Boolean((myId&&returnedId===myId)||returnedUsername.toLowerCase()===myUsername.toLowerCase())
   }
+  const local=isOwnProfile?getProfile():{},p=normalizeProfile(viewedUser,serverProfile,serverStats,local);viewedUser={...viewedUser,...p};
+  if(isOwnProfile)saveLocalProfile({...local,...p});renderProfile(p);setOwnProfileUI(isOwnProfile);
+  if(!isOwnProfile){followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);updateFollowButton()}
+  setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");await loadPostsForViewedUser()
+ }catch(e){console.error(e);setStatus(e.message||"Could not load profile.","error");document.getElementById("retrySessionButton").style.display="block";document.getElementById("myPosts").textContent="Profile or posts could not be loaded.";document.getElementById("postCount").textContent="Unavailable"}
+ finally{loadingProfile=false}
 }
-
 async function toggleFollow(){
-  if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");
-  if(!getToken())return notify("Please log in first.");
-
-  const userId=String(viewedUser.id??viewedUser.user_id??serverProfile.user_id??"");
-  if(!userId)return notify("The profile API did not provide a user ID.");
-
-  const button=document.getElementById("followButton");
-  button.disabled=true;
-
-  try{
-    const result=await apiRequest("/users/"+encodeURIComponent(userId)+"/follow",{
-      method:followingThisUser?"DELETE":"POST"
-    });
-
-    const nextState=typeof result.following==="boolean"?result.following:!followingThisUser;
-
-    if(nextState!==followingThisUser){
-      followingThisUser=nextState;
-      serverProfile.is_following=nextState;
-      serverProfile.followers_count=Math.max(0,Number(serverProfile.followers_count||0)+(nextState?1:-1));
-      serverStats.followers=serverProfile.followers_count;
-      viewedUser={...viewedUser,...serverProfile};
-      renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats));
-    }
-
-    updateFollowButton();
-    notify(followingThisUser?"You are now following this user.":"You unfollowed this user.");
-  }catch(error){
-    notify("Follow failed: "+error.message);
-  }finally{
-    button.disabled=false;
-  }
+ if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");if(!getToken())return notify("Please log in first.");
+ const id=String(viewedUser.id??viewedUser.user_id??"");if(!id)return notify("Profile user ID is missing.");
+ const b=document.getElementById("followButton");b.disabled=true;
+ try{
+  const r=await apiRequest("/users/"+encodeURIComponent(id)+"/follow",{method:followingThisUser?"DELETE":"POST"});
+  const next=typeof r.following==="boolean"?r.following:!followingThisUser;
+  if(next!==followingThisUser){followingThisUser=next;serverProfile.is_following=next;serverProfile.followers_count=Math.max(0,Number(serverProfile.followers_count||0)+(next?1:-1));serverStats.followers=serverProfile.followers_count;renderProfile(normalizeProfile(viewedUser,serverProfile,serverStats))}
+  updateFollowButton();notify(followingThisUser?"You are now following this user.":"You unfollowed this user.")
+ }catch(e){notify("Follow failed: "+e.message)}finally{b.disabled=false}
 }
-
-function openMessage(){
-  if(!viewedUser)return;
-  const username=String(viewedUser.username||viewedUser.handle||"").replace(/^@/,"");
-  const id=viewedUser.id??viewedUser.user_id;
-  const params=new URLSearchParams();
-  if(id!==undefined&&id!==null&&String(id))params.set("user_id",String(id));
-  if(username)params.set("username",username);
-  location.href="inbox.html?"+params.toString();
-}
-
-function openUserProfile(username,userId){
-  const name=String(username||"").replace(/^@/,"").trim();
-  const id=String(userId||"").trim();
-  if(!name&&!id)return;
-
-  const params=new URLSearchParams();
-  if(name)params.set("username",name);
-  if(id)params.set("userId",id);
-  location.href="profile.html?"+params.toString();
-}
-
+function openMessage(){if(!viewedUser)return;const p=new URLSearchParams();const id=viewedUser.id??viewedUser.user_id;const name=String(viewedUser.username||viewedUser.handle||"").replace(/^@/,"");if(id)p.set("user_id",String(id));if(name)p.set("username",name);location.href="inbox.html?"+p}
 function openEditModal(){
-  if(!isOwnProfile)return notify("You can only edit your own profile.");
-
-  const p=normalizeProfile(viewedUser||{},serverProfile,serverStats,getProfile());
-
-  document.getElementById("editName").value=p.name==="User"?"":p.name;
-  document.getElementById("editBio").value=p.bio;
-  document.getElementById("editCity").value=p.city;
-  document.getElementById("editHome").value=p.home;
-  document.getElementById("editBirthday").value=p.birthday;
-  document.getElementById("editWork").value=p.work;
-  document.getElementById("editEducation").value=p.education;
-  document.getElementById("editStatus").textContent="";
-  document.getElementById("editModal").classList.add("open");
+ if(!isOwnProfile)return notify("You can only edit your own profile.");
+ const p=normalizeProfile(viewedUser||{},serverProfile,serverStats,getProfile());
+ document.getElementById("editName").value=p.name==="User"?"":p.name;
+ document.getElementById("editBio").value=p.bio;document.getElementById("editCity").value=p.city;
+ document.getElementById("editHome").value=p.home;document.getElementById("editBirthday").value=p.birthday;
+ document.getElementById("editWork").value=p.work;document.getElementById("editEducation").value=p.education;
+ document.getElementById("editStatus").textContent="";document.getElementById("editModal").classList.add("open")
 }
-
-function closeModal(id){document.getElementById(id).classList.remove("open")}
-
-/* Drawer open and close */
-const drawer=document.getElementById("sideDrawer");
-const overlay=document.getElementById("drawerOverlay");
-const subpage=document.getElementById("drawerSubpage");
-
-function openDrawer(){
-  drawer.classList.add("open");
-  overlay.classList.add("open");
-  drawer.setAttribute("aria-hidden","false");
-  document.body.classList.add("drawer-open");
-  document.getElementById("menuToggle").setAttribute("aria-expanded","true");
-}
-
-function closeDrawer(){
-  drawer.classList.remove("open");
-  overlay.classList.remove("open");
-  drawer.setAttribute("aria-hidden","true");
-  document.body.classList.remove("drawer-open");
-  document.getElementById("menuToggle").setAttribute("aria-expanded","false");
-}
-
-function closeSubpage(){subpage.classList.remove("open")}
-
-document.getElementById("menuToggle").addEventListener("click",openDrawer);
-document.getElementById("drawerClose").addEventListener("click",closeDrawer);
-document.getElementById("drawerBack").addEventListener("click",closeDrawer);
-overlay.addEventListener("click",closeDrawer);
-document.getElementById("subpageBack").addEventListener("click",closeSubpage);
-document.getElementById("subpageClose").addEventListener("click",closeSubpage);
-
-/* Settings pages: no dark-mode option */
-function showSubpage(key){
-  const pages={
-    settings:{
-      title:"Settings",
-      html:'<button class="drawer-item" data-action="editprofile"><i class="fa-solid fa-user-pen"></i><span>Edit profile information</span><i class="fa-solid fa-chevron-right chevron"></i></button><button class="drawer-item" data-action="language"><i class="fa-solid fa-globe"></i><span>Language</span><i class="fa-solid fa-chevron-right chevron"></i></button><p class="drawer-note">Manage your FreeTube profile and language preferences here.</p>'
-    },
-    privacy:{
-      title:"Privacy Center",
-      html:'<div class="subpage-row"><i class="fa-solid fa-lock"></i><span>Keep your password private and never share your login token.</span></div><div class="subpage-row"><i class="fa-solid fa-user-shield"></i><span>Review the information you choose to share on your public profile.</span></div>'
-    },
-    time:{
-      title:"Time management",
-      html:'<div class="subpage-row"><i class="fa-regular fa-clock"></i><span>Daily reminder</span><button class="switch" id="timeReminderSwitch" type="button" aria-label="Daily reminder"></button></div><p class="drawer-note">This is a local reminder preference. It does not track your activity on the server.</p>'
-    },
-    devices:{
-      title:"Device requests",
-      html:'<div class="subpage-row"><i class="fa-solid fa-mobile-screen-button"></i><span>No device requests are available in this version.</span></div>'
-    },
-    ads:{
-      title:"Your Ad Activity",
-      html:'<div class="subpage-row"><i class="fa-solid fa-rectangle-ad"></i><span>Ad activity is not available in this version of FreeTube.</span></div>'
-    },
-    payments:{
-      title:"Orders and payments",
-      html:'<div class="subpage-row"><i class="fa-regular fa-credit-card"></i><span>Payments are not available in this version of FreeTube.</span></div>'
-    },
-    links:{
-      title:"Link history",
-      html:'<div class="subpage-row"><i class="fa-solid fa-link"></i><span>Link history is not recorded by this page.</span></div>'
-    },
-    language:{
-      title:"Language",
-      html:'<div class="subpage-row"><i class="fa-solid fa-globe"></i><span>Choose language</span></div><label class="drawer-note" for="languageSelect">Language preference</label><select class="drawer-field" id="languageSelect"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select><button class="primary-button" id="saveLanguageButton" style="margin:18px;width:calc(100% - 36px)">Save language</button>'
-    },
-    editprofile:{
-      title:"Edit profile",
-      html:'<div class="subpage-row"><i class="fa-solid fa-user-pen"></i><span>Update your name, bio and personal details.</span></div><button class="primary-button" id="openEditFromSettings" style="margin:18px;width:calc(100% - 36px)">Edit profile</button>'
-    },
-    scam:{
-      title:"Scam Protection Center",
-      html:'<div class="subpage-row"><i class="fa-solid fa-shield-halved"></i><span>Protect your account. Never share your password, verification code, or access token.</span></div>'
-    },
-    support:{
-      title:"Help and support",
-      html:'<div class="subpage-row"><i class="fa-solid fa-life-ring"></i><span>For help, use Report a problem to describe what happened.</span></div><div class="subpage-row"><i class="fa-solid fa-circle-info"></i><span>FreeTube support tools are being developed.</span></div>'
-    },
-    report:{
-      title:"Report a problem",
-      html:'<form id="reportForm" style="padding:18px"><label for="reportText">Describe the problem</label><textarea id="reportText" class="drawer-field" rows="5" maxlength="1500" required placeholder="Tell us what went wrong..."></textarea><button class="primary-button" type="submit">Prepare report</button><p class="drawer-note" id="reportStatus">This prepares a report on your device; it does not automatically send it to a server.</p></form>'
-    },
-    terms:{
-      title:"Terms and Policies",
-      html:'<div class="subpage-row"><i class="fa-solid fa-book"></i><span>Use FreeTube respectfully. Do not post unlawful, harmful, or deceptive content.</span></div><div class="subpage-row"><i class="fa-solid fa-shield-halved"></i><span>Respect other users’ privacy and intellectual property.</span></div><p class="drawer-note">These are basic in-app guidelines, not a substitute for published legal terms.</p>'
-    }
-  };
-
-  const page=pages[key]||pages.settings;
-  document.getElementById("subpageTitle").textContent=page.title;
-  document.getElementById("subpageContent").innerHTML=page.html;
-  closeDrawer();
-  subpage.classList.add("open");
-
-  if(key==="editprofile"){
-    document.getElementById("openEditFromSettings").addEventListener("click",()=>{
-      closeSubpage();
-      openEditModal();
-    });
-  }
-
-  if(key==="language"){
-    const select=document.getElementById("languageSelect");
-    try{select.value=localStorage.getItem("freetube_language")||"en"}catch{}
-
-    document.getElementById("saveLanguageButton").addEventListener("click",()=>{
-      try{localStorage.setItem("freetube_language",select.value)}catch{}
-      notify(select.value==="bn"?"ভাষার পছন্দ সংরক্ষণ করা হয়েছে।":"Language preference saved.");
-      closeSubpage();
-    });
-  }
-
-  if(key==="report"){
-    document.getElementById("reportForm").addEventListener("submit",event=>{
-      event.preventDefault();
-      const message=document.getElementById("reportText").value.trim();
-      if(!message)return;
-      document.getElementById("reportStatus").textContent=
-        "Your report is ready. If you have a support email, send your report to that address.";
-      notify("Report prepared.");
-    });
-  }
-
-  if(key==="time"){
-    const sw=document.getElementById("timeReminderSwitch");
-    try{sw.classList.toggle("on",localStorage.getItem("freetube_time_reminder")==="on")}catch{}
-
-    sw.addEventListener("click",()=>{
-      sw.classList.toggle("on");
-      try{
-        localStorage.setItem("freetube_time_reminder",sw.classList.contains("on")?"on":"off");
-      }catch{}
-    });
-  }
-}
-
-document.querySelectorAll(".drawer-item[data-page]").forEach(button=>{
-  button.addEventListener("click",()=>showSubpage(button.dataset.page));
-});
-
-document.getElementById("subpageContent").addEventListener("click",event=>{
-  const button=event.target.closest("[data-action]");
-  if(!button)return;
-  if(button.dataset.action==="editprofile"){
-    closeSubpage();
-    openEditModal();
-  }
-  if(button.dataset.action==="language")showSubpage("language");
-});
-
-/* Logout confirmation and logout */
-const logoutConfirm=document.getElementById("logoutConfirm");
-
-function openLogoutConfirm(){
-  closeDrawer();
-  closeSubpage();
-  document.getElementById("logoutStatus").textContent="";
-  logoutConfirm.classList.add("open");
-}
-
-function closeLogoutConfirm(){logoutConfirm.classList.remove("open")}
-
-document.getElementById("logoutButton").addEventListener("click",openLogoutConfirm);
-document.getElementById("cancelLogout").addEventListener("click",closeLogoutConfirm);
-
-logoutConfirm.addEventListener("click",event=>{
-  if(event.target===logoutConfirm)closeLogoutConfirm();
-});
-
-document.getElementById("confirmLogout").addEventListener("click",()=>{
-  const button=document.getElementById("confirmLogout");
-  const status=document.getElementById("logoutStatus");
-  button.disabled=true;
-  button.textContent="Logging out...";
-
-  try{
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(PROFILE_KEY);
-
-    /* Remove only this app's session-related local keys. */
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(PROFILE_KEY);
-
-    status.textContent="Logged out. Redirecting...";
-    location.replace("auth.html");
-  }catch(error){
-    console.error("Logout failed:",error);
-    status.textContent="Could not clear local session. Please try again.";
-    button.disabled=false;
-    button.textContent="Log out";
-  }
-});
-
-/* Profile editing and image upload */
+function closeModal(){document.getElementById("editModal").classList.remove("open")}
+document.getElementById("menuToggle").addEventListener("click",()=>location.href="settings.html");
 document.getElementById("editButton").addEventListener("click",openEditModal);
 document.getElementById("homeButton").addEventListener("click",()=>location.href="home.html");
 document.getElementById("dashboardButton").addEventListener("click",()=>notify("Dashboard is not connected yet."));
 document.getElementById("followButton").addEventListener("click",toggleFollow);
 document.getElementById("messageButton").addEventListener("click",openMessage);
 document.getElementById("retrySessionButton").addEventListener("click",loadProfile);
-document.getElementById("closeEdit").addEventListener("click",()=>closeModal("editModal"));
-document.querySelectorAll("[data-edit]").forEach(button=>button.addEventListener("click",openEditModal));
+document.getElementById("closeEdit").addEventListener("click",closeModal);
+document.querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",openEditModal));
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeModal()});
 
-document.getElementById("editForm").addEventListener("submit",async event=>{
-  event.preventDefault();
-  if(!isOwnProfile)return;
-
-  const button=document.getElementById("saveProfileButton");
-  const status=document.getElementById("editStatus");
-  const oldText=button.textContent;
-
-  button.disabled=true;
-  button.textContent="Saving...";
-
-  const local=getProfile();
-  const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
-
-  const p={
-    name:document.getElementById("editName").value.trim(),
-    bio:document.getElementById("editBio").value.trim(),
-    city:document.getElementById("editCity").value.trim(),
-    home:document.getElementById("editHome").value.trim(),
-    birthday:document.getElementById("editBirthday").value,
-    work:document.getElementById("editWork").value.trim(),
-    education:document.getElementById("editEducation").value.trim()
-  };
-
-  if(!p.name){
-    status.textContent="Please enter your name.";
-    status.className="status error";
-    button.disabled=false;
-    button.textContent=oldText;
-    return;
-  }
-
-  try{
-    const payload={
-      display_name:p.name,
-      bio:p.bio,
-      city:p.city,
-      home:p.home,
-      birthday:p.birthday||null,
-      work:p.work,
-      education:p.education,
-      avatar_url:old.avatar_url||"",
-      cover_url:old.cover_url||""
-    };
-
-    const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
-    });
-
-    const saved=extractProfile(result);
-    serverProfile={...serverProfile,...payload,...saved};
-    viewedUser={...viewedUser,...serverProfile};
-
-    const normalized=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
-    saveLocalProfile({...local,...normalized});
-    renderProfile(normalized);
-
-    status.textContent="Profile saved.";
-    status.className="status success";
-    closeModal("editModal");
-    setStatus("Profile saved successfully.","success");
-    notify("Profile updated.");
-  }catch(error){
-    console.error("Profile save failed:",error);
-    status.textContent="Save failed: "+error.message;
-    status.className="status error";
-  }finally{
-    button.disabled=false;
-    button.textContent=oldText;
-  }
+document.getElementById("editForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!isOwnProfile)return;
+ const b=document.getElementById("saveProfileButton"),s=document.getElementById("editStatus"),oldText=b.textContent;
+ b.disabled=true;b.textContent="Saving...";
+ const local=getProfile(),old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
+ const p={name:document.getElementById("editName").value.trim(),bio:document.getElementById("editBio").value.trim(),city:document.getElementById("editCity").value.trim(),home:document.getElementById("editHome").value.trim(),birthday:document.getElementById("editBirthday").value,work:document.getElementById("editWork").value.trim(),education:document.getElementById("editEducation").value.trim()};
+ if(!p.name){s.textContent="Please enter your name.";s.className="status error";b.disabled=false;b.textContent=oldText;return}
+ const payload={display_name:p.name,bio:p.bio,city:p.city,home:p.home,birthday:p.birthday||null,work:p.work,education:p.education,avatar_url:old.avatar_url||"",cover_url:old.cover_url||""};
+ try{
+  const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)}),saved=extractProfile(result);
+  serverProfile={...serverProfile,...payload,...saved};viewedUser={...viewedUser,...serverProfile};
+  const normalized=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);saveLocalProfile({...local,...normalized});renderProfile(normalized);
+  s.textContent="Profile saved.";s.className="status success";closeModal();setStatus("Profile saved successfully.","success");notify("Profile updated.")
+ }catch(err){console.error(err);s.textContent="Save failed: "+err.message;s.className="status error"}
+ finally{b.disabled=false;b.textContent=oldText}
 });
-
 async function uploadProfileImage(file){
-  if(!file)throw new Error("Please choose an image.");
-  if(!file.type.startsWith("image/"))throw new Error("Choose an image file.");
-  if(file.size>5*1024*1024)throw new Error("Image must be smaller than 5 MB.");
-
-  const form=new FormData();
-  form.append("file",file);
-
-  const result=await apiRequest("/media/upload",{method:"POST",body:form});
-  const media=result.media||result.data?.media||result;
-  const url=media.url||media.secure_url;
-
-  if(!url||!/^https:\/\//i.test(String(url))){
-    throw new Error("The upload API did not return an HTTPS image URL.");
-  }
-  return String(url);
+ if(!file)throw new Error("Please choose an image.");if(!file.type.startsWith("image/"))throw new Error("Choose an image file.");if(file.size>5*1024*1024)throw new Error("Image must be smaller than 5 MB.");
+ const form=new FormData();form.append("file",file);const r=await apiRequest("/media/upload",{method:"POST",body:form});const m=r.media||r.data?.media||r;
+ const url=m.url||m.secure_url;if(!url||!/^https:\/\//i.test(String(url)))throw new Error("Upload API did not return an HTTPS image URL.");return String(url)
 }
-
 async function changeProfileImage(file,type){
-  if(!file)return;
-  if(!isOwnProfile)return notify("You cannot change another user's image.");
-  if(!getToken())return notify("Please log in first.");
-
-  setStatus("Uploading image...");
-  const avatarInput=document.getElementById("avatarInput");
-  const coverInput=document.getElementById("coverInput");
-  avatarInput.disabled=true;
-  coverInput.disabled=true;
-
-  try{
-    const url=await uploadProfileImage(file);
-    const local=getProfile();
-    const old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
-
-    const payload={
-      display_name:old.name==="User"?(currentUser?.username||""):old.name,
-      bio:old.bio,
-      city:old.city,
-      home:old.home,
-      birthday:old.birthday||null,
-      work:old.work,
-      education:old.education,
-      avatar_url:type==="avatar"?url:old.avatar_url,
-      cover_url:type==="cover"?url:old.cover_url
-    };
-
-    const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
-    });
-
-    const saved=extractProfile(result);
-    serverProfile={...serverProfile,...payload,...saved};
-    viewedUser={...viewedUser,...serverProfile};
-
-    const p=normalizeProfile(viewedUser,serverProfile,result.stats||serverStats,local);
-    saveLocalProfile({...local,...p});
-    renderProfile(p);
-
-    setStatus("Image saved successfully.","success");
-    notify(type==="avatar"?"Profile photo updated.":"Cover photo updated.");
-  }catch(error){
-    console.error("Image upload failed:",error);
-    setStatus(error.message,"error");
-    notify("Image upload failed: "+error.message);
-  }finally{
-    avatarInput.disabled=false;
-    coverInput.disabled=false;
-  }
+ if(!file)return;if(!isOwnProfile)return notify("You cannot change another user's image.");if(!getToken())return notify("Please log in first.");
+ setStatus("Uploading image...");const ai=document.getElementById("avatarInput"),ci=document.getElementById("coverInput");ai.disabled=true;ci.disabled=true;
+ try{
+  const url=await uploadProfileImage(file),local=getProfile(),old=normalizeProfile(viewedUser||{},serverProfile,serverStats,local);
+  const payload={display_name:old.name==="User"?(currentUser?.username||""):old.name,bio:old.bio,city:old.city,home:old.home,birthday:old.birthday||null,work:old.work,education:old.education,avatar_url:type==="avatar"?url:old.avatar_url,cover_url:type==="cover"?url:old.cover_url};
+  const r=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)}),saved=extractProfile(r);
+  serverProfile={...serverProfile,...payload,...saved};viewedUser={...viewedUser,...serverProfile};
+  const p=normalizeProfile(viewedUser,serverProfile,r.stats||serverStats,local);saveLocalProfile({...local,...p});renderProfile(p);
+  setStatus("Image saved successfully.","success");notify(type==="avatar"?"Profile photo updated.":"Cover photo updated.")
+ }catch(e){console.error(e);setStatus(e.message,"error");notify("Image upload failed: "+e.message)}
+ finally{ai.disabled=false;ci.disabled=false}
 }
+document.getElementById("avatarInput").addEventListener("change",function(){const f=this.files[0];this.value="";changeProfileImage(f,"avatar")});
+document.getElementById("coverInput").addEventListener("change",function(){const f=this.files[0];this.value="";changeProfileImage(f,"cover")});
 
-document.getElementById("avatarInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
-  changeProfileImage(file,"avatar");
-});
-
-document.getElementById("coverInput").addEventListener("change",function(){
-  const file=this.files[0];
-  this.value="";
-  changeProfileImage(file,"cover");
-});
-
-/* Posts */
-function postAuthor(post){return post.user||post.author||post.owner||{}}
-
-function postUsername(post){
-  const author=postAuthor(post);
-  return firstNonEmpty(post.username,post.author_username,post.user_username,author.username,author.handle);
-}
-
-function postUserId(post){
-  const author=postAuthor(post);
-  return post.user_id??post.author_id??post.owner_id??author.id??author.user_id??null;
-}
-
+function postAuthor(p){return p.user||p.author||p.owner||{}}
+function postUsername(p){const a=postAuthor(p);return firstNonEmpty(p.username,p.author_username,p.user_username,a.username,a.handle)}
+function postUserId(p){const a=postAuthor(p);return p.user_id??p.author_id??p.owner_id??a.id??a.user_id??null}
 async function loadPostsForViewedUser(){
-  const container=document.getElementById("myPosts");
-  const count=document.getElementById("postCount");
-
-  container.textContent="Loading posts...";
-  count.textContent="Loading...";
-
-  try{
-    const data=await apiRequest("/posts?limit=50");
-    const posts=Array.isArray(data)
-      ?data
-      :Array.isArray(data.posts)
-        ?data.posts
-        :Array.isArray(data.data?.posts)
-          ?data.data.posts
-          :[];
-
-    const viewedId=String(
-      viewedUser?.id??viewedUser?.user_id??serverProfile?.id??serverProfile?.user_id??""
-    ).trim();
-
-    const viewedName=String(
-      viewedUser?.username??viewedUser?.handle??serverProfile?.username??targetUsername??""
-    ).replace(/^@/,"").trim().toLowerCase();
-
-    const filtered=posts.filter(post=>{
-      const id=String(postUserId(post)??"").trim();
-      const name=String(postUsername(post)||"").replace(/^@/,"").trim().toLowerCase();
-
-      if(viewedId&&id)return viewedId===id;
-      return Boolean(viewedName&&name&&viewedName===name);
-    });
-
-    count.textContent=filtered.length+(filtered.length===1?" post":" posts");
-    container.replaceChildren();
-
-    if(!filtered.length){
-      container.textContent="No posts found for this user.";
-      return;
-    }
-
-    filtered.forEach(post=>{
-      const card=document.createElement("article");
-      card.className="post-card";
-
-      const authorData=postAuthor(post);
-      const authorName=String(postUsername(post)||viewedName||"User").replace(/^@/,"");
-
-      const author=document.createElement("div");
-      author.className="post-author";
-
-      const avatar=document.createElement("img");
-      avatar.alt="Profile picture";
-      setImageSource(
-        avatar,
-        firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),
-        DEFAULT_AVATAR
-      );
-
-      const name=document.createElement("strong");
-      name.textContent=firstNonEmpty(post.display_name,authorData.display_name,authorData.name,authorName);
-      author.append(avatar,name);
-      author.addEventListener("click",()=>openUserProfile(authorName,postUserId(post)));
-      card.appendChild(author);
-
-      const content=String(firstNonEmpty(post.content,post.text,post.caption)||"");
-      if(content.trim()){
-        const text=document.createElement("p");
-        text.className="post-content";
-        text.textContent=content;
-        card.appendChild(text);
-      }
-
-      const mediaUrl=String(firstNonEmpty(post.media_url,post.image_url,post.video_url)||"").trim();
-      const mediaType=String(post.media_type||post.type||"").toLowerCase();
-
-      if(mediaUrl){
-        const isVideo=mediaType.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(mediaUrl);
-        const media=document.createElement(isVideo?"video":"img");
-        media.className="post-media";
-        media.src=mediaUrl;
-        media.alt=isVideo?"Post video":"Post image";
-
-        if(isVideo){
-          media.controls=true;
-          media.playsInline=true;
-          media.preload="metadata";
-        }else{
-          media.loading="lazy";
-          media.onerror=()=>{
-            media.onerror=null;
-            media.alt="Post image could not be loaded";
-          };
-        }
-        card.appendChild(media);
-      }
-
-      const metadata=document.createElement("div");
-      metadata.className="post-metadata muted";
-
-      [
-        ["fa-regular fa-heart",post.like_count],
-        ["fa-regular fa-comment",post.comment_count],
-        ["fa-regular fa-eye",post.view_count]
-      ].forEach(([icon,value])=>{
-        const span=document.createElement("span");
-        const i=document.createElement("i");
-        i.className=icon;
-        span.append(i,document.createTextNode(" "+(Number(value)||0)));
-        metadata.appendChild(span);
-      });
-
-      card.appendChild(metadata);
-
-      if(post.created_at){
-        const date=document.createElement("p");
-        date.className="muted";
-        date.style.marginTop="8px";
-        const parsed=new Date(post.created_at);
-        date.textContent=Number.isNaN(parsed.getTime())?String(post.created_at):parsed.toLocaleString();
-        card.appendChild(date);
-      }
-
-      container.appendChild(card);
-    });
-  }catch(error){
-    console.error("Posts load error:",error);
-    count.textContent="Posts unavailable";
-    container.textContent="Could not load posts: "+error.message;
-  }
+ const box=document.getElementById("myPosts"),count=document.getElementById("postCount");box.textContent="Loading posts...";count.textContent="Loading...";
+ try{
+  const d=await apiRequest("/posts?limit=50"),posts=Array.isArray(d)?d:Array.isArray(d.posts)?d.posts:Array.isArray(d.data?.posts)?d.data.posts:[];
+  const id=String(viewedUser?.id??viewedUser?.user_id??serverProfile?.id??serverProfile?.user_id??"").trim();
+  const name=String(viewedUser?.username??viewedUser?.handle??serverProfile?.username??targetUsername??"").replace(/^@/,"").trim().toLowerCase();
+  const filtered=posts.filter(p=>{const pid=String(postUserId(p)??"").trim(),pn=String(postUsername(p)||"").replace(/^@/,"").trim().toLowerCase();if(id&&pid)return id===pid;return Boolean(name&&pn&&name===pn)});
+  count.textContent=filtered.length+(filtered.length===1?" post":" posts");box.replaceChildren();
+  if(!filtered.length){box.textContent="No posts found for this user.";return}
+  filtered.forEach(p=>{
+   const card=document.createElement("article");card.className="post-card";const a=postAuthor(p),authorName=String(postUsername(p)||name||"User").replace(/^@/,"");
+   const author=document.createElement("div");author.className="post-author";const av=document.createElement("img");av.alt="Profile picture";setImageSource(av,firstNonEmpty(a.avatar_url,a.avatar,p.avatar_url),DEFAULT_AVATAR);
+   const n=document.createElement("strong");n.textContent=firstNonEmpty(p.display_name,a.display_name,a.name,authorName);author.append(av,n);author.addEventListener("click",()=>{const q=new URLSearchParams({username:authorName});const uid=postUserId(p);if(uid)q.set("userId",String(uid));location.href="profile.html?"+q});card.append(author);
+   const content=String(firstNonEmpty(p.content,p.text,p.caption)||"");if(content.trim()){const t=document.createElement("p");t.className="post-content";t.textContent=content;card.append(t)}
+   const url=String(firstNonEmpty(p.media_url,p.image_url,p.video_url)||"").trim(),type=String(p.media_type||p.type||"").toLowerCase();
+   if(url){const video=type.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url),m=document.createElement(video?"video":"img");m.className="post-media";m.src=url;m.alt=video?"Post video":"Post image";if(video){m.controls=true;m.playsInline=true;m.preload="metadata"}else{m.loading="lazy"}card.append(m)}
+   const meta=document.createElement("div");meta.className="post-metadata muted";
+   [["fa-regular fa-heart",p.like_count],["fa-regular fa-comment",p.comment_count],["fa-regular fa-eye",p.view_count]].forEach(([ic,v])=>{const s=document.createElement("span"),i=document.createElement("i");i.className=ic;s.append(i,document.createTextNode(" "+(Number(v)||0)));meta.append(s)});card.append(meta);
+   if(p.created_at){const dt=document.createElement("p");dt.className="muted";dt.style.marginTop="8px";const date=new Date(p.created_at);dt.textContent=Number.isNaN(date.getTime())?String(p.created_at):date.toLocaleString();card.append(dt)}
+   box.append(card)
+  })
+ }catch(e){console.error(e);count.textContent="Posts unavailable";box.textContent="Could not load posts: "+e.message}
 }
-
-/* Keyboard accessibility */
-document.addEventListener("keydown",event=>{
-  if(event.key==="Escape"){
-    closeDrawer();
-    closeSubpage();
-    closeModal("editModal");
-    closeLogoutConfirm();
-  }
-});
-
-window.addEventListener("DOMContentLoaded",()=>{
-  if(targetUsername)document.title="FreeTube - @"+targetUsername;
-
-  /* Dark-mode settings are intentionally not loaded or applied. */
-  loadProfile();
-});
+window.addEventListener("DOMContentLoaded",()=>{if(targetUsername)document.title="FreeTube - @"+targetUsername;loadProfile()});
 </script>
 </body>
 </html>
