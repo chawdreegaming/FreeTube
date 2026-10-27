@@ -28,7 +28,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .ad-card{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;margin:10px 0;padding:10px 8px;background:rgba(19,45,31,.84);border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;min-height:76px}
 .ad-label{font-size:9px;letter-spacing:.8px;color:var(--muted);text-transform:uppercase}
 .ad-slot{width:320px;max-width:100%;min-height:50px;display:flex;justify-content:center;align-items:center;overflow:hidden}
-.ad-slot iframe{max-width:100%}
+.ad-slot iframe{max-width:100%;border:0}
 .post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
 .post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 .post-author{font-size:14px;font-weight:700;overflow-wrap:anywhere}.post-time{font-size:11px;color:var(--muted);margin-top:4px}
@@ -234,13 +234,11 @@ function openUserProfile(username,userId){
 
 function findAvatar(source){
   if(!source||typeof source!=="object")return "";
-
   const keys=["avatar_url","avatarUrl","profile_picture","profilePicture","profile_image","profileImage","photo_url","photoURL","image_url","imageUrl","avatar","picture"];
 
   for(const key of keys){
     const v=source[key];
     if(typeof v==="string"&&v.trim())return v.trim();
-
     if(v&&typeof v==="object"){
       const u=v.url||v.secure_url||v.src;
       if(typeof u==="string"&&u.trim())return u.trim();
@@ -253,7 +251,6 @@ function findAvatar(source){
       if(found)return found;
     }
   }
-
   return "";
 }
 
@@ -271,7 +268,6 @@ function count(value){
 function relativeTime(date){
   const t=new Date(date).getTime();
   if(!Number.isFinite(t))return "Just now";
-
   const m=Math.max(0,Math.floor((Date.now()-t)/60000));
   if(m<1)return "Just now";
   if(m<60)return m+"m ago";
@@ -283,10 +279,8 @@ function normalizePost(post){
   const author=post.user||post.author||post.profile||{};
   const profileUsername=String(post.author_username||post.user_username||post.username||author.username||author.handle||"").trim().replace(/^@/,"");
   const displayName=String(post.display_name||post.full_name||post.fullName||author.display_name||author.displayName||author.full_name||author.fullName||author.name||author.username||post.username||"FreeTube User").trim();
-
   const rawType=String(post.media_type||post.type||"").toLowerCase();
   const type=["video","mp4","webm","quicktime"].includes(rawType)?"video":(["image","photo","png","jpg","jpeg","webp","gif"].includes(rawType)?"photo":"");
-
   const raw=post.reaction_counts||post.reactions_count||{};
   const counts={
     like:count(raw.like??raw.likes??post.like_count??post.likes),
@@ -294,56 +288,29 @@ function normalizePost(post){
     sad:count(raw.sad??raw.sads??post.sad_count),
     angry:count(raw.angry??raw.angries??post.angry_count)
   };
-
   const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:((post.liked_by_me===true||post.liked===true)?"like":null);
 
   return {
-    ...post,
-    id:String(post.id),
-    username:displayName,
-    profileUsername,
+    ...post,id:String(post.id),username:displayName,profileUsername,
     authorId:post.user_id??post.author_id??author.id??post.userId??"",
     avatar:findAvatar(post)||findAvatar(author)||FALLBACK_AVATAR,
-    content:post.content||"",
-    src:post.media_url||post.url||"",
-    type,
-    counts,
-    myReaction,
+    content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,
     comments:count(post.comment_count??post.comments_count),
-    views:count(post.view_count??post.views),
-    time:relativeTime(post.created_at)
+    views:count(post.view_count??post.views),time:relativeTime(post.created_at)
   };
 }
 
 async function loadMe(){
   const data=await api("/auth/me");
-  currentUser=data.user||data.profile||data.data?.user||data.data||data;
-
+  currentUser=data.user||data.profile||data.data?.user||data.data||{};
   const display=currentUser.display_name||currentUser.full_name||currentUser.name||currentUser.username||"FreeTube User";
   const avatar=findAvatar(data)||findAvatar(currentUser);
-
   document.getElementById("modalUsername").textContent=display;
   setAvatar(document.getElementById("modalAvatar"),avatar);
   setAvatar(document.getElementById("composerAvatar"),avatar);
 }
 
-async function loadFeed(){
-  if(loading)return;
-  loading=true;
-  document.getElementById("feed").innerHTML='<div class="loading">Loading posts...</div>';
-
-  try{
-    const data=await api("/posts?limit=30");
-    videos=(data.posts||[]).map(normalizePost);
-    render(videos);
-  }catch(error){
-    document.getElementById("feed").innerHTML='<div class="empty-state">'+esc(error.message)+'<br><br><button class="secondary" onclick="loadFeed()">Try again</button></div>';
-  }finally{
-    loading=false;
-  }
-}
-
-/* Adsterra banner: one 320x50 ad slot after every five posts. */
+/* Adsterra is isolated from the main page JavaScript. */
 function adBannerHTML(index){
   return '<aside class="ad-card" aria-label="Advertisement">'+
     '<div class="ad-label">Advertisement</div>'+
@@ -351,35 +318,27 @@ function adBannerHTML(index){
     '</aside>';
 }
 
-/*
- * The publisher script runs inside an isolated iframe so it does not
- * overwrite FreeTube's page-level JavaScript variables.
- */
 function loadAdsterraBanner(slot){
   if(!slot||slot.dataset.adLoaded==="1")return;
   slot.dataset.adLoaded="1";
-  slot.innerHTML="";
 
-  const frame=document.createElement("iframe");
-  frame.title="Advertisement";
-  frame.width="320";
-  frame.height="50";
-  frame.setAttribute("scrolling","no");
-  frame.setAttribute("frameborder","0");
-  frame.setAttribute("loading","lazy");
-  frame.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox");
-  frame.style.cssText="width:320px;height:50px;max-width:100%;border:0;overflow:hidden;display:block";
-  slot.appendChild(frame);
+  try{
+    const frame=document.createElement("iframe");
+    frame.title="Advertisement";
+    frame.width="320";
+    frame.height="50";
+    frame.loading="lazy";
+    frame.setAttribute("scrolling","no");
+    frame.setAttribute("frameborder","0");
+    frame.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox");
+    frame.style.cssText="width:320px;height:50px;max-width:100%;border:0;display:block";
+    slot.replaceChildren(frame);
 
-  const doc=frame.contentDocument;
-  if(!doc){
+    frame.srcdoc='<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0;padding:0;width:320px;height:50px;overflow:hidden;background:transparent}</style></head><body><script>var atOptions={key:"'+ADSTERRA_KEY+'",format:"iframe",height:50,width:320,params:{}};<\/script><script src="'+ADSTERRA_SCRIPT+'"><\/script></body></html>';
+  }catch(error){
     slot.textContent="Advertisement unavailable";
-    return;
+    console.error("Adsterra error:",error);
   }
-
-  doc.open();
-  doc.write('<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;width:320px;height:50px;overflow:hidden;background:transparent"><script>var atOptions={\\'key\\':\\''+ADSTERRA_KEY+'\\',\\'format\\':\\'iframe\\',\\'height\\':50,\\'width\\':320,\\'params\\':{}};<\\/script><script src="'+ADSTERRA_SCRIPT+'"><\\/script></body></html>');
-  doc.close();
 }
 
 function setupAdSlots(){
@@ -405,7 +364,6 @@ function reactionButtonHTML(v){
   const label=key?REACTIONS[key].label:"Like";
   const emoji=key?REACTIONS[key].emoji:"👍";
   const cls=key?" "+REACTIONS[key].className:"";
-
   const picker=Object.entries(REACTIONS).map(([name,item])=>
     '<button type="button" class="reaction-choice" aria-label="'+item.label+'" title="'+item.label+'" onclick="chooseReaction(event,\''+esc(v.id)+'\',\''+name+'\')"><span class="emoji">'+item.emoji+'</span><small>'+item.label+'</small></button>'
   ).join("");
@@ -501,12 +459,11 @@ function showPicker(id){
   wrap.classList.add("open");
 }
 
-let holdTimer=null,holdPostId=null,holdTriggered=false,holdStartX=0,holdStartY=0;
+let holdTimer=null,holdTriggered=false,holdStartX=0,holdStartY=0;
 
 function clearHold(){
   if(holdTimer)clearTimeout(holdTimer);
   holdTimer=null;
-  holdPostId=null;
 }
 
 document.addEventListener("pointerdown",event=>{
@@ -515,11 +472,10 @@ document.addEventListener("pointerdown",event=>{
 
   clearHold();
   holdTriggered=false;
-  holdPostId=button.dataset.likeButton;
   holdStartX=event.clientX;
   holdStartY=event.clientY;
 
-  const id=holdPostId;
+  const id=button.dataset.likeButton;
   holdTimer=setTimeout(()=>{
     holdTriggered=true;
     showPicker(id);
@@ -530,7 +486,6 @@ document.addEventListener("pointermove",event=>{
   if(!holdTimer)return;
   if(Math.abs(event.clientX-holdStartX)>12||Math.abs(event.clientY-holdStartY)>12)clearHold();
 });
-
 document.addEventListener("pointerup",clearHold);
 document.addEventListener("pointercancel",clearHold);
 
@@ -547,12 +502,7 @@ document.addEventListener("click",event=>{
   if(like){
     event.preventDefault();
     event.stopPropagation();
-
-    if(holdTriggered){
-      holdTriggered=false;
-      return;
-    }
-
+    if(holdTriggered){holdTriggered=false;return;}
     closePickers();
     reactToPost(like.dataset.likeButton,"like");
     return;
@@ -585,7 +535,6 @@ async function reactToPost(id,reaction){
   if(!requireLogin()||pendingReactions.has(post.id))return;
 
   pendingReactions.add(post.id);
-
   const oldReaction=post.myReaction;
   const oldCounts={...post.counts};
   const nextReaction=oldReaction===reaction?null:reaction;
@@ -593,25 +542,16 @@ async function reactToPost(id,reaction){
   if(oldReaction&&REACTIONS[oldReaction]){
     post.counts[oldReaction]=Math.max(0,count(post.counts[oldReaction])-1);
   }
-
   post.myReaction=nextReaction;
-
-  if(nextReaction){
-    post.counts[nextReaction]=count(post.counts[nextReaction])+1;
-  }
-
+  if(nextReaction)post.counts[nextReaction]=count(post.counts[nextReaction])+1;
   updateOnePost(post);
 
   try{
     const data=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{
-      method:"PUT",
-      body:JSON.stringify({reaction:nextReaction})
+      method:"PUT",body:JSON.stringify({reaction:nextReaction})
     });
 
-    if(data.my_reaction!==undefined){
-      post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
-    }
-
+    if(data.my_reaction!==undefined)post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
     if(data.reaction_counts){
       for(const key of Object.keys(REACTIONS)){
         post.counts[key]=count(data.reaction_counts[key]??data.reaction_counts[key+"s"]??post.counts[key]);
@@ -619,7 +559,6 @@ async function reactToPost(id,reaction){
     }else if(data.like_count!==undefined){
       post.counts.like=count(data.like_count);
     }
-
     updateOnePost(post);
   }catch(error){
     post.myReaction=oldReaction;
@@ -641,7 +580,6 @@ function setupVideoAutoplay(){
     video.defaultMuted=true;
 
     const button=video.closest(".post-media-container")?.querySelector(".sound-toggle");
-
     if(button&&!button.dataset.bound){
       button.dataset.bound="1";
       button.addEventListener("click",event=>{
@@ -656,7 +594,6 @@ function setupVideoAutoplay(){
               if(b)b.innerHTML='<i class="fa-solid fa-volume-xmark"></i>';
             }
           });
-
           video.muted=false;
           video.play().catch(()=>toast("Tap the video to start playback."));
         }else{
@@ -676,7 +613,6 @@ function setupVideoAutoplay(){
           if(other!==video&&!other.paused)other.pause();
         });
       });
-
       video.addEventListener("error",()=>{
         const message=video.closest(".post-card")?.querySelector(".video-error-message");
         if(message)message.hidden=false;
@@ -684,40 +620,32 @@ function setupVideoAutoplay(){
     }
   });
 
-  if("IntersectionObserver"in window){
+  if("IntersectionObserver" in window){
     const observer=new IntersectionObserver(entries=>{
       entries.forEach(entry=>{
         const video=entry.target;
-        if(entry.isIntersecting&&entry.intersectionRatio>=.6){
-          video.play().catch(()=>{});
-        }else{
-          video.pause();
-        }
+        if(entry.isIntersecting&&entry.intersectionRatio>=.6)video.play().catch(()=>{});
+        else video.pause();
       });
     },{threshold:[0,.6]});
-
     videosOnPage.forEach(video=>observer.observe(video));
   }
 }
 
 function setupPostViewObserver(){
-  if(!("IntersectionObserver"in window))return;
+  if(!("IntersectionObserver" in window))return;
 
   const observer=new IntersectionObserver(entries=>entries.forEach(async entry=>{
     if(!entry.isIntersecting||entry.intersectionRatio<.5)return;
-
     observer.unobserve(entry.target);
     const id=String(entry.target.dataset.id);
-
     if(viewRequestsInSession.has(id)||!token())return;
     viewRequestsInSession.add(id);
 
     try{
       const data=await api("/posts/"+encodeURIComponent(id)+"/view",{
-        method:"POST",
-        body:JSON.stringify({})
+        method:"POST",body:JSON.stringify({})
       });
-
       const p=videos.find(v=>v.id===id);
       if(p&&data.view_count!==undefined){
         p.views=count(data.view_count);
@@ -735,7 +663,6 @@ function setupPostViewObserver(){
 
 async function comments(id){
   if(!requireLogin())return;
-
   activeCommentId=String(id);
   document.getElementById("commentModal").classList.add("open");
   document.getElementById("commentList").innerHTML='<div class="loading">Loading comments...</div>';
@@ -753,29 +680,22 @@ async function comments(id){
 document.getElementById("commentForm").addEventListener("submit",async event=>{
   event.preventDefault();
   if(!requireLogin()||!activeCommentId)return;
-
   const input=document.getElementById("commentInput");
   const content=input.value.trim();
   if(!content)return;
-
   const button=event.submitter;
   if(button)button.disabled=true;
 
   try{
     await api("/posts/"+encodeURIComponent(activeCommentId)+"/comments",{
-      method:"POST",
-      body:JSON.stringify({content})
+      method:"POST",body:JSON.stringify({content})
     });
-
     input.value="";
-
     const p=videos.find(v=>v.id===activeCommentId);
     if(p)p.comments++;
-
     const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===activeCommentId);
     const countLabel=card?.querySelector(".comment-count");
     if(countLabel&&p)countLabel.textContent=p.comments+" comments";
-
     await comments(activeCommentId);
     toast("Comment added.");
   }catch(error){
@@ -787,34 +707,21 @@ document.getElementById("commentForm").addEventListener("submit",async event=>{
 
 async function submitPost(){
   if(!requireLogin())return;
-
   const button=document.getElementById("publishButton");
   const content=document.getElementById("postText").value.trim();
   const file=document.getElementById("postFile").files?.[0];
 
-  if(!content&&!file){
-    toast("Please write something or select media.");
-    return;
-  }
-
-  if(file&&file.size>50*1024*1024){
-    toast("File must be smaller than 50 MB.");
-    return;
-  }
+  if(!content&&!file){toast("Please write something or select media.");return;}
+  if(file&&file.size>50*1024*1024){toast("File must be smaller than 50 MB.");return;}
 
   const allowed=["image/jpeg","image/png","image/webp","image/gif","video/mp4","video/webm","video/quicktime"];
-
-  if(file&&!allowed.includes(file.type)){
-    toast("Unsupported file type.");
-    return;
-  }
+  if(file&&!allowed.includes(file.type)){toast("Unsupported file type.");return;}
 
   button.disabled=true;
   button.textContent="Publishing...";
 
   try{
     let media=null;
-
     if(file){
       const form=new FormData();
       form.append("file",file);
@@ -847,7 +754,6 @@ async function submitPost(){
 async function sharePost(id){
   const p=videos.find(v=>v.id===String(id));
   if(!p)return;
-
   const url=location.href.split("#")[0]+"#post-"+encodeURIComponent(id);
 
   try{
@@ -904,6 +810,7 @@ async function loadMessageCount(){
   }catch(_){}
 }
 
+/* Do not let a profile-request failure permanently stop the feed. */
 async function initialize(){
   if(!token()){
     location.replace("auth.html?mode=login");
@@ -914,7 +821,6 @@ async function initialize(){
     await loadMe();
   }catch(error){
     toast(error.message);
-    return;
   }
 
   await loadFeed();
