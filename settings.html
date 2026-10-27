@@ -1,0 +1,312 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16382b">
+<title>FreeTube - Settings</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--green:#00ff88;--border:rgba(255,255,255,.17);--panel:rgba(255,255,255,.09);--muted:#b0b3b8}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff}
+button,input,textarea,select{font:inherit}button{cursor:pointer;color:inherit}a{color:inherit;text-decoration:none}
+.app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:90px}
+.header{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:15px;padding:16px;background:rgba(13,30,22,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(18px)}
+.back{width:42px;height:42px;border:1px solid var(--border);border-radius:50%;background:#ffffff10;font-size:18px}
+.header h1{font-size:21px;flex:1}
+.user-card{display:flex;align-items:center;gap:13px;margin:16px 14px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--panel)}
+.user-card img{width:54px;height:54px;border-radius:50%;object-fit:cover;background:#244b37}
+.user-name{font-weight:bold;font-size:16px}.user-handle{color:var(--muted);font-size:13px;margin-top:5px}
+.section-title{font-size:12px;font-weight:bold;color:#d0d2d5;text-transform:uppercase;letter-spacing:.8px;padding:18px 20px 8px}
+.group{margin:0 14px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:var(--panel);backdrop-filter:blur(12px)}
+.item{width:100%;min-height:60px;padding:14px 16px;display:flex;align-items:center;gap:14px;text-align:left;border:0;border-bottom:1px solid #ffffff13;background:transparent;color:white;font-size:15px}
+.item:last-child{border-bottom:0}.item:active,.item:hover{background:#ffffff12}
+.item>i:first-child{width:25px;text-align:center;font-size:19px;color:#e2e7e3}
+.item .desc{display:block;color:var(--muted);font-size:12px;margin-top:5px;line-height:1.4}
+.item .arrow{margin-left:auto;color:#c5cbc7;font-size:13px}
+.item-text{flex:1}
+.danger{color:#ffaaaa!important}
+.panel{margin:14px;padding:16px;border:1px solid var(--border);border-radius:16px;background:var(--panel)}
+.panel h2{font-size:17px;margin-bottom:10px}.muted{font-size:13px;color:var(--muted);line-height:1.6}
+.field{display:block;margin:14px 0;font-size:14px;color:#eee}
+.field input,.field textarea,.field select{display:block;width:100%;margin-top:8px;border:1px solid var(--border);background:#17251d;border-radius:10px;padding:13px;color:white;outline:none}
+.field textarea{min-height:110px;resize:vertical}
+.primary{width:100%;padding:13px;border:0;border-radius:10px;background:linear-gradient(135deg,#00b074,#008253);color:white;font-weight:bold;margin-top:8px}
+.secondary{width:100%;padding:13px;border:1px solid var(--border);border-radius:10px;background:#ffffff10;color:white;font-weight:bold;margin-top:10px}
+.status{font-size:13px;color:var(--muted);margin-top:10px;line-height:1.5;overflow-wrap:anywhere}.status.error{color:#ffaaaa}.status.success{color:var(--green)}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;min-height:64px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-around;background:rgba(13,59,34,.92);border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:20}
+.nav-item{min-width:48px;background:none;border:0;color:#ffffffa6;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px}
+.nav-item i{font-size:19px}.nav-item.active{color:var(--green)}
+.view{display:none}.view.active{display:block}
+.confirm{position:fixed;inset:0;z-index:100;background:#0009;display:none;align-items:center;justify-content:center;padding:20px}
+.confirm.open{display:flex}
+.confirm-card{width:100%;max-width:360px;border:1px solid var(--border);border-radius:18px;padding:22px;background:#202a24;box-shadow:0 12px 40px #0007}
+.confirm-card h2{font-size:20px;margin-bottom:10px}.confirm-card p{font-size:14px;color:#ddd;line-height:1.6}
+.confirm-actions{display:flex;gap:10px;margin-top:20px}.confirm-actions button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--border);background:#ffffff10}
+.confirm-actions .logout-confirm{background:#b52b35;border-color:#b52b35}
+.toast{position:fixed;z-index:120;bottom:82px;left:50%;transform:translateX(-50%);background:#151d18;border:1px solid var(--border);padding:12px 16px;border-radius:10px;font-size:13px;display:none;width:max-content;max-width:90%;text-align:center}
+@media(max-width:350px){.nav-item{min-width:42px}.nav-item span{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+<button class="back" id="backButton" aria-label="Back to profile"><i class="fa-solid fa-arrow-left"></i></button>
+<h1 id="pageTitle">Settings</h1>
+</header>
+
+<div class="user-card">
+<img id="userAvatar" src="https://placehold.co/100x100/244b37/ffffff?text=FT" alt="Profile">
+<div><div class="user-name" id="userName">FreeTube user</div><div class="user-handle" id="userHandle">@username</div></div>
+</div>
+
+<div id="mainView" class="view active">
+<div class="section-title">Account</div>
+<div class="group">
+<button class="item" data-view="editprofile"><i class="fa-solid fa-user-pen"></i><span class="item-text">Edit profile<span class="desc">Change your public profile information</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="privacy"><i class="fa-solid fa-lock"></i><span class="item-text">Privacy Center<span class="desc">Privacy and account safety information</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="language"><i class="fa-solid fa-globe"></i><span class="item-text">Language<span class="desc">Choose your preferred language</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="time"><i class="fa-regular fa-clock"></i><span class="item-text">Time management<span class="desc">Manage your local reminder preference</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+</div>
+
+<div class="section-title">Activity and services</div>
+<div class="group">
+<button class="item" data-view="devices"><i class="fa-solid fa-mobile-screen-button"></i><span class="item-text">Device requests<span class="desc">Device request availability</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="ads"><i class="fa-solid fa-rectangle-ad"></i><span class="item-text">Your Ad Activity<span class="desc">Advertising activity information</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="payments"><i class="fa-regular fa-credit-card"></i><span class="item-text">Orders and payments<span class="desc">Payment service information</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="links"><i class="fa-solid fa-link"></i><span class="item-text">Link history<span class="desc">Link history availability</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+</div>
+
+<div class="section-title">Help and support</div>
+<div class="group">
+<button class="item" data-view="scam"><i class="fa-solid fa-shield-halved"></i><span class="item-text">Scam Protection Center<span class="desc">Keep your account secure</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="support"><i class="fa-solid fa-life-ring"></i><span class="item-text">Support<span class="desc">Help using FreeTube</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="report"><i class="fa-regular fa-flag"></i><span class="item-text">Report a problem<span class="desc">Prepare a report about an issue</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+<button class="item" data-view="terms"><i class="fa-solid fa-book"></i><span class="item-text">Terms and Policies<span class="desc">Basic community guidelines</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+</div>
+
+<div class="section-title">Session</div>
+<div class="group">
+<button class="item" id="logoutButton"><i class="fa-solid fa-right-from-bracket danger"></i><span class="item-text danger">Log out<span class="desc">Log out of this device</span></span><i class="fa-solid fa-chevron-right arrow"></i></button>
+</div>
+<div class="panel"><p class="muted">FreeTube Settings. Some options depend on backend support and may not be available yet.</p></div>
+</div>
+
+<div id="editprofileView" class="view">
+<div class="panel">
+<h2>Edit profile</h2>
+<p class="muted">Edit your public profile details. This uses the same profile API as profile.html.</p>
+<form id="profileForm">
+<label class="field">Full name<input id="fullName" maxlength="80" required></label>
+<label class="field">Bio<textarea id="bio" maxlength="500"></textarea></label>
+<label class="field">Lives in<input id="city" maxlength="120"></label>
+<label class="field">From<input id="home" maxlength="200"></label>
+<label class="field">Birthday<input id="birthday" type="date"></label>
+<label class="field">Work<input id="work" maxlength="200"></label>
+<label class="field">Education<input id="education" maxlength="200"></label>
+<button class="primary" id="saveProfile" type="submit">Save profile</button>
+<p class="status" id="profileStatus" role="status"></p>
+</form>
+</div>
+</div>
+
+<div id="privacyView" class="view">
+<div class="panel"><h2><i class="fa-solid fa-lock"></i> Privacy Center</h2><p class="muted">Keep your password, verification codes, and login token private. Avoid signing in on devices you do not trust.</p></div>
+<div class="panel"><h2>Public profile</h2><p class="muted">Your name, bio, profile photo, and posts may be visible to other users depending on your backend's privacy rules. This page does not independently change server-side privacy settings.</p></div>
+<div class="panel"><h2>Account data</h2><p class="muted">Use the account features provided by FreeTube to manage your information. Logging out removes the local session token from this browser.</p></div>
+</div>
+
+<div id="languageView" class="view">
+<div class="panel">
+<h2>Language</h2><p class="muted">Choose a language preference for this device.</p>
+<label class="field">Preferred language
+<select id="languageSelect"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select>
+</label>
+<button class="primary" id="saveLanguage">Save language</button>
+<p class="status" id="languageStatus"></p>
+<p class="muted">This saves your preference locally. It does not automatically translate every page unless that page supports the selected language.</p>
+</div>
+</div>
+
+<div id="timeView" class="view">
+<div class="panel"><h2>Time management</h2><p class="muted">Enable or disable a local reminder preference. This option does not track time spent on the server and does not schedule an operating-system notification.</p>
+<label class="field"><input id="timeReminder" type="checkbox" style="width:auto;display:inline-block;margin-right:8px"> Enable reminder preference</label>
+<button class="primary" id="saveTime">Save preference</button><p class="status" id="timeStatus"></p>
+</div>
+</div>
+
+<div id="devicesView" class="view"><div class="panel"><h2>Device requests</h2><p class="muted">Device requests are not connected in this version of FreeTube.</p></div></div>
+<div id="adsView" class="view"><div class="panel"><h2>Your Ad Activity</h2><p class="muted">Ad activity history is not available in this version of FreeTube.</p></div></div>
+<div id="paymentsView" class="view"><div class="panel"><h2>Orders and payments</h2><p class="muted">Payment and order services are not connected in this version of FreeTube.</p></div></div>
+<div id="linksView" class="view"><div class="panel"><h2>Link history</h2><p class="muted">This page does not record link history.</p></div></div>
+<div id="scamView" class="view"><div class="panel"><h2>Scam Protection Center</h2><p class="muted">Never share your password, access token, or verification codes. Be cautious of links asking you to log in again.</p></div></div>
+<div id="supportView" class="view"><div class="panel"><h2>Help and support</h2><p class="muted">If a feature fails, note what you were doing and the error message. Use Report a problem to prepare a report on this device.</p></div></div>
+
+<div id="reportView" class="view">
+<div class="panel">
+<h2>Report a problem</h2>
+<p class="muted">Describe the issue. This form prepares a report locally; it does not send anything to the server.</p>
+<form id="reportForm">
+<label class="field">Problem details<textarea id="reportText" maxlength="1500" required placeholder="Tell us what went wrong..."></textarea></label>
+<button class="primary" type="submit">Prepare report</button>
+<p class="status" id="reportStatus"></p>
+<button class="secondary" type="button" id="copyReport">Copy report</button>
+</form>
+</div>
+</div>
+
+<div id="termsView" class="view">
+<div class="panel"><h2>Terms and Policies</h2><p class="muted">Use FreeTube respectfully. Do not post unlawful, harmful, deceptive, or abusive content. Respect other users' privacy and intellectual property.</p><p class="muted" style="margin-top:12px">These are basic in-app guidelines, not a replacement for the official legal terms of the service.</p></div>
+</div>
+</div>
+
+<nav class="bottom-nav">
+<a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+<a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
+<a class="nav-item" href="create.html"><i class="fa-solid fa-square-plus"></i><span>Create</span></a>
+<a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+<a class="nav-item active" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+</nav>
+
+<div class="confirm" id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
+<div class="confirm-card">
+<h2 id="logoutTitle">Log out of FreeTube?</h2>
+<p>Are you sure you want to log out of this account on this device?</p>
+<div class="confirm-actions"><button id="cancelLogout">Cancel</button><button class="logout-confirm" id="confirmLogout">Log out</button></div>
+<p class="status" id="logoutStatus"></p>
+</div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const PROFILE_KEY="freetube_profile_data";
+const DEFAULT_AVATAR="https://placehold.co/100x100/244b37/ffffff?text=FT";
+let toastTimer=null,reportDraft="";
+
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||""}catch{return""}}
+function getCachedProfile(){try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{}}catch{return{}}}
+function notify(message){const el=document.getElementById("toast");el.textContent=message;el.style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.style.display="none",3000)}
+async function apiRequest(path,options={}){
+ const headers={...(options.headers||{})},token=getToken();if(token)headers.Authorization="Bearer "+token;
+ if(options.body!==undefined&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
+ let response;try{response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"})}catch{throw new Error("Cannot connect to FreeTube server. Check your internet connection.")}
+ let data={};try{data=await response.json()}catch{}
+ if(!response.ok){const e=new Error(data.error||data.message||("HTTP "+response.status));e.status=response.status;throw e}return data
+}
+function setImage(img,url){img.onerror=null;img.src=DEFAULT_AVATAR;if(url){img.onerror=()=>{img.onerror=null;img.src=DEFAULT_AVATAR};img.src=url}}
+function setStatus(id,message,type=""){const el=document.getElementById(id);el.textContent=message;el.className="status"+(type?" "+type:"")}
+function fillProfile(user,profile){
+ const local=getCachedProfile();
+ const value=(...a)=>{for(const v of a)if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;return""};
+ document.getElementById("fullName").value=value(profile.display_name,profile.full_name,user.display_name,user.full_name,user.name,local.name);
+ document.getElementById("bio").value=value(profile.bio,user.bio,local.bio);
+ document.getElementById("city").value=value(profile.city,user.city,local.city);
+ document.getElementById("home").value=value(profile.home,user.home,local.home);
+ document.getElementById("birthday").value=String(value(profile.birthday,user.birthday,local.birthday)).slice(0,10);
+ document.getElementById("work").value=value(profile.work,user.work,local.work);
+ document.getElementById("education").value=value(profile.education,user.education,local.education);
+ const name=value(profile.display_name,profile.full_name,user.display_name,user.full_name,user.name,local.name,"FreeTube user");
+ const username=String(value(profile.username,user.username,user.handle)||"username").replace(/^@/,"");
+ document.getElementById("userName").textContent=name;
+ document.getElementById("userHandle").textContent="@"+username;
+ setImage(document.getElementById("userAvatar"),value(profile.avatar_url,profile.avatarUrl,user.avatar_url,user.avatarUrl,local.avatar_url));
+}
+async function loadSettings(){
+ const local=getCachedProfile();fillProfile(local,local);
+ try{
+  if(!getToken()){setStatus("profileStatus","You are not logged in. Sign in to save account changes.","error");return}
+  const d=await apiRequest("/auth/me"),user=d.user||d.profile||d.data?.user||d.data||d;
+  let profile={};try{const p=await apiRequest("/profile");profile=p.profile||p.data?.profile||p.user||p.data||p}catch(e){console.warn("Could not load profile details:",e.message)}
+  fillProfile(user,profile)
+ }catch(e){console.error(e);setStatus("profileStatus","Could not load account information: "+e.message,"error")}
+}
+function showView(key){
+ document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+ const view=document.getElementById(key+"View");
+ if(view)view.classList.add("active");
+ const titles={main:"Settings",editprofile:"Edit profile",privacy:"Privacy Center",language:"Language",time:"Time management",devices:"Device requests",ads:"Your Ad Activity",payments:"Orders and payments",links:"Link history",scam:"Scam Protection Center",support:"Help and support",report:"Report a problem",terms:"Terms and Policies"};
+ document.getElementById("pageTitle").textContent=titles[key]||"Settings";
+ window.scrollTo({top:0,behavior:"auto"});
+}
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>showView(b.dataset.view)));
+document.getElementById("backButton").addEventListener("click",()=>{
+ const active=document.querySelector(".view.active");
+ if(active&&active.id!=="mainView")showView("main");else location.href="profile.html"
+});
+
+document.getElementById("profileForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ if(!getToken()){setStatus("profileStatus","Please log in before saving your profile.","error");return}
+ const b=document.getElementById("saveProfile"),oldText=b.textContent;b.disabled=true;b.textContent="Saving...";
+ const payload={
+ display_name:document.getElementById("fullName").value.trim(),
+ bio:document.getElementById("bio").value.trim(),
+ city:document.getElementById("city").value.trim(),
+ home:document.getElementById("home").value.trim(),
+ birthday:document.getElementById("birthday").value||null,
+ work:document.getElementById("work").value.trim(),
+ education:document.getElementById("education").value.trim(),
+ avatar_url:getCachedProfile().avatar_url||"",
+ cover_url:getCachedProfile().cover_url||""
+ };
+ if(!payload.display_name){setStatus("profileStatus","Please enter your name.","error");b.disabled=false;b.textContent=oldText;return}
+ try{
+  const r=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
+  const p=r.profile||r.data?.profile||r.user||r.data||{};
+  const old=getCachedProfile();
+  const saved={...old,...payload,...p,name:p.display_name||p.full_name||payload.display_name};
+  localStorage.setItem(PROFILE_KEY,JSON.stringify(saved));
+  setStatus("profileStatus","Profile saved successfully.","success");notify("Profile updated.")
+ }catch(err){console.error(err);setStatus("profileStatus","Could not save profile: "+err.message,"error")}
+ finally{b.disabled=false;b.textContent=oldText}
+});
+
+const langSelect=document.getElementById("languageSelect");
+try{langSelect.value=localStorage.getItem("freetube_language")||"en"}catch{}
+document.getElementById("saveLanguage").addEventListener("click",()=>{
+ try{localStorage.setItem("freetube_language",langSelect.value);setStatus("languageStatus","Language preference saved on this device.","success");notify(langSelect.value==="bn"?"ভাষার পছন্দ সংরক্ষণ করা হয়েছে।":"Language preference saved.")}
+ catch{setStatus("languageStatus","Could not save language preference.","error")}
+});
+const timeCheckbox=document.getElementById("timeReminder");
+try{timeCheckbox.checked=localStorage.getItem("freetube_time_reminder")==="on"}catch{}
+document.getElementById("saveTime").addEventListener("click",()=>{
+ try{localStorage.setItem("freetube_time_reminder",timeCheckbox.checked?"on":"off");setStatus("timeStatus","Preference saved on this device.","success")}
+ catch{setStatus("timeStatus","Could not save preference.","error")}
+});
+
+document.getElementById("reportForm").addEventListener("submit",e=>{
+ e.preventDefault();const message=document.getElementById("reportText").value.trim();if(!message)return;
+ reportDraft="FreeTube problem report\n\n"+message+"\n\nPage: "+location.href+"\nDate: "+new Date().toISOString();
+ setStatus("reportStatus","Report prepared on this device. It has not been sent to a server.","success");notify("Report prepared.")
+});
+document.getElementById("copyReport").addEventListener("click",async()=>{
+ if(!reportDraft){const message=document.getElementById("reportText").value.trim();if(!message)return notify("Write your report first.");reportDraft="FreeTube problem report\n\n"+message+"\n\nPage: "+location.href+"\nDate: "+new Date().toISOString()}
+ try{await navigator.clipboard.writeText(reportDraft);notify("Report copied.")}catch{const ta=document.createElement("textarea");ta.value=reportDraft;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");notify("Report copied.")}catch{notify("Copy failed. Select and copy the report manually.")}ta.remove()}
+});
+
+const logoutConfirm=document.getElementById("logoutConfirm");
+document.getElementById("logoutButton").addEventListener("click",()=>{document.getElementById("logoutStatus").textContent="";logoutConfirm.classList.add("open")});
+document.getElementById("cancelLogout").addEventListener("click",()=>logoutConfirm.classList.remove("open"));
+logoutConfirm.addEventListener("click",e=>{if(e.target===logoutConfirm)logoutConfirm.classList.remove("open")});
+document.getElementById("confirmLogout").addEventListener("click",()=>{
+ const b=document.getElementById("confirmLogout");b.disabled=true;b.textContent="Logging out...";
+ try{
+  localStorage.removeItem(TOKEN_KEY);localStorage.removeItem(PROFILE_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);sessionStorage.removeItem(PROFILE_KEY);
+  location.replace("auth.html")
+ }catch(e){console.error(e);setStatus("logoutStatus","Could not clear the local session. Please try again.","error");b.disabled=false;b.textContent="Log out"}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(logoutConfirm.classList.contains("open"))logoutConfirm.classList.remove("open");else if(document.querySelector(".view.active")?.id!=="mainView")showView("main")}});
+window.addEventListener("DOMContentLoaded",()=>{
+ loadSettings();
+ const params=new URLSearchParams(location.search),requested=params.get("page");
+ if(requested&&document.getElementById(requested+"View"))showView(requested);
+});
+</script>
+</body>
+</html>
