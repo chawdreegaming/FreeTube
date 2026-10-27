@@ -1,114 +1,380 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10291f">
-<title>Create Post — FreeTube</title>
+<meta name="theme-color" content="#701b39">
+<title>New post — FreeTube</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
-:root{--bg:#10291f;--panel:#172f24;--panel2:#20392d;--green:#00e991;--text:#f6fff9;--muted:#a9bdb2;--border:rgba(255,255,255,.13);--red:#ff626b}
+:root{
+  --green:#00f59b;
+  --red:#ff5369;
+  --text:#fff;
+  --muted:#d1d9d4;
+  --border:rgba(255,255,255,.15);
+  --glass:rgba(30,31,34,.60);
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100vh}
-button,input,textarea{font:inherit}button{cursor:pointer;color:inherit}button:disabled{opacity:.5}
-.app{max-width:650px;margin:auto;min-height:100dvh;padding-bottom:85px}
-header{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:15px 17px;background:#10291ff5;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
-.brand{font-size:25px;font-weight:900}.brand i,.brand span{color:var(--green)}
-.icon-btn{width:40px;height:40px;border-radius:50%;background:var(--panel2);border:1px solid var(--border)}
-main{padding:16px}
-.page-title{font-size:22px;margin-bottom:6px}
-.subtitle{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:18px}
-.panel{padding:16px;background:var(--panel);border:1px solid var(--border);border-radius:17px;margin-bottom:14px}
-.user-row{display:flex;align-items:center;gap:11px;margin-bottom:16px}
-.avatar{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--panel2)}
-.user-name{font-size:15px;font-weight:bold}
-.user-sub{font-size:12px;color:var(--muted);margin-top:4px}
-textarea,input{width:100%;color:white;background:#10291f;border:1px solid var(--border);border-radius:11px;padding:13px;outline:none}
-textarea{resize:vertical;min-height:125px;line-height:1.5}
-textarea:focus,input:focus{border-color:var(--green)}
-.field-label{display:block;font-size:13px;color:var(--muted);margin:13px 0 7px}
-.upload-area{margin-top:13px;border:1px dashed #668373;border-radius:14px;min-height:155px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden;background:#11271d}
-.upload-prompt{padding:22px;cursor:pointer;width:100%}
-.upload-prompt i{font-size:34px;color:var(--green);margin-bottom:12px}
-.upload-prompt strong{display:block;font-size:14px;margin-bottom:7px}
-.upload-prompt span{font-size:12px;color:var(--muted)}
-#preview{display:none;width:100%;position:relative}
-#preview img,#preview video{width:100%;max-height:400px;object-fit:contain;display:block;background:#000}
-.remove-media{margin:10px;padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:#3b2929;color:#ffd9d9}
-.file-info{font-size:12px;color:var(--muted);padding:10px;overflow-wrap:anywhere}
-.row{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
-.row button{flex:1}
-.primary,.secondary{padding:12px 15px;border-radius:10px;border:1px solid var(--border)}
-.primary{background:var(--green);color:#073421;font-weight:bold}
-.secondary{background:var(--panel2);color:white}
-.primary:disabled{background:#517565;color:#ddd}
-.notice{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:20;width:100%;max-width:650px;display:flex;justify-content:space-around;padding:9px 3px calc(9px + env(safe-area-inset-bottom));background:#10291ff7;border-top:1px solid var(--border)}
-.nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:5px;background:none;border:0;color:var(--muted);font-size:11px}
-.nav-item i{font-size:21px}.nav-item.active{color:var(--green)}
-.toast{position:fixed;z-index:50;bottom:90px;left:50%;transform:translateX(-50%);display:none;background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px 16px;max-width:90%;font-size:13px}
+html,body{min-height:100%;background:#173d30}
+body{
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#a90f31 0%,#681d3d 30%,#3d2940 52%,#17563c 78%,#008a4b 100%);
+  background-attachment:fixed;
+}
+button,input,textarea{font:inherit}
+button{color:inherit;cursor:pointer}
+button:disabled{opacity:.45;cursor:not-allowed}
+[hidden]{display:none!important}
+.app{
+  max-width:650px;
+  min-height:100dvh;
+  margin:auto;
+  padding-bottom:20px;
+  display:flex;
+  flex-direction:column;
+  background:rgba(20,27,29,.18);
+}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  display:grid;
+  grid-template-columns:52px 1fr 88px;
+  align-items:center;
+  gap:8px;
+  padding:calc(10px + env(safe-area-inset-top)) 15px 12px;
+  background:rgba(30,30,34,.65);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+}
+.close-btn{
+  width:44px;height:44px;
+  display:grid;place-items:center;
+  border:0;border-radius:50%;
+  background:transparent;font-size:25px;
+}
+.page-title{
+  text-align:center;
+  font-size:21px;font-weight:750;
+}
+.next-btn{
+  min-width:80px;
+  padding:12px 17px;
+  border:0;border-radius:14px;
+  background:linear-gradient(120deg,#ff5369,#00bd78);
+  color:#fff;font-weight:bold;
+}
+.next-btn:disabled{
+  background:rgba(255,255,255,.13);
+  color:#a7aaa9;
+}
+main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  padding:20px 18px 16px;
+}
+.user-row{
+  display:flex;align-items:center;gap:13px;
+  margin:7px 0 22px;
+}
+.avatar{
+  width:66px;height:66px;
+  object-fit:cover;border-radius:50%;
+  border:2px solid rgba(255,255,255,.20);
+  background:rgba(255,255,255,.08);
+}
+.user-name{
+  font-size:20px;font-weight:750;
+  overflow-wrap:anywhere;
+}
+.user-sub{font-size:12px;color:var(--muted);margin-top:6px}
+.options{
+  display:flex;gap:9px;
+  overflow-x:auto;scrollbar-width:none;
+  margin-bottom:25px;padding-bottom:2px;
+}
+.options::-webkit-scrollbar,.media-options::-webkit-scrollbar{display:none}
+.pill{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:9px;
+  padding:10px 15px;
+  border:1px solid var(--border);
+  border-radius:28px;
+  background:rgba(255,255,255,.10);
+  backdrop-filter:blur(12px);
+  font-size:14px;font-weight:650;
+}
+.pill i{font-size:16px}
+.pill.selected{
+  border-color:rgba(0,245,155,.55);
+  background:rgba(0,245,155,.12);
+}
+.caption-wrap{position:relative}
+#content{
+  display:block;
+  width:100%;
+  min-height:190px;
+  flex:1;
+  resize:none;
+  outline:none;
+  border:0;
+  background:transparent;
+  color:white;
+  font-size:25px;
+  line-height:1.5;
+  padding:8px 0 18px;
+}
+#content::placeholder{color:rgba(255,255,255,.68)}
+#content:focus{outline:none}
+.media-area{margin-top:auto;padding-top:18px}
+#preview{
+  display:none;
+  position:relative;
+  margin-bottom:14px;
+  padding:8px;
+  border:1px solid var(--border);
+  border-radius:17px;
+  background:rgba(25,30,32,.52);
+}
+#previewMedia img,#previewMedia video{
+  width:100%;max-height:330px;
+  object-fit:contain;display:block;
+  border-radius:10px;background:#000;
+}
+.file-info{
+  font-size:12px;color:var(--muted);
+  overflow-wrap:anywhere;padding:9px 3px 3px;
+}
+.remove-media{
+  margin-top:7px;
+  padding:8px 12px;border-radius:10px;
+  border:1px solid var(--border);
+  background:rgba(255,83,105,.17);
+}
+.media-options{
+  display:flex;gap:12px;
+  overflow-x:auto;scrollbar-width:none;
+  padding:8px 0 12px;
+}
+.media-card{
+  flex:0 0 118px;min-height:112px;
+  display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:12px;
+  border-radius:20px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.10);
+  box-shadow:0 6px 18px rgba(0,0,0,.09);
+  font-size:14px;font-weight:700;
+}
+.media-card i{font-size:27px;color:#fff}
+.media-card:active{transform:scale(.97)}
+.media-card input{display:none}
+.bottom-settings{
+  position:sticky;bottom:0;
+  padding:13px 15px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(30,30,34,.60);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-top:1px solid var(--border);
+}
+.setting-row{
+  display:flex;gap:9px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.setting-pill{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:8px;
+  padding:11px 15px;border-radius:28px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.11);
+  font-size:14px;font-weight:650;
+}
+.setting-pill i{font-size:17px}
+.setting-pill.active{
+  background:rgba(0,245,155,.14);
+  border-color:rgba(0,245,155,.45);
+}
+.toast{
+  display:none;position:fixed;z-index:50;
+  bottom:95px;left:50%;transform:translateX(-50%);
+  max-width:90%;padding:12px 16px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(28,35,34,.96);
+  font-size:13px;text-align:center;
+}
 .toast.show{display:block}
-@media(min-width:651px){body{background:#091710}.app{border-left:1px solid var(--border);border-right:1px solid var(--border)}}
+.modal{
+  display:none;position:fixed;inset:0;z-index:40;
+  align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.65);padding:12px;
+}
+.modal.open{display:flex}
+.modal-box{
+  width:100%;max-width:500px;
+  padding:20px;border-radius:22px;
+  background:linear-gradient(145deg,#67213e,#154c36);
+  border:1px solid var(--border);
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.modal-head h3{font-size:19px}
+.modal-close{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid var(--border);
+}
+.modal-box p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:15px}
+.modal-box select{
+  width:100%;padding:13px;border-radius:12px;
+  color:white;background:#26352f;border:1px solid var(--border);
+  margin-bottom:14px;
+}
+.publish-btn{
+  width:100%;padding:14px;border:0;border-radius:12px;
+  background:linear-gradient(110deg,#ff5369,#00bd78);
+  color:white;font-weight:bold;
+}
+@media(min-width:651px){
+  body{padding:0 12px}
+  .app{border-left:1px solid var(--border);border-right:1px solid var(--border)}
+}
+@media(max-width:370px){
+  .topbar{grid-template-columns:42px 1fr 75px;padding-left:10px;padding-right:10px}
+  .page-title{font-size:19px}
+  .next-btn{min-width:70px;padding:11px}
+  main{padding-left:14px;padding-right:14px}
+  #content{font-size:22px}
+}
 </style>
 </head>
+
 <body>
 <div class="app">
-<header>
-  <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
-  <button class="icon-btn" onclick="go('home.html')" aria-label="Home"><i class="fa-solid fa-house"></i></button>
+
+<header class="topbar">
+  <button class="close-btn" onclick="cancelPost()" aria-label="Close">
+    <i class="fa-solid fa-xmark"></i>
+  </button>
+  <h1 class="page-title">New post</h1>
+  <button id="nextButton" class="next-btn" onclick="openPublish()" disabled>Next</button>
 </header>
 
 <main>
-  <h1 class="page-title">Create a post</h1>
-  <p class="subtitle">Share something with the FreeTube community.</p>
+  <div class="user-row">
+    <img id="avatar" class="avatar"
+      src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile">
+    <div>
+      <div id="username" class="user-name">FreeTube User</div>
+      <div class="user-sub">Share with your community</div>
+    </div>
+  </div>
 
-  <section class="panel">
-    <div class="user-row">
-      <img id="avatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Profile">
-      <div>
-        <div id="username" class="user-name">FreeTube User</div>
-        <div class="user-sub"><i class="fa-solid fa-earth-americas"></i> Public post</div>
-      </div>
+  <div class="options">
+    <button class="pill" type="button" onclick="showToast('Music attachment is not configured yet.')">
+      <i class="fa-solid fa-music"></i> Music
+    </button>
+    <button class="pill" type="button" onclick="showToast('Tag/collaborate is not configured yet.')">
+      <i class="fa-solid fa-user-plus"></i> Tag/collaborate
+    </button>
+    <button class="pill" type="button" onclick="showToast('Location sharing is not configured yet.')">
+      <i class="fa-solid fa-location-dot"></i> Location
+    </button>
+  </div>
+
+  <div class="caption-wrap">
+    <textarea id="content" maxlength="5000"
+      placeholder="What's on your mind?" aria-label="Post caption"></textarea>
+  </div>
+
+  <div id="preview">
+    <div id="previewMedia"></div>
+    <div id="fileInfo" class="file-info"></div>
+    <button class="remove-media" type="button" onclick="removeMedia()">
+      <i class="fa-solid fa-trash"></i> Remove media
+    </button>
+  </div>
+
+  <div class="media-area">
+    <div class="media-options">
+      <label class="media-card" for="mediaFile">
+        <i class="fa-regular fa-image"></i>
+        <span>Gallery</span>
+      </label>
+      <button class="media-card" type="button" onclick="showToast('GIF selection is not configured yet.')">
+        <i class="fa-regular fa-file-video"></i>
+        <span>GIF</span>
+      </button>
+      <button class="media-card" type="button" onclick="showToast('Live video is not available yet.')">
+        <i class="fa-solid fa-video"></i>
+        <span>Live</span>
+      </button>
+      <button class="media-card" type="button" onclick="showToast('Background selection is not configured yet.')">
+        <i class="fa-solid fa-palette"></i>
+        <span>Background</span>
+      </button>
     </div>
 
-    <form id="postForm">
-      <label class="field-label" for="content">What's on your mind?</label>
-      <textarea id="content" maxlength="5000" placeholder="Write a caption or a message..."></textarea>
-
-      <label class="field-label">Photo or video</label>
-      <div class="upload-area">
-        <label id="uploadPrompt" class="upload-prompt" for="mediaFile">
-          <i class="fa-solid fa-photo-film"></i>
-          <strong>Add photos or videos</strong>
-          <span>JPG, PNG, WEBP, GIF, MP4, WEBM or MOV · Max 50 MB</span>
-        </label>
-        <div id="preview">
-          <div id="previewMedia"></div>
-          <div id="fileInfo" class="file-info"></div>
-          <button type="button" class="remove-media" onclick="removeMedia()">
-            <i class="fa-solid fa-trash"></i> Remove media
-          </button>
-        </div>
-      </div>
-      <input id="mediaFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" hidden>
-
-      <p class="notice">Please share content you have the right to upload. Avoid private information and harmful content.</p>
-      <div class="row">
-        <button type="button" class="secondary" onclick="go('home.html')">Cancel</button>
-        <button id="publishButton" type="submit" class="primary"><i class="fa-solid fa-paper-plane"></i> Publish</button>
-      </div>
-    </form>
-  </section>
+    <input id="mediaFile" type="file"
+      accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
+      hidden>
+  </div>
 </main>
 
-<nav class="bottom-nav" aria-label="Main navigation">
-  <button class="nav-item" onclick="go('home.html')"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button class="nav-item" onclick="go('discover.html')"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-  <button class="nav-item active" onclick="go('create.html')"><i class="fa-solid fa-square-plus"></i><span>Create</span></button>
-  <button class="nav-item" onclick="go('notifications.html')"><i class="fa-solid fa-bell"></i><span>Alerts</span></button>
-  <button class="nav-item" onclick="go('profile.html')"><i class="fa-regular fa-user"></i><span>Profile</span></button>
-</nav>
+<footer class="bottom-settings">
+  <div class="setting-row">
+    <button id="audienceButton" class="setting-pill" type="button" onclick="openAudience()">
+      <i class="fa-solid fa-earth-americas"></i>
+      <span id="audienceLabel">Public</span>
+      <i class="fa-solid fa-chevron-down" style="font-size:11px"></i>
+    </button>
+    <button id="instagramButton" class="setting-pill" type="button" onclick="toggleOption('instagram')">
+      <i class="fa-brands fa-instagram"></i>
+      <span id="instagramLabel">Off</span>
+    </button>
+    <button id="threadsButton" class="setting-pill" type="button" onclick="toggleOption('threads')">
+      <i class="fa-brands fa-threads"></i>
+      <span id="threadsLabel">Off</span>
+    </button>
+  </div>
+</footer>
+</div>
+
+<div id="audienceModal" class="modal">
+  <section class="modal-box">
+    <div class="modal-head">
+      <h3>Post audience</h3>
+      <button class="modal-close" onclick="closeAudience()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <p>Choose who can see your post.</p>
+    <select id="audienceSelect">
+      <option value="public">🌎 Public</option>
+      <option value="followers">👥 Followers</option>
+      <option value="private">🔒 Only me</option>
+    </select>
+    <button class="publish-btn" onclick="saveAudience()">Save audience</button>
+  </section>
+</div>
+
+<div id="publishModal" class="modal">
+  <section class="modal-box">
+    <div class="modal-head">
+      <h3>Publish post</h3>
+      <button class="modal-close" onclick="closePublish()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <p>Review your post and publish it to FreeTube.</p>
+    <button id="publishButton" class="publish-btn" onclick="publishPost()">
+      <i class="fa-solid fa-paper-plane"></i> Share post
+    </button>
+  </section>
 </div>
 
 <div id="toast" class="toast" role="status"></div>
@@ -124,9 +390,16 @@ const MAX_FILE_SIZE=50*1024*1024;
 let selectedFile=null;
 let previewUrl=null;
 let toastTimer=null;
+let audience="public";
+let instagram=false;
+let threads=false;
+let publishing=false;
 
 function go(page){location.href=page}
-function getToken(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
+function getToken(){
+  try{return localStorage.getItem(TOKEN_KEY)||""}
+  catch(_){return ""}
+}
 function showToast(message){
   const el=document.getElementById("toast");
   el.textContent=String(message||"Something went wrong.");
@@ -134,56 +407,90 @@ function showToast(message){
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove("show"),3200);
 }
+function requireLogin(){
+  if(getToken())return true;
+  go("auth.html?mode=login");
+  return false;
+}
+function cancelPost(){
+  const content=document.getElementById("content").value.trim();
+  if(content||selectedFile){
+    if(!confirm("Discard this post? Your changes will be lost."))return;
+  }
+  go("home.html");
+}
+
 async function api(path,options={}){
   const headers=new Headers(options.headers||{});
   const t=getToken();
   if(t)headers.set("Authorization","Bearer "+t);
+
   const isForm=options.body instanceof FormData;
-  if(options.body&&!isForm&&!headers.has("Content-Type"))headers.set("Content-Type","application/json");
+  if(options.body&&!isForm&&!headers.has("Content-Type")){
+    headers.set("Content-Type","application/json");
+  }
 
   let response;
   try{
-    response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"});
+    response=await fetch(API_BASE+path,{
+      ...options,headers,cache:"no-store"
+    });
   }catch(_){
     throw new Error("Backend-এর সঙ্গে সংযোগ হচ্ছে না। আবার চেষ্টা করো।");
   }
 
   const raw=await response.text();
   let data={};
-  try{data=raw?JSON.parse(raw):{}}catch(_){data={message:raw}}
+  try{data=raw?JSON.parse(raw):{}}
+  catch(_){data={message:raw}}
 
   if(response.status===401){
     try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
     go("auth.html?mode=login");
     throw new Error("Login session শেষ হয়েছে। আবার লগইন করো।");
   }
-  if(!response.ok)throw new Error(data.message||data.error||("API error "+response.status));
+  if(!response.ok){
+    throw new Error(data.message||data.error||("API error "+response.status));
+  }
   return data;
 }
 
 async function loadUser(){
-  if(!getToken()){
-    go("auth.html?mode=login");
-    return;
-  }
+  if(!requireLogin())return;
   try{
     const data=await api("/auth/me");
     const user=data.user||data;
-    document.getElementById("username").textContent=user.display_name||user.username||"FreeTube User";
-    document.getElementById("avatar").src=user.avatar_url||user.avatar||FALLBACK_AVATAR;
+    document.getElementById("username").textContent=
+      user.display_name||user.username||"FreeTube User";
+    document.getElementById("avatar").src=
+      user.avatar_url||user.avatar||FALLBACK_AVATAR;
+    document.getElementById("avatar").onerror=function(){
+      this.onerror=null;
+      this.src=FALLBACK_AVATAR;
+    };
   }catch(error){
     showToast(error.message||"Could not load profile.");
   }
 }
 
+function updateNextButton(){
+  const hasContent=document.getElementById("content").value.trim().length>0;
+  const hasMedia=Boolean(selectedFile);
+  document.getElementById("nextButton").disabled=!(hasContent||hasMedia);
+}
+document.getElementById("content").addEventListener("input",updateNextButton);
+
 function removeMedia(){
-  if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null}
+  if(previewUrl){
+    URL.revokeObjectURL(previewUrl);
+    previewUrl=null;
+  }
   selectedFile=null;
   document.getElementById("mediaFile").value="";
   document.getElementById("previewMedia").replaceChildren();
   document.getElementById("fileInfo").textContent="";
   document.getElementById("preview").style.display="none";
-  document.getElementById("uploadPrompt").style.display="block";
+  updateNextButton();
 }
 
 document.getElementById("mediaFile").addEventListener("change",event=>{
@@ -194,6 +501,7 @@ document.getElementById("mediaFile").addEventListener("change",event=>{
     "image/jpeg","image/png","image/webp","image/gif",
     "video/mp4","video/webm","video/quicktime"
   ];
+
   if(!allowed.includes(file.type)){
     showToast("Unsupported file type.");
     removeMedia();
@@ -219,30 +527,72 @@ document.getElementById("mediaFile").addEventListener("change",event=>{
   }else{
     const image=document.createElement("img");
     image.src=previewUrl;
-    image.alt="Selected photo";
+    image.alt="Selected media";
     preview.appendChild(image);
   }
 
   document.getElementById("fileInfo").textContent=
     file.name+" · "+(file.size/1024/1024).toFixed(2)+" MB";
-  document.getElementById("uploadPrompt").style.display="none";
   document.getElementById("preview").style.display="block";
+  updateNextButton();
 });
 
-document.getElementById("postForm").addEventListener("submit",async event=>{
-  event.preventDefault();
+function openAudience(){
+  document.getElementById("audienceSelect").value=audience;
+  document.getElementById("audienceModal").classList.add("open");
+}
+function closeAudience(){
+  document.getElementById("audienceModal").classList.remove("open");
+}
+function saveAudience(){
+  audience=document.getElementById("audienceSelect").value;
+  const labels={
+    public:"Public",
+    followers:"Followers",
+    private:"Only me"
+  };
+  document.getElementById("audienceLabel").textContent=labels[audience];
+  document.getElementById("audienceButton").classList.add("active");
+  closeAudience();
+}
+function toggleOption(name){
+  if(name==="instagram"){
+    instagram=!instagram;
+    document.getElementById("instagramLabel").textContent=instagram?"On":"Off";
+    document.getElementById("instagramButton").classList.toggle("active",instagram);
+    if(instagram)showToast("Instagram sharing UI enabled. External publishing is not connected.");
+  }else{
+    threads=!threads;
+    document.getElementById("threadsLabel").textContent=threads?"On":"Off";
+    document.getElementById("threadsButton").classList.toggle("active",threads);
+    if(threads)showToast("Threads sharing UI enabled. External publishing is not connected.");
+  }
+}
 
-  if(!getToken()){
-    go("auth.html?mode=login");
+function openPublish(){
+  if(!requireLogin())return;
+  const content=document.getElementById("content").value.trim();
+  if(!content&&!selectedFile){
+    showToast("Write something or choose media first.");
     return;
   }
+  document.getElementById("publishModal").classList.add("open");
+}
+function closePublish(){
+  document.getElementById("publishModal").classList.remove("open");
+}
+
+async function publishPost(){
+  if(publishing||!requireLogin())return;
 
   const content=document.getElementById("content").value.trim();
   if(!content&&!selectedFile){
-    showToast("Write something or select a photo/video first.");
+    showToast("Write something or choose media first.");
+    closePublish();
     return;
   }
 
+  publishing=true;
   const button=document.getElementById("publishButton");
   button.disabled=true;
   button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Publishing...';
@@ -259,38 +609,51 @@ document.getElementById("postForm").addEventListener("submit",async event=>{
         body:formData
       });
       media=uploadData.media||uploadData;
+
       if(!media.url&&!media.secure_url){
         throw new Error("Upload response-এ media URL পাওয়া যায়নি।");
       }
     }
 
     const mediaUrl=media?(media.url||media.secure_url):"";
-    const resourceType=media?(media.resource_type||media.type||""):"";
     const mediaType=selectedFile
       ?(selectedFile.type.startsWith("video/")?"video":"image")
       :"";
 
+    const payload={
+      content,
+      media_url:mediaUrl,
+      media_type:mediaType,
+      media_public_id:media?(media.public_id||""):""
+    };
+
+    /*
+      Audience selection is currently local UI only.
+      Send it only after your backend supports an audience field.
+    */
     await api("/posts",{
       method:"POST",
-      body:JSON.stringify({
-        content,
-        media_url:mediaUrl,
-        media_type:mediaType,
-        media_public_id:media?(media.public_id||""):""
-      })
+      body:JSON.stringify(payload)
     });
 
+    closePublish();
     showToast("Post published successfully!");
     document.getElementById("content").value="";
     removeMedia();
-
     setTimeout(()=>go("home.html"),700);
   }catch(error){
     showToast(error.message||"Could not publish post.");
   }finally{
+    publishing=false;
     button.disabled=false;
-    button.innerHTML='<i class="fa-solid fa-paper-plane"></i> Publish';
+    button.innerHTML='<i class="fa-solid fa-paper-plane"></i> Share post';
   }
+}
+
+document.querySelectorAll(".modal").forEach(modal=>{
+  modal.addEventListener("click",event=>{
+    if(event.target===modal)modal.classList.remove("open");
+  });
 });
 
 window.addEventListener("beforeunload",()=>{
