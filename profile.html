@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,7 +156,7 @@ input[type=file]{display:none}
   <a class="nav-item" href="home.html#discover"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
   <a class="nav-item" href="home.html#create"><i class="fa-solid fa-square-plus"></i><span>Create</span></a>
   <a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-  <a class="nav-item active" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+  <a class="nav-item active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
 </nav>
 
 <div class="modal" id="editModal">
@@ -199,10 +198,11 @@ let loadingProfile=false;
 let isOwnProfile=true;
 let followingThisUser=false;
 
-const targetUsername=new URLSearchParams(location.search).get("username");
+const queryParams=new URLSearchParams(location.search);
+const targetUsername=String(queryParams.get("username")||"").replace(/^@/,"").trim();
 
 const defaults={
-  name:"",handle:"",bio:"Welcome to my FreeTube profile!",
+  name:"",handle:"",bio:"No bio added yet.",
   city:"",home:"",birthday:"",work:"",education:"",
   followers:0,following:0,avatar_url:"",cover_url:""
 };
@@ -240,6 +240,7 @@ function notify(message){
 async function apiRequest(path,options={}){
   const headers={...(options.headers||{})};
   const token=getToken();
+
   if(token)headers.Authorization="Bearer "+token;
 
   if(options.body!==undefined && !(options.body instanceof FormData)){
@@ -258,28 +259,55 @@ async function apiRequest(path,options={}){
     error.status=response.status;
     throw error;
   }
+
   return data;
 }
 
-function extractUser(data){
-  return data?.user||data?.profile||data?.data?.user||data?.data?.profile||data?.data||data;
+function firstNonEmpty(...values){
+  for(const value of values){
+    if(value!==undefined&&value!==null&&String(value).trim()!==""){
+      return value;
+    }
+  }
+  return "";
 }
 
 function normalizeProfile(user={},profile={}){
+  const avatar=firstNonEmpty(profile.avatar_url,user.avatar_url);
+  const cover=firstNonEmpty(profile.cover_url,user.cover_url);
+
   return {
-    name:profile.display_name||profile.full_name||user.display_name||user.full_name||user.name||user.username||user.handle||"User",
-    handle:user.username||user.handle||profile.username||"",
-    bio:profile.bio??user.bio??"No bio added yet.",
-    city:profile.city||profile.location||"",
-    home:profile.home||"",
-    birthday:profile.birthday?String(profile.birthday).slice(0,10):"",
-    work:profile.work||"",
-    education:profile.education||"",
-    followers:Number(profile.followers_count??profile.followers??0),
-    following:Number(profile.following_count??profile.following??0),
-    avatar_url:profile.avatar_url||user.avatar_url||"",
-    cover_url:profile.cover_url||user.cover_url||""
+    id:firstNonEmpty(profile.id,user.id,profile.user_id,user.user_id),
+    name:firstNonEmpty(
+      profile.display_name,profile.full_name,user.display_name,
+      user.full_name,user.name,profile.username,user.username,user.handle
+    )||"User",
+    handle:String(firstNonEmpty(profile.username,user.username,profile.handle,user.handle)||"").replace(/^@/,""),
+    bio:firstNonEmpty(profile.bio,user.bio)||"No bio added yet.",
+    city:firstNonEmpty(profile.city,user.city,profile.location,user.location),
+    home:firstNonEmpty(profile.home,user.home),
+    birthday:firstNonEmpty(profile.birthday,user.birthday)
+      ?String(firstNonEmpty(profile.birthday,user.birthday)).slice(0,10):"",
+    work:firstNonEmpty(profile.work,user.work),
+    education:firstNonEmpty(profile.education,user.education),
+    followers:Number(firstNonEmpty(profile.followers_count,profile.followers,user.followers_count,user.followers)||0),
+    following:Number(firstNonEmpty(profile.following_count,profile.following,user.following_count,user.following)||0),
+    avatar_url:avatar||"",
+    cover_url:cover||""
   };
+}
+
+function setImageSource(image,url,fallback){
+  image.onerror=null;
+  image.src=fallback;
+
+  if(url&&typeof url==="string"){
+    image.onerror=()=>{
+      image.onerror=null;
+      image.src=fallback;
+    };
+    image.src=url;
+  }
 }
 
 function renderProfile(p){
@@ -291,21 +319,23 @@ function renderProfile(p){
   document.getElementById("birthdayText").textContent=formatBirthday(p.birthday);
   document.getElementById("workText").textContent=p.work||"Not added";
   document.getElementById("educationText").textContent=p.education||"Not added";
-  document.getElementById("followersCount").textContent=p.followers||0;
-  document.getElementById("followingCount").textContent=p.following||0;
+  document.getElementById("followersCount").textContent=Number(p.followers)||0;
+  document.getElementById("followingCount").textContent=Number(p.following)||0;
 
-  document.getElementById("profileAvatar").src=p.avatar_url||DEFAULT_AVATAR;
-  document.getElementById("coverPhoto").src=p.cover_url||DEFAULT_COVER;
+  setImageSource(document.getElementById("profileAvatar"),p.avatar_url,DEFAULT_AVATAR);
+  setImageSource(document.getElementById("coverPhoto"),p.cover_url,DEFAULT_COVER);
 }
 
 function formatBirthday(value){
   if(!value)return "Not added";
   const date=String(value).slice(0,10);
   const parts=date.split("-");
-  if(parts.length!==3)return value;
+  if(parts.length!==3)return String(value);
   const parsed=new Date(date+"T00:00:00Z");
-  if(Number.isNaN(parsed.getTime()))return value;
-  return parsed.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric",timeZone:"UTC"});
+  if(Number.isNaN(parsed.getTime()))return String(value);
+  return parsed.toLocaleDateString("en-US",{
+    year:"numeric",month:"long",day:"numeric",timeZone:"UTC"
+  });
 }
 
 function setOwnProfileUI(own){
@@ -316,11 +346,23 @@ function setOwnProfileUI(own){
   document.getElementById("avatarUploadLabel").classList.toggle("hidden",!own);
   document.getElementById("coverUploadLabel").classList.toggle("hidden",!own);
   document.getElementById("menuEdit").classList.toggle("hidden",!own);
+  document.getElementById("profileNavLink").href=own
+    ?"profile.html"
+    :"profile.html?username="+encodeURIComponent(viewedUser?.username||targetUsername);
+}
+
+function extractProfile(data){
+  if(data?.profile&&typeof data.profile==="object")return data.profile;
+  if(data?.data?.profile&&typeof data.data.profile==="object")return data.data.profile;
+  if(data?.user&&typeof data.user==="object")return data.user;
+  if(data?.data&&typeof data.data==="object")return data.data;
+  return data||{};
 }
 
 async function loadProfile(){
   if(loadingProfile)return;
   loadingProfile=true;
+
   document.getElementById("retrySessionButton").style.display="none";
   setStatus("Connecting to FreeTube...");
 
@@ -328,28 +370,48 @@ async function loadProfile(){
     if(!getToken())throw new Error("Please log in to view profiles.");
 
     const meData=await apiRequest("/auth/me");
-    currentUser=extractUser(meData);
+    currentUser=meData.user||meData.data?.user||meData;
 
-    const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"");
-    const requested=String(targetUsername||"").replace(/^@/,"");
+    const myUsername=String(currentUser.username||currentUser.handle||"").replace(/^@/,"").trim();
+    const requested=targetUsername;
+
     isOwnProfile=!requested||requested.toLowerCase()===myUsername.toLowerCase();
 
     if(isOwnProfile){
       const data=await apiRequest("/profile");
-      serverProfile=data.profile||data.data?.profile||data;
-      viewedUser={...currentUser,...serverProfile,id:serverProfile.id??currentUser.id};
+      serverProfile=extractProfile(data);
+
+      viewedUser={
+        ...currentUser,
+        ...serverProfile,
+        id:serverProfile.id??serverProfile.user_id??currentUser.id,
+        username:serverProfile.username||currentUser.username
+      };
     }else{
       const data=await apiRequest("/profile/"+encodeURIComponent(requested));
-      serverProfile=data.profile||data.data?.profile||{};
+      serverProfile=extractProfile(data);
+
+      const apiUser=data.user&&typeof data.user==="object"?data.user:{};
+
       viewedUser={
+        ...apiUser,
         ...serverProfile,
-        ...(data.user||{}),
-        id:serverProfile.id??data.user?.id??serverProfile.user_id,
-        username:serverProfile.username||data.user?.username||requested
+        id:serverProfile.id??serverProfile.user_id??apiUser.id??apiUser.user_id,
+        username:serverProfile.username||apiUser.username||requested,
+        avatar_url:firstNonEmpty(serverProfile.avatar_url,apiUser.avatar_url),
+        cover_url:firstNonEmpty(serverProfile.cover_url,apiUser.cover_url)
       };
+
+      // Never replace the requested person's public profile with the viewer's local profile.
+      isOwnProfile=false;
     }
 
     const p=normalizeProfile(viewedUser,serverProfile);
+
+    if(!p.handle&&!isOwnProfile){
+      p.handle=requested;
+      viewedUser.username=requested;
+    }
 
     if(isOwnProfile){
       saveLocalProfile({...getProfile(),...p});
@@ -365,8 +427,8 @@ async function loadProfile(){
 
     applyClickableProfileName();
     setStatus(isOwnProfile?"Your profile is connected.":"Viewing @"+p.handle,"success");
-    await loadPostsForViewedUser();
 
+    await loadPostsForViewedUser();
   }catch(error){
     console.error("Profile loading failed:",error);
     setStatus(error.message||"Could not load profile.","error");
@@ -386,7 +448,7 @@ function updateFollowButton(){
 }
 
 async function toggleFollow(){
-  if(isOwnProfile||!viewedUser)return;
+  if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");
   if(!getToken())return notify("Please log in first.");
 
   const userId=viewedUser.id??viewedUser.user_id??serverProfile.user_id;
@@ -399,22 +461,19 @@ async function toggleFollow(){
 
   try{
     const method=followingThisUser?"DELETE":"POST";
-    const result=await apiRequest("/users/"+encodeURIComponent(userId)+"/follow",{
-      method
-    });
-
-    const nextState=typeof result.following==="boolean"
-      ?result.following:!followingThisUser;
+    const result=await apiRequest("/users/"+encodeURIComponent(userId)+"/follow",{method});
+    const nextState=typeof result.following==="boolean"?result.following:!followingThisUser;
 
     if(nextState!==followingThisUser){
-      const p=normalizeProfile(viewedUser,serverProfile);
-      p.followers=Math.max(0,p.followers+(nextState?1:-1));
-      serverProfile.followers_count=p.followers;
+      followingThisUser=nextState;
       serverProfile.is_following=nextState;
-      followingThisUser=nextState;
+      serverProfile.followers_count=Math.max(
+        0,Number(serverProfile.followers_count||0)+(nextState?1:-1)
+      );
+
+      const p=normalizeProfile(viewedUser,serverProfile);
+      viewedUser={...viewedUser,...serverProfile};
       renderProfile(p);
-    }else{
-      followingThisUser=nextState;
     }
 
     updateFollowButton();
@@ -642,32 +701,46 @@ function postAuthor(post){
 
 function postUsername(post){
   const author=postAuthor(post);
-  return post.username||post.author_username||author.username||author.handle||"";
+  return firstNonEmpty(
+    post.username,post.author_username,post.user_username,
+    author.username,author.handle
+  );
 }
 
 function postUserId(post){
   const author=postAuthor(post);
-  return post.user_id??post.author_id??author.id??author.user_id??null;
+  return post.user_id??post.author_id??post.owner_id??author.id??author.user_id??null;
+}
+
+function isSamePostOwner(post,viewedId,viewedName){
+  const id=String(postUserId(post)??"");
+  const username=String(postUsername(post)||"").replace(/^@/,"").toLowerCase();
+
+  // Prefer IDs when both sides have them. Otherwise compare usernames.
+  if(viewedId&&id)return id===viewedId;
+  return Boolean(viewedName&&username&&viewedName===username);
 }
 
 async function loadPostsForViewedUser(){
   const container=document.getElementById("myPosts");
   container.textContent="Loading posts...";
+  document.getElementById("postCount").textContent="Loading...";
 
   try{
     const data=await apiRequest("/posts?limit=50");
     const posts=Array.isArray(data)?data:(data.posts||data.data?.posts||[]);
-    const viewedId=String(viewedUser?.id??viewedUser?.user_id??serverProfile.user_id??"");
-    const viewedName=String(viewedUser?.username||viewedUser?.handle||targetUsername||"").replace(/^@/,"").toLowerCase();
 
-    const filtered=posts.filter(post=>{
-      const id=String(postUserId(post)??"");
-      const username=String(postUsername(post)).replace(/^@/,"").toLowerCase();
-      if(viewedId&&id)return viewedId===id;
-      return Boolean(viewedName&&username&&viewedName===username);
-    });
+    const viewedId=String(
+      viewedUser?.id??viewedUser?.user_id??serverProfile.user_id??""
+    );
+    const viewedName=String(
+      viewedUser?.username||viewedUser?.handle||targetUsername||""
+    ).replace(/^@/,"").toLowerCase();
 
-    document.getElementById("postCount").textContent=filtered.length+(filtered.length===1?" post":" posts");
+    const filtered=posts.filter(post=>isSamePostOwner(post,viewedId,viewedName));
+
+    document.getElementById("postCount").textContent=
+      filtered.length+(filtered.length===1?" post":" posts");
     container.replaceChildren();
 
     if(!filtered.length){
@@ -679,42 +752,58 @@ async function loadPostsForViewedUser(){
       const card=document.createElement("article");
       card.className="post-card";
 
-      const authorName=postUsername(post)||"User";
+      const authorName=postUsername(post)||viewedName||"User";
       const authorData=postAuthor(post);
       const author=document.createElement("div");
       author.className="post-author";
 
       const avatar=document.createElement("img");
       avatar.alt="";
-      avatar.src=authorData.avatar_url||authorData.avatar||DEFAULT_AVATAR;
+      setImageSource(
+        avatar,
+        firstNonEmpty(authorData.avatar_url,authorData.avatar,post.avatar_url),
+        DEFAULT_AVATAR
+      );
 
       const name=document.createElement("strong");
-      name.textContent=authorData.display_name||authorData.name||authorName;
+      name.textContent=firstNonEmpty(
+        post.display_name,authorData.display_name,authorData.name,authorName
+      );
 
       author.append(avatar,name);
       author.addEventListener("click",()=>openUserProfile(authorName));
       card.appendChild(author);
 
-      const content=post.content||post.text||post.caption||"";
+      const content=firstNonEmpty(post.content,post.text,post.caption);
       if(content){
         const text=document.createElement("p");
         text.textContent=content;
         card.appendChild(text);
       }
 
-      const url=post.media_url||post.image_url||post.video_url;
+      const url=firstNonEmpty(post.media_url,post.image_url,post.video_url);
       const mediaType=String(post.media_type||post.type||"").toLowerCase();
 
       if(url){
-        const media=document.createElement(
-          mediaType.includes("video")?"video":"img"
-        );
+        const looksLikeVideo=
+          mediaType.includes("video")||
+          /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(url);
+
+        const media=document.createElement(looksLikeVideo?"video":"img");
         media.src=url;
         media.alt="Post media";
-        if(media.tagName==="VIDEO"){
+
+        if(looksLikeVideo){
           media.controls=true;
           media.playsInline=true;
+          media.preload="metadata";
+        }else{
+          media.onerror=()=>{
+            media.onerror=null;
+            media.alt="Post image could not be loaded.";
+          };
         }
+
         card.appendChild(media);
       }
 
@@ -722,7 +811,10 @@ async function loadPostsForViewedUser(){
         const date=document.createElement("p");
         date.className="muted";
         date.style.marginTop="8px";
-        date.textContent=new Date(post.created_at).toLocaleString();
+        const parsedDate=new Date(post.created_at);
+        date.textContent=Number.isNaN(parsedDate.getTime())
+          ?String(post.created_at)
+          :parsedDate.toLocaleString();
         card.appendChild(date);
       }
 
@@ -730,6 +822,7 @@ async function loadPostsForViewedUser(){
     });
   }catch(error){
     console.error("Posts load error:",error);
+    document.getElementById("postCount").textContent="Posts unavailable";
     container.textContent="Could not load posts: "+error.message;
   }
 }
