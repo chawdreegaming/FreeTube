@@ -4,148 +4,340 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#173d2b">
-<title>FreeTube - Inbox</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+<meta name="theme-color" content="#17132f">
+<title>Messages — Boys vs Girls 💙💗</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-:root{--green:#00d084;--bg:#101713;--panel:#19231d;--text:#f4fff7;--muted:#9caaa1;--red:#e84b5b}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(145deg,#102d20,#111713 45%,#281419);color:var(--text);min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer}
+:root{
+  --bg:#100f24;
+  --panel:#1b1937;
+  --panel2:#242044;
+  --blue:#4295ff;
+  --purple:#9565ff;
+  --pink:#ff5ebc;
+  --text:#faf9ff;
+  --muted:#aaa8c8;
+  --border:rgba(255,255,255,.11);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%;background:var(--bg)}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(66,100,255,.23),transparent 42%),
+    radial-gradient(ellipse at 100% 30%,rgba(255,69,177,.17),transparent 42%),
+    linear-gradient(145deg,#111126,#19132f 55%,#11152b);
+  background-attachment:fixed;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
 button:disabled{opacity:.55;cursor:not-allowed}
-.topbar{position:sticky;top:0;z-index:5;background:#101713ed;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff12;padding:15px 16px;display:flex;align-items:center;justify-content:space-between}
-.brand{display:flex;align-items:center;gap:10px;font-size:21px;font-weight:800}
-.brand-icon{width:38px;height:38px;border-radius:13px;background:linear-gradient(135deg,#00c878,#006c43);display:grid;place-items:center;color:white}
-.brand span{color:var(--green)}
-.icon-btn{width:42px;height:42px;border:1px solid #ffffff18;background:#ffffff09;color:white;border-radius:14px;font-size:17px}
-.page{max-width:780px;margin:auto;padding:20px 14px 100px}
-.page-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-h1{font-size:28px}
-.subtitle{font-size:13px;color:var(--muted);margin:8px 0 20px}
-.searchbox{display:flex;align-items:center;gap:10px;padding:13px 15px;background:#ffffff0c;border:1px solid #ffffff12;border-radius:16px;margin-bottom:18px}
-.searchbox i{color:var(--muted)}
-.searchbox input{width:100%;background:none;border:0;outline:none;color:white;font-size:14px}
-.section-title{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:700;margin:22px 0 12px}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:rgba(20,18,43,.88);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+  padding:calc(10px + env(safe-area-inset-top)) 14px 12px;
+  display:flex;align-items:center;gap:11px;
+}
+.brand{
+  flex:1;min-width:0;
+  display:flex;align-items:center;gap:10px;
+  font-size:19px;font-weight:900;letter-spacing:-.4px;
+  white-space:nowrap;
+}
+.brand-icon{
+  width:39px;height:39px;flex-shrink:0;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+  display:grid;place-items:center;color:white;
+  box-shadow:0 5px 18px rgba(137,94,255,.22);
+}
+.brand-name{
+  overflow:hidden;text-overflow:ellipsis;
+  background:linear-gradient(100deg,#fff,#b9caff 48%,#ff9ad8);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.icon-btn{
+  flex-shrink:0;width:41px;height:41px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.055);
+  color:white;border-radius:13px;font-size:16px;
+}
+.icon-btn:active{background:rgba(255,255,255,.14)}
+.page{max-width:780px;margin:auto;padding:20px 13px 105px}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:27px;font-weight:900;letter-spacing:-.5px}
+.subtitle{font-size:13px;color:var(--muted);margin:8px 0 20px;line-height:1.6}
+.primary-btn{
+  background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));
+  border:0;border-radius:13px;color:white;font-weight:800;
+  padding:12px 14px;white-space:nowrap;
+  box-shadow:0 5px 18px rgba(137,94,255,.18);
+}
+.primary-btn:active{opacity:.85}
+.searchbox{
+  display:flex;align-items:center;gap:10px;
+  padding:0 14px;background:rgba(255,255,255,.045);
+  border:1px solid var(--border);border-radius:15px;
+  margin-bottom:19px;
+}
+.searchbox i{color:#b5a3ff}
+.searchbox input{
+  width:100%;min-width:0;padding:14px 0;
+  background:transparent;border:0;outline:none;color:white;font-size:14px;
+}
+.searchbox input::placeholder{color:var(--muted)}
+.section-title{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:10px;font-size:15px;font-weight:800;margin:21px 2px 12px;
+}
 .small-muted{font-size:12px;color:var(--muted);font-weight:400}
-.chat-list{display:flex;flex-direction:column;gap:8px}
-.chat-row{display:flex;align-items:center;gap:12px;padding:13px;background:#ffffff08;border:1px solid #ffffff0c;border-radius:17px;text-align:left;color:white;width:100%;min-width:0}
-.chat-row:active{background:#ffffff15}
-.avatar{width:49px;height:49px;flex-shrink:0;border-radius:50%;object-fit:cover;background:#254332;display:grid;place-items:center;color:#d4ffdf;font-weight:bold;font-size:19px}
+.chat-list{display:flex;flex-direction:column;gap:9px}
+.chat-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px;width:100%;min-width:0;
+  background:linear-gradient(115deg,rgba(37,34,70,.94),rgba(31,27,57,.94));
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:17px;text-align:left;color:white;
+}
+.chat-row:active{background:rgba(91,76,148,.35)}
+.avatar{
+  width:49px;height:49px;flex-shrink:0;
+  border-radius:50%;object-fit:cover;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+  display:grid;place-items:center;color:white;
+  font-weight:800;font-size:19px;overflow:hidden;
+}
 .avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 .chat-info{flex:1;min-width:0}
 .chat-name-line{display:flex;align-items:center;gap:7px;margin-bottom:6px}
-.chat-name{font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.handle{font-size:12px;color:var(--muted);margin-top:3px}
-.last-message{font-size:13px;color:#aebbb2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-name{font-size:15px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.handle{font-size:12px;color:var(--muted);margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.last-message{font-size:13px;color:#b6b3ce;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
 .time{font-size:10px;color:var(--muted)}
-.unread{background:var(--green);color:#062d1b;font-size:11px;font-weight:bold;min-width:20px;height:20px;padding:0 6px;border-radius:20px;display:grid;place-items:center}
-.empty{padding:35px 15px;text-align:center;color:var(--muted);background:#ffffff06;border:1px dashed #ffffff20;border-radius:17px;line-height:1.7}
-.empty i{font-size:30px;color:var(--green);display:block;margin-bottom:12px}
-.primary-btn{background:linear-gradient(135deg,#00c878,#007c4b);border:0;border-radius:13px;color:white;font-weight:bold;padding:12px 15px}
-.secondary-btn{background:#ffffff10;border:1px solid #ffffff1c;color:white;border-radius:12px;padding:10px 13px}
-.status{font-size:13px;color:var(--muted);padding:12px 2px;line-height:1.6}
-.status.error{color:#ff9ca5}
-.bottom-nav{position:fixed;z-index:8;bottom:0;left:0;right:0;background:#111813f5;backdrop-filter:blur(16px);border-top:1px solid #ffffff15;display:flex;justify-content:space-around;padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
-.nav-item{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;color:#92a096;font-size:10px;min-width:53px}
+.unread{
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  color:white;font-size:11px;font-weight:800;
+  min-width:21px;height:21px;padding:0 6px;
+  border-radius:20px;display:grid;place-items:center;
+}
+.empty{
+  padding:32px 15px;text-align:center;color:var(--muted);
+  background:rgba(255,255,255,.035);
+  border:1px dashed rgba(255,255,255,.15);
+  border-radius:17px;line-height:1.8;font-size:14px;
+}
+.empty i{font-size:30px;color:#b5a0ff;display:block;margin-bottom:12px}
+.secondary-btn{
+  background:rgba(255,255,255,.07);
+  border:1px solid var(--border);color:white;
+  border-radius:12px;padding:10px 13px;
+}
+.status{font-size:13px;color:var(--muted);padding:12px 2px;line-height:1.6;overflow-wrap:anywhere}
+.status.error{color:#ff9cae}
+.bottom-nav{
+  position:fixed;z-index:15;bottom:0;left:0;right:0;
+  background:rgba(20,18,43,.91);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-top:1px solid var(--border);
+  display:flex;justify-content:space-around;
+  padding:9px 3px calc(9px + env(safe-area-inset-bottom));
+}
+.nav-item{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  text-decoration:none;color:#9996b8;font-size:10px;
+  min-width:0;flex:1;
+}
 .nav-item i{font-size:19px}
-.nav-item.active{color:var(--green)}
-.overlay{position:fixed;inset:0;background:#000b;z-index:20;display:none;align-items:stretch;justify-content:center}
+.nav-item.active{color:#b69bff}
+.nav-item.active i{filter:drop-shadow(0 0 7px rgba(164,120,255,.4))}
+.overlay{
+  position:fixed;inset:0;background:rgba(5,4,16,.76);
+  backdrop-filter:blur(5px);z-index:30;
+  display:none;align-items:stretch;justify-content:center;
+}
 .overlay.show{display:flex}
-.chat-window{width:100%;max-width:780px;background:#111914;display:flex;flex-direction:column;min-height:0;height:100%;padding-bottom:env(safe-area-inset-bottom)}
-.chat-header{display:flex;align-items:center;gap:11px;padding:12px;border-bottom:1px solid #ffffff15;background:#17211a}
+.chat-window{
+  width:100%;max-width:780px;background:#14122b;
+  display:flex;flex-direction:column;min-height:0;height:100%;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.chat-header{
+  display:flex;align-items:center;gap:10px;
+  padding:12px;background:rgba(29,26,57,.98);
+  border-bottom:1px solid var(--border);
+}
 .chat-person{flex:1;min-width:0}
-.chat-person strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.chat-person small{color:var(--muted);font-size:12px}
-.messages{flex:1;overflow-y:auto;padding:18px 13px;display:flex;flex-direction:column;gap:10px}
-.date-note{text-align:center;color:var(--muted);font-size:11px;margin:6px 0}
+.chat-person strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:15px}
+.chat-person small{color:var(--muted);font-size:12px;display:block;margin-top:4px}
+.messages{
+  flex:1;min-height:0;overflow-y:auto;padding:18px 13px;
+  display:flex;flex-direction:column;gap:10px;
+}
 .bubble-row{display:flex;width:100%}
 .bubble-row.mine{justify-content:flex-end}
-.bubble{max-width:82%;padding:11px 13px;border-radius:17px;background:#26352b;color:#f5fff7;font-size:14px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
-.mine .bubble{background:linear-gradient(135deg,#087f50,#075b3d);border-bottom-right-radius:5px}
+.bubble{
+  max-width:82%;padding:11px 13px;border-radius:17px;
+  background:#292644;color:#f5f3ff;font-size:14px;
+  line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap;
+}
+.mine .bubble{
+  background:linear-gradient(135deg,#347fe9,#7756df 65%,#b54ca8);
+  border-bottom-right-radius:5px;
+}
 .theirs .bubble{border-bottom-left-radius:5px}
-.bubble-time{text-align:right;color:#c4d9cc;font-size:10px;margin-top:5px}
-.compose{display:flex;align-items:flex-end;gap:9px;padding:12px;background:#17211a;border-top:1px solid #ffffff12}
-.compose textarea{flex:1;min-width:0;max-height:120px;resize:none;background:#ffffff0b;border:1px solid #ffffff17;border-radius:20px;color:white;padding:12px 15px;outline:none;line-height:1.4}
-.send-btn{width:45px;height:45px;flex-shrink:0;border:0;border-radius:50%;background:var(--green);color:#07321f;font-size:17px}
-.modal-card{margin:auto;width:calc(100% - 24px);max-width:480px;max-height:82vh;display:flex;flex-direction:column;background:#17211a;border:1px solid #ffffff20;border-radius:22px;overflow:hidden}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:17px;border-bottom:1px solid #ffffff15}
+.bubble-time{text-align:right;color:#e0dcf5;font-size:10px;margin-top:5px}
+.compose{
+  display:flex;align-items:flex-end;gap:9px;
+  padding:11px;background:rgba(29,26,57,.98);
+  border-top:1px solid var(--border);
+}
+.compose textarea{
+  flex:1;min-width:0;max-height:120px;resize:none;
+  background:rgba(255,255,255,.055);
+  border:1px solid var(--border);border-radius:20px;
+  color:white;padding:12px 15px;outline:none;line-height:1.4;
+}
+.compose textarea:focus{border-color:#9b80ff}
+.compose textarea::placeholder{color:var(--muted)}
+.send-btn{
+  width:45px;height:45px;flex-shrink:0;border:0;
+  border-radius:50%;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+  color:white;font-size:16px;
+}
+.modal-card{
+  margin:auto;width:calc(100% - 24px);max-width:480px;
+  max-height:82vh;display:flex;flex-direction:column;
+  background:#1b1937;border:1px solid var(--border);
+  border-radius:22px;overflow:hidden;
+}
+.modal-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:15px;border-bottom:1px solid var(--border);
+}
 .modal-head h2{font-size:19px}
 .modal-body{padding:15px;overflow:auto}
 .search-hint{font-size:12px;color:var(--muted);margin:0 0 12px}
-.user-result{display:flex;align-items:center;gap:12px;width:100%;text-align:left;color:white;background:#ffffff07;border:1px solid #ffffff0c;border-radius:14px;padding:12px;margin-bottom:8px}
+.user-result{
+  display:flex;align-items:center;gap:12px;width:100%;
+  text-align:left;color:white;background:rgba(255,255,255,.035);
+  border:1px solid var(--border);border-radius:14px;padding:12px;margin-bottom:8px;
+}
 .user-result .chat-info{overflow:hidden}
-@media(min-width:600px){.chat-window{height:min(850px,95vh);align-self:center;border:1px solid #ffffff25;border-radius:20px;overflow:hidden}.overlay{padding:2vh 12px}}
+@media(min-width:600px){
+  .chat-window{height:min(850px,95vh);align-self:center;border:1px solid var(--border);border-radius:20px;overflow:hidden}
+  .overlay{padding:2vh 12px}
+}
+@media(max-width:360px){
+  .page{padding-left:9px;padding-right:9px}
+  .brand{font-size:16px;gap:7px}
+  .brand-icon{width:35px;height:35px}
+  h1{font-size:23px}
+  .chat-row{padding:10px;gap:9px}
+  .avatar{width:44px;height:44px}
+  .chat-name{font-size:14px}
+  .last-message{font-size:12px}
+}
 </style>
 </head>
 
 <body>
 <header class="topbar">
-  <button class="icon-btn" id="backBtn" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
-  <div class="brand"><div class="brand-icon"><i class="fa-solid fa-play"></i></div>Free<span>Tube</span></div>
-  <button class="icon-btn" id="newChatBtn" aria-label="New message"><i class="fa-solid fa-pen-to-square"></i></button>
+  <button class="icon-btn" id="backBtn" type="button" aria-label="Go back">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
+  <div class="brand">
+    <div class="brand-icon"><i class="fa-solid fa-users"></i></div>
+    <div class="brand-name">Boys vs Girls 💙💗</div>
+  </div>
+  <button class="icon-btn" id="newChatBtn" type="button" aria-label="New message">
+    <i class="fa-solid fa-pen-to-square"></i>
+  </button>
 </header>
 
 <main class="page">
   <div class="page-heading">
     <h1>Messages</h1>
-    <button class="primary-btn" id="startChatBtn"><i class="fa-solid fa-plus"></i> New</button>
+    <button class="primary-btn" id="startChatBtn" type="button">
+      <i class="fa-solid fa-plus"></i> New
+    </button>
   </div>
-  <p class="subtitle">Talk to people in the FreeTube community.</p>
+  <p class="subtitle">Chat, share and stay connected with your community.</p>
 
   <label class="searchbox">
     <i class="fa-solid fa-magnifying-glass"></i>
     <input type="search" id="conversationSearch" placeholder="Search conversations..." autocomplete="off">
   </label>
 
-  <div class="section-title"><span>Your conversations</span><span class="small-muted" id="conversationCount"></span></div>
+  <div class="section-title">
+    <span>Your conversations</span>
+    <span class="small-muted" id="conversationCount"></span>
+  </div>
+
   <div id="chatList" class="chat-list">
     <div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading conversations...</div>
   </div>
   <div id="pageStatus" class="status" role="status" aria-live="polite"></div>
 </main>
 
-<nav class="bottom-nav">
+<nav class="bottom-nav" aria-label="Main navigation">
   <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a class="nav-item" href="home.html#discover"><i class="fa-solid fa-compass"></i><span>Discover</span></a>
-  <a class="nav-item" href="home.html"><i class="fa-solid fa-circle-plus"></i><span>Create</span></a>
-  <a class="nav-item active" href="inbox.html"><i class="fa-solid fa-envelope"></i><span>Inbox</span></a>
+  <a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
+  <a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+  <a class="nav-item active" href="inbox.html" aria-current="page"><i class="fa-solid fa-comment-dots"></i><span>Messages</span></a>
   <a class="nav-item" href="profile.html"><i class="fa-solid fa-user"></i><span>Profile</span></a>
 </nav>
 
-<!-- Chat window -->
 <div class="overlay" id="chatOverlay" role="dialog" aria-modal="true" aria-label="Conversation">
   <section class="chat-window">
     <header class="chat-header">
-      <button class="icon-btn" id="closeChatBtn" aria-label="Close conversation"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="icon-btn" id="closeChatBtn" type="button" aria-label="Close conversation">
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
       <div class="avatar" id="activeAvatar">?</div>
-      <div class="chat-person"><strong id="activeName">Conversation</strong><small id="activeHandle"></small></div>
-      <button class="icon-btn" id="refreshChatBtn" aria-label="Refresh messages"><i class="fa-solid fa-rotate"></i></button>
+      <div class="chat-person">
+        <strong id="activeName">Conversation</strong>
+        <small id="activeHandle"></small>
+      </div>
+      <button class="icon-btn" id="refreshChatBtn" type="button" aria-label="Refresh messages">
+        <i class="fa-solid fa-rotate"></i>
+      </button>
     </header>
     <div class="messages" id="messageList"><div class="status">Loading messages...</div></div>
     <form class="compose" id="messageForm">
       <textarea id="messageInput" rows="1" maxlength="5000" placeholder="Write a message..." aria-label="Write a message" required></textarea>
-      <button class="send-btn" id="sendBtn" type="submit" aria-label="Send message"><i class="fa-solid fa-paper-plane"></i></button>
+      <button class="send-btn" id="sendBtn" type="submit" aria-label="Send message">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
     </form>
   </section>
 </div>
 
-<!-- New conversation modal -->
 <div class="overlay" id="searchOverlay" role="dialog" aria-modal="true" aria-label="Find people">
   <section class="modal-card">
     <header class="modal-head">
       <h2>New message</h2>
-      <button class="icon-btn" id="closeSearchBtn" aria-label="Close search"><i class="fa-solid fa-xmark"></i></button>
+      <button class="icon-btn" id="closeSearchBtn" type="button" aria-label="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
     </header>
     <div class="modal-body">
       <label class="searchbox">
         <i class="fa-solid fa-magnifying-glass"></i>
         <input type="search" id="userSearch" placeholder="Search by username..." autocomplete="off">
       </label>
-      <p class="search-hint">Type at least 2 characters to find FreeTube users.</p>
-      <div id="userResults"><div class="empty"><i class="fa-solid fa-users"></i>Search for a user to start a conversation.</div></div>
+      <p class="search-hint">Type at least 2 characters to find users.</p>
+      <div id="userResults">
+        <div class="empty"><i class="fa-solid fa-users"></i>Search for a user to start a conversation.</div>
+      </div>
     </div>
   </section>
 </div>
@@ -154,145 +346,156 @@ h1{font-size:28px}
 (function(){
 "use strict";
 
-const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
+const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const LOGIN_URL="auth.html?mode=login";
+const $=id=>document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-let currentUser = null;
-let conversations = [];
-let activeUser = null;
-let messages = [];
-let loadingMessages = false;
-let sending = false;
-let searchTimer = null;
-let searchRequestId = 0;
+let currentUser=null;
+let conversations=[];
+let activeUser=null;
+let messages=[];
+let loadingMessages=false;
+let sending=false;
+let searchTimer=null;
+let searchRequestId=0;
+let chatRequestId=0;
 
 function getToken(){
-  try { return localStorage.getItem(TOKEN_KEY); }
-  catch(e){ return null; }
+  try{return localStorage.getItem(TOKEN_KEY)||""}
+  catch(_){return ""}
 }
 
-async function api(path, options = {}){
-  const token = getToken();
-  if(!token) throw new Error("Your session is missing. Please log in to FreeTube again.");
+async function api(path,options={}){
+  const token=getToken();
+  if(!token)throw new Error("Your session is missing. Please log in again.");
 
-  const headers = {
-    "Authorization": "Bearer " + token,
-    ...(options.body ? {"Content-Type":"application/json"} : {}),
-    ...(options.headers || {})
+  const headers={
+    Authorization:"Bearer "+token,
+    ...(options.body?{"Content-Type":"application/json"}:{}),
+    ...(options.headers||{})
   };
 
   let response;
-  try {
-    response = await fetch(API_BASE_URL + path, {...options, headers});
-  } catch(e) {
+  try{
+    response=await fetch(API_BASE_URL+path,{
+      ...options,headers,cache:"no-store"
+    });
+  }catch(_){
     throw new Error("Cannot connect to the server. Check your internet connection and try again.");
   }
 
-  let data = {};
-  try { data = await response.json(); } catch(e) {}
+  const raw=await response.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}
+  catch(_){data={message:raw}}
 
   if(!response.ok){
-    if(response.status === 401 || response.status === 403){
+    if(response.status===401||response.status===403){
       throw new Error("Your login session may have expired. Please log in again.");
     }
-    throw new Error(data.error || data.message || "Request failed (" + response.status + ").");
+    throw new Error(data.error||data.message||("Request failed ("+response.status+")."));
   }
   return data;
 }
 
 function escapeHTML(value){
-  return String(value == null ? "" : value).replace(/[&<>"']/g, c => ({
+  return String(value==null?"":value).replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[c]));
+  })[c]);
 }
 
 function displayName(user){
-  return user.display_name || user.name || user.username || "FreeTube user";
+  return user.display_name||user.name||user.username||"Community member";
 }
 
-function avatarHTML(user, className = "avatar"){
-  const name = displayName(user);
-  const initial = escapeHTML((name.trim()[0] || "?").toUpperCase());
-  const url = user.avatar_url || user.avatar || "";
-  if(url && /^https?:\/\//i.test(url)){
-    return '<div class="'+className+'"><img src="'+escapeHTML(url)+'" alt="" loading="lazy" onerror="this.parentElement.textContent='+JSON.stringify((name.trim()[0] || "?").toUpperCase())+'"></div>';
+function avatarHTML(user,className="avatar"){
+  const name=displayName(user);
+  const initial=escapeHTML((name.trim()[0]||"?").toUpperCase());
+  const url=user.avatar_url||user.avatar||"";
+
+  if(url&&/^https?:\/\//i.test(url)){
+    return '<div class="'+className+'"><img src="'+escapeHTML(url)+'" alt="" loading="lazy" onerror="this.remove();this.parentElement.textContent='+JSON.stringify((name.trim()[0]||"?").toUpperCase())+'"></div>';
   }
   return '<div class="'+className+'">'+initial+'</div>';
 }
 
-function setPageStatus(message, isError = false){
-  $("pageStatus").textContent = message || "";
-  $("pageStatus").className = "status" + (isError ? " error" : "");
+function setPageStatus(message,isError=false){
+  $("pageStatus").textContent=message||"";
+  $("pageStatus").className="status"+(isError?" error":"");
 }
 
 function formatTime(value){
-  if(!value) return "";
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return "";
-  const now = new Date();
-  if(date.toDateString() === now.toDateString()){
-    return date.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  if(!value)return "";
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime()))return "";
+  const now=new Date();
+  if(date.toDateString()===now.toDateString()){
+    return date.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
   }
-  return date.toLocaleDateString([], {month:"short", day:"numeric"});
+  return date.toLocaleDateString([],{month:"short",day:"numeric"});
 }
 
 function formatMessageTime(value){
-  if(!value) return "";
-  const date = new Date(value);
-  if(Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+  if(!value)return "";
+  const date=new Date(value);
+  if(Number.isNaN(date.getTime()))return "";
+  return date.toLocaleTimeString([],{hour:"numeric",minute:"2-digit"});
 }
 
-function openOverlay(id){ $(id).classList.add("show"); }
-function closeOverlay(id){ $(id).classList.remove("show"); }
+function openOverlay(id){$(id).classList.add("show")}
+function closeOverlay(id){$(id).classList.remove("show")}
 
 function renderConversations(){
-  const query = $("conversationSearch").value.trim().toLowerCase();
-  const filtered = conversations.filter(c => {
-    const name = displayName(c).toLowerCase();
-    const username = String(c.username || "").toLowerCase();
-    const last = String(c.content || "").toLowerCase();
-    return !query || name.includes(query) || username.includes(query) || last.includes(query);
+  const query=$("conversationSearch").value.trim().toLowerCase();
+
+  const filtered=conversations.filter(c=>{
+    const name=displayName(c).toLowerCase();
+    const username=String(c.username||"").toLowerCase();
+    const last=String(c.content||"").toLowerCase();
+    return !query||name.includes(query)||username.includes(query)||last.includes(query);
   });
 
-  $("conversationCount").textContent = conversations.length
-    ? conversations.length + (conversations.length === 1 ? " chat" : " chats")
-    : "";
+  $("conversationCount").textContent=conversations.length
+    ?conversations.length+(conversations.length===1?" chat":" chats")
+    :"";
 
   if(!filtered.length){
-    $("chatList").innerHTML = '<div class="empty"><i class="fa-regular fa-comments"></i>'+
-      (query ? 'No conversations match your search.' : 'No messages yet.<br>Start a conversation with a FreeTube user.')+
-      '<br><button class="primary-btn" style="margin-top:15px" id="emptyNewChat"><i class="fa-solid fa-plus"></i> New message</button></div>';
-    const btn = $("emptyNewChat");
-    if(btn) btn.addEventListener("click", showUserSearch);
+    $("chatList").innerHTML=
+      '<div class="empty"><i class="fa-regular fa-comments"></i>'+
+      (query?"No conversations match your search.":"No messages yet.<br>Start a conversation with someone.")+
+      '<br><button class="primary-btn" style="margin-top:15px" id="emptyNewChat" type="button"><i class="fa-solid fa-plus"></i> New message</button></div>';
+
+    const btn=$("emptyNewChat");
+    if(btn)btn.addEventListener("click",showUserSearch);
     return;
   }
 
-  $("chatList").innerHTML = filtered.map(c => {
-    const id = String(c.other_id);
-    const unread = Number(c.unread_count || 0);
-    const preview = c.content
-      ? ((String(c.sender_id) === String(currentUser.id) ? "You: " : "") + c.content)
-      : "Start a conversation";
+  $("chatList").innerHTML=filtered.map(c=>{
+    const id=String(c.other_id);
+    const unread=Number(c.unread_count||0);
+    const preview=c.content
+      ?((String(c.sender_id)===String(currentUser.id)?"You: ":"")+c.content)
+      :"Start a conversation";
+
     return '<button class="chat-row" type="button" data-user-id="'+escapeHTML(id)+'">'+
       avatarHTML(c)+
       '<div class="chat-info"><div class="chat-name-line"><span class="chat-name">'+escapeHTML(displayName(c))+'</span></div>'+
       '<div class="last-message">'+escapeHTML(preview)+'</div>'+
-      '<div class="handle">@'+escapeHTML(c.username || "user")+'</div></div>'+
+      '<div class="handle">@'+escapeHTML(c.username||"user")+'</div></div>'+
       '<div class="chat-meta"><span class="time">'+escapeHTML(formatTime(c.created_at))+'</span>'+
-      (unread ? '<span class="unread">'+(unread > 99 ? "99+" : unread)+'</span>' : '')+
+      (unread?'<span class="unread">'+(unread>99?"99+":unread)+'</span>':"")+
       '</div></button>';
   }).join("");
 
-  $("chatList").querySelectorAll("[data-user-id]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const contact = conversations.find(c => String(c.other_id) === btn.dataset.userId);
-      if(contact) openChat({
-        id: contact.other_id,
-        username: contact.username,
-        display_name: contact.display_name,
-        avatar_url: contact.avatar_url
+  $("chatList").querySelectorAll("[data-user-id]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const contact=conversations.find(c=>String(c.other_id)===btn.dataset.userId);
+      if(contact)openChat({
+        id:contact.other_id,
+        username:contact.username,
+        display_name:contact.display_name,
+        avatar_url:contact.avatar_url
       });
     });
   });
@@ -300,216 +503,265 @@ function renderConversations(){
 
 async function loadConversations(){
   try{
-    const data = await api("/messages");
-    conversations = Array.isArray(data.conversations) ? data.conversations : [];
+    const data=await api("/messages");
+    conversations=Array.isArray(data.conversations)?data.conversations:[];
     renderConversations();
     setPageStatus("");
   }catch(error){
-    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>'+escapeHTML(error.message)+'<br><button class="secondary-btn" id="retryConversations" style="margin-top:15px">Try again</button></div>';
-    $("retryConversations").addEventListener("click", loadConversations);
-    setPageStatus("", true);
+    $("chatList").innerHTML=
+      '<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>'+
+      escapeHTML(error.message)+
+      '<br><button class="secondary-btn" id="retryConversations" type="button" style="margin-top:15px">Try again</button></div>';
+
+    const retry=$("retryConversations");
+    if(retry)retry.addEventListener("click",loadConversations);
+    setPageStatus("",true);
   }
 }
 
 function renderMessages(){
-  const list = $("messageList");
+  const list=$("messageList");
+
   if(!messages.length){
-    list.innerHTML = '<div class="empty"><i class="fa-regular fa-paper-plane"></i>No messages here yet.<br>Say hello!</div>';
+    list.innerHTML='<div class="empty"><i class="fa-regular fa-paper-plane"></i>No messages here yet.<br>Say hello!</div>';
     return;
   }
 
-  list.innerHTML = messages.map(m => {
-    const mine = String(m.sender_id) === String(currentUser.id);
-    return '<div class="bubble-row '+(mine ? "mine" : "theirs")+'"><div class="bubble">'+
-      escapeHTML(m.content)+'<div class="bubble-time">'+escapeHTML(formatMessageTime(m.created_at))+
-      (mine && m.read_at ? ' · Seen' : '')+'</div></div></div>';
+  list.innerHTML=messages.map(m=>{
+    const mine=String(m.sender_id)===String(currentUser.id);
+    return '<div class="bubble-row '+(mine?"mine":"theirs")+'"><div class="bubble">'+
+      escapeHTML(m.content)+
+      '<div class="bubble-time">'+escapeHTML(formatMessageTime(m.created_at))+
+      (mine&&m.read_at?" · Seen":"")+'</div></div></div>';
   }).join("");
 
-  list.scrollTop = list.scrollHeight;
+  list.scrollTop=list.scrollHeight;
 }
 
 async function loadMessages(){
-  if(!activeUser || loadingMessages) return;
-  loadingMessages = true;
-  $("messageList").innerHTML = '<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading messages...</div>';
+  if(!activeUser||loadingMessages)return;
+  loadingMessages=true;
+
+  const requestedUserId=String(activeUser.id);
+  const requestId=chatRequestId;
+
+  $("messageList").innerHTML='<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading messages...</div>';
+
   try{
-    const data = await api("/messages/" + encodeURIComponent(activeUser.id));
-    if(!activeUser) return;
-    messages = Array.isArray(data.messages) ? data.messages : [];
+    const data=await api("/messages/"+encodeURIComponent(requestedUserId));
+
+    if(!activeUser||requestId!==chatRequestId||String(activeUser.id)!==requestedUserId)return;
+
+    messages=Array.isArray(data.messages)?data.messages:[];
     renderMessages();
     await loadConversations();
   }catch(error){
-    $("messageList").innerHTML = '<div class="empty">'+escapeHTML(error.message)+'<br><button class="secondary-btn" id="retryMessages" style="margin-top:12px">Try again</button></div>';
-    const retry = $("retryMessages");
-    if(retry) retry.addEventListener("click", loadMessages);
+    if(requestId!==chatRequestId)return;
+
+    $("messageList").innerHTML=
+      '<div class="empty">'+escapeHTML(error.message)+
+      '<br><button class="secondary-btn" id="retryMessages" type="button" style="margin-top:12px">Try again</button></div>';
+
+    const retry=$("retryMessages");
+    if(retry)retry.addEventListener("click",loadMessages);
   }finally{
-    loadingMessages = false;
+    loadingMessages=false;
   }
 }
 
 async function openChat(user){
-  if(!user || user.id == null) return;
-  activeUser = {
-    id: user.id,
-    username: user.username || "",
-    display_name: user.display_name || user.name || user.username || "FreeTube user",
-    avatar_url: user.avatar_url || ""
-  };
-  messages = [];
+  if(!user||user.id==null)return;
 
-  $("activeName").textContent = displayName(activeUser);
-  $("activeHandle").textContent = activeUser.username ? "@"+activeUser.username : "FreeTube messages";
-  $("activeAvatar").innerHTML = avatarHTML(activeUser).replace(/^<div class="avatar">|<\/div>$/g,"");
-  if(activeUser.avatar_url && /^https?:\/\//i.test(activeUser.avatar_url)){
-    $("activeAvatar").innerHTML = '<img src="'+escapeHTML(activeUser.avatar_url)+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">';
+  chatRequestId++;
+  loadingMessages=false;
+
+  activeUser={
+    id:user.id,
+    username:user.username||"",
+    display_name:user.display_name||user.name||user.username||"Community member",
+    avatar_url:user.avatar_url||user.avatar||""
+  };
+  messages=[];
+
+  $("activeName").textContent=displayName(activeUser);
+  $("activeHandle").textContent=activeUser.username?"@"+activeUser.username:"Boys vs Girls messages";
+
+  $("activeAvatar").innerHTML="";
+  if(activeUser.avatar_url&&/^https?:\/\//i.test(activeUser.avatar_url)){
+    const img=document.createElement("img");
+    img.src=activeUser.avatar_url;
+    img.alt="";
+    img.style.cssText="width:100%;height:100%;object-fit:cover;border-radius:50%";
+    img.onerror=()=>{img.remove();$("activeAvatar").textContent=(displayName(activeUser)[0]||"?").toUpperCase()};
+    $("activeAvatar").appendChild(img);
   }else{
-    $("activeAvatar").textContent = (displayName(activeUser).trim()[0] || "?").toUpperCase();
+    $("activeAvatar").textContent=(displayName(activeUser)[0]||"?").toUpperCase();
   }
 
   closeOverlay("searchOverlay");
   openOverlay("chatOverlay");
-  $("messageInput").value = "";
+  $("messageInput").value="";
+  $("messageInput").style.height="auto";
   await loadMessages();
-  $("messageInput").focus();
+  if(activeUser)$("messageInput").focus();
 }
 
 async function sendMessage(event){
   event.preventDefault();
-  if(sending || !activeUser) return;
-  const input = $("messageInput");
-  const content = input.value.trim();
-  if(!content) return;
+  if(sending||!activeUser)return;
 
-  sending = true;
-  $("sendBtn").disabled = true;
+  const input=$("messageInput");
+  const content=input.value.trim();
+  if(!content)return;
+
+  sending=true;
+  $("sendBtn").disabled=true;
+
   try{
-    await api("/messages", {
+    await api("/messages",{
       method:"POST",
-      body:JSON.stringify({
-        recipient_id:activeUser.id,
-        content:content
-      })
+      body:JSON.stringify({recipient_id:activeUser.id,content:content})
     });
-    input.value = "";
-    input.style.height = "auto";
+
+    input.value="";
+    input.style.height="auto";
     await loadMessages();
   }catch(error){
-    alert(error.message);
+    setPageStatus(error.message,true);
   }finally{
-    sending = false;
-    $("sendBtn").disabled = false;
-    input.focus();
+    sending=false;
+    $("sendBtn").disabled=false;
+    if(activeUser)input.focus();
   }
 }
 
 function showUserSearch(){
-  $("userSearch").value = "";
-  $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-users"></i>Type a username to find people.</div>';
+  $("userSearch").value="";
+  $("userResults").innerHTML='<div class="empty"><i class="fa-solid fa-users"></i>Type a username to find people.</div>';
   openOverlay("searchOverlay");
   $("userSearch").focus();
 }
 
 async function searchUsers(query){
-  const requestId = ++searchRequestId;
-  if(query.length < 2){
-    $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-magnifying-glass"></i>Type at least 2 characters to search.</div>';
+  const requestId=++searchRequestId;
+
+  if(query.length<2){
+    $("userResults").innerHTML='<div class="empty"><i class="fa-solid fa-magnifying-glass"></i>Type at least 2 characters to search.</div>';
     return;
   }
 
-  $("userResults").innerHTML = '<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</div>';
-  try{
-    const data = await api("/users/search?q=" + encodeURIComponent(query));
-    if(requestId !== searchRequestId) return;
+  $("userResults").innerHTML='<div class="status"><i class="fa-solid fa-spinner fa-spin"></i> Searching...</div>';
 
-    const users = Array.isArray(data.users) ? data.users : [];
-    const filtered = users.filter(u => String(u.id) !== String(currentUser.id));
+  try{
+    const data=await api("/users/search?q="+encodeURIComponent(query));
+    if(requestId!==searchRequestId)return;
+
+    const users=Array.isArray(data.users)?data.users:[];
+    const filtered=users.filter(u=>String(u.id)!==String(currentUser.id));
 
     if(!filtered.length){
-      $("userResults").innerHTML = '<div class="empty"><i class="fa-solid fa-user-slash"></i>No users found. Try another username.</div>';
+      $("userResults").innerHTML='<div class="empty"><i class="fa-solid fa-user-slash"></i>No users found. Try another username.</div>';
       return;
     }
 
-    $("userResults").innerHTML = filtered.map(u =>
+    $("userResults").innerHTML=filtered.map(u=>
       '<button class="user-result" type="button" data-user-id="'+escapeHTML(u.id)+'">'+
       avatarHTML(u)+
       '<div class="chat-info"><div class="chat-name">'+escapeHTML(displayName(u))+'</div>'+
-      '<div class="handle">@'+escapeHTML(u.username || "user")+'</div></div>'+
-      '<i class="fa-solid fa-chevron-right" style="color:#91a397"></i></button>'
+      '<div class="handle">@'+escapeHTML(u.username||"user")+'</div></div>'+
+      '<i class="fa-solid fa-chevron-right" style="color:#aaa8c8"></i></button>'
     ).join("");
 
-    $("userResults").querySelectorAll("[data-user-id]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const user = filtered.find(u => String(u.id) === btn.dataset.userId);
-        if(user) openChat(user);
+    $("userResults").querySelectorAll("[data-user-id]").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        const user=filtered.find(u=>String(u.id)===btn.dataset.userId);
+        if(user)openChat(user);
       });
     });
   }catch(error){
-    if(requestId !== searchRequestId) return;
-    $("userResults").innerHTML = '<div class="empty">'+escapeHTML(error.message)+'</div>';
+    if(requestId!==searchRequestId)return;
+    $("userResults").innerHTML='<div class="empty">'+escapeHTML(error.message)+'</div>';
   }
 }
 
-$("conversationSearch").addEventListener("input", renderConversations);
-$("newChatBtn").addEventListener("click", showUserSearch);
-$("startChatBtn").addEventListener("click", showUserSearch);
-$("closeChatBtn").addEventListener("click", () => {
+function closeChat(){
+  chatRequestId++;
+  activeUser=null;
+  messages=[];
+  loadingMessages=false;
   closeOverlay("chatOverlay");
-  activeUser = null;
   loadConversations();
-});
-$("closeSearchBtn").addEventListener("click", () => closeOverlay("searchOverlay"));
-$("refreshChatBtn").addEventListener("click", loadMessages);
-$("messageForm").addEventListener("submit", sendMessage);
-$("userSearch").addEventListener("input", () => {
+}
+
+$("conversationSearch").addEventListener("input",renderConversations);
+$("newChatBtn").addEventListener("click",showUserSearch);
+$("startChatBtn").addEventListener("click",showUserSearch);
+$("closeChatBtn").addEventListener("click",closeChat);
+$("closeSearchBtn").addEventListener("click",()=>closeOverlay("searchOverlay"));
+$("refreshChatBtn").addEventListener("click",loadMessages);
+$("messageForm").addEventListener("submit",sendMessage);
+
+$("userSearch").addEventListener("input",()=>{
   clearTimeout(searchTimer);
-  const query = $("userSearch").value.trim();
-  searchTimer = setTimeout(() => searchUsers(query), 300);
-});
-$("messageInput").addEventListener("input", function(){
-  this.style.height = "auto";
-  this.style.height = Math.min(this.scrollHeight,120) + "px";
-});
-$("backBtn").addEventListener("click", () => {
-  if(history.length > 1) history.back();
-  else window.location.href = "home.html";
+  const query=$("userSearch").value.trim();
+  searchTimer=setTimeout(()=>searchUsers(query),300);
 });
 
-$("chatOverlay").addEventListener("click", e => {
-  if(e.target === $("chatOverlay")){
-    closeOverlay("chatOverlay");
-    activeUser = null;
-    loadConversations();
-  }
-});
-$("searchOverlay").addEventListener("click", e => {
-  if(e.target === $("searchOverlay")) closeOverlay("searchOverlay");
+$("messageInput").addEventListener("input",function(){
+  this.style.height="auto";
+  this.style.height=Math.min(this.scrollHeight,120)+"px";
 });
 
-document.addEventListener("keydown", e => {
-  if(e.key === "Escape"){
+$("backBtn").addEventListener("click",()=>{
+  if(history.length>1)history.back();
+  else window.location.href="home.html";
+});
+
+$("chatOverlay").addEventListener("click",event=>{
+  if(event.target===$("chatOverlay"))closeChat();
+});
+
+$("searchOverlay").addEventListener("click",event=>{
+  if(event.target===$("searchOverlay"))closeOverlay("searchOverlay");
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"){
     closeOverlay("searchOverlay");
-    closeOverlay("chatOverlay");
-    activeUser = null;
+    if($("chatOverlay").classList.contains("show"))closeChat();
   }
 });
 
 async function init(){
   if(!getToken()){
-    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-lock"></i>You need to log in before using messages.<br><button class="primary-btn" id="loginNow" style="margin-top:15px">Go to Login</button></div>';
-    $("loginNow").addEventListener("click", () => window.location.href = "login.html");
+    $("chatList").innerHTML=
+      '<div class="empty"><i class="fa-solid fa-lock"></i>You need to log in before using messages.'+
+      '<br><button class="primary-btn" id="loginNow" type="button" style="margin-top:15px">Go to Login</button></div>';
+
+    $("loginNow").addEventListener("click",()=>window.location.href=LOGIN_URL);
     return;
   }
 
   try{
-    const data = await api("/auth/me");
-    currentUser = data.user;
-    if(!currentUser || currentUser.id == null) throw new Error("Could not identify your account.");
+    const data=await api("/auth/me");
+    currentUser=data.user||data.data?.user||data;
+
+    if(!currentUser||currentUser.id==null){
+      throw new Error("Could not identify your account from the server response.");
+    }
+
     await loadConversations();
   }catch(error){
-    $("chatList").innerHTML = '<div class="empty"><i class="fa-solid fa-lock"></i>'+escapeHTML(error.message)+'<br><button class="primary-btn" id="loginNow" style="margin-top:15px">Go to Login</button></div>';
-    $("loginNow").addEventListener("click", () => {
-      try{localStorage.removeItem(TOKEN_KEY);}catch(e){}
-      window.location.href = "login.html";
+    $("chatList").innerHTML=
+      '<div class="empty"><i class="fa-solid fa-lock"></i>'+
+      escapeHTML(error.message)+
+      '<br><button class="primary-btn" id="loginNow" type="button" style="margin-top:15px">Go to Login</button></div>';
+
+    $("loginNow").addEventListener("click",()=>{
+      if(error.message.includes("session")||error.message.includes("log in")){
+        try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+      }
+      window.location.href=LOGIN_URL;
     });
   }
 }
