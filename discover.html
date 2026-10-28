@@ -8,39 +8,41 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-:root{
+:root {
   --bg:#10291f;
   --panel:#172f24;
   --panel2:#20392d;
   --green:#00e991;
-  --red:#ff626b;
   --text:#f6fff9;
   --muted:#a9bdb2;
   --border:rgba(255,255,255,.12);
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{min-height:100%;background:var(--bg)}
-body{
+* {
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+html { min-height:100%; background:var(--bg); }
+body {
   min-height:100vh;
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
   background:linear-gradient(145deg,#65172f 0%,#35233a 35%,#123e2b 70%,#007b48 100%);
   background-attachment:fixed;
 }
-button,input{font:inherit}
-button{cursor:pointer;color:inherit}
-button:disabled{opacity:.5;cursor:not-allowed}
-[hidden]{display:none!important}
+button,input { font:inherit; }
+button { cursor:pointer; color:inherit; }
+[hidden] { display:none!important; }
 
-.app{
+.app {
   max-width:650px;
   margin:auto;
   min-height:100dvh;
   padding-bottom:90px;
   background:rgba(16,41,31,.18);
 }
-
-.topbar{
+.topbar {
   position:sticky;
   top:0;
   z-index:20;
@@ -48,38 +50,36 @@ button:disabled{opacity:.5;cursor:not-allowed}
   align-items:center;
   justify-content:space-between;
   padding:15px 18px;
-  background:rgba(16,41,31,.72);
-  -webkit-backdrop-filter:blur(18px);
+  background:rgba(16,41,31,.85);
   backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);
 }
-.brand{
+.brand {
   font-size:26px;
   font-weight:900;
   letter-spacing:-1px;
 }
-.brand i,.brand span{color:var(--green)}
-.top-actions{display:flex;gap:10px}
-.icon-btn{
-  width:42px;height:42px;
-  display:grid;place-items:center;
+.brand i,.brand span { color:var(--green); }
+.icon-btn {
+  width:42px;
+  height:42px;
+  display:grid;
+  place-items:center;
   border-radius:50%;
   background:rgba(255,255,255,.08);
   border:1px solid var(--border);
 }
-.icon-btn i{font-size:18px}
-
-.search-area{
+.search-area {
   padding:17px 16px;
   background:rgba(23,47,36,.48);
   border-bottom:1px solid var(--border);
 }
-.page-title{
+.page-title {
   font-size:23px;
   font-weight:800;
   margin-bottom:13px;
 }
-.search-box{
+.search-box {
   display:flex;
   align-items:center;
   gap:10px;
@@ -88,8 +88,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
   border:1px solid var(--border);
   border-radius:16px;
 }
-.search-box>i{color:var(--green);font-size:19px}
-.search-box input{
+.search-box>i { color:var(--green); }
+.search-box input {
   flex:1;
   width:100%;
   min-width:0;
@@ -99,24 +99,24 @@ button:disabled{opacity:.5;cursor:not-allowed}
   border:0;
   outline:0;
 }
-.search-box input::placeholder{color:var(--muted)}
-.clear-btn{
-  width:32px;height:32px;
-  display:grid;place-items:center;
-  border:0;border-radius:50%;
+.search-box input::placeholder { color:var(--muted); }
+.clear-btn {
+  width:32px;
+  height:32px;
+  border:0;
+  border-radius:50%;
   background:rgba(0,233,145,.14);
   color:var(--green);
 }
-
-.filters{
+.filters {
   display:flex;
   gap:9px;
   overflow-x:auto;
   padding:14px 16px 11px;
   scrollbar-width:none;
 }
-.filters::-webkit-scrollbar{display:none}
-.filter-btn{
+.filters::-webkit-scrollbar { display:none; }
+.filter-btn {
   white-space:nowrap;
   padding:9px 18px;
   border:1px solid var(--border);
@@ -126,74 +126,72 @@ button:disabled{opacity:.5;cursor:not-allowed}
   font-size:13px;
   font-weight:600;
 }
-.filter-btn.active{
+.filter-btn.active {
   background:var(--green);
   border-color:var(--green);
   color:#073421;
 }
-
-.results-info{
+.results-info {
   padding:0 16px 12px;
   color:var(--muted);
   font-size:13px;
 }
-#results{padding:0 0 10px}
-
-.card{
-  background:rgba(23,47,36,.72);
+#results { padding:0 0 10px; }
+.card {
+  background:rgba(23,47,36,.85);
   margin-bottom:11px;
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
   overflow:hidden;
 }
-.card-head{
+.card-head {
   display:flex;
   align-items:center;
   gap:10px;
   padding:13px 14px;
 }
-.avatar{
-  width:42px;height:42px;
+.avatar {
+  width:42px;
+  height:42px;
   flex-shrink:0;
   object-fit:cover;
   border-radius:50%;
   background:var(--panel2);
   border:1px solid var(--border);
 }
-.user-info{flex:1;min-width:0}
-.username{
+.user-info { flex:1; min-width:0; }
+.username {
   font-weight:700;
   font-size:14px;
   overflow-wrap:anywhere;
 }
-.time{
+.time {
   font-size:12px;
   color:var(--muted);
   margin-top:4px;
 }
-.content{
+.content {
   padding:0 14px 12px;
   white-space:pre-wrap;
   overflow-wrap:anywhere;
   line-height:1.5;
   font-size:14px;
 }
-.media{
+.media {
   width:100%;
   background:#000;
   display:flex;
   align-items:center;
   justify-content:center;
-  position:relative;
 }
-.media video{
+.media video {
   display:block;
   width:100%;
   max-height:480px;
   object-fit:contain;
   background:#000;
 }
-.stats{
+.stats {
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -204,8 +202,8 @@ button:disabled{opacity:.5;cursor:not-allowed}
   font-size:12px;
   border-top:1px solid var(--border);
 }
-.stats i{color:var(--green)}
-.open-post{
+.stats i { color:var(--green); }
+.open-post {
   display:block;
   text-decoration:none;
   text-align:center;
@@ -214,22 +212,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
   border-top:1px solid var(--border);
   font-size:13px;
 }
-.state{
+.state {
   text-align:center;
   padding:38px 18px;
   color:var(--muted);
   line-height:1.8;
 }
-.secondary{
+.secondary {
   padding:10px 15px;
   border-radius:10px;
   background:var(--panel2);
   color:white;
   border:1px solid var(--border);
 }
-
-/* Same four-item glass navigation across the app */
-.bottom-nav{
+.bottom-nav {
   position:fixed;
   bottom:0;
   left:50%;
@@ -241,12 +237,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
   justify-content:space-around;
   align-items:center;
   padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,41,31,.52);
-  -webkit-backdrop-filter:blur(22px);
+  background:rgba(16,41,31,.92);
   backdrop-filter:blur(22px);
   border-top:1px solid rgba(255,255,255,.15);
 }
-.nav-item{
+.nav-item {
   flex:1;
   min-width:0;
   display:flex;
@@ -259,11 +254,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
   color:var(--muted);
   font-size:11px;
 }
-.nav-item i{font-size:21px}
-.nav-item.active{color:var(--green)}
-.nav-item.active i{filter:drop-shadow(0 0 5px rgba(0,233,145,.3))}
-
-.toast{
+.nav-item i { font-size:21px; }
+.nav-item.active { color:var(--green); }
+.nav-item.active i {
+  filter:drop-shadow(0 0 5px rgba(0,233,145,.3));
+}
+.toast {
   position:fixed;
   bottom:90px;
   left:50%;
@@ -278,20 +274,12 @@ button:disabled{opacity:.5;cursor:not-allowed}
   font-size:13px;
   text-align:center;
 }
-.toast.show{display:block}
-
-@media(min-width:651px){
-  body{background-attachment:fixed}
-  .app{
-    border-left:1px solid var(--border);
-    border-right:1px solid var(--border);
-  }
-}
-@media(max-width:360px){
-  .brand{font-size:23px}
-  .nav-item{font-size:10px}
-  .nav-item i{font-size:20px}
-  .filter-btn{padding:9px 15px}
+.toast.show { display:block; }
+@media(max-width:360px) {
+  .brand { font-size:23px; }
+  .nav-item { font-size:10px; }
+  .nav-item i { font-size:20px; }
+  .filter-btn { padding:9px 15px; }
 }
 </style>
 </head>
@@ -303,25 +291,20 @@ button:disabled{opacity:.5;cursor:not-allowed}
     <div class="brand">
       <i class="fa-solid fa-play"></i> Free<span>Tube</span>
     </div>
-    <div class="top-actions">
-      <button class="icon-btn" onclick="go('inbox.html')" aria-label="Messages">
-        <i class="fa-brands fa-facebook-messenger"></i>
-      </button>
-    </div>
+    <button class="icon-btn" onclick="go('inbox.html')" aria-label="Messages">
+      <i class="fa-brands fa-facebook-messenger"></i>
+    </button>
   </header>
 
   <section class="search-area">
     <h1 class="page-title">Pulse</h1>
     <form id="searchForm" class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input
-        id="searchInput"
-        type="search"
+      <input id="searchInput" type="search"
         placeholder="Search videos, people..."
-        autocomplete="off"
-        aria-label="Search videos and people"
-      >
-      <button type="button" id="clearButton" class="clear-btn" aria-label="Clear search">
+        autocomplete="off" aria-label="Search videos and people">
+      <button type="button" id="clearButton"
+        class="clear-btn" aria-label="Clear search">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </form>
@@ -343,26 +326,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
 
   <nav class="bottom-nav" aria-label="Main navigation">
     <button class="nav-item" onclick="go('home.html')">
-      <i class="fa-solid fa-house"></i>
-      <span>Home</span>
+      <i class="fa-solid fa-house"></i><span>Home</span>
     </button>
-
     <button class="nav-item active" onclick="go('discover.html')" aria-current="page">
-      <i class="fa-solid fa-compass"></i>
-      <span>Pulse</span>
+      <i class="fa-solid fa-compass"></i><span>Pulse</span>
     </button>
-
     <button class="nav-item" onclick="go('notifications.html')">
-      <i class="fa-solid fa-bell"></i>
-      <span>Notifications</span>
+      <i class="fa-solid fa-bell"></i><span>Notifications</span>
     </button>
-
     <button class="nav-item" onclick="go('profile.html')">
-      <i class="fa-regular fa-user"></i>
-      <span>Profile</span>
+      <i class="fa-regular fa-user"></i><span>Profile</span>
     </button>
   </nav>
-
 </div>
 
 <div id="toast" class="toast" role="status"></div>
@@ -370,147 +345,175 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <script>
 "use strict";
 
-const API_BASE="https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY="freetube_access_token";
-const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
+const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+const FALLBACK_AVATAR =
+  "https://placehold.co/120x120/244b37/ffffff?text=FT";
 
-let allVideos=[];
-let activeFilter="all";
-let searchTimer=null;
-let toastTimer=null;
+let allVideos = [];
+let activeFilter = "all";
+let searchTimer = null;
+let toastTimer = null;
+let videoObserver = null;
 
-function go(page){
-  location.href=page;
+function go(page) {
+  location.href = page;
 }
 
-function token(){
-  try{return localStorage.getItem(TOKEN_KEY)||""}
-  catch(_){return ""}
+function token() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  } catch (_) {
+    return "";
+  }
 }
 
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
   }[c]));
 }
 
-function count(value){
-  const n=Number(value);
-  return Number.isFinite(n)?Math.max(0,n):0;
+function count(value) {
+  const n = Number(value);
+  return Number.isFinite(n) ? Math.max(0, n) : 0;
 }
 
-function showToast(message){
-  const el=document.getElementById("toast");
-  el.textContent=String(message||"Something went wrong.");
+function showToast(message) {
+  const el = document.getElementById("toast");
+  el.textContent = String(message || "Something went wrong.");
   el.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>el.classList.remove("show"),2800);
+  toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
 }
 
-async function api(path){
-  const headers={};
-  const accessToken=token();
-  if(accessToken)headers.Authorization="Bearer "+accessToken;
+async function api(path) {
+  const headers = {};
+  const accessToken = token();
 
-  let response;
-  try{
-    response=await fetch(API_BASE+path,{
-      headers,
-      cache:"no-store"
-    });
-  }catch(_){
-    throw new Error("Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করো।");
+  if (accessToken) {
+    headers.Authorization = "Bearer " + accessToken;
   }
 
-  const raw=await response.text();
-  let data={};
-  try{data=raw?JSON.parse(raw):{}}
-  catch(_){data={message:raw}}
+  let response;
 
-  if(response.status===401){
-    try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+  try {
+    response = await fetch(API_BASE + path, {
+      headers,
+      cache: "no-store"
+    });
+  } catch (_) {
+    throw new Error(
+      "Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করো।"
+    );
+  }
+
+  const raw = await response.text();
+  let data = {};
+
+  try {
+    data = raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    data = { message: raw };
+  }
+
+  if (response.status === 401) {
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch (_) {}
+
     go("auth.html?mode=login");
     throw new Error("সেশন শেষ হয়েছে। আবার লগইন করো।");
   }
 
-  if(!response.ok){
-    throw new Error(data.message||data.error||("API error "+response.status));
+  if (!response.ok) {
+    throw new Error(
+      data.message || data.error || ("API error " + response.status)
+    );
   }
 
   return data;
 }
 
-function normalize(post){
-  const src=post.media_url||post.mediaUrl||post.src||"";
-  let type=String(post.media_type||post.type||"").toLowerCase();
+function normalize(post) {
+  const src = post.media_url || post.mediaUrl || post.src || "";
+  let type = String(post.media_type || post.type || "").toLowerCase();
 
-  if(type==="photo")type="image";
+  if (type === "photo") type = "image";
 
-  if(!type&&src){
-    type=/\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(src)?"video":"image";
+  if (!type && src) {
+    type = /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(src)
+      ? "video"
+      : "image";
   }
 
   return {
-    id:String(post.id??post.post_id??""),
-    userId:String(post.user_id??post.author_id??post.owner_id??""),
-    username:post.display_name||post.username||post.author_name||"FreeTube User",
-    avatar:post.avatar_url||post.avatar||post.profile_picture||FALLBACK_AVATAR,
-    content:post.content||post.text||"",
+    id: String(post.id ?? post.post_id ?? ""),
+    userId: String(post.user_id ?? post.author_id ?? post.owner_id ?? ""),
+    username: post.display_name || post.username ||
+      post.author_name || "FreeTube User",
+    avatar: post.avatar_url || post.avatar ||
+      post.profile_picture || FALLBACK_AVATAR,
+    content: post.content || post.text || "",
     src,
     type,
-    likes:count(post.like_count??post.likes_count??post.likes),
-    comments:count(post.comment_count??post.comments_count??post.comments),
-    views:count(post.view_count??post.views_count??post.views),
-    created:post.created_at||post.createdAt||post.time||""
+    likes: count(post.like_count ?? post.likes_count ?? post.likes),
+    comments: count(post.comment_count ?? post.comments_count ?? post.comments),
+    views: count(post.view_count ?? post.views_count ?? post.views),
+    created: post.created_at || post.createdAt || post.time || ""
   };
 }
 
-function timeAgo(value){
-  if(!value)return "Recently";
+function timeAgo(value) {
+  if (!value) return "Recently";
 
-  const date=new Date(value);
-  if(Number.isNaN(date.getTime()))return String(value);
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return String(value);
 
-  const minutes=Math.max(0,Math.floor((Date.now()-date.getTime())/60000));
-  if(minutes<1)return "Just now";
-  if(minutes<60)return minutes+"m ago";
+  const minutes = Math.max(
+    0, Math.floor((Date.now() - date.getTime()) / 60000)
+  );
 
-  const hours=Math.floor(minutes/60);
-  if(hours<24)return hours+"h ago";
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return minutes + "m ago";
 
-  const days=Math.floor(hours/24);
-  if(days<7)return days+"d ago";
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return hours + "h ago";
+
+  const days = Math.floor(hours / 24);
+  if (days < 7) return days + "d ago";
 
   return date.toLocaleDateString();
 }
 
-function render(){
-  const query=document.getElementById("searchInput").value.trim().toLowerCase();
+function render() {
+  const query = document.getElementById("searchInput")
+    .value.trim().toLowerCase();
 
-  let videos=allVideos.filter(video=>{
-    const searchable=(video.username+" "+video.content).toLowerCase();
-    return !query||searchable.includes(query);
+  let videos = allVideos.filter(video => {
+    const searchable = (video.username + " " + video.content).toLowerCase();
+    return !query || searchable.includes(query);
   });
 
-  if(activeFilter==="recent"){
-    videos=videos.slice().sort((a,b)=>{
-      const dateA=new Date(a.created||0).getTime()||0;
-      const dateB=new Date(b.created||0).getTime()||0;
-      return dateB-dateA;
+  if (activeFilter === "recent") {
+    videos = videos.slice().sort((a, b) => {
+      const dateA = new Date(a.created || 0).getTime() || 0;
+      const dateB = new Date(b.created || 0).getTime() || 0;
+      return dateB - dateA;
     });
   }
 
-  document.getElementById("resultsInfo").textContent=
-    videos.length+" video"+(videos.length===1?"":"s");
+  document.getElementById("resultsInfo").textContent =
+    videos.length + " video" + (videos.length === 1 ? "" : "s");
 
-  const root=document.getElementById("results");
+  const root = document.getElementById("results");
 
-  if(!videos.length){
-    root.innerHTML=`
+  if (!videos.length) {
+    root.innerHTML = `
       <div class="state">
         <i class="fa-solid fa-video-slash"></i><br>
         No videos found.<br>
@@ -519,12 +522,16 @@ function render(){
     return;
   }
 
-  root.innerHTML=videos.map(video=>{
-    const media=`
+  root.innerHTML = videos.map(video => {
+    const media = `
       <div class="media">
         <video
           controls
           playsinline
+          webkit-playsinline
+          muted
+          autoplay
+          loop
           preload="metadata"
           src="${esc(video.src)}"
           aria-label="Video by ${esc(video.username)}"
@@ -534,20 +541,20 @@ function render(){
     return `
       <article class="card" id="video-${esc(video.id)}">
         <header class="card-head">
-          <img
-            class="avatar"
+          <img class="avatar"
             src="${esc(video.avatar)}"
             alt=""
             loading="lazy"
-            onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'"
-          >
+            onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
           <div class="user-info">
             <div class="username">${esc(video.username)}</div>
             <div class="time">${esc(timeAgo(video.created))}</div>
           </div>
         </header>
 
-        ${video.content?`<div class="content">${esc(video.content)}</div>`:""}
+        ${video.content
+          ? `<div class="content">${esc(video.content)}</div>`
+          : ""}
 
         ${media}
 
@@ -557,8 +564,10 @@ function render(){
           <span>${video.comments} comments</span>
         </div>
 
-        <a class="open-post" href="home.html#post-${encodeURIComponent(video.id)}">
-          View post <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <a class="open-post"
+          href="home.html#post-${encodeURIComponent(video.id)}">
+          View post
+          <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
       </article>`;
   }).join("");
@@ -566,92 +575,127 @@ function render(){
   setupVideoPlayback();
 }
 
-function setupVideoPlayback(){
-  const videos=document.querySelectorAll(".media video");
+function setupVideoPlayback() {
+  if (videoObserver) {
+    videoObserver.disconnect();
+  }
 
-  if(!("IntersectionObserver" in window))return;
+  const videos = [...document.querySelectorAll(".media video")];
 
-  const observer=new IntersectionObserver(entries=>{
-    entries.forEach(entry=>{
-      const video=entry.target;
+  videos.forEach(video => {
+    video.muted = true;
+    video.playsInline = true;
+    video.loop = true;
+  });
 
-      if(entry.isIntersecting){
-        // Videos remain user-controlled; no forced autoplay or sound.
-      }else{
+  if (!("IntersectionObserver" in window)) {
+    videos.forEach(video => {
+      const playPromise = video.play();
+      if (playPromise && playPromise.catch) {
+        playPromise.catch(() => {});
+      }
+    });
+    return;
+  }
+
+  videoObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      const video = entry.target;
+
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
+        videos.forEach(other => {
+          if (other !== video) other.pause();
+        });
+
+        const playPromise = video.play();
+
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(() => {
+            // Browser settings may block automatic playback.
+          });
+        }
+      } else {
         video.pause();
       }
     });
-  },{threshold:0.25});
+  }, {
+    threshold: [0, 0.25, 0.55, 0.75, 1]
+  });
 
-  videos.forEach(video=>observer.observe(video));
+  videos.forEach(video => videoObserver.observe(video));
 }
 
-async function loadVideos(){
-  const root=document.getElementById("results");
+async function loadVideos() {
+  const root = document.getElementById("results");
 
-  root.innerHTML=`
+  root.innerHTML = `
     <div class="state">
       <i class="fa-solid fa-spinner fa-spin"></i><br>
       Loading videos...
     </div>`;
 
-  document.getElementById("resultsInfo").textContent="Loading videos...";
+  document.getElementById("resultsInfo").textContent = "Loading videos...";
 
-  try{
-    const data=await api("/posts");
-    const posts=Array.isArray(data)?data:(data.posts||data.items||[]);
+  try {
+    const data = await api("/posts");
+    const posts = Array.isArray(data)
+      ? data
+      : (data.posts || data.items || []);
 
-    // Only posts with video media are displayed.
-    allVideos=posts
+    allVideos = posts
       .map(normalize)
-      .filter(post=>post.id&&post.src&&post.type==="video");
+      .filter(post => post.id && post.src && post.type === "video");
 
     render();
-  }catch(error){
-    root.innerHTML=`
+  } catch (error) {
+    root.innerHTML = `
       <div class="state">
         <i class="fa-solid fa-triangle-exclamation"></i><br>
         ${esc(error.message)}<br><br>
         <button class="secondary" onclick="loadVideos()">Retry</button>
       </div>`;
 
-    document.getElementById("resultsInfo").textContent="Unable to load videos";
+    document.getElementById("resultsInfo").textContent =
+      "Unable to load videos";
+
     showToast(error.message);
   }
 }
 
-document.getElementById("searchInput").addEventListener("input",()=>{
+document.getElementById("searchInput").addEventListener("input", () => {
   clearTimeout(searchTimer);
-  searchTimer=setTimeout(render,120);
+  searchTimer = setTimeout(render, 120);
 });
 
-document.getElementById("searchForm").addEventListener("submit",event=>{
+document.getElementById("searchForm").addEventListener("submit", event => {
   event.preventDefault();
   render();
 });
 
-document.getElementById("clearButton").addEventListener("click",()=>{
-  const input=document.getElementById("searchInput");
-  input.value="";
+document.getElementById("clearButton").addEventListener("click", () => {
+  const input = document.getElementById("searchInput");
+  input.value = "";
   render();
   input.focus();
 });
 
-document.querySelectorAll("[data-filter]").forEach(button=>{
-  button.addEventListener("click",()=>{
-    activeFilter=button.dataset.filter;
+document.querySelectorAll("[data-filter]").forEach(button => {
+  button.addEventListener("click", () => {
+    activeFilter = button.dataset.filter;
 
-    document.querySelectorAll("[data-filter]").forEach(item=>{
-      item.classList.toggle("active",item===button);
+    document.querySelectorAll("[data-filter]").forEach(item => {
+      item.classList.toggle("active", item === button);
     });
 
     render();
   });
 });
 
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden){
-    document.querySelectorAll(".media video").forEach(video=>video.pause());
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    document.querySelectorAll(".media video").forEach(video => video.pause());
+  } else {
+    setupVideoPlayback();
   }
 });
 
