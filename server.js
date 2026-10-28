@@ -356,6 +356,8 @@ async function initializeDatabase() {
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS work VARCHAR(160);
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS education VARCHAR(160);
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS blue_badge_status VARCHAR(20) NOT NULL DEFAULT 'none';
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS blue_badge_expires_at TIMESTAMPTZ;
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS blue_badge_duration_months INTEGER;
 
     ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS moderation_status VARCHAR(20) NOT NULL DEFAULT 'approved';
     ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS moderation_result JSONB;
@@ -417,6 +419,7 @@ async function initializeDatabase() {
       user_id TEXT NOT NULL,
       purpose VARCHAR(30) NOT NULL CHECK(purpose IN ('blue_badge','monetization','other')),
       amount NUMERIC(12,2) NOT NULL CHECK(amount > 0),
+      duration_months INTEGER NOT NULL DEFAULT 1 CHECK(duration_months IN (1,3,6,12)),
       currency VARCHAR(8) NOT NULL DEFAULT 'BDT',
       method VARCHAR(40) NOT NULL,
       transaction_ref VARCHAR(160) NOT NULL,
@@ -443,6 +446,12 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+
+    ALTER TABLE ft_manual_payments ADD COLUMN IF NOT EXISTS duration_months INTEGER NOT NULL DEFAULT 1;
+    ALTER TABLE ft_payment_methods ADD COLUMN IF NOT EXISTS price_1_month NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK(price_1_month >= 0);
+    ALTER TABLE ft_payment_methods ADD COLUMN IF NOT EXISTS price_3_months NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK(price_3_months >= 0);
+    ALTER TABLE ft_payment_methods ADD COLUMN IF NOT EXISTS price_6_months NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK(price_6_months >= 0);
+    ALTER TABLE ft_payment_methods ADD COLUMN IF NOT EXISTS price_12_months NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK(price_12_months >= 0);
 
     CREATE TABLE IF NOT EXISTS ft_password_resets (
       id BIGSERIAL PRIMARY KEY,
@@ -706,7 +715,7 @@ app.get("/api/profile/:username", async (req, res, next) => {
     const result = await pool.query(
       `SELECT u.id::text AS id,u.username,u.email,
               p.display_name,p.bio,p.avatar_url,p.cover_url,p.location,p.hometown,
-              p.birthday,p.work,p.education,p.blue_badge_status,p.updated_at,u.created_at AS account_created_at
+              p.birthday,p.work,p.education,CASE WHEN p.blue_badge_status='verified' AND p.blue_badge_expires_at IS NOT NULL AND p.blue_badge_expires_at<=NOW() THEN 'expired' ELSE p.blue_badge_status END AS blue_badge_status,p.blue_badge_expires_at,p.blue_badge_duration_months,p.updated_at,u.created_at AS account_created_at
        FROM users u LEFT JOIN ft_profiles p ON p.user_id=u.id::text
        WHERE LOWER(u.username)=LOWER($1)
          AND u.account_status='active'
@@ -739,7 +748,7 @@ app.get("/api/profile/id/:userId", requireAuth, async(req,res,next)=>{
   try {
     const id=cleanText(req.params.userId,100);
     const result=await pool.query(`SELECT u.id::text AS id,u.username,u.email,
-      p.display_name,p.bio,p.avatar_url,p.cover_url,p.location,p.hometown,p.birthday,p.work,p.education,p.blue_badge_status,p.updated_at,
+      p.display_name,p.bio,p.avatar_url,p.cover_url,p.location,p.hometown,p.birthday,p.work,p.education,CASE WHEN p.blue_badge_status='verified' AND p.blue_badge_expires_at IS NOT NULL AND p.blue_badge_expires_at<=NOW() THEN 'expired' ELSE p.blue_badge_status END AS blue_badge_status,p.blue_badge_expires_at,p.blue_badge_duration_months,p.updated_at,
       u.created_at AS account_created_at
       FROM users u LEFT JOIN ft_profiles p ON p.user_id=u.id::text
       WHERE u.id::text=$1 AND u.account_status='active' LIMIT 1`,[id]);
@@ -1665,8 +1674,13 @@ app.get("/api/admin/notices", requireAuth, requireAdmin, async(req,res,next)=>{t
 // Payment methods are configured by admins. Card payments are intentionally not supported.
 app.get('/api/payments/methods', async (req,res,next) => {
   try {
-    const r = await pool.query(`SELECT id,code,name,region,currency,price_amount,account_name,account_details,instructions,qr_image_url
-      FROM ft_payment_methods WHERE enabled=TRUE AND price_amount>0 ORDER BY sort_order,name`);
+    const r = await pool.query(`SELECT id,code,name,region,currency,price_amount,
+             CASE WHEN price_1_month>0 THEN price_1_month ELSE price_amount END AS price_1_month,
+             CASE WHEN price_3_months>0 THEN price_3_months ELSE price_amount END AS price_3_months,
+             CASE WHEN price_6_months>0 THEN price_6_months ELSE price_amount END AS price_6_months,
+             CASE WHEN price_12_months>0 THEN price_12_months ELSE price_amount END AS price_12_months,
+             account_name,account_details,instructions,qr_image_url
+      FROM ft_payment_methods WHERE enabled=TRUE AND (price_amount>0 OR price_1_month>0 OR price_3_months>0 OR price_6_months>0 OR price_12_months>0) ORDER BY sort_order,name`);
     res.json({methods:r.rows});
   } catch(e) { next(e); }
 });
@@ -1685,9 +1699,9 @@ app.post('/api/admin/payment-methods', requireAuth, requireAdmin, async (req,res
     const price=Number(req.body.price_amount), accountName=cleanText(req.body.account_name,160), details=cleanText(req.body.account_details,500), instructions=cleanText(req.body.instructions,1500), qr=cleanText(req.body.qr_image_url,2000), order=Number.parseInt(req.body.sort_order,10)||100;
     if(!code||!name||!['bangladesh','india','global'].includes(region)||!currency||!Number.isFinite(price)||price<0) return res.status(400).json({error:'Valid code, name, region, currency and non-negative price are required.'});
     if(qr && !/^https:\/\//i.test(qr)) return res.status(400).json({error:'QR image URL must use HTTPS.'});
-    const enabled=Boolean(req.body.enabled) && price>0 && Boolean(details);
-    const r=await pool.query(`INSERT INTO ft_payment_methods(code,name,region,currency,price_amount,account_name,account_details,instructions,qr_image_url,enabled,sort_order,updated_at)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING *`,[code,name,region,currency,price,accountName,details,instructions,qr,enabled,order]);
+    const enabled=Boolean(req.body.enabled) && (price>0 || Number(req.body.price_1_month)>0 || Number(req.body.price_3_months)>0 || Number(req.body.price_6_months)>0 || Number(req.body.price_12_months)>0) && Boolean(details);
+    const r=await pool.query(`INSERT INTO ft_payment_methods(code,name,region,currency,price_amount,price_1_month,price_3_months,price_6_months,price_12_months,account_name,account_details,instructions,qr_image_url,enabled,sort_order,updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,NOW()) RETURNING *`,[code,name,region,currency,price,Number(req.body.price_1_month)||0,Number(req.body.price_3_months)||0,Number(req.body.price_6_months)||0,Number(req.body.price_12_months)||0,accountName,details,instructions,qr,enabled,order]);
     res.status(201).json({method:r.rows[0]});
   } catch(e) { if(e.code==='23505') return res.status(409).json({error:'Payment method code already exists.'}); next(e); }
 });
@@ -1703,16 +1717,20 @@ app.patch('/api/admin/payment-methods/:id', requireAuth, requireAdmin, async (re
     const region=b.region===undefined?old.region:cleanText(b.region,20);
     const currency=b.currency===undefined?old.currency:cleanText(b.currency,8).toUpperCase();
     const price=b.price_amount===undefined?Number(old.price_amount):Number(b.price_amount);
+    const price1=b.price_1_month===undefined?Number(old.price_1_month||0):Number(b.price_1_month);
+    const price3=b.price_3_months===undefined?Number(old.price_3_months||0):Number(b.price_3_months);
+    const price6=b.price_6_months===undefined?Number(old.price_6_months||0):Number(b.price_6_months);
+    const price12=b.price_12_months===undefined?Number(old.price_12_months||0):Number(b.price_12_months);
     const accountName=b.account_name===undefined?old.account_name:cleanText(b.account_name,160);
     const details=b.account_details===undefined?old.account_details:cleanText(b.account_details,500);
     const instructions=b.instructions===undefined?old.instructions:cleanText(b.instructions,1500);
     const qr=b.qr_image_url===undefined?old.qr_image_url:cleanText(b.qr_image_url,2000);
     const order=b.sort_order===undefined?old.sort_order:(Number.parseInt(b.sort_order,10)||100);
     const requestedEnabled=b.enabled===undefined?old.enabled:Boolean(b.enabled);
-    if(!name||!['bangladesh','india','global'].includes(region)||!currency||!Number.isFinite(price)||price<0) return res.status(400).json({error:'Invalid payment method details.'});
+    if(!name||!['bangladesh','india','global'].includes(region)||!currency||![price,price1,price3,price6,price12].every(x=>Number.isFinite(x)&&x>=0)) return res.status(400).json({error:'Invalid payment method details.'});
     if(qr && !/^https:\/\//i.test(qr)) return res.status(400).json({error:'QR image URL must use HTTPS.'});
-    const enabled=requestedEnabled && price>0 && Boolean(details);
-    const r=await pool.query(`UPDATE ft_payment_methods SET name=$1,region=$2,currency=$3,price_amount=$4,account_name=$5,account_details=$6,instructions=$7,qr_image_url=$8,enabled=$9,sort_order=$10,updated_at=NOW() WHERE id=$11 RETURNING *`,[name,region,currency,price,accountName,details,instructions,qr,enabled,order,id]);
+    const enabled=requestedEnabled && (price>0 || price1>0 || price3>0 || price6>0 || price12>0) && Boolean(details);
+    const r=await pool.query(`UPDATE ft_payment_methods SET name=$1,region=$2,currency=$3,price_amount=$4,price_1_month=$5,price_3_months=$6,price_6_months=$7,price_12_months=$8,account_name=$9,account_details=$10,instructions=$11,qr_image_url=$12,enabled=$13,sort_order=$14,updated_at=NOW() WHERE id=$15 RETURNING *`,[name,region,currency,price,price1,price3,price6,price12,accountName,details,instructions,qr,enabled,order,id]);
     res.json({method:r.rows[0]});
   } catch(e) { next(e); }
 });
@@ -1732,37 +1750,69 @@ app.post('/api/payments/manual', requireAuth, async(req,res,next) => {
   try {
     const purpose=cleanText(req.body.purpose,30), amount=Number(req.body.amount), currency=cleanText(req.body.currency||'BDT',8).toUpperCase();
     const method=cleanText(req.body.method,80), ref=cleanText(req.body.transaction_ref,160), payer=cleanText(req.body.payer_account,160);
+    const durationMonths=Number.parseInt(req.body.duration_months,10)||1;
     if(!['blue_badge','monetization','other'].includes(purpose)||!Number.isFinite(amount)||amount<=0||!method||!ref) return res.status(400).json({error:'Purpose, valid amount, payment method and transaction reference are required.'});
     if(/card|visa|mastercard|cvv|credit|debit/i.test(method)) return res.status(400).json({error:'Card payments are not supported.'});
     if(purpose==='blue_badge') {
-      const pm=await pool.query("SELECT name,currency,price_amount FROM ft_payment_methods WHERE enabled=TRUE AND price_amount>0 AND account_details<>'' AND LOWER(name)=LOWER($1)",[method]);
+      if(![1,3,6,12].includes(durationMonths)) return res.status(400).json({error:'Choose a badge duration of 1, 3, 6 or 12 months.'});
+      const pm=await pool.query(`SELECT name,currency,price_amount,
+        CASE WHEN price_1_month>0 THEN price_1_month ELSE price_amount END AS price_1_month,
+        CASE WHEN price_3_months>0 THEN price_3_months ELSE price_amount END AS price_3_months,
+        CASE WHEN price_6_months>0 THEN price_6_months ELSE price_amount END AS price_6_months,
+        CASE WHEN price_12_months>0 THEN price_12_months ELSE price_amount END AS price_12_months
+        FROM ft_payment_methods WHERE enabled=TRUE AND account_details<>'' AND LOWER(name)=LOWER($1)`,[method]);
       if(!pm.rowCount) return res.status(400).json({error:'This payment method is not currently available. Please choose an enabled method.'});
-      if(Number(pm.rows[0].price_amount)!==amount || pm.rows[0].currency!==currency) return res.status(400).json({error:'Payment amount or currency does not match the current Blue Badge price.'});
+      const p=pm.rows[0], priceKey={1:'price_1_month',3:'price_3_months',6:'price_6_months',12:'price_12_months'}[durationMonths];
+      if(Number(p[priceKey])!==amount || p.currency!==currency) return res.status(400).json({error:'Payment amount or currency does not match the selected Blue Badge duration price.'});
+      const active=await pool.query("SELECT blue_badge_expires_at FROM ft_profiles WHERE user_id=$1 AND blue_badge_status='verified' AND blue_badge_expires_at>NOW()",[String(req.user.id)]);
+      const pending=await pool.query("SELECT id FROM ft_manual_payments WHERE user_id=$1 AND purpose='blue_badge' AND status='pending' LIMIT 1",[String(req.user.id)]);
+      if(pending.rowCount) return res.status(409).json({error:'You already have a Blue Badge application awaiting review.'});
     }
-    const r=await pool.query(`INSERT INTO ft_manual_payments(user_id,purpose,amount,currency,method,transaction_ref,payer_account) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id::text AS id,purpose,amount,currency,method,transaction_ref,status,created_at`,[String(req.user.id),purpose,amount,currency,method,ref,payer]);
-    if(purpose==='blue_badge') await pool.query("UPDATE ft_profiles SET blue_badge_status='pending' WHERE user_id=$1",[String(req.user.id)]);
+    const r=await pool.query(`INSERT INTO ft_manual_payments(user_id,purpose,amount,currency,method,transaction_ref,payer_account,duration_months) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id::text AS id,purpose,amount,currency,method,transaction_ref,duration_months,status,created_at`,[String(req.user.id),purpose,amount,currency,method,ref,payer,durationMonths]);
+    if(purpose==='blue_badge') await pool.query("INSERT INTO ft_profiles(user_id,display_name,blue_badge_status,blue_badge_duration_months) VALUES($1,$2,'pending',$3) ON CONFLICT(user_id) DO UPDATE SET blue_badge_status=CASE WHEN ft_profiles.blue_badge_expires_at>NOW() THEN 'verified' ELSE 'pending' END,blue_badge_duration_months=EXCLUDED.blue_badge_duration_months,updated_at=NOW()",[String(req.user.id),req.user.username,durationMonths]);
     if(purpose==='monetization') await pool.query("INSERT INTO ft_monetization(user_id,status) VALUES($1,'pending') ON CONFLICT(user_id) DO UPDATE SET status='pending',updated_at=NOW()",[String(req.user.id)]);
     await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'payment',$2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Manual payment submission (${purpose}) requires review.`]);
     res.status(201).json({payment:r.rows[0],message:'Payment submitted for manual verification.'});
   } catch(e) { if(e.code==='23505') return res.status(409).json({error:'This transaction reference has already been submitted.'}); next(e); }
 });
+app.get('/api/payments/mine', requireAuth, async(req,res,next)=>{
+  try {
+    const r=await pool.query(`SELECT id::text AS id,purpose,amount,currency,method,transaction_ref,duration_months,status,admin_note,created_at,reviewed_at FROM ft_manual_payments WHERE user_id=$1 ORDER BY created_at DESC LIMIT 50`,[String(req.user.id)]);
+    const b=await pool.query(`SELECT CASE WHEN blue_badge_status='verified' AND blue_badge_expires_at IS NOT NULL AND blue_badge_expires_at<=NOW() THEN 'expired' ELSE blue_badge_status END AS blue_badge_status,blue_badge_duration_months,blue_badge_expires_at,CASE WHEN blue_badge_status='verified' AND blue_badge_expires_at>NOW() THEN TRUE ELSE FALSE END AS blue_badge_active FROM ft_profiles WHERE user_id=$1`,[String(req.user.id)]);
+    res.json({payments:r.rows,blue_badge:b.rows[0]||{blue_badge_status:'none',blue_badge_active:false}});
+  } catch(e){next(e);}
+});
 app.get('/api/admin/payments', requireAuth, requireAdmin, async(req,res,next) => {
-  try { const status=cleanText(req.query.status||'pending',20); const r=await pool.query(`SELECT m.*,u.username,u.email FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id WHERE ($1='all' OR m.status=$1) ORDER BY m.created_at DESC LIMIT 200`,[status]); res.json({payments:r.rows}); }
+  try { const status=cleanText(req.query.status||'pending',20); if(!['pending','approved','rejected','all'].includes(status))return res.status(400).json({error:'Invalid payment status filter.'}); const r=await pool.query(`SELECT m.*,u.username,u.email,p.display_name,p.blue_badge_expires_at FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id LEFT JOIN ft_profiles p ON p.user_id=m.user_id WHERE ($1='all' OR m.status=$1) ORDER BY m.created_at DESC LIMIT 200`,[status]); res.json({payments:r.rows}); }
   catch(e) { next(e); }
 });
 app.patch('/api/admin/payments/:id', requireAuth, requireAdmin, async(req,res,next) => {
+  const client=await pool.connect();
   try {
     const id=Number.parseInt(req.params.id,10),action=req.body.action,note=cleanText(req.body.admin_note,500);
-    if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action)) return res.status(400).json({error:'Action must be approve or reject.'});
-    const status=action==='approve'?'approved':'rejected';
-    const r=await pool.query(`UPDATE ft_manual_payments SET status=$1,admin_note=$2,reviewed_at=NOW() WHERE id=$3 AND status='pending' RETURNING *`,[status,note,id]);
-    if(!r.rowCount) return res.status(404).json({error:'Pending payment not found.'});
+    if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action)){return res.status(400).json({error:'Action must be approve or reject.'});}
+    await client.query('BEGIN');
+    const r=await client.query(`UPDATE ft_manual_payments SET status=$1,admin_note=$2,reviewed_at=NOW() WHERE id=$3 AND status='pending' RETURNING *`,[action==='approve'?'approved':'rejected',note,id]);
+    if(!r.rowCount){await client.query('ROLLBACK');return res.status(404).json({error:'Pending payment not found.'});}
     const p=r.rows[0];
-    if(p.purpose==='blue_badge') await pool.query("UPDATE ft_profiles SET blue_badge_status=$1 WHERE user_id=$2",[status==='approved'?'verified':'rejected',p.user_id]);
-    if(p.purpose==='monetization') await pool.query("INSERT INTO ft_monetization(user_id,enabled,status) VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET enabled=EXCLUDED.enabled,status=EXCLUDED.status,updated_at=NOW()",[p.user_id,status==='approved',status]);
-    await notifyUser(p.user_id,req.user.id,'payment',`Your ${p.purpose} payment was ${status}.`);
-    res.json({payment:p});
-  } catch(e) { next(e); }
+    if(p.purpose==='blue_badge'){
+      if(action==='approve'){
+        if(![1,3,6,12].includes(Number(p.duration_months))) throw new Error('Stored Blue Badge duration is invalid.');
+        await client.query(`INSERT INTO ft_profiles(user_id,display_name,blue_badge_status,blue_badge_duration_months,blue_badge_expires_at,updated_at)
+          VALUES($1,$2,'verified',$3,NOW()+make_interval(months => $3),NOW())
+          ON CONFLICT(user_id) DO UPDATE SET blue_badge_status='verified',blue_badge_duration_months=$3,
+          blue_badge_expires_at=GREATEST(COALESCE(ft_profiles.blue_badge_expires_at,NOW()),NOW())+make_interval(months => $3),updated_at=NOW()`,[p.user_id,p.user_id,Number(p.duration_months)]);
+      } else {
+        await client.query(`UPDATE ft_profiles SET blue_badge_status=CASE WHEN blue_badge_expires_at>NOW() THEN 'verified' ELSE 'rejected' END,updated_at=NOW() WHERE user_id=$1`,[p.user_id]);
+      }
+    }
+    if(p.purpose==='monetization') await client.query("INSERT INTO ft_monetization(user_id,enabled,status) VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET enabled=EXCLUDED.enabled,status=EXCLUDED.status,updated_at=NOW()",[p.user_id,action==='approve',action==='approve'?'approved':'rejected']);
+    await client.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) VALUES($1,$2,'payment',$3)`,[p.user_id,String(req.user.id),p.purpose==='blue_badge'?(action==='approve'?`Your Blue Badge application was approved for ${p.duration_months} month(s).`:'Your Blue Badge application was rejected.'): `Your ${p.purpose} payment was ${action==='approve'?'approved':'rejected'}.`]);
+    await client.query('COMMIT');
+    const fresh=await pool.query(`SELECT m.*,u.username,u.email,p.blue_badge_expires_at FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id LEFT JOIN ft_profiles p ON p.user_id=m.user_id WHERE m.id=$1`,[id]);
+    res.json({payment:fresh.rows[0]});
+  } catch(e) { await client.query('ROLLBACK').catch(()=>{}); next(e); }
+  finally { client.release(); }
 });
 app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const r=await pool.query("SELECT enabled,status,updated_at FROM ft_monetization WHERE user_id=$1",[String(req.user.id)]);res.json({monetization:r.rows[0]||{enabled:false,status:'not_applied'}});}catch(e){next(e);}});
 
