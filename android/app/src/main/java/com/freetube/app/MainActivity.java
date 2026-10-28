@@ -48,9 +48,9 @@ public class MainActivity extends Activity {
     private static final String HOME_URL =
             "https://chawdreegaming.github.io/FreeTube/";
 
-    // Google official TEST Native Ad Unit ID.
+    // FreeTube REAL Native Ad Unit ID.
     private static final String NATIVE_AD_UNIT_ID =
-            "ca-app-pub-3940256099942544/2247696110";
+            "ca-app-pub-2013650243814059/3524026549";
 
     private static final int FILE_CHOOSER_REQUEST = 1201;
 
@@ -300,10 +300,7 @@ public class MainActivity extends Activity {
 
         loadVersions.put(slotId, version);
 
-        /*
-         * Keep the holder so callbacks can safely compare the loader
-         * after the loader has been initialized.
-         */
+        // Holder prevents the Java callback initialization error.
         final AdLoader[] loaderHolder = new AdLoader[1];
 
         AdLoader loader = new AdLoader.Builder(
@@ -326,7 +323,6 @@ public class MainActivity extends Activity {
                             || !isDiscoveryPage(webView.getUrl())
                             || currentVersion == null
                             || currentVersion != version) {
-
                         nativeAd.destroy();
                         return;
                     }
