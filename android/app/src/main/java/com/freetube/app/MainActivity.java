@@ -8,6 +8,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,8 +48,7 @@ public class MainActivity extends Activity {
     private static final String HOME_URL =
             "https://chawdreegaming.github.io/FreeTube/";
 
-    // Google's official TEST Native Ad Unit ID.
-    // Keep this test ID during development.
+    // Google official TEST Native Ad Unit ID.
     private static final String NATIVE_AD_UNIT_ID =
             "ca-app-pub-3940256099942544/2247696110";
 
@@ -82,6 +82,7 @@ public class MainActivity extends Activity {
 
         root = new FrameLayout(this);
         root.setBackgroundColor(0xFF191A20);
+        root.setClipChildren(true);
 
         webView = new WebView(this);
         webView.setBackgroundColor(0xFF191A20);
@@ -91,10 +92,9 @@ public class MainActivity extends Activity {
                 ViewGroup.LayoutParams.MATCH_PARENT
         ));
 
-        // Native ads are positioned over the HTML ad slots.
         adOverlay = new FrameLayout(this);
-        adOverlay.setClipChildren(false);
-        adOverlay.setClipToPadding(false);
+        adOverlay.setClipChildren(true);
+        adOverlay.setClipToPadding(true);
 
         root.addView(adOverlay, new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -125,7 +125,6 @@ public class MainActivity extends Activity {
         );
 
         webView.setWebViewClient(new WebViewClient() {
-
             @Override
             public boolean shouldOverrideUrlLoading(
                     WebView view,
@@ -161,7 +160,6 @@ public class MainActivity extends Activity {
         });
 
         webView.setWebChromeClient(new WebChromeClient() {
-
             @Override
             public boolean onShowFileChooser(
                     WebView view,
@@ -180,7 +178,6 @@ public class MainActivity extends Activity {
                             FILE_CHOOSER_REQUEST
                     );
                     return true;
-
                 } catch (ActivityNotFoundException e) {
                     fileCallback = null;
 
@@ -203,7 +200,6 @@ public class MainActivity extends Activity {
                                 Intent.ACTION_VIEW,
                                 Uri.parse(url)
                         ));
-
                     } catch (Exception e) {
                         Toast.makeText(
                                 MainActivity.this,
@@ -245,7 +241,6 @@ public class MainActivity extends Activity {
     }
 
     private class NativeAdBridge {
-
         @JavascriptInterface
         public void updateSlot(
                 String slotId,
@@ -295,22 +290,22 @@ public class MainActivity extends Activity {
             return;
         }
 
-        // Always initialize the version before requesting an ad.
-        // This also lets us reject callbacks from outdated requests.
-        Integer savedVersion = loadVersions.get(slotId);
-
-        final int version = savedVersion == null
-                ? 0 : savedVersion;
+        final int version =
+                loadVersions.containsKey(slotId)
+                        ? loadVersions.get(slotId) : 0;
 
         loadVersions.put(slotId, version);
 
-        AdLoader loader = new AdLoader.Builder(
+        final AdLoader loader = new AdLoader.Builder(
                 this,
                 NATIVE_AD_UNIT_ID
         )
                 .forNativeAd(nativeAd -> runOnUiThread(() -> {
+                    AdLoader currentLoader = loadingAds.get(slotId);
 
-                    loadingAds.remove(slotId);
+                    if (currentLoader == loader) {
+                        loadingAds.remove(slotId);
+                    }
 
                     Integer currentVersion = loadVersions.get(slotId);
 
@@ -320,19 +315,12 @@ public class MainActivity extends Activity {
                             || !isDiscoveryPage(webView.getUrl())
                             || currentVersion == null
                             || currentVersion != version) {
-
                         nativeAd.destroy();
                         return;
                     }
 
-                    NativeAd oldAd = nativeAds.put(
-                            slotId,
-                            nativeAd
-                    );
-
-                    if (oldAd != null) {
-                        oldAd.destroy();
-                    }
+                    NativeAd oldAd = nativeAds.put(slotId, nativeAd);
+                    if (oldAd != null) oldAd.destroy();
 
                     NativeAdView nativeAdView =
                             createNativeAdView(nativeAd);
@@ -345,22 +333,21 @@ public class MainActivity extends Activity {
                     }
 
                     adOverlay.addView(nativeAdView);
-
                     refreshSlotPositions();
                 }))
                 .withAdListener(new AdListener() {
-
                     @Override
-                    public void onAdFailedToLoad(
-                            LoadAdError error) {
+                    public void onAdFailedToLoad(LoadAdError error) {
+                        AdLoader currentLoader = loadingAds.get(slotId);
 
-                        loadingAds.remove(slotId);
+                        if (currentLoader == loader) {
+                            loadingAds.remove(slotId);
+                        }
 
-                        android.util.Log.w(
+                        Log.w(
                                 "FreeTubeAds",
-                                "Native ad failed for "
-                                        + slotId + ": "
-                                        + error.getMessage()
+                                "Native ad failed for " + slotId
+                                        + ": " + error.getMessage()
                         );
                     }
                 })
@@ -375,20 +362,16 @@ public class MainActivity extends Activity {
 
     private NativeAdView createNativeAdView(NativeAd ad) {
         NativeAdView adView = new NativeAdView(this);
-
-        adView.setBackground(makeBackground(
-                Color.WHITE,
-                0xFFE0E0E0
-        ));
-
+        adView.setBackground(makeBackground(Color.WHITE, 0xFFE0E0E0));
         adView.setClipChildren(true);
         adView.setClipToPadding(true);
 
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dp(12), dp(10), dp(12), dp(10));
+        card.setClipChildren(true);
+        card.setClipToPadding(true);
 
-        // Sponsored label.
         TextView sponsored = new TextView(this);
         sponsored.setText("Ad · Sponsored");
         sponsored.setTextColor(Color.rgb(40, 100, 65));
@@ -396,32 +379,22 @@ public class MainActivity extends Activity {
         sponsored.setTypeface(null, Typeface.BOLD);
         card.addView(sponsored);
 
-        // Headline.
         TextView headline = new TextView(this);
         headline.setTextColor(Color.rgb(25, 35, 28));
         headline.setTextSize(16);
         headline.setTypeface(null, Typeface.BOLD);
         headline.setPadding(0, dp(5), 0, dp(5));
-
+        headline.setMaxLines(2);
         card.addView(headline);
         adView.setHeadlineView(headline);
 
-        // Advertiser.
         TextView advertiser = new TextView(this);
         advertiser.setTextColor(Color.DKGRAY);
         advertiser.setTextSize(12);
-
+        advertiser.setMaxLines(1);
         card.addView(advertiser);
         adView.setAdvertiserView(advertiser);
 
-        /*
-         * IMPORTANT:
-         * The MediaView has a real layout height of 160dp,
-         * not just a minimum height.
-         *
-         * Its actual measured width must also be at least 120dp
-         * when the ad is displayed.
-         */
         MediaView mediaView = new MediaView(this);
         mediaView.setMinimumWidth(dp(120));
         mediaView.setMinimumHeight(dp(120));
@@ -431,26 +404,17 @@ public class MainActivity extends Activity {
                         ViewGroup.LayoutParams.MATCH_PARENT,
                         dp(160)
                 );
-
-        mediaParams.setMargins(
-                0,
-                dp(8),
-                0,
-                dp(8)
-        );
-
+        mediaParams.setMargins(0, dp(8), 0, dp(8));
         card.addView(mediaView, mediaParams);
         adView.setMediaView(mediaView);
 
-        // Body.
         TextView body = new TextView(this);
         body.setTextColor(Color.DKGRAY);
         body.setTextSize(13);
-
+        body.setMaxLines(4);
         card.addView(body);
         adView.setBodyView(body);
 
-        // Icon and call-to-action.
         LinearLayout bottom = new LinearLayout(this);
         bottom.setGravity(Gravity.CENTER_VERTICAL);
         bottom.setOrientation(LinearLayout.HORIZONTAL);
@@ -459,82 +423,52 @@ public class MainActivity extends Activity {
         icon.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
         LinearLayout.LayoutParams iconParams =
-                new LinearLayout.LayoutParams(
-                        dp(38),
-                        dp(38)
-                );
-
-        iconParams.setMargins(
-                0,
-                dp(8),
-                dp(10),
-                0
-        );
-
+                new LinearLayout.LayoutParams(dp(38), dp(38));
+        iconParams.setMargins(0, dp(8), dp(10), 0);
         bottom.addView(icon, iconParams);
         adView.setIconView(icon);
 
         Button cta = new Button(this);
         cta.setTextSize(12);
         cta.setAllCaps(false);
-
         bottom.addView(cta, new LinearLayout.LayoutParams(
-                0,
-                dp(44),
-                1
+                0, dp(44), 1
         ));
-
         adView.setCallToActionView(cta);
+
         card.addView(bottom);
 
-        /*
-         * NativeAdView extends FrameLayout.
-         * Use FrameLayout.LayoutParams here.
-         */
+        // The card fills the NativeAdView bounds instead of overflowing
+        // with WRAP_CONTENT when the ad slot is measured.
         FrameLayout.LayoutParams cardParams =
                 new FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
                         Gravity.TOP | Gravity.START
                 );
 
         adView.addView(card, cardParams);
 
-        // Populate the native ad assets.
         headline.setText(
-                ad.getHeadline() == null
-                        ? "Sponsored"
-                        : ad.getHeadline()
+                ad.getHeadline() == null ? "Sponsored" : ad.getHeadline()
         );
 
         String advertiserText = ad.getAdvertiser();
-
-        advertiser.setText(
-                advertiserText == null ? "" : advertiserText
-        );
-
+        advertiser.setText(advertiserText == null ? "" : advertiserText);
         advertiser.setVisibility(
                 advertiserText == null || advertiserText.isEmpty()
                         ? View.GONE : View.VISIBLE
         );
 
         String bodyText = ad.getBody();
-
-        body.setText(
-                bodyText == null ? "" : bodyText
-        );
-
+        body.setText(bodyText == null ? "" : bodyText);
         body.setVisibility(
                 bodyText == null || bodyText.isEmpty()
                         ? View.GONE : View.VISIBLE
         );
 
         String ctaText = ad.getCallToAction();
-
-        cta.setText(
-                ctaText == null ? "Learn more" : ctaText
-        );
-
+        cta.setText(ctaText == null ? "Learn more" : ctaText);
         cta.setVisibility(
                 ctaText == null || ctaText.isEmpty()
                         ? View.GONE : View.VISIBLE
@@ -547,16 +481,10 @@ public class MainActivity extends Activity {
             icon.setVisibility(View.GONE);
         }
 
-        // Register the native assets after assigning their views.
         adView.setNativeAd(ad);
-
         return adView;
     }
 
-    /*
-     * JavaScript supplies coordinates from getBoundingClientRect().
-     * Convert those viewport coordinates into overlay coordinates.
-     */
     private void positionAd(
             NativeAdView view,
             double x,
@@ -592,26 +520,21 @@ public class MainActivity extends Activity {
         );
 
         FrameLayout.LayoutParams params =
-                new FrameLayout.LayoutParams(
-                        widthPx,
-                        heightPx
-                );
+                new FrameLayout.LayoutParams(widthPx, heightPx);
 
         params.leftMargin = left;
         params.topMargin = top;
         params.gravity = Gravity.TOP | Gravity.LEFT;
 
-        view.setVisibility(View.VISIBLE);
         view.setLayoutParams(params);
+        view.setVisibility(View.VISIBLE);
     }
 
     private void refreshSlotPositions() {
         if (webView == null || !adsInitialized) return;
 
         runOnUiThread(() -> {
-            if (webView != null
-                    && isDiscoveryPage(webView.getUrl())) {
-
+            if (webView != null && isDiscoveryPage(webView.getUrl())) {
                 webView.evaluateJavascript(
                         "if (window.updateNativeAdSlots) "
                                 + "window.updateNativeAdSlots();",
@@ -624,12 +547,10 @@ public class MainActivity extends Activity {
     private GradientDrawable makeBackground(
             int fillColor,
             int strokeColor) {
-
         GradientDrawable drawable = new GradientDrawable();
         drawable.setColor(fillColor);
         drawable.setCornerRadius(dp(10));
         drawable.setStroke(dp(1), strokeColor);
-
         return drawable;
     }
 
@@ -639,13 +560,10 @@ public class MainActivity extends Activity {
     }
 
     private void clearNativeAds() {
-        // Invalidate pending requests before clearing their references.
-        Set<String> pendingSlots =
-                new HashSet<>(loadingAds.keySet());
+        Set<String> pendingSlots = new HashSet<>(loadingAds.keySet());
 
         for (String slotId : pendingSlots) {
             Integer oldVersion = loadVersions.get(slotId);
-
             loadVersions.put(
                     slotId,
                     oldVersion == null ? 1 : oldVersion + 1
@@ -655,17 +573,11 @@ public class MainActivity extends Activity {
         loadingAds.clear();
 
         for (NativeAdView view : adViews.values()) {
-            if (adOverlay != null) {
-                adOverlay.removeView(view);
-            }
+            if (adOverlay != null) adOverlay.removeView(view);
         }
-
         adViews.clear();
 
-        for (NativeAd ad : nativeAds.values()) {
-            ad.destroy();
-        }
-
+        for (NativeAd ad : nativeAds.values()) ad.destroy();
         nativeAds.clear();
     }
 
@@ -680,25 +592,16 @@ public class MainActivity extends Activity {
 
         boolean allowedHost =
                 host.equals("chawdreegaming.github.io")
-                || host.equals(
-                        "freetube-backend-a222.onrender.com"
-                );
+                || host.equals("freetube-backend-a222.onrender.com");
 
-        if (scheme.equals("https") && allowedHost) {
-            return false;
-        }
+        if (scheme.equals("https") && allowedHost) return false;
 
         if (scheme.equals("http")
                 || scheme.equals("https")
                 || scheme.equals("mailto")
                 || scheme.equals("tel")) {
-
             try {
-                startActivity(new Intent(
-                        Intent.ACTION_VIEW,
-                        uri
-                ));
-
+                startActivity(new Intent(Intent.ACTION_VIEW, uri));
             } catch (Exception e) {
                 Toast.makeText(
                         this,
@@ -716,16 +619,9 @@ public class MainActivity extends Activity {
             int requestCode,
             int resultCode,
             Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
 
-        super.onActivityResult(
-                requestCode,
-                resultCode,
-                data
-        );
-
-        if (requestCode == FILE_CHOOSER_REQUEST
-                && fileCallback != null) {
-
+        if (requestCode == FILE_CHOOSER_REQUEST && fileCallback != null) {
             Uri[] results = null;
 
             if (resultCode == Activity.RESULT_OK && data != null) {
@@ -733,10 +629,8 @@ public class MainActivity extends Activity {
 
                 if (selected != null) {
                     results = new Uri[]{selected};
-
                 } else if (data.getClipData() != null) {
                     int count = data.getClipData().getItemCount();
-
                     results = new Uri[count];
 
                     for (int i = 0; i < count; i++) {
@@ -763,10 +657,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (webView != null) {
-            webView.saveState(outState);
-        }
-
+        if (webView != null) webView.saveState(outState);
         super.onSaveInstanceState(outState);
     }
 
