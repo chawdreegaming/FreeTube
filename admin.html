@@ -1,351 +1,460 @@
+
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Admin Payments — Boys vs Girls</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<title>Admin Dashboard — Boys vs Girls</title>
+
 <style>
-:root{color-scheme:dark;--bg:#07111f;--card:#101e32;--line:#293d59;--text:#f3f7ff;--muted:#9fb0c8;--blue:#4b8dff;--green:#30c997;--red:#ff7185}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle at 0 0,#142d50,transparent 38%),var(--bg);color:var(--text);font:15px/1.5 system-ui,sans-serif}
-.wrap{max-width:1100px;margin:auto;padding:20px 14px 50px}
-.head{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
-.muted{color:var(--muted)}
-h1{font-size:clamp(25px,5vw,34px);margin:0}
-h2{margin:0 0 14px;font-size:20px}
-.card{background:linear-gradient(160deg,#13243a,#0d192b);border:1px solid var(--line);border-radius:18px;padding:17px;margin:14px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.field{margin:10px 0}
-label{display:block;color:#cbd7e8;font-size:13px;margin-bottom:5px}
-input,select,textarea{width:100%;padding:10px 11px;border:1px solid #30435e;border-radius:10px;background:#081426;color:var(--text);font:inherit}
-button{border:0;border-radius:10px;padding:10px 13px;background:var(--blue);color:#fff;font-weight:700;cursor:pointer;margin:3px}
-button.secondary{background:#30415b}
-button.danger{background:#a82d48}
-button.ok{background:#147b60}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.pill{font-size:12px;border-radius:999px;padding:4px 8px;background:#263952}
-.pill.on{background:#12533f;color:#b9ffe6}
-.pill.off{background:#493020;color:#ffdbb0}
-.notice{display:none;padding:11px;border-radius:10px;margin:12px 0}
-.success{background:#103c32;color:#b4ffe2}
-.error{background:#421e2a;color:#ffd0d7}
-.method{border:1px solid var(--line);border-radius:14px;padding:13px;background:#0a1729;min-width:0}
-.method h3{margin:0 0 5px}
-.small{font-size:12px}
-.break{overflow-wrap:anywhere;white-space:pre-wrap}
-.payments{display:grid;gap:12px}
-.pay{border:1px solid var(--line);border-radius:14px;padding:14px;background:#0a1729}
-.pay h3{margin:0}
-.empty{padding:20px;text-align:center;color:var(--muted)}
-.check{display:flex;align-items:center;gap:8px}
-.check input{width:auto}
+:root {
+  color-scheme: dark;
+  --bg: #07111f;
+  --card: #101e32;
+  --line: #293d59;
+  --text: #f3f7ff;
+  --muted: #9fb0c8;
+  --blue: #4b8dff;
+  --green: #30c997;
+  --purple: #a78bfa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, #17365d, transparent 40%),
+    radial-gradient(circle at bottom right, #24204b, transparent 35%),
+    var(--bg);
+  color: var(--text);
+  font: 15px/1.55 system-ui, sans-serif;
+}
+
+.wrap {
+  max-width: 1100px;
+  margin: auto;
+  padding: 28px 16px 45px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #4b8dff, #a78bfa);
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 0 8px 25px #4b8dff30;
+}
+
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+h1 {
+  margin: 3px 0;
+  font-size: clamp(27px, 5vw, 38px);
+  line-height: 1.2;
+}
+
+.subtitle {
+  margin: 5px 0 0;
+  color: var(--muted);
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+button {
+  padding: 10px 14px;
+  border: 1px solid #3b5272;
+  border-radius: 11px;
+  background: #263a56;
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover,
+.card-link:hover {
+  filter: brightness(1.12);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff7185;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 275px;
+  padding: 23px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(155deg, #142740, #0d192b);
+  box-shadow: 0 16px 40px #0002;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  top: -65px;
+  right: -65px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: .12;
+  pointer-events: none;
+}
+
+.app {
+  --accent: var(--blue);
+  --icon-bg: #1c3c68;
+}
+
+.badge {
+  --accent: var(--green);
+  --icon-bg: #164a46;
+}
+
+.notifications {
+  --accent: var(--purple);
+  --icon-bg: #3c2c63;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 60px;
+  height: 60px;
+  margin-bottom: 20px;
+  border-radius: 18px;
+  background: var(--icon-bg);
+  color: var(--accent);
+}
+
+.icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card h2 {
+  margin: 0 0 9px;
+  font-size: 21px;
+}
+
+.card p {
+  flex: 1;
+  margin: 0 0 22px;
+  color: var(--muted);
+}
+
+.card-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #07111f;
+  font-weight: 850;
+  text-decoration: none;
+  text-align: center;
+}
+
+.message {
+  display: none;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #395477;
+  border-radius: 12px;
+  background: #122640;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  margin-top: 26px;
+  padding-top: 17px;
+  border-top: 1px solid #263a53;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .wrap {
+    padding: 20px 14px 35px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    min-height: 235px;
+  }
+
+  .header {
+    margin-bottom: 23px;
+  }
+}
+
+@media (min-width: 761px) and (max-width: 950px) {
+  .card {
+    padding: 18px;
+  }
+
+  .card h2 {
+    font-size: 19px;
+  }
+}
 </style>
 </head>
+
 <body>
 <main class="wrap">
-<header class="head">
-<div>
-<div class="muted">BOYS VS GIRLS / ADMIN</div>
-<h1>Payment management</h1>
-<p class="muted">No card payments. Configure wallet details, prices and manual payment review.</p>
-</div>
-<div class="row">
-<button class="secondary" id="refresh">Refresh</button>
-<button class="danger" id="logout">Clear token</button>
-</div>
-</header>
 
-<div id="message" class="notice"></div>
+  <header class="header">
+    <div class="brand">
+      <div class="logo">BvG</div>
 
-<section class="card">
-<h2>Admin access</h2>
-<p class="muted small">Uses your existing logged-in token stored as <code>freetube_access_token</code>. Your account must have the admin role.</p>
-<div class="field">
-<label for="tokenInput">Access token (optional: paste if not already logged in)</label>
-<input id="tokenInput" type="password" autocomplete="off" placeholder="Bearer token only; do not share it">
-</div>
-<button id="saveToken">Use token</button>
-</section>
+      <div>
+        <div class="eyebrow">BOYS VS GIRLS</div>
+        <h1>Admin Dashboard</h1>
+        <p class="subtitle">
+          Select a management section below.
+        </p>
+      </div>
+    </div>
 
-<section class="card">
-<h2>Add payment method</h2>
-<form id="addForm">
-<div class="grid">
-<div class="field"><label>Method code (unique)</label><input name="code" required placeholder="example_wallet" pattern="[A-Za-z0-9_]+"></div>
-<div class="field"><label>Display name</label><input name="name" required placeholder="Wallet name"></div>
-<div class="field"><label>Region</label><select name="region"><option value="bangladesh">Bangladesh</option><option value="india">India</option><option value="global">Crypto / International</option></select></div>
-<div class="field"><label>Currency</label><select name="currency"><option>BDT</option><option>INR</option><option>USDT</option><option>USD</option></select></div>
-<div class="field"><label>Legacy / fallback price</label><input name="price_amount" type="number" min="0" step="0.01" required value="0"><small class="muted">Used only when a duration-specific price is 0.</small></div>
-<div class="field"><label>1-month price</label><input name="price_1_month" type="number" min="0" step="0.01" value="0" required></div>
-<div class="field"><label>3-month price</label><input name="price_3_months" type="number" min="0" step="0.01" value="0" required></div>
-<div class="field"><label>6-month price</label><input name="price_6_months" type="number" min="0" step="0.01" value="0" required></div>
-<div class="field"><label>12-month price</label><input name="price_12_months" type="number" min="0" step="0.01" value="0" required></div>
-<div class="field"><label>Sort order</label><input name="sort_order" type="number" value="100"></div>
-<div class="field"><label>Account / recipient name</label><input name="account_name" maxlength="160"></div>
-<div class="field"><label>Account / wallet address / UPI ID</label><input name="account_details" maxlength="500" required></div>
-<div class="field"><label>QR image URL (HTTPS only)</label><input name="qr_image_url" type="url" placeholder="https://…"></div>
-<div class="field"><label>Payment instructions</label><textarea name="instructions" rows="3" maxlength="1500" placeholder="Network, memo/tag, steps, exact transfer guidance"></textarea></div>
-</div>
-<label class="check"><input type="checkbox" name="enabled"> Enable after saving (requires price and account details)</label>
-<p class="muted small">For crypto, clearly specify the network and any required memo/tag. Never request wallet seed phrases, PINs, OTPs or passwords.</p>
-<button type="submit">Add method</button>
-</form>
-</section>
+    <div class="header-actions">
+      <button type="button" id="tokenButton">
+        Set Admin Token
+      </button>
 
-<section class="card">
-<div class="head">
-<h2>Payment methods</h2>
-<span class="muted small">Edit account details and price; disabled methods are hidden from users.</span>
-</div>
-<div id="methods" class="grid"><div class="empty">Loading…</div></div>
-</section>
+      <button type="button" id="refreshButton">
+        Refresh
+      </button>
+    </div>
+  </header>
 
-<section class="card">
-<div class="head">
-<h2>Manual payment submissions</h2>
-<div class="row">
-<select id="statusFilter">
-<option value="pending">Pending</option>
-<option value="all">All</option>
-<option value="approved">Approved</option>
-<option value="rejected">Rejected</option>
-</select>
-<button id="loadPayments">Load submissions</button>
-</div>
-</div>
-<div id="payments" class="payments"><div class="empty">Loading…</div></div>
-</section>
+  <div class="message" id="message" role="status"></div>
+
+  <div class="status">
+    <span class="dot" id="statusDot"></span>
+    <span id="statusText">Checking access token...</span>
+  </div>
+
+  <section class="cards">
+
+    <!-- CARD 1: APP MANAGEMENT -->
+    <article class="card app">
+
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        </svg>
+      </div>
+
+      <h2>App Management</h2>
+
+      <p>
+        Manage users, posts, reports and the main
+        administration features of your app.
+      </p>
+
+      <a class="card-link" href="admin-app.html">
+        Open App Management <span>→</span>
+      </a>
+
+    </article>
+
+    <!-- CARD 2: BLUE BADGE MANAGEMENT -->
+    <article class="card badge">
+
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 3l2.5 1.7 3-.1.9 2.9 2.2 2-1.2 2.8.4 3-2.6 1.5-1.4 2.7-3-.5-2.8 1.1-2.2-2-3-.7-.3-3-1.9-2.3 1.4-2.7.1-3 2.8-1.2L9 3.8z"/>
+          <path d="m8.5 12 2.2 2.2 4.8-5"/>
+        </svg>
+      </div>
+
+      <h2>Blue Badge Management</h2>
+
+      <p>
+        Configure payment methods and prices, review
+        payment references, and approve or reject
+        Blue Badge applications.
+      </p>
+
+      <a class="card-link" href="admin-payments.html">
+        Open Blue Badge <span>→</span>
+      </a>
+
+    </article>
+
+    <!-- CARD 3: NOTIFICATION MANAGEMENT -->
+    <article class="card notifications">
+
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+          <path d="M10 21h4"/>
+        </svg>
+      </div>
+
+      <h2>Notification Management</h2>
+
+      <p>
+        Send notifications to users, compose messages,
+        choose recipients and review notification history.
+      </p>
+
+      <a class="card-link" href="admin-notifications.html">
+        Open Notifications <span>→</span>
+      </a>
+
+    </article>
+
+  </section>
+
+  <footer class="footer">
+    <p>Admin Dashboard · Boys vs Girls 💙💗</p>
+    <p>
+      Keep your access token private. The backend must
+      verify admin permissions for protected actions.
+    </p>
+  </footer>
+
 </main>
 
 <script>
-const API='https://freetube-backend-a222.onrender.com/api';
-const $=id=>document.getElementById(id);
-let methods=[];
+(function () {
+  "use strict";
 
-function token(){return localStorage.getItem('freetube_access_token')||''}
+  const TOKEN_KEY = "freetube_access_token";
 
-function show(text,type='error'){
- const el=$('message');
- el.textContent=text;
- el.className='notice '+(type==='success'?'success':'error');
- el.style.display='block';
- el.scrollIntoView({behavior:'smooth',block:'center'});
-}
+  const $ = function (id) {
+    return document.getElementById(id);
+  };
 
-async function api(path,options={}){
- const headers=Object.assign(
-  {'Content-Type':'application/json','Authorization':'Bearer '+token()},
-  options.headers||{}
- );
- const r=await fetch(API+path,{...options,headers});
- const d=await r.json().catch(()=>({}));
- if(!r.ok)throw Error(d.error||`Request failed (${r.status})`);
- return d;
-}
-
-function esc(v){
- return String(v??'').replace(/[&<>"']/g,c=>({
-  '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
- }[c]));
-}
-
-async function loadMethods(){
- try{
-  const d=await api('/admin/payment-methods');
-  methods=d.methods||[];
-  const root=$('methods');
-  root.innerHTML='';
-
-  if(!methods.length){
-   root.innerHTML='<div class="empty">No methods found.</div>';
-   return;
+  function showMessage(text) {
+    const box = $("message");
+    box.textContent = text;
+    box.style.display = "block";
   }
 
-  for(const m of methods){
-   const el=document.createElement('article');
-   el.className='method';
+  function refreshStatus() {
+    const savedToken = localStorage.getItem(TOKEN_KEY) || "";
 
-   el.innerHTML=`
-   <div class="row" style="justify-content:space-between">
-    <h3>${esc(m.name)}</h3>
-    <span class="pill ${m.enabled?'on':'off'}">${m.enabled?'Enabled':'Disabled'}</span>
-   </div>
-   <div class="muted small">${esc(m.region)} · ${esc(m.currency)} · code: ${esc(m.code)}</div>
-   <form data-method="${m.id}" class="editMethod">
-    <div class="field"><label>Display name</label><input name="name" value="${esc(m.name)}" required></div>
-    <div class="grid">
-     <div class="field"><label>Region</label><select name="region">
-      <option value="bangladesh" ${m.region==='bangladesh'?'selected':''}>Bangladesh</option>
-      <option value="india" ${m.region==='india'?'selected':''}>India</option>
-      <option value="global" ${m.region==='global'?'selected':''}>Crypto / International</option>
-     </select></div>
-     <div class="field"><label>Currency</label><select name="currency">
-      ${['BDT','INR','USDT','USD'].map(c=>`<option ${m.currency===c?'selected':''}>${c}</option>`).join('')}
-     </select></div>
-     <div class="field"><label>Legacy / fallback price</label><input name="price_amount" type="number" min="0" step="0.01" value="${esc(m.price_amount)}" required></div>
-     <div class="field"><label>1-month price</label><input name="price_1_month" type="number" min="0" step="0.01" value="${esc(Number(m.price_1_month)||Number(m.price_amount)||0)}" required></div>
-     <div class="field"><label>3-month price</label><input name="price_3_months" type="number" min="0" step="0.01" value="${esc(Number(m.price_3_months)||Number(m.price_amount)||0)}" required></div>
-     <div class="field"><label>6-month price</label><input name="price_6_months" type="number" min="0" step="0.01" value="${esc(Number(m.price_6_months)||Number(m.price_amount)||0)}" required></div>
-     <div class="field"><label>12-month price</label><input name="price_12_months" type="number" min="0" step="0.01" value="${esc(Number(m.price_12_months)||Number(m.price_amount)||0)}" required></div>
-     <div class="field"><label>Sort order</label><input name="sort_order" type="number" value="${esc(m.sort_order)}"></div>
-    </div>
-    <div class="field"><label>Recipient name</label><input name="account_name" value="${esc(m.account_name)}"></div>
-    <div class="field"><label>Account / wallet / UPI ID</label><input name="account_details" value="${esc(m.account_details)}" maxlength="500" required></div>
-    <div class="field"><label>QR image URL (HTTPS)</label><input name="qr_image_url" value="${esc(m.qr_image_url)}" type="url"></div>
-    <div class="field"><label>Instructions</label><textarea name="instructions" rows="3">${esc(m.instructions)}</textarea></div>
-    <label class="check"><input type="checkbox" name="enabled" ${m.enabled?'checked':''}> Enabled for users</label>
-    <div class="row">
-     <button type="submit">Save changes</button>
-     <button type="button" class="secondary toggle" data-id="${m.id}" data-enable="${!m.enabled}">${m.enabled?'Disable':'Enable'}</button>
-    </div>
-   </form>`;
+    $("statusText").textContent = savedToken
+      ? "An access token is saved in this browser."
+      : "No access token is saved in this browser.";
 
-   root.appendChild(el);
+    $("statusDot").style.background = savedToken
+      ? "#30c997"
+      : "#ff7185";
+
+    $("message").style.display = "none";
   }
 
-  for(const f of root.querySelectorAll('.editMethod')){
-   f.addEventListener('submit',saveMethod);
-  }
+  $("tokenButton").addEventListener("click", function () {
+    const currentToken = localStorage.getItem(TOKEN_KEY) || "";
 
-  for(const b of root.querySelectorAll('.toggle')){
-   b.addEventListener('click',async()=>{
-    const m=methods.find(x=>String(x.id)===b.dataset.id);
-    if(!m)return;
-    try{
-     await api('/admin/payment-methods/'+m.id,{
-      method:'PATCH',
-      body:JSON.stringify({enabled:b.dataset.enable==='true'})
-     });
-     show('Payment method updated.','success');
-     await loadMethods();
-    }catch(e){show(e.message)}
-   });
-  }
- }catch(e){
-  $('methods').innerHTML='<div class="empty">Could not load methods. Check admin access and token.</div>';
-  show(e.message);
- }
-}
+    const value = prompt(
+      "Paste your existing access token. Do not share it with anyone.",
+      currentToken
+    );
 
-async function saveMethod(e){
- e.preventDefault();
- const f=e.currentTarget;
- const obj=Object.fromEntries(new FormData(f).entries());
- obj.price_amount=Number(obj.price_amount);
- for(const k of ['price_1_month','price_3_months','price_6_months','price_12_months']){
-  obj[k]=Number(obj[k]);
- }
- obj.sort_order=Number(obj.sort_order)||100;
- obj.enabled=f.elements.enabled.checked;
+    if (value === null) {
+      return;
+    }
 
- try{
-  await api('/admin/payment-methods/'+f.dataset.method,{
-   method:'PATCH',
-   body:JSON.stringify(obj)
+    if (!value.trim()) {
+      localStorage.removeItem(TOKEN_KEY);
+      refreshStatus();
+      showMessage("The local access token was cleared.");
+      return;
+    }
+
+    localStorage.setItem(TOKEN_KEY, value.trim());
+
+    refreshStatus();
+
+    showMessage(
+      "Token saved in this browser. Your backend must still verify admin access."
+    );
   });
-  show('Payment method saved.','success');
-  await loadMethods();
- }catch(err){show(err.message)}
-}
 
-$('addForm').addEventListener('submit',async e=>{
- e.preventDefault();
- const f=e.currentTarget;
- const obj=Object.fromEntries(new FormData(f).entries());
- obj.price_amount=Number(obj.price_amount);
- for(const k of ['price_1_month','price_3_months','price_6_months','price_12_months']){
-  obj[k]=Number(obj[k]);
- }
- obj.sort_order=Number(obj.sort_order)||100;
- obj.enabled=f.elements.enabled.checked;
+  $("refreshButton").addEventListener("click", refreshStatus);
 
- try{
-  await api('/admin/payment-methods',{
-   method:'POST',
-   body:JSON.stringify(obj)
-  });
-  f.reset();
-  show('Payment method added.','success');
-  await loadMethods();
- }catch(err){show(err.message)}
-});
-
-async function loadPayments(){
- try{
-  const d=await api('/admin/payments?status='+encodeURIComponent($('statusFilter').value));
-  const root=$('payments');
-  root.innerHTML='';
-  const items=d.payments||[];
-
-  if(!items.length){
-   root.innerHTML='<div class="empty">No submissions in this filter.</div>';
-   return;
-  }
-
-  for(const p of items){
-   const el=document.createElement('article');
-   el.className='pay';
-   el.innerHTML=`
-   <div class="row" style="justify-content:space-between">
-    <h3>Payment #${esc(p.id)} · ${esc(p.purpose)}</h3>
-    <span class="pill ${p.status==='approved'?'on':'off'}">${esc(p.status)}</span>
-   </div>
-   <p><b>User:</b> ${esc(p.username||p.user_id)} ${p.email?'· '+esc(p.email):''}</p>
-   <p><b>Amount:</b> ${esc(p.amount)} ${esc(p.currency)} · <b>Method:</b> ${esc(p.method)}${p.purpose==='blue_badge'?` · <b>Badge duration:</b> ${esc(p.duration_months||1)} month(s)`:''}</p>
-   <p><b>Transaction reference:</b> <span class="break">${esc(p.transaction_ref)}</span></p>
-   <p><b>Payer account:</b> <span class="break">${esc(p.payer_account||'Not provided')}</span></p>
-   <p class="muted small">Submitted: ${esc(p.created_at||'')} ${p.reviewed_at?'· Reviewed: '+esc(p.reviewed_at):''}</p>
-   <div class="field"><label>Admin note</label><input class="note" maxlength="500" value="${esc(p.admin_note||'')}" placeholder="Optional note to user"></div>
-   ${p.status==='pending'?`<div class="row"><button class="ok" data-action="approve" data-id="${p.id}">Approve</button><button class="danger" data-action="reject" data-id="${p.id}">Reject</button></div>`:''}`;
-   root.appendChild(el);
-  }
-
-  for(const b of root.querySelectorAll('button[data-action]')){
-   b.addEventListener('click',async()=>{
-    const parent=b.closest('.pay');
-    const note=parent.querySelector('.note').value;
-    if(!confirm(`Are you sure you want to ${b.dataset.action} payment #${b.dataset.id}? Verify the transfer first.`))return;
-
-    try{
-     await api('/admin/payments/'+b.dataset.id,{
-      method:'PATCH',
-      body:JSON.stringify({action:b.dataset.action,admin_note:note})
-     });
-     show('Payment '+b.dataset.action+'d.','success');
-     await loadPayments();
-    }catch(e){show(e.message)}
-   });
-  }
- }catch(e){
-  $('payments').innerHTML='<div class="empty">Could not load submissions.</div>';
-  show(e.message);
- }
-}
-
-$('saveToken').addEventListener('click',()=>{
- const t=$('tokenInput').value.trim();
- if(!t)return show('Paste an access token first.');
- localStorage.setItem('freetube_access_token',t);
- $('tokenInput').value='';
- show('Token saved in this browser.','success');
- refreshAll();
-});
-
-$('logout').addEventListener('click',()=>{
- localStorage.removeItem('freetube_access_token');
- show('Local access token cleared.','success');
-});
-
-$('refresh').addEventListener('click',refreshAll);
-$('loadPayments').addEventListener('click',loadPayments);
-$('statusFilter').addEventListener('change',loadPayments);
-
-async function refreshAll(){
- await loadMethods();
- await loadPayments();
-}
-
-refreshAll();
+  refreshStatus();
+})();
 </script>
+
 </body>
 </html>
