@@ -2,23 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#ffffff">
-<title>FreeTube</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05030d">
+<title>Boys ♡ Girls</title>
 
 <style>
+:root {
+    --blue: #00d9ff;
+    --pink: #ff27b9;
+    --purple: #852cff;
+    --bg: #05030d;
+}
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
     overflow: hidden;
     font-family: Arial, Helvetica, sans-serif;
-    background: #ffffff;
+    background: var(--bg);
+    color: #fff;
 }
 
 .splash-screen {
@@ -28,84 +37,172 @@ html, body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: #ffffff;
     padding: 24px;
-    animation: fadeIn 0.5s ease;
+    padding-top: calc(24px + env(safe-area-inset-top));
+    padding-bottom: calc(35px + env(safe-area-inset-bottom));
+    overflow: hidden;
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 15% 35%,
+            rgba(0, 100, 255, .22), transparent 42%),
+        radial-gradient(ellipse at 85% 40%,
+            rgba(255, 0, 153, .20), transparent 42%),
+        linear-gradient(145deg, #03030b, #10051e 52%, #03030b);
+    animation: fadeIn .6s ease both;
 }
 
-/* FreeTube Logo */
-.logo {
-    width: 110px;
-    height: 78px;
-    border-radius: 23px;
-    background: #ff2028;
+/* Animated neon background */
+.splash-screen::before,
+.splash-screen::after {
+    content: "";
+    position: absolute;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    filter: blur(75px);
+    opacity: .35;
+    z-index: -1;
+    pointer-events: none;
+    animation: glowMove 4s ease-in-out infinite alternate;
+}
+
+.splash-screen::before {
+    background: var(--blue);
+    top: 12%;
+    left: -110px;
+}
+
+.splash-screen::after {
+    background: var(--pink);
+    right: -110px;
+    bottom: 12%;
+    animation-delay: -2s;
+}
+
+/* Logo container */
+.logo-wrap {
+    position: relative;
+    width: min(76vw, 330px);
+    aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 22px rgba(255, 32, 40, 0.16);
-    animation: logoIntro 0.8s ease;
+    animation: logoIntro .9s cubic-bezier(.2,.8,.2,1) both;
 }
 
-.logo-letter {
-    color: #ffffff;
-    font-size: 65px;
-    font-weight: 900;
-    line-height: 1;
-    font-family: Arial, Helvetica, sans-serif;
-    transform: translateY(2px);
+/* Replace the src below with the actual path to your logo */
+.logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 22%;
+    filter:
+        drop-shadow(0 0 10px rgba(0, 217, 255, .45))
+        drop-shadow(0 0 22px rgba(255, 39, 185, .28));
+    animation: logoGlow 2.5s ease-in-out infinite alternate;
 }
 
-/* App Name */
+.logo-ring {
+    position: absolute;
+    inset: -9px;
+    border-radius: 25%;
+    border: 2px solid transparent;
+    background:
+        linear-gradient(var(--bg), var(--bg)) padding-box,
+        linear-gradient(125deg, var(--blue), #713dff, var(--pink)) border-box;
+    opacity: .75;
+    pointer-events: none;
+    animation: ringPulse 2.5s ease-in-out infinite;
+}
+
+/* Brand name */
 .app-name {
-    margin-top: 24px;
-    font-size: 35px;
-    font-weight: 800;
-    color: #171717;
-    letter-spacing: -1.5px;
+    margin-top: 26px;
+    text-align: center;
+    font-size: clamp(27px, 7vw, 39px);
+    line-height: 1.15;
+    font-weight: 900;
+    letter-spacing: -1.2px;
+    color: #fff;
+    text-shadow: 0 0 18px rgba(119, 82, 255, .28);
+    animation: riseIn .7s .2s ease both;
 }
 
-.app-name span {
-    color: #ff2028;
+.app-name .boys {
+    color: var(--blue);
+    text-shadow: 0 0 15px rgba(0, 217, 255, .45);
+}
+
+.app-name .girls {
+    color: var(--pink);
+    text-shadow: 0 0 15px rgba(255, 39, 185, .45);
+}
+
+.heart {
+    display: inline-block;
+    color: #ff68d0;
+    margin: 0 3px;
+    animation: heartbeat 1.2s ease-in-out infinite;
 }
 
 /* Tagline */
 .tagline {
-    margin-top: 9px;
-    font-size: 14px;
-    color: #777777;
-    letter-spacing: 0.2px;
+    margin-top: 12px;
+    color: #c4bbdc;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-align: center;
+    animation: riseIn .7s .35s ease both;
 }
 
-/* Loading Animation */
+/* Loading indicator */
 .loader {
     display: flex;
-    gap: 7px;
-    margin-top: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 35px;
+    height: 18px;
 }
 
 .loader span {
     width: 8px;
     height: 8px;
-    background: #ff2028;
     border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 12px var(--blue);
     animation: loading 1s infinite ease-in-out;
 }
 
 .loader span:nth-child(2) {
-    animation-delay: 0.15s;
+    background: #a64dff;
+    box-shadow: 0 0 12px #a64dff;
+    animation-delay: .15s;
 }
 
 .loader span:nth-child(3) {
-    animation-delay: 0.3s;
+    background: var(--pink);
+    box-shadow: 0 0 12px var(--pink);
+    animation-delay: .3s;
 }
 
 /* Footer */
 .footer {
     position: absolute;
-    bottom: calc(28px + env(safe-area-inset-bottom));
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    color: #999999;
+    left: 10px;
+    right: 10px;
+    bottom: calc(19px + env(safe-area-inset-bottom));
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: #8d83a9;
+    animation: fadeIn 1s .5s both;
+}
+
+.footer span {
+    color: #c7a2ff;
 }
 
 /* Animations */
@@ -116,11 +213,11 @@ html, body {
 
 @keyframes logoIntro {
     0% {
-        transform: scale(0.7);
+        transform: scale(.72);
         opacity: 0;
     }
     70% {
-        transform: scale(1.06);
+        transform: scale(1.04);
     }
     100% {
         transform: scale(1);
@@ -128,10 +225,35 @@ html, body {
     }
 }
 
+@keyframes logoGlow {
+    from {
+        filter:
+            drop-shadow(0 0 8px rgba(0, 217, 255, .35))
+            drop-shadow(0 0 16px rgba(255, 39, 185, .22));
+    }
+    to {
+        filter:
+            drop-shadow(0 0 15px rgba(0, 217, 255, .6))
+            drop-shadow(0 0 28px rgba(255, 39, 185, .42));
+    }
+}
+
+@keyframes ringPulse {
+    0%, 100% { opacity: .4; transform: scale(.99); }
+    50% { opacity: .9; transform: scale(1.015); }
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.2); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.12); }
+}
+
 @keyframes loading {
     0%, 60%, 100% {
         transform: translateY(0);
-        opacity: 0.35;
+        opacity: .35;
     }
     30% {
         transform: translateY(-7px);
@@ -139,24 +261,53 @@ html, body {
     }
 }
 
-@media (max-width: 360px) {
-    .logo {
-        width: 96px;
-        height: 69px;
-    }
+@keyframes glowMove {
+    from { transform: translate(0, 0) scale(.9); }
+    to { transform: translate(30px, -20px) scale(1.15); }
+}
 
-    .logo-letter {
-        font-size: 57px;
+@keyframes riseIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-height: 650px) {
+    .logo-wrap {
+        width: min(48vh, 235px);
     }
 
     .app-name {
-        font-size: 31px;
+        margin-top: 16px;
+        font-size: 29px;
+    }
+
+    .tagline {
+        margin-top: 8px;
+    }
+
+    .loader {
+        margin-top: 22px;
+    }
+}
+
+@media (max-width: 360px) {
+    .logo-wrap {
+        width: min(72vw, 260px);
+    }
+
+    .app-name {
+        font-size: 29px;
+    }
+
+    .tagline {
+        font-size: 11px;
+        letter-spacing: 1px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
-        animation-duration: 0.01ms !important;
+        animation-duration: .01ms !important;
         animation-iteration-count: 1 !important;
     }
 }
@@ -164,26 +315,54 @@ html, body {
 </head>
 
 <body>
+<main class="splash-screen">
 
-<div class="splash-screen">
-
-    <div class="logo">
-        <span class="logo-letter">F</span>
+    <div class="logo-wrap">
+        <div class="logo-ring"></div>
+        <img
+            class="logo"
+            src="assets/boys-girls-logo.png"
+            alt="Boys ♡ Girls logo"
+            onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex';"
+        >
+        <div id="logoFallback" style="
+            display:none;
+            position:absolute;
+            inset:0;
+            align-items:center;
+            justify-content:center;
+            flex-direction:column;
+            border-radius:22%;
+            border:2px solid #00d9ff;
+            background:linear-gradient(145deg,#090c25,#250b30);
+            box-shadow:0 0 25px rgba(0,217,255,.3),0 0 30px rgba(255,39,185,.25);
+        ">
+            <div style="font-size:70px;line-height:1">💙💗</div>
+            <div style="font-size:23px;font-weight:900;margin-top:10px">
+                Boys <span style="color:#ff27b9">♡ Girls</span>
+            </div>
+        </div>
     </div>
 
-    <div class="app-name">Free<span>Tube</span></div>
+    <h1 class="app-name">
+        <span class="boys">Boys</span>
+        <span class="heart">♡</span>
+        <span class="girls">Girls</span>
+    </h1>
 
-    <div class="tagline">Watch. Share. Enjoy.</div>
+    <p class="tagline">CONNECT · SHARE · BE YOURSELF</p>
 
-    <div class="loader">
+    <div class="loader" aria-label="Loading">
         <span></span>
         <span></span>
         <span></span>
     </div>
 
-    <div class="footer">YOUR WORLD OF VIDEOS</div>
+    <div class="footer">
+        <span>YOUR COMMUNITY</span> · YOUR WORLD
+    </div>
 
-</div>
+</main>
 
 <script>
 (function () {
@@ -193,12 +372,11 @@ html, body {
     const SPLASH_DURATION = 1800;
 
     window.addEventListener("load", function () {
-        setTimeout(function () {
+        window.setTimeout(function () {
             window.location.replace(HOME_PAGE);
         }, SPLASH_DURATION);
     });
 })();
 </script>
-
 </body>
 </html>
