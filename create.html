@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -67,15 +66,12 @@ main{width:100%;max-width:650px;margin:auto;padding-bottom:20px}
 }
 .privacy-select option{background:#303133;color:#fff}
 
-/* Composer text grows naturally as the user types */
+/* Text grows naturally as the user types */
 .composer{padding:7px 18px 0}
 textarea{
   display:block;width:100%;
-  height:3em;
-  min-height:3em;
-  max-height:none;
-  resize:none;
-  overflow:hidden;
+  height:3em;min-height:3em;max-height:none;
+  resize:none;overflow:hidden;
   border:0;outline:0;background:transparent;color:var(--text);
   font-size:24px;line-height:1.5;padding:16px 0 8px;
 }
@@ -85,7 +81,7 @@ textarea::placeholder{color:#b2b3b9}
   color:var(--muted);font-size:12px;padding:0 0 12px;
 }
 
-/* Media preview follows the text naturally */
+/* Media preview follows the text */
 .media-preview{
   display:none;position:relative;margin:12px 15px 15px;
   overflow:hidden;border:1px solid var(--border);
@@ -117,7 +113,7 @@ textarea::placeholder{color:#b2b3b9}
 .progress-track{height:4px;border-radius:8px;background:#454648;overflow:hidden}
 .progress-bar{height:100%;width:0;background:linear-gradient(90deg,#80aaff,#c28bff,#ff86b5);transition:width .2s}
 
-/* Fixed Gallery/GIF/Live panel */
+/* Gallery/GIF/Live panel */
 .media-section{
   position:fixed;left:50%;bottom:0;transform:translateX(-50%);
   z-index:15;width:100%;max-width:650px;
@@ -126,17 +122,11 @@ textarea::placeholder{color:#b2b3b9}
   border-top:1px solid var(--border);
   transition:opacity .18s ease,visibility .18s ease;
 }
-
-/* Hide all three cards when media is selected */
 .media-section.hidden{
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
+  opacity:0;visibility:hidden;pointer-events:none;
 }
 .media-heading{font-size:15px;font-weight:850;margin:0 0 12px 2px}
-.gallery-options{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;
-}
+.gallery-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .gallery-card{
   min-width:0;min-height:91px;padding:11px 5px;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
@@ -149,6 +139,8 @@ textarea::placeholder{color:#b2b3b9}
 .gallery-card:active{transform:scale(.98)}
 .gallery-card small{font-size:10px;color:var(--muted);font-weight:500}
 .hidden-input{display:none}
+
+/* Toast message */
 .toast{
   position:fixed;z-index:60;bottom:165px;left:50%;transform:translateX(-50%);
   max-width:90%;padding:11px 15px;border-radius:12px;
@@ -156,6 +148,45 @@ textarea::placeholder{color:#b2b3b9}
   box-shadow:0 8px 24px #0006;font-size:12px;
 }
 .toast[hidden]{display:none}
+
+/* Custom dark discard dialog */
+.dialog-overlay{
+  position:fixed;inset:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;background:rgba(0,0,0,.72);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .2s ease,visibility .2s ease;
+}
+.dialog-overlay.show{
+  opacity:1;visibility:visible;pointer-events:auto;
+}
+.dialog-card{
+  width:100%;max-width:380px;
+  padding:23px 21px 18px;
+  background:#303133;border:1px solid #ffffff16;
+  border-radius:22px;
+  box-shadow:0 18px 60px #0009;
+  transform:translateY(12px) scale(.97);
+  transition:transform .2s ease;
+}
+.dialog-overlay.show .dialog-card{transform:translateY(0) scale(1)}
+.dialog-title-row{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.dialog-icon{
+  width:48px;height:48px;flex-shrink:0;
+  display:grid;place-items:center;border-radius:50%;
+  background:#49303a;color:#ff83b3;font-size:20px;
+}
+.dialog-title{font-size:20px;font-weight:850;margin:0}
+.dialog-message{font-size:14px;line-height:1.65;color:#c8c9ce;margin:0 0 10px}
+.dialog-warning{font-size:12px;line-height:1.6;color:#9698a0;margin:0 0 23px}
+.dialog-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dialog-btn{
+  min-height:46px;padding:11px 8px;border:0;border-radius:13px;
+  font-size:13px;font-weight:800;
+}
+.dialog-keep{background:#414245;color:#f5f5f7}
+.dialog-discard{background:#dce7ff;color:#1d2c48}
+.dialog-btn:active{transform:scale(.98)}
 
 @media(min-width:600px){
   .topbar{min-height:72px}
@@ -179,6 +210,8 @@ textarea::placeholder{color:#b2b3b9}
   .gallery-options{gap:7px}
   .gallery-card{min-height:80px;font-size:12px;border-radius:13px}
   .gallery-card i{font-size:22px}
+  .dialog-card{padding:20px 17px 16px}
+  .dialog-title{font-size:18px}
 }
 </style>
 </head>
@@ -252,6 +285,22 @@ textarea::placeholder{color:#b2b3b9}
 
 <div class="toast" id="toast" hidden></div>
 
+<!-- Custom discard confirmation -->
+<div class="dialog-overlay" id="discardDialog" aria-hidden="true">
+  <section class="dialog-card" role="dialog" aria-modal="true" aria-labelledby="discardTitle" aria-describedby="discardMessage">
+    <div class="dialog-title-row">
+      <div class="dialog-icon"><i class="fa-solid fa-trash-can"></i></div>
+      <h2 class="dialog-title" id="discardTitle">Discard post?</h2>
+    </div>
+    <p class="dialog-message" id="discardMessage">Are you sure you want to discard this post?</p>
+    <p class="dialog-warning">Your written text and selected media will be lost.</p>
+    <div class="dialog-actions">
+      <button class="dialog-btn dialog-keep" id="keepEditingBtn" type="button">Keep editing</button>
+      <button class="dialog-btn dialog-discard" id="confirmDiscardBtn" type="button">Discard</button>
+    </div>
+  </section>
+</div>
+
 <script>
 "use strict";
 
@@ -266,6 +315,7 @@ let selectedMediaType=null;
 let previewUrl=null;
 let publishing=false;
 let toastTimer=null;
+let previousFocus=null;
 
 function getToken(){
   try{
@@ -291,7 +341,7 @@ function showToast(message){
   toastTimer=setTimeout(()=>el.hidden=true,2800);
 }
 
-/* Resize text area to fit the actual text height */
+/* Automatically resize the text area as text changes */
 function resizeComposer(){
   const textarea=$("postContent");
   textarea.style.height="auto";
@@ -300,9 +350,8 @@ function resizeComposer(){
   const lineHeight=parseFloat(styles.lineHeight)||36;
   const paddingTop=parseFloat(styles.paddingTop)||0;
   const paddingBottom=parseFloat(styles.paddingBottom)||0;
-
-  /* Keep space for approximately two lines initially */
   const minimumHeight=lineHeight*2+paddingTop+paddingBottom;
+
   textarea.style.height=Math.max(minimumHeight,textarea.scrollHeight)+"px";
 }
 
@@ -311,6 +360,7 @@ function updateComposer(){
 
   const hasContent=Boolean($("postContent").value.trim()||selectedFile);
   const enabled=hasContent&&Boolean(getToken())&&!publishing;
+
   $("publishBtn").disabled=!enabled;
   $("publishBtn").classList.toggle("ready",enabled);
   $("charCount").textContent=$("postContent").value.length+"/5000";
@@ -326,11 +376,13 @@ function displayProfile(profile){
   const name=profile.display_name||profile.displayName||
     profile.full_name||profile.fullName||profile.name||
     profile.username||profile.email||"Your profile";
+
   $("profileName").textContent=name;
 
   const avatarUrl=profile.avatar_url||profile.avatarUrl||
     profile.profile_picture||profile.profilePicture||
     profile.photo_url||profile.photoUrl||profile.avatar||"";
+
   const avatar=$("userAvatar");
   avatar.replaceChildren();
 
@@ -338,7 +390,9 @@ function displayProfile(profile){
     const img=document.createElement("img");
     img.src=avatarUrl;
     img.alt="Profile picture";
-    img.onerror=()=>{avatar.textContent=String(name).trim().charAt(0).toUpperCase()||"💙";};
+    img.onerror=()=>{
+      avatar.textContent=String(name).trim().charAt(0).toUpperCase()||"💙";
+    };
     avatar.appendChild(img);
   }else{
     avatar.textContent=String(name).trim().charAt(0).toUpperCase()||"💙";
@@ -348,6 +402,7 @@ function displayProfile(profile){
 async function apiRequest(path,options={}){
   const headers=new Headers(options.headers||{});
   const token=getToken();
+
   if(token)headers.set("Authorization","Bearer "+token);
 
   if(options.body&&!(options.body instanceof FormData)&&!headers.has("Content-Type")){
@@ -355,6 +410,7 @@ async function apiRequest(path,options={}){
   }
 
   let response;
+
   try{
     response=await fetch(API_BASE+path,{...options,headers});
   }catch(_){
@@ -363,13 +419,19 @@ async function apiRequest(path,options={}){
 
   const raw=await response.text();
   let data={};
-  try{data=raw?JSON.parse(raw):{};}catch(_){data={message:raw};}
+
+  try{
+    data=raw?JSON.parse(raw):{};
+  }catch(_){
+    data={message:raw};
+  }
 
   if(!response.ok){
     const error=new Error(data.error||data.message||"Request failed ("+response.status+").");
     error.status=response.status;
     throw error;
   }
+
   return data;
 }
 
@@ -388,13 +450,18 @@ async function loadCurrentUser(){
   try{
     const result=await apiRequest("/auth/me");
     const user=result.user||result.profile||result.data||result;
+
     displayProfile(user);
-    try{localStorage.setItem(PROFILE_KEY,JSON.stringify(user));}catch(_){}
+
+    try{
+      localStorage.setItem(PROFILE_KEY,JSON.stringify(user));
+    }catch(_){}
   }catch(error){
     if(error.status===401||error.status===403){
       showStatus("Your login session may have expired. Please log in again.","error");
     }
   }
+
   updateComposer();
 }
 
@@ -423,6 +490,7 @@ function formatFileSize(bytes){
 
 function selectMedia(file){
   if(!file)return;
+
   clearStatus();
 
   if(!getToken()){
@@ -469,7 +537,6 @@ function selectMedia(file){
   $("fileInfo").textContent=file.name+" · "+formatFileSize(file.size);
   $("mediaPreview").classList.add("show");
 
-  /* Hide Gallery, GIF and Live immediately after selecting media */
   updateMediaSection();
   updateComposer();
 }
@@ -491,7 +558,11 @@ function loadDraft(){
   try{
     const draft=JSON.parse(localStorage.getItem(DRAFT_KEY)||"null");
     if(!draft)return;
-    if(typeof draft.content==="string")$("postContent").value=draft.content;
+
+    if(typeof draft.content==="string"){
+      $("postContent").value=draft.content;
+    }
+
     if(["public","friends"].includes(draft.audience)){
       $("audience").value=draft.audience;
     }
@@ -509,11 +580,17 @@ async function uploadMedia(){
   const form=new FormData();
   form.append("file",selectedFile);
 
-  const result=await apiRequest("/media/upload",{method:"POST",body:form});
+  const result=await apiRequest("/media/upload",{
+    method:"POST",
+    body:form
+  });
+
   const media=result.media||result.data||result;
   const url=media.url||media.media_url||media.mediaUrl;
 
-  if(!url)throw new Error("The server did not return a media URL.");
+  if(!url){
+    throw new Error("The server did not return a media URL.");
+  }
 
   $("progressBar").style.width="65%";
   $("progressLabel").textContent="Media uploaded. Publishing post...";
@@ -528,6 +605,7 @@ async function uploadMedia(){
 
 async function publishPost(){
   if(publishing)return;
+
   clearStatus();
 
   const content=$("postContent").value.trim();
@@ -555,6 +633,7 @@ async function publishPost(){
     $("progressPercent").textContent=media?"80%":"35%";
 
     const audience=$("audience").value;
+
     const payload={
       content,
       media_url:media?media.media_url:null,
@@ -573,7 +652,9 @@ async function publishPost(){
     $("progressPercent").textContent="100%";
     $("progressLabel").textContent="Post published!";
 
-    try{localStorage.removeItem(DRAFT_KEY);}catch(_){}
+    try{
+      localStorage.removeItem(DRAFT_KEY);
+    }catch(_){}
 
     showStatus(result.message||"Your post was published successfully.","success");
     $("postContent").value="";
@@ -595,13 +676,72 @@ async function publishPost(){
   }
 }
 
-function goBack(){
-  if($("postContent").value.trim()||selectedFile){
-    if(!confirm("Discard this post and leave the page?"))return;
+/* Open the custom dialog instead of the Android confirm popup */
+function openDiscardDialog(){
+  previousFocus=document.activeElement;
+
+  const dialog=$("discardDialog");
+  dialog.classList.add("show");
+  dialog.setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+
+  $("keepEditingBtn").focus();
+}
+
+function closeDiscardDialog(){
+  const dialog=$("discardDialog");
+  dialog.classList.remove("show");
+  dialog.setAttribute("aria-hidden","true");
+  document.body.style.overflow="";
+
+  if(previousFocus&&typeof previousFocus.focus==="function"){
+    previousFocus.focus();
+  }
+}
+
+function confirmDiscard(){
+  closeDiscardDialog();
+
+  /* Do not keep an abandoned draft after explicit discard */
+  try{
+    localStorage.removeItem(DRAFT_KEY);
+  }catch(_){}
+
+  if(previewUrl){
+    URL.revokeObjectURL(previewUrl);
+    previewUrl=null;
   }
 
-  if(history.length>1)history.back();
-  else location.href="home.html";
+  selectedFile=null;
+  selectedMediaType=null;
+
+  if(history.length>1){
+    history.back();
+  }else{
+    location.href="home.html";
+  }
+}
+
+function goBack(){
+  if(publishing){
+    showToast("Please wait until publishing finishes.");
+    return;
+  }
+
+  const hasContent=Boolean(
+    $("postContent").value.trim()||selectedFile
+  );
+
+  if(hasContent){
+    openDiscardDialog();
+    return;
+  }
+
+  if(history.length>1){
+    history.back();
+  }else{
+    location.href="home.html";
+  }
 }
 
 function featureMessage(feature){
@@ -614,13 +754,30 @@ function featureMessage(feature){
 
 $("backBtn").addEventListener("click",goBack);
 $("galleryBtn").addEventListener("click",()=>$("galleryInput").click());
+
 $("galleryInput").addEventListener("change",event=>{
   const file=event.target.files&&event.target.files[0];
   if(file)selectMedia(file);
 });
+
 $("removeMediaBtn").addEventListener("click",clearMedia);
 $("postContent").addEventListener("input",updateComposer);
 $("publishBtn").addEventListener("click",publishPost);
+
+$("keepEditingBtn").addEventListener("click",closeDiscardDialog);
+$("confirmDiscardBtn").addEventListener("click",confirmDiscard);
+
+$("discardDialog").addEventListener("click",event=>{
+  if(event.target===$("discardDialog")){
+    closeDiscardDialog();
+  }
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape"&&$("discardDialog").classList.contains("show")){
+    closeDiscardDialog();
+  }
+});
 
 document.querySelectorAll("[data-feature]").forEach(button=>{
   button.addEventListener("click",()=>featureMessage(button.dataset.feature));
