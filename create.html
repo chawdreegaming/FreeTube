@@ -46,7 +46,7 @@ button:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px sol
 }
 .post-top-btn.ready{background:#dce7ff;color:#1d2c48}
 
-main{width:100%;max-width:650px;margin:auto;padding-bottom:0}
+main{width:100%;max-width:650px;margin:auto;padding-bottom:20px}
 .profile-area{padding:20px 17px 8px}
 .profile-row{display:flex;align-items:center;gap:11px}
 .avatar{
@@ -67,10 +67,15 @@ main{width:100%;max-width:650px;margin:auto;padding-bottom:0}
 }
 .privacy-select option{background:#303133;color:#fff}
 
+/* Composer text grows naturally as the user types */
 .composer{padding:7px 18px 0}
 textarea{
-  display:block;width:100%;height:calc(100dvh - 440px);
-  min-height:180px;max-height:470px;resize:vertical;
+  display:block;width:100%;
+  height:3em;
+  min-height:3em;
+  max-height:none;
+  resize:none;
+  overflow:hidden;
   border:0;outline:0;background:transparent;color:var(--text);
   font-size:24px;line-height:1.5;padding:16px 0 8px;
 }
@@ -80,21 +85,7 @@ textarea::placeholder{color:#b2b3b9}
   color:var(--muted);font-size:12px;padding:0 0 12px;
 }
 
-.status{
-  display:none;margin:10px 15px;padding:11px 12px;
-  border-radius:11px;font-size:12px;line-height:1.5;overflow-wrap:anywhere;
-}
-.status.show{display:block}
-.status.error{background:#642a32;color:#ffc5cd}
-.status.success{background:#204b39;color:#a6f4ce}
-.status.info{background:#293d5f;color:#c7d9ff}
-
-.progress-wrap{display:none;margin:8px 15px 12px}
-.progress-wrap.show{display:block}
-.progress-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px}
-.progress-track{height:4px;border-radius:8px;background:#454648;overflow:hidden}
-.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#80aaff,#c28bff,#ff86b5);transition:width .2s}
-
+/* Media preview follows the text naturally */
 .media-preview{
   display:none;position:relative;margin:12px 15px 15px;
   overflow:hidden;border:1px solid var(--border);
@@ -111,12 +102,36 @@ textarea::placeholder{color:#b2b3b9}
 }
 .file-info{padding:8px 10px;font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 
+.status{
+  display:none;margin:10px 15px;padding:11px 12px;
+  border-radius:11px;font-size:12px;line-height:1.5;overflow-wrap:anywhere;
+}
+.status.show{display:block}
+.status.error{background:#642a32;color:#ffc5cd}
+.status.success{background:#204b39;color:#a6f4ce}
+.status.info{background:#293d5f;color:#c7d9ff}
+
+.progress-wrap{display:none;margin:8px 15px 12px}
+.progress-wrap.show{display:block}
+.progress-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px}
+.progress-track{height:4px;border-radius:8px;background:#454648;overflow:hidden}
+.progress-bar{height:100%;width:0;background:linear-gradient(90deg,#80aaff,#c28bff,#ff86b5);transition:width .2s}
+
+/* Fixed Gallery/GIF/Live panel */
 .media-section{
   position:fixed;left:50%;bottom:0;transform:translateX(-50%);
   z-index:15;width:100%;max-width:650px;
   padding:14px 14px calc(17px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,rgba(36,37,38,.92),#242526 24%);
   border-top:1px solid var(--border);
+  transition:opacity .18s ease,visibility .18s ease;
+}
+
+/* Hide all three cards when media is selected */
+.media-section.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
 }
 .media-heading{font-size:15px;font-weight:850;margin:0 0 12px 2px}
 .gallery-options{
@@ -146,7 +161,7 @@ textarea::placeholder{color:#b2b3b9}
   .topbar{min-height:72px}
   .top-title{font-size:23px}
   .profile-area{padding-top:24px}
-  textarea{font-size:26px;min-height:220px}
+  textarea{font-size:26px}
   .media-section{padding-left:18px;padding-right:18px}
   .gallery-card{min-height:100px}
 }
@@ -159,7 +174,7 @@ textarea::placeholder{color:#b2b3b9}
   .profile-name{font-size:14px}
   .privacy-select{min-width:98px;max-width:112px;padding:9px 6px;font-size:11px}
   .composer{padding-left:14px;padding-right:14px}
-  textarea{font-size:21px;min-height:160px;height:calc(100dvh - 410px)}
+  textarea{font-size:21px}
   .media-section{padding:12px 10px calc(14px + env(safe-area-inset-bottom))}
   .gallery-options{gap:7px}
   .gallery-card{min-height:80px;font-size:12px;border-radius:13px}
@@ -193,7 +208,7 @@ textarea::placeholder{color:#b2b3b9}
   </section>
 
   <section class="composer">
-    <textarea id="postContent" maxlength="5000" placeholder="What's on your mind?" aria-label="Post text"></textarea>
+    <textarea id="postContent" maxlength="5000" placeholder="What's on your mind?" aria-label="Post text" rows="1"></textarea>
     <div class="composer-bottom"><span id="charCount">0/5000</span></div>
   </section>
 
@@ -215,7 +230,7 @@ textarea::placeholder{color:#b2b3b9}
   </div>
 </main>
 
-<section class="media-section" aria-label="Add media">
+<section class="media-section" id="mediaSection" aria-label="Add media">
   <h2 class="media-heading">Add to your post</h2>
   <div class="gallery-options">
     <button class="gallery-card" id="galleryBtn" type="button">
@@ -276,12 +291,33 @@ function showToast(message){
   toastTimer=setTimeout(()=>el.hidden=true,2800);
 }
 
+/* Resize text area to fit the actual text height */
+function resizeComposer(){
+  const textarea=$("postContent");
+  textarea.style.height="auto";
+
+  const styles=getComputedStyle(textarea);
+  const lineHeight=parseFloat(styles.lineHeight)||36;
+  const paddingTop=parseFloat(styles.paddingTop)||0;
+  const paddingBottom=parseFloat(styles.paddingBottom)||0;
+
+  /* Keep space for approximately two lines initially */
+  const minimumHeight=lineHeight*2+paddingTop+paddingBottom;
+  textarea.style.height=Math.max(minimumHeight,textarea.scrollHeight)+"px";
+}
+
 function updateComposer(){
+  resizeComposer();
+
   const hasContent=Boolean($("postContent").value.trim()||selectedFile);
   const enabled=hasContent&&Boolean(getToken())&&!publishing;
   $("publishBtn").disabled=!enabled;
   $("publishBtn").classList.toggle("ready",enabled);
   $("charCount").textContent=$("postContent").value.length+"/5000";
+}
+
+function updateMediaSection(){
+  $("mediaSection").classList.toggle("hidden",Boolean(selectedFile));
 }
 
 function displayProfile(profile){
@@ -367,12 +403,15 @@ function clearMedia(){
     URL.revokeObjectURL(previewUrl);
     previewUrl=null;
   }
+
   selectedFile=null;
   selectedMediaType=null;
   $("galleryInput").value="";
   $("previewContent").replaceChildren();
   $("fileInfo").textContent="";
   $("mediaPreview").classList.remove("show");
+
+  updateMediaSection();
   updateComposer();
 }
 
@@ -388,8 +427,10 @@ function selectMedia(file){
 
   if(!getToken()){
     showStatus("Please log in before creating a post.","error");
+    $("galleryInput").value="";
     return;
   }
+
   if(file.size>50*1024*1024){
     showStatus("Maximum file size is 50 MB.","error");
     $("galleryInput").value="";
@@ -398,6 +439,7 @@ function selectMedia(file){
 
   const type=file.type.startsWith("image/")?"image":
     file.type.startsWith("video/")?"video":"";
+
   if(!type){
     showStatus("Choose a supported photo or video.","error");
     $("galleryInput").value="";
@@ -405,6 +447,7 @@ function selectMedia(file){
   }
 
   clearMedia();
+
   selectedFile=file;
   selectedMediaType=type;
   previewUrl=URL.createObjectURL(file);
@@ -412,6 +455,7 @@ function selectMedia(file){
   const element=type==="image"
     ?document.createElement("img")
     :document.createElement("video");
+
   element.src=previewUrl;
   element.alt=type==="image"?"Selected photo preview":"";
 
@@ -424,6 +468,9 @@ function selectMedia(file){
   $("previewContent").appendChild(element);
   $("fileInfo").textContent=file.name+" · "+formatFileSize(file.size);
   $("mediaPreview").classList.add("show");
+
+  /* Hide Gallery, GIF and Live immediately after selecting media */
+  updateMediaSection();
   updateComposer();
 }
 
@@ -461,6 +508,7 @@ async function uploadMedia(){
 
   const form=new FormData();
   form.append("file",selectedFile);
+
   const result=await apiRequest("/media/upload",{method:"POST",body:form});
   const media=result.media||result.data||result;
   const url=media.url||media.media_url||media.mediaUrl;
@@ -483,11 +531,13 @@ async function publishPost(){
   clearStatus();
 
   const content=$("postContent").value.trim();
+
   if(!content&&!selectedFile){
     showStatus("Write something or select a photo/video first.","error");
     $("postContent").focus();
     return;
   }
+
   if(!getToken()){
     showStatus("Please log in before publishing a post.","error");
     return;
@@ -522,6 +572,7 @@ async function publishPost(){
     $("progressBar").style.width="100%";
     $("progressPercent").textContent="100%";
     $("progressLabel").textContent="Post published!";
+
     try{localStorage.removeItem(DRAFT_KEY);}catch(_){}
 
     showStatus(result.message||"Your post was published successfully.","success");
@@ -532,6 +583,7 @@ async function publishPost(){
     setTimeout(()=>{location.href="home.html";},900);
   }catch(error){
     $("progressWrap").classList.remove("show");
+
     if(error.status===401||error.status===403){
       showStatus("Your login session may have expired. Please log in again.","error");
     }else{
@@ -547,6 +599,7 @@ function goBack(){
   if($("postContent").value.trim()||selectedFile){
     if(!confirm("Discard this post and leave the page?"))return;
   }
+
   if(history.length>1)history.back();
   else location.href="home.html";
 }
@@ -561,7 +614,10 @@ function featureMessage(feature){
 
 $("backBtn").addEventListener("click",goBack);
 $("galleryBtn").addEventListener("click",()=>$("galleryInput").click());
-$("galleryInput").addEventListener("change",event=>selectMedia(event.target.files&&event.target.files[0]));
+$("galleryInput").addEventListener("change",event=>{
+  const file=event.target.files&&event.target.files[0];
+  if(file)selectMedia(file);
+});
 $("removeMediaBtn").addEventListener("click",clearMedia);
 $("postContent").addEventListener("input",updateComposer);
 $("publishBtn").addEventListener("click",publishPost);
@@ -575,6 +631,7 @@ window.addEventListener("beforeunload",()=>{
 });
 
 loadDraft();
+updateMediaSection();
 updateComposer();
 loadCurrentUser();
 </script>
