@@ -288,8 +288,10 @@ input[type=file]{display:none}
     <button class="btn btn-icon" id="editButton" aria-label="Edit profile" type="button"><i class="fa-solid fa-pen"></i></button>
   </div>
   <div class="action-row hidden" id="otherActions">
-    <button class="btn btn-primary" id="followButton" type="button"><i class="fa-solid fa-user-plus"></i> Follow</button>
+    <button class="btn btn-primary" id="friendButton" type="button"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+    <button class="btn" id="followButton" type="button"><i class="fa-solid fa-user-plus"></i> Follow</button>
     <button class="btn" id="messageButton" type="button"><i class="fa-regular fa-paper-plane"></i> Message</button>
+    <button class="btn hidden" id="declineFriendButton" type="button"><i class="fa-solid fa-xmark"></i> Decline</button>
   </div>
 
   <p class="status" id="sessionStatus" role="status">Loading profile...</p>
@@ -365,6 +367,7 @@ const DEFAULT_COVER="https://images.unsplash.com/photo-1579546929518-9e396f3cc80
 
 let toastTimer=null,currentUser=null,viewedUser=null,serverProfile={},serverStats={};
 let loadingProfile=false,isOwnProfile=true,followingThisUser=false,isAdminAccount=false;
+let friendState="none",incomingFriendRequestId="";
 const queryParams=new URLSearchParams(location.search);
 const targetUsername=String(queryParams.get("username")||"").replace(/^@/,"").trim();
 const targetUserId=String(queryParams.get("userId")||"").trim();
@@ -472,6 +475,90 @@ function updateFollowButton(){
  b.innerHTML=followingThisUser?'<i class="fa-solid fa-user-check"></i> Following':'<i class="fa-solid fa-user-plus"></i> Follow';
  b.setAttribute("aria-pressed",String(followingThisUser))
 }
+function friendStorageKey(){
+ const id=String(viewedUser?.id??viewedUser?.user_id??"");
+ return "bvg_friend_request_sent_"+id
+}
+function updateFriendButton(){
+ const b=$("friendButton"),decline=$("declineFriendButton");
+ if(!b||!decline)return;
+ b.disabled=false;
+ decline.classList.toggle("hidden",friendState!=="incoming");
+ if(friendState==="friends"){
+  b.innerHTML='<i class="fa-solid fa-user-check"></i> Friends';b.classList.remove("btn-primary");b.title="Tap to remove this friend"
+ }else if(friendState==="sent"){
+  b.innerHTML='<i class="fa-regular fa-clock"></i> Request Sent';b.classList.remove("btn-primary");b.title="Friend request already sent"
+ }else if(friendState==="incoming"){
+  b.innerHTML='<i class="fa-solid fa-user-plus"></i> Accept Request';b.classList.add("btn-primary");b.title="Accept this friend request"
+ }else{
+  b.innerHTML='<i class="fa-solid fa-user-plus"></i> Add Friend';b.classList.add("btn-primary");b.title="Send a friend request"
+ }
+}
+async function refreshFriendState(){
+ if(isOwnProfile||!viewedUser)return;
+ const targetId=String(viewedUser.id??viewedUser.user_id??"");
+ if(!targetId){friendState="none";updateFriendButton();return}
+ friendState="none";incomingFriendRequestId="";
+ try{
+  const [friendsData,requestsData]=await Promise.all([
+   apiRequest("/friends"),apiRequest("/friends/requests")
+  ]);
+  const friends=Array.isArray(friendsData.friends)?friendsData.friends:Array.isArray(friendsData.data?.friends)?friendsData.data.friends:[];
+  if(friends.some(x=>String(x.id??x.user_id??x.friend_id??"")===targetId)){
+   friendState="friends";
+  }else{
+   const requests=Array.isArray(requestsData.requests)?requestsData.requests:Array.isArray(requestsData.data?.requests)?requestsData.data.requests:[];
+   const incoming=requests.find(x=>String(x.sender_id??x.senderId??"")===targetId&&String(x.status||"pending").toLowerCase()==="pending");
+   if(incoming){friendState="incoming";incomingFriendRequestId=String(incoming.id||"")}
+   else{
+    try{friendState=localStorage.getItem(friendStorageKey())==="sent"?"sent":"none"}catch{friendState="none"}
+   }
+  }
+ }catch(error){
+  console.warn("Could not check friend status:",error);
+  try{friendState=localStorage.getItem(friendStorageKey())==="sent"?"sent":"none"}catch{friendState="none"}
+ }
+ updateFriendButton()
+}
+async function handleFriendAction(){
+ if(isOwnProfile||!viewedUser)return notify("Open another user's profile first.");
+ if(!getToken())return notify("Please log in first.");
+ const targetId=String(viewedUser.id??viewedUser.user_id??"");
+ if(!targetId)return notify("Profile user ID is missing.");
+ const b=$("friendButton");b.disabled=true;
+ try{
+  if(friendState==="friends"){
+   if(!confirm("Remove this person from your friends?"))return;
+   await apiRequest("/friends/"+encodeURIComponent(targetId),{method:"DELETE"});
+   friendState="none";notify("Friend removed.");
+  }else if(friendState==="incoming"){
+   if(!incomingFriendRequestId)throw new Error("Friend request ID is missing.");
+   await apiRequest("/friends/requests/"+encodeURIComponent(incomingFriendRequestId),{method:"PATCH",body:JSON.stringify({action:"accept"})});
+   friendState="friends";incomingFriendRequestId="";notify("Friend request accepted.");
+  }else if(friendState==="sent"){
+   notify("Your friend request has already been sent.");
+  }else{
+   const result=await apiRequest("/friends/request",{method:"POST",body:JSON.stringify({user_id:targetId})});
+   if(String(result.status||result.request?.status||"").toLowerCase()==="accepted")friendState="friends";
+   else{
+    friendState="sent";
+    try{localStorage.setItem(friendStorageKey(),"sent")}catch{}
+   }
+   notify(friendState==="friends"?"You are now friends.":"Friend request sent.");
+  }
+  updateFriendButton();
+ }catch(error){notify("Friend action failed: "+error.message)}
+ finally{b.disabled=false}
+}
+async function declineFriendRequest(){
+ if(friendState!=="incoming"||!incomingFriendRequestId)return;
+ const b=$("declineFriendButton");b.disabled=true;
+ try{
+  await apiRequest("/friends/requests/"+encodeURIComponent(incomingFriendRequestId),{method:"PATCH",body:JSON.stringify({action:"decline"})});
+  friendState="none";incomingFriendRequestId="";updateFriendButton();notify("Friend request declined.")
+ }catch(error){notify("Could not decline request: "+error.message)}
+ finally{b.disabled=false}
+}
 
 async function loadProfile(){
  if(loadingProfile)return;
@@ -541,7 +628,8 @@ async function loadProfile(){
 
   if(!isOwnProfile){
    followingThisUser=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);
-   updateFollowButton()
+   updateFollowButton();
+   await refreshFriendState()
   }
   setStatus(isOwnProfile?(isAdminAccount?"Admin account connected.":"Your profile is connected."):"Viewing @"+p.handle,"success");
   await loadPostsForViewedUser()
@@ -607,6 +695,8 @@ $("dashboardButton").addEventListener("click",()=>{
  location.href="admin.html"
 });
 $("followButton").addEventListener("click",toggleFollow);
+$("friendButton").addEventListener("click",handleFriendAction);
+$("declineFriendButton").addEventListener("click",declineFriendRequest);
 $("messageButton").addEventListener("click",openMessage);
 $("retrySessionButton").addEventListener("click",loadProfile);
 $("closeEdit").addEventListener("click",closeModal);
