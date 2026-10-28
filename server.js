@@ -688,8 +688,8 @@ app.get("/api/profile/:username", async (req, res, next) => {
        (SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) AS posts,
        (SELECT COUNT(*) FROM ft_likes l JOIN ft_posts p ON p.id=l.post_id
          WHERE p.user_id=$1) AS likes,
-       (SELECT COUNT(*) FROM ft_follows WHERE following_id=$1) AS followers,
-       (SELECT COUNT(*) FROM ft_follows WHERE follower_id=$1) AS following`,
+       (SELECT COUNT(*) FROM (SELECT follower_id AS uid FROM ft_follows WHERE following_id=$1 UNION SELECT user_id AS uid FROM ft_friends WHERE friend_id=$1) x) AS followers,
+       (SELECT COUNT(*) FROM (SELECT following_id AS uid FROM ft_follows WHERE follower_id=$1 UNION SELECT friend_id AS uid FROM ft_friends WHERE user_id=$1) x) AS following`,
       [String(profile.id)]
     );
 
@@ -697,6 +697,25 @@ app.get("/api/profile/:username", async (req, res, next) => {
   } catch (e) {
     next(e);
   }
+});
+
+app.get("/api/profile/id/:userId", requireAuth, async(req,res,next)=>{
+  try {
+    const id=cleanText(req.params.userId,100);
+    const result=await pool.query(`SELECT u.id::text AS id,u.username,u.email,
+      p.display_name,p.bio,p.avatar_url,p.cover_url,p.location,p.hometown,p.birthday,p.work,p.education,p.blue_badge_status,p.updated_at,
+      u.created_at AS account_created_at
+      FROM users u LEFT JOIN ft_profiles p ON p.user_id=u.id::text
+      WHERE u.id::text=$1 AND u.account_status='active' LIMIT 1`,[id]);
+    if(!result.rowCount) return res.status(404).json({error:"User not found."});
+    const profile=result.rows[0];
+    const stats=await pool.query(`SELECT
+      (SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) AS posts,
+      (SELECT COUNT(*) FROM ft_likes l JOIN ft_posts p ON p.id=l.post_id WHERE p.user_id=$1) AS likes,
+      (SELECT COUNT(*) FROM (SELECT follower_id AS uid FROM ft_follows WHERE following_id=$1 UNION SELECT user_id AS uid FROM ft_friends WHERE friend_id=$1) x) AS followers,
+      (SELECT COUNT(*) FROM (SELECT following_id AS uid FROM ft_follows WHERE follower_id=$1 UNION SELECT friend_id AS uid FROM ft_friends WHERE user_id=$1) x) AS following`,[id]);
+    res.json({profile,stats:stats.rows[0]});
+  } catch(e){next(e);}
 });
 
 app.put("/api/profile", requireAuth, async (req, res, next) => {
@@ -1059,11 +1078,18 @@ app.get("/api/users/:userId/followers", async (req, res, next) => {
   try {
     const id = cleanText(req.params.userId, 100);
     const result = await pool.query(
-      `SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url
-       FROM ft_follows f JOIN users u ON u.id::text=f.follower_id
+      `WITH relations AS (
+         SELECT follower_id AS person_id, created_at FROM ft_follows WHERE following_id=$1
+         UNION ALL
+         SELECT user_id AS person_id, created_at FROM ft_friends WHERE friend_id=$1
+       ), unique_relations AS (
+         SELECT person_id, MAX(created_at) AS relation_at FROM relations GROUP BY person_id
+       )
+       SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url
+       FROM unique_relations r JOIN users u ON u.id::text=r.person_id
        LEFT JOIN ft_profiles p ON p.user_id=u.id::text
-       WHERE f.following_id=$1 AND u.account_status='active'
-       ORDER BY f.created_at DESC LIMIT 100`,
+       WHERE u.account_status='active'
+       ORDER BY r.relation_at DESC LIMIT 100`, 
       [id]
     );
     res.json({ users: result.rows });
@@ -1077,11 +1103,18 @@ app.get("/api/users/:userId/following", async (req, res, next) => {
   try {
     const id = cleanText(req.params.userId, 100);
     const result = await pool.query(
-      `SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url
-       FROM ft_follows f JOIN users u ON u.id::text=f.following_id
+      `WITH relations AS (
+         SELECT following_id AS person_id, created_at FROM ft_follows WHERE follower_id=$1
+         UNION ALL
+         SELECT friend_id AS person_id, created_at FROM ft_friends WHERE user_id=$1
+       ), unique_relations AS (
+         SELECT person_id, MAX(created_at) AS relation_at FROM relations GROUP BY person_id
+       )
+       SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url
+       FROM unique_relations r JOIN users u ON u.id::text=r.person_id
        LEFT JOIN ft_profiles p ON p.user_id=u.id::text
-       WHERE f.follower_id=$1 AND u.account_status='active'
-       ORDER BY f.created_at DESC LIMIT 100`,
+       WHERE u.account_status='active'
+       ORDER BY r.relation_at DESC LIMIT 100`, 
       [id]
     );
     res.json({ users: result.rows });
@@ -1548,7 +1581,43 @@ app.post("/api/friends/request", requireAuth, async(req,res,next)=>{
     const r=await pool.query(`INSERT INTO ft_friend_requests(sender_id,recipient_id) VALUES($1,$2) ON CONFLICT(sender_id,recipient_id) DO UPDATE SET status='pending',updated_at=NOW() RETURNING id,status`,[me,target]);await notifyUser(target,me,'friend_request',`${req.user.username} sent you a friend request.`);res.status(201).json({request:r.rows[0]});
   }catch(e){next(e);}
 });
-app.get("/api/friends/requests", requireAuth, async(req,res,next)=>{try{const r=await pool.query(`SELECT f.id::text AS id,f.sender_id,u.username,p.display_name,p.avatar_url,f.created_at FROM ft_friend_requests f JOIN users u ON u.id::text=f.sender_id LEFT JOIN ft_profiles p ON p.user_id=f.sender_id WHERE f.recipient_id=$1 AND f.status='pending' ORDER BY f.created_at DESC`,[String(req.user.id)]);res.json({requests:r.rows});}catch(e){next(e);}});
+app.get("/api/friends/requests", requireAuth, async(req,res,next)=>{
+  try {
+    const me=String(req.user.id);
+    const r=await pool.query(`SELECT f.id::text AS id,f.sender_id,f.recipient_id,f.status,
+      u.username,p.display_name,p.avatar_url,f.created_at
+      FROM ft_friend_requests f JOIN users u ON u.id::text=f.sender_id
+      LEFT JOIN ft_profiles p ON p.user_id=f.sender_id
+      WHERE f.recipient_id=$1 AND f.status='pending'
+      ORDER BY f.created_at DESC`,[me]);
+    res.json({requests:r.rows,incoming:r.rows});
+  } catch(e){next(e);}
+});
+
+app.get("/api/friends/requests/sent", requireAuth, async(req,res,next)=>{
+  try {
+    const me=String(req.user.id);
+    const r=await pool.query(`SELECT f.id::text AS id,f.sender_id,f.recipient_id,f.status,
+      u.username,p.display_name,p.avatar_url,f.created_at
+      FROM ft_friend_requests f JOIN users u ON u.id::text=f.recipient_id
+      LEFT JOIN ft_profiles p ON p.user_id=f.recipient_id
+      WHERE f.sender_id=$1 AND f.status='pending'
+      ORDER BY f.created_at DESC`,[me]);
+    res.json({requests:r.rows,sent:r.rows});
+  } catch(e){next(e);}
+});
+
+app.delete("/api/friends/requests/:id", requireAuth, async(req,res,next)=>{
+  try {
+    const id=Number.parseInt(req.params.id,10);
+    if(!Number.isSafeInteger(id)) return res.status(400).json({error:"Invalid request ID."});
+    const r=await pool.query(`UPDATE ft_friend_requests SET status='cancelled',updated_at=NOW()
+      WHERE id=$1 AND sender_id=$2 AND status='pending' RETURNING id`,[id,String(req.user.id)]);
+    if(!r.rowCount) return res.status(404).json({error:"Pending sent request not found."});
+    res.json({status:"cancelled",message:"Friend request cancelled."});
+  } catch(e){next(e);}
+});
+
 app.patch("/api/friends/requests/:id", requireAuth, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['accept','decline'].includes(action))return res.status(400).json({error:'Action must be accept or decline.'});const status=action==='accept'?'accepted':'declined';const r=await pool.query(`UPDATE ft_friend_requests SET status=$1,updated_at=NOW() WHERE id=$2 AND recipient_id=$3 AND status='pending' RETURNING sender_id,recipient_id`,[status,id,String(req.user.id)]);if(!r.rowCount)return res.status(404).json({error:'Pending request not found.'});if(action==='accept')await pool.query("INSERT INTO ft_friends(user_id,friend_id) VALUES($1,$2),($2,$1) ON CONFLICT DO NOTHING",[String(req.user.id),r.rows[0].sender_id]);await notifyUser(r.rows[0].sender_id,req.user.id,'friend',action==='accept'?'Your friend request was accepted.':'Your friend request was declined.');res.json({status});}catch(e){next(e);}});
 app.get("/api/friends", requireAuth, async(req,res,next)=>{try{const r=await pool.query(`SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url,f.created_at AS friends_since FROM ft_friends f JOIN users u ON u.id::text=f.friend_id LEFT JOIN ft_profiles p ON p.user_id=f.friend_id WHERE f.user_id=$1 AND u.account_status='active' ORDER BY f.created_at DESC`,[String(req.user.id)]);res.json({friends:r.rows});}catch(e){next(e);}});
 app.delete("/api/friends/:userId", requireAuth, async(req,res,next)=>{try{const other=cleanText(req.params.userId,100),me=String(req.user.id);await pool.query("DELETE FROM ft_friends WHERE (user_id=$1 AND friend_id=$2) OR (user_id=$2 AND friend_id=$1)",[me,other]);res.json({message:'Friend removed.'});}catch(e){next(e);}});
