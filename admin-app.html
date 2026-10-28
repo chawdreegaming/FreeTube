@@ -1,0 +1,912 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07111f">
+<title>App Management - Boys vs Girls</title>
+
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #07111f;
+  --card: #101e32;
+  --line: #293d59;
+  --text: #f3f7ff;
+  --muted: #9fb0c8;
+  --blue: #4b8dff;
+  --green: #30c997;
+  --red: #ff7185;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, #17365d, transparent 38%),
+    var(--bg);
+  color: var(--text);
+  font: 15px/1.55 system-ui, sans-serif;
+}
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+  padding: 20px 14px 45px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #4b8dff, #a78bfa);
+  font-weight: 900;
+}
+
+h1 {
+  font-size: clamp(25px, 5vw, 34px);
+  margin: 0;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 20px;
+}
+
+h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 12px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  padding: 10px 13px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--blue);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #263a56;
+}
+
+button.danger {
+  background: #a82d48;
+}
+
+button:hover {
+  filter: brightness(1.1);
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  padding: 16px;
+  margin: 14px 0;
+  background: linear-gradient(155deg, #13243a, #0d192b);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat {
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #0d1b2e;
+}
+
+.stat-value {
+  font-size: 27px;
+  font-weight: 850;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border-radius: 9px 9px 0 0;
+}
+
+.tab.active {
+  color: white;
+  background: #152943;
+  border-bottom: 2px solid var(--blue);
+}
+
+.panel {
+  display: none;
+}
+
+.panel.active {
+  display: block;
+}
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.field {
+  flex: 1;
+  min-width: 180px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: #cbd7e8;
+  font-size: 12px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #30435e;
+  border-radius: 10px;
+  background: #081426;
+  color: white;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.item {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #0a1729;
+  overflow-wrap: anywhere;
+}
+
+.item-top {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #263952;
+  font-size: 12px;
+}
+
+.pill.green {
+  background: #12533f;
+  color: #b9ffe6;
+}
+
+.pill.red {
+  background: #532432;
+  color: #ffd0d7;
+}
+
+.empty {
+  padding: 20px;
+  border: 1px dashed #30435e;
+  border-radius: 13px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.notice {
+  display: none;
+  padding: 12px;
+  margin: 12px 0;
+  border-radius: 10px;
+  background: #42232c;
+  color: #ffd5dc;
+  overflow-wrap: anywhere;
+}
+
+.notice.success {
+  background: #103c32;
+  color: #b4ffe2;
+}
+
+a {
+  text-decoration: none;
+}
+
+footer {
+  margin-top: 25px;
+  padding-top: 15px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+@media (max-width: 750px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .stats {
+    gap: 8px;
+  }
+
+  .stat {
+    padding: 11px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+}
+</style>
+</head>
+
+<body>
+<main class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">BvG</div>
+    <div>
+      <div class="muted small">BOYS VS GIRLS</div>
+      <h1>App Management</h1>
+      <div class="muted small">Users, Posts and Reports</div>
+    </div>
+  </div>
+
+  <div>
+    <a href="admin.html">
+      <button class="secondary" type="button">← Dashboard</button>
+    </a>
+    <button id="refreshButton" type="button">Refresh</button>
+  </div>
+</header>
+
+<div id="notice" class="notice" role="status"></div>
+
+<section class="card">
+  <div class="item-top">
+    <div>
+      <h3>Admin Connection</h3>
+      <div id="connection" class="muted small">
+        Checking access token...
+      </div>
+    </div>
+    <button id="tokenButton" class="secondary" type="button">
+      Set Token
+    </button>
+  </div>
+
+  <p class="muted small">
+    Uses the existing freetube_access_token stored in this browser.
+    Your backend must verify that the account has admin permissions.
+  </p>
+</section>
+
+<section class="stats">
+  <div class="stat">
+    <div class="muted">Users Loaded</div>
+    <div class="stat-value" id="usersCount">—</div>
+  </div>
+
+  <div class="stat">
+    <div class="muted">Posts Loaded</div>
+    <div class="stat-value" id="postsCount">—</div>
+  </div>
+
+  <div class="stat">
+    <div class="muted">Reports Loaded</div>
+    <div class="stat-value" id="reportsCount">—</div>
+  </div>
+
+  <div class="stat">
+    <div class="muted">Access Token</div>
+    <div class="stat-value" id="tokenStatus" style="font-size:18px">
+      Unknown
+    </div>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="overview" type="button">
+    Overview
+  </button>
+
+  <button class="tab" data-tab="users" type="button">
+    Users
+  </button>
+
+  <button class="tab" data-tab="posts" type="button">
+    Posts
+  </button>
+
+  <button class="tab" data-tab="reports" type="button">
+    Reports
+  </button>
+</nav>
+
+<section id="overview" class="panel active">
+  <div class="card">
+    <h2>Welcome to App Management</h2>
+    <p class="muted">
+      Manage your users, review posts and inspect reports from one place.
+      Choose a section below to load its records.
+    </p>
+
+    <div class="toolbar">
+      <button data-open="users" type="button">Manage Users</button>
+      <button data-open="posts" type="button">Manage Posts</button>
+      <button data-open="reports" type="button">Review Reports</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Other Admin Sections</h2>
+
+    <div class="toolbar">
+      <a href="admin.html">
+        <button class="secondary" type="button">Main Dashboard</button>
+      </a>
+
+      <a href="admin-payments.html">
+        <button class="secondary" type="button">
+          Blue Badge Management
+        </button>
+      </a>
+
+      <a href="admin-notifications.html">
+        <button class="secondary" type="button">
+          Notification Management
+        </button>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="users" class="panel">
+  <div class="card">
+    <div class="item-top">
+      <h2>User Management</h2>
+      <button id="loadUsers" type="button">Load Users</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="userSearch">Search users</label>
+        <input id="userSearch" placeholder="Name, username, email or ID">
+      </div>
+
+      <div class="field">
+        <label for="userFilter">Status</label>
+        <select id="userFilter">
+          <option value="all">All loaded users</option>
+          <option value="active">Active</option>
+          <option value="banned">Banned</option>
+          <option value="disabled">Disabled</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="muted small">
+      This page only displays data returned by the backend.
+      Ban/Unban requires a verified admin API route.
+    </p>
+  </div>
+
+  <div id="usersList" class="list">
+    <div class="empty">Click Load Users to begin.</div>
+  </div>
+</section>
+
+<section id="posts" class="panel">
+  <div class="card">
+    <div class="item-top">
+      <h2>Post Management</h2>
+      <button id="loadPosts" type="button">Load Posts</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="postSearch">Search posts</label>
+        <input id="postSearch" placeholder="Post text, author or ID">
+      </div>
+    </div>
+
+    <p class="muted small">
+      Post deletion is not enabled here because the exact admin delete
+      endpoint must be verified before destructive actions are added.
+    </p>
+  </div>
+
+  <div id="postsList" class="list">
+    <div class="empty">Click Load Posts to begin.</div>
+  </div>
+</section>
+
+<section id="reports" class="panel">
+  <div class="card">
+    <div class="item-top">
+      <h2>Reports Management</h2>
+      <button id="loadReports" type="button">Load Reports</button>
+    </div>
+
+    <div class="toolbar">
+      <div class="field">
+        <label for="reportFilter">Report status</label>
+        <select id="reportFilter">
+          <option value="all">All loaded reports</option>
+          <option value="pending">Pending</option>
+          <option value="open">Open</option>
+          <option value="resolved">Resolved</option>
+          <option value="dismissed">Dismissed</option>
+        </select>
+      </div>
+    </div>
+
+    <p class="muted small">
+      Report listing and review require a reports API route in your backend.
+    </p>
+  </div>
+
+  <div id="reportsList" class="list">
+    <div class="empty">Click Load Reports to begin.</div>
+  </div>
+</section>
+
+<footer>
+  Boys vs Girls 💙💗 — App Management<br>
+  Keep your access token private. All administrative permissions
+  must be checked by the backend.
+</footer>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  const API =
+    "https://freetube-backend-a222.onrender.com/api";
+
+  const TOKEN_KEY = "freetube_access_token";
+
+  const $ = function (id) {
+    return document.getElementById(id);
+  };
+
+  let users = [];
+  let posts = [];
+  let reports = [];
+
+  function getToken() {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  }
+
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function (char) {
+      return {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[char];
+    });
+  }
+
+  function showNotice(message, success) {
+    const box = $("notice");
+    box.textContent = message;
+    box.className = "notice" + (success ? " success" : "");
+    box.style.display = "block";
+  }
+
+  function updateConnection() {
+    const saved = Boolean(getToken());
+
+    $("connection").textContent = saved
+      ? "An access token is saved in this browser."
+      : "No access token is saved.";
+
+    $("tokenStatus").textContent = saved
+      ? "Saved"
+      : "Missing";
+  }
+
+  async function api(path) {
+    const headers = {};
+
+    if (getToken()) {
+      headers.Authorization = "Bearer " + getToken();
+    }
+
+    const response = await fetch(API + path, {
+      method: "GET",
+      headers: headers
+    });
+
+    const data = await response.json().catch(function () {
+      return {};
+    });
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || data.message || "Request failed: " + response.status
+      );
+    }
+
+    return data;
+  }
+
+  function extractArray(data, keys) {
+    if (Array.isArray(data)) {
+      return data;
+    }
+
+    for (const key of keys) {
+      if (Array.isArray(data[key])) {
+        return data[key];
+      }
+    }
+
+    return [];
+  }
+
+  function switchTab(name) {
+    document.querySelectorAll(".tab").forEach(function (button) {
+      button.classList.toggle(
+        "active",
+        button.dataset.tab === name
+      );
+    });
+
+    document.querySelectorAll(".panel").forEach(function (panel) {
+      panel.classList.toggle("active", panel.id === name);
+    });
+  }
+
+  document.querySelectorAll("[data-tab]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      switchTab(button.dataset.tab);
+    });
+  });
+
+  document.querySelectorAll("[data-open]").forEach(function (button) {
+    button.addEventListener("click", function () {
+      switchTab(button.dataset.open);
+    });
+  });
+
+  async function loadUsers() {
+    $("usersList").innerHTML =
+      '<div class="empty">Loading users...</div>';
+
+    try {
+      const data = await api("/admin/users");
+
+      users = extractArray(data, ["users", "data", "results"]);
+
+      $("usersCount").textContent = users.length;
+
+      renderUsers();
+
+      showNotice("Users loaded successfully.", true);
+    } catch (error) {
+      $("usersCount").textContent = "—";
+
+      $("usersList").innerHTML =
+        '<div class="empty">Could not load users. Check whether your backend provides GET /api/admin/users. ' +
+        escapeHTML(error.message) +
+        "</div>";
+
+      showNotice("Users could not be loaded: " + error.message, false);
+    }
+  }
+
+  function renderUsers() {
+    const query = $("userSearch").value.trim().toLowerCase();
+    const filter = $("userFilter").value;
+
+    const filtered = users.filter(function (user) {
+      const text = [
+        user.id,
+        user.user_id,
+        user.username,
+        user.name,
+        user.full_name,
+        user.email
+      ].join(" ").toLowerCase();
+
+      const status = String(
+        user.account_status || user.status || "unknown"
+      ).toLowerCase();
+
+      const statusMatch =
+        filter === "all" ||
+        (filter === "active" && status === "active") ||
+        (filter === "banned" && status === "banned") ||
+        (filter === "disabled" &&
+          ["disabled", "inactive", "suspended"].includes(status));
+
+      return text.includes(query) && statusMatch;
+    });
+
+    const root = $("usersList");
+    root.innerHTML = "";
+
+    if (!filtered.length) {
+      root.innerHTML =
+        '<div class="empty">No matching users in the loaded results.</div>';
+      return;
+    }
+
+    filtered.forEach(function (user) {
+      const id = user.id ?? user.user_id ?? "Not provided";
+      const name =
+        user.username || user.full_name || user.name || "Unknown user";
+
+      const status = String(
+        user.account_status || user.status || "unknown"
+      ).toLowerCase();
+
+      const item = document.createElement("article");
+      item.className = "item";
+
+      item.innerHTML =
+        '<div class="item-top">' +
+          "<div><h3>" + escapeHTML(name) + "</h3>" +
+          '<div class="muted small">ID: ' + escapeHTML(id) +
+          " · " + escapeHTML(user.email || "No email") + "</div></div>" +
+          '<span class="pill ' +
+          (status === "active" ? "green" : status === "banned" ? "red" : "") +
+          '">' + escapeHTML(status) + "</span>" +
+        "</div>" +
+        '<p class="muted small">Role: ' +
+        escapeHTML(user.role || "unknown") +
+        " · Created: " +
+        escapeHTML(user.created_at || "Not provided") +
+        "</p>";
+
+      root.appendChild(item);
+    });
+  }
+
+  async function loadPosts() {
+    $("postsList").innerHTML =
+      '<div class="empty">Loading posts...</div>';
+
+    try {
+      const data = await api("/admin/posts");
+
+      posts = extractArray(data, ["posts", "data", "results"]);
+
+      $("postsCount").textContent = posts.length;
+
+      renderPosts();
+
+      showNotice("Posts loaded successfully.", true);
+    } catch (error) {
+      $("postsCount").textContent = "—";
+
+      $("postsList").innerHTML =
+        '<div class="empty">Could not load posts. Check whether your backend provides GET /api/admin/posts. ' +
+        escapeHTML(error.message) +
+        "</div>";
+
+      showNotice("Posts could not be loaded: " + error.message, false);
+    }
+  }
+
+  function renderPosts() {
+    const query = $("postSearch").value.trim().toLowerCase();
+
+    const filtered = posts.filter(function (post) {
+      return [
+        post.id,
+        post.post_id,
+        post.username,
+        post.author,
+        post.author_name,
+        post.text,
+        post.content,
+        post.caption
+      ].join(" ").toLowerCase().includes(query);
+    });
+
+    const root = $("postsList");
+    root.innerHTML = "";
+
+    if (!filtered.length) {
+      root.innerHTML =
+        '<div class="empty">No matching posts in the loaded results.</div>';
+      return;
+    }
+
+    filtered.forEach(function (post) {
+      const id = post.id ?? post.post_id ?? "Unknown";
+      const author =
+        post.username || post.author_name || post.author || "Unknown author";
+      const content =
+        post.content || post.text || post.caption || "[No text content]";
+
+      const item = document.createElement("article");
+      item.className = "item";
+
+      item.innerHTML =
+        '<div class="item-top"><h3>Post #' + escapeHTML(id) + "</h3>" +
+        '<span class="pill">' + escapeHTML(post.status || "Post") + "</span></div>" +
+        '<p style="white-space:pre-wrap">' + escapeHTML(content) + "</p>" +
+        '<div class="muted small">Author: ' + escapeHTML(author) +
+        " · Created: " + escapeHTML(post.created_at || "Not provided") +
+        "</div>";
+
+      root.appendChild(item);
+    });
+  }
+
+  async function loadReports() {
+    $("reportsList").innerHTML =
+      '<div class="empty">Loading reports...</div>';
+
+    try {
+      const data = await api("/admin/reports");
+
+      reports = extractArray(data, ["reports", "data", "results"]);
+
+      $("reportsCount").textContent = reports.length;
+
+      renderReports();
+
+      showNotice("Reports loaded successfully.", true);
+    } catch (error) {
+      $("reportsCount").textContent = "—";
+
+      $("reportsList").innerHTML =
+        '<div class="empty">Could not load reports. The backend may not provide GET /api/admin/reports. ' +
+        escapeHTML(error.message) +
+        "</div>";
+
+      showNotice("Reports could not be loaded: " + error.message, false);
+    }
+  }
+
+  function renderReports() {
+    const filter = $("reportFilter").value;
+
+    const filtered = reports.filter(function (report) {
+      const status = String(report.status || "open").toLowerCase();
+
+      return filter === "all" || status === filter;
+    });
+
+    const root = $("reportsList");
+    root.innerHTML = "";
+
+    if (!filtered.length) {
+      root.innerHTML =
+        '<div class="empty">No reports for this filter.</div>';
+      return;
+    }
+
+    filtered.forEach(function (report) {
+      const item = document.createElement("article");
+      item.className = "item";
+
+      item.innerHTML =
+        '<div class="item-top"><h3>Report #' +
+        escapeHTML(report.id ?? report.report_id ?? "Unknown") +
+        "</h3><span class=\"pill\">" +
+        escapeHTML(report.status || "Open") +
+        "</span></div><p>" +
+        escapeHTML(report.reason || report.description || report.message || "No details") +
+        '</p><div class="muted small">Reporter: ' +
+        escapeHTML(report.reporter_username || report.reporter_id || "Unknown") +
+        " · Target: " +
+        escapeHTML(report.target_type || "Unknown") +
+        " " +
+        escapeHTML(report.target_id || "") +
+        "</div>";
+
+      root.appendChild(item);
+    });
+  }
+
+  $("tokenButton").addEventListener("click", function () {
+    const value = prompt(
+      "Paste your existing access token. Keep it private.",
+      getToken()
+    );
+
+    if (value === null) return;
+
+    if (value.trim()) {
+      localStorage.setItem(TOKEN_KEY, value.trim());
+    } else {
+      localStorage.removeItem(TOKEN_KEY);
+    }
+
+    updateConnection();
+
+    showNotice("Local token setting updated.", true);
+  });
+
+  $("refreshButton").addEventListener("click", function () {
+    updateConnection();
+    Promise.allSettled([
+      loadUsers(),
+      loadPosts(),
+      loadReports()
+    ]);
+  });
+
+  $("loadUsers").addEventListener("click", loadUsers);
+  $("userSearch").addEventListener("input", renderUsers);
+  $("userFilter").addEventListener("change", renderUsers);
+
+  $("loadPosts").addEventListener("click", loadPosts);
+  $("postSearch").addEventListener("input", renderPosts);
+
+  $("loadReports").addEventListener("click", loadReports);
+  $("reportFilter").addEventListener("change", renderReports);
+
+  updateConnection();
+})();
+</script>
+
+</body>
+</html>
