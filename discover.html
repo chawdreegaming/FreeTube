@@ -1,47 +1,76 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10291f">
-<title>Pulse — FreeTube</title>
+<meta name="theme-color" content="#101329">
+<title>Pulse — Boys vs Girls 💙💗</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root {
-  --bg:#10291f;
-  --panel:#172f24;
-  --panel2:#20392d;
-  --green:#00e991;
-  --text:#f6fff9;
-  --muted:#a9bdb2;
-  --border:rgba(255,255,255,.12);
+  --blue:#168cff;
+  --pink:#ff248c;
+  --purple:#862dff;
+  --cyan:#37d7ff;
+  --bg:#101329;
+  --panel:#191b35;
+  --panel2:#24203f;
+  --text:#fff;
+  --muted:#c8c9e3;
+  --border:#ffffff20;
+  --gradient:linear-gradient(120deg,#168cff,#862dff 48%,#ff248c);
 }
+
 * {
   box-sizing:border-box;
   margin:0;
   padding:0;
   -webkit-tap-highlight-color:transparent;
 }
-html { min-height:100%; background:var(--bg); }
+
+html {
+  min-height:100%;
+  background:var(--bg);
+  scroll-behavior:smooth;
+}
+
 body {
   min-height:100vh;
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
-  background:linear-gradient(145deg,#65172f 0%,#35233a 35%,#123e2b 70%,#007b48 100%);
+  background:
+    radial-gradient(ellipse at 0% 0%,#173e81 0,transparent 38%),
+    radial-gradient(ellipse at 100% 30%,#741c65 0,transparent 38%),
+    linear-gradient(145deg,#101329,#24152f 55%,#101c3b);
   background-attachment:fixed;
 }
-button,input { font:inherit; }
-button { cursor:pointer; color:inherit; }
-[hidden] { display:none!important; }
+
+button,input {
+  font:inherit;
+}
+
+button {
+  cursor:pointer;
+  color:inherit;
+}
+
+[hidden] {
+  display:none!important;
+}
 
 .app {
   max-width:650px;
   margin:auto;
   min-height:100dvh;
   padding-bottom:90px;
-  background:rgba(16,41,31,.18);
+  background:#101329b8;
+  border-inline:1px solid #ffffff08;
 }
+
+/* Header */
+
 .topbar {
   position:sticky;
   top:0;
@@ -49,46 +78,95 @@ button { cursor:pointer; color:inherit; }
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:15px 18px;
-  background:rgba(16,41,31,.85);
-  backdrop-filter:blur(18px);
+  gap:8px;
+  padding:14px 17px;
+  background:linear-gradient(110deg,#102c54ee,#3a1a48ee,#641d4bee);
+  backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
 }
+
 .brand {
-  font-size:26px;
+  font-size:23px;
   font-weight:900;
   letter-spacing:-1px;
+  white-space:nowrap;
+  background:var(--gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
 }
-.brand i,.brand span { color:var(--green); }
+
+.brand i {
+  color:var(--blue);
+  -webkit-text-fill-color:var(--blue);
+}
+
+.brand span {
+  color:var(--pink);
+  -webkit-text-fill-color:var(--pink);
+}
+
+.top-actions {
+  display:flex;
+  gap:9px;
+}
+
 .icon-btn {
   width:42px;
   height:42px;
   display:grid;
   place-items:center;
   border-radius:50%;
-  background:rgba(255,255,255,.08);
-  border:1px solid var(--border);
+  background:linear-gradient(145deg,#ffffff18,#168cff20);
+  border:1px solid #ffffff26;
 }
+
+.love-messenger {
+  font-size:19px;
+  background:var(--gradient);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  filter:drop-shadow(0 0 5px #ff248c55);
+}
+
+/* Search */
+
 .search-area {
   padding:17px 16px;
-  background:rgba(23,47,36,.48);
+  background:linear-gradient(110deg,#162344d9,#321b3cd9);
   border-bottom:1px solid var(--border);
 }
+
 .page-title {
-  font-size:23px;
-  font-weight:800;
-  margin-bottom:13px;
+  font-size:25px;
+  font-weight:900;
+  margin-bottom:5px;
+  letter-spacing:-.5px;
 }
+
+.page-subtitle {
+  color:var(--muted);
+  font-size:13px;
+  margin-bottom:15px;
+  line-height:1.5;
+}
+
 .search-box {
   display:flex;
   align-items:center;
   gap:10px;
   padding:0 12px;
-  background:rgba(10,35,25,.55);
-  border:1px solid var(--border);
+  background:#11152ccc;
+  border:1px solid #ffffff28;
   border-radius:16px;
+  box-shadow:0 5px 18px #0002;
 }
-.search-box>i { color:var(--green); }
+
+.search-box>i {
+  color:var(--cyan);
+}
+
 .search-box input {
   flex:1;
   width:100%;
@@ -99,15 +177,23 @@ button { cursor:pointer; color:inherit; }
   border:0;
   outline:0;
 }
-.search-box input::placeholder { color:var(--muted); }
+
+.search-box input::placeholder {
+  color:var(--muted);
+}
+
 .clear-btn {
   width:32px;
   height:32px;
+  flex-shrink:0;
   border:0;
   border-radius:50%;
-  background:rgba(0,233,145,.14);
-  color:var(--green);
+  background:#ff248c20;
+  color:var(--pink);
 }
+
+/* Filters */
+
 .filters {
   display:flex;
   gap:9px;
@@ -115,57 +201,84 @@ button { cursor:pointer; color:inherit; }
   padding:14px 16px 11px;
   scrollbar-width:none;
 }
-.filters::-webkit-scrollbar { display:none; }
+
+.filters::-webkit-scrollbar {
+  display:none;
+}
+
 .filter-btn {
   white-space:nowrap;
   padding:9px 18px;
   border:1px solid var(--border);
   border-radius:24px;
-  background:rgba(255,255,255,.08);
+  background:#ffffff0c;
   color:var(--text);
   font-size:13px;
-  font-weight:600;
+  font-weight:700;
+  transition:background .2s,transform .2s;
 }
+
+.filter-btn:active {
+  transform:scale(.97);
+}
+
 .filter-btn.active {
-  background:var(--green);
-  border-color:var(--green);
-  color:#073421;
+  background:var(--gradient);
+  border-color:transparent;
+  color:#fff;
+  box-shadow:0 4px 15px #862dff33;
 }
+
 .results-info {
-  padding:0 16px 12px;
+  padding:2px 16px 12px;
   color:var(--muted);
   font-size:13px;
 }
-#results { padding:0 0 10px; }
+
+#results {
+  padding:0 0 10px;
+}
+
+/* Video cards */
 
 .card {
-  background:rgba(23,47,36,.85);
+  background:linear-gradient(145deg,#191c35f5,#24203af5);
   margin-bottom:11px;
   border-top:1px solid var(--border);
   border-bottom:1px solid var(--border);
   overflow:hidden;
+  box-shadow:0 6px 22px #0002;
 }
+
 .card-head {
   display:flex;
   align-items:center;
   gap:10px;
   padding:13px 14px;
 }
+
 .avatar {
   width:42px;
   height:42px;
   flex-shrink:0;
   object-fit:cover;
   border-radius:50%;
-  background:var(--panel2);
-  border:1px solid var(--border);
+  background:#22274b;
+  border:2px solid var(--blue);
 }
-.user-info { flex:1; min-width:0; }
+
+.user-info {
+  flex:1;
+  min-width:0;
+}
+
 .username {
   font-weight:700;
   font-size:14px;
   overflow-wrap:anywhere;
+  color:var(--text);
 }
+
 .profile-link {
   display:flex;
   align-items:center;
@@ -173,18 +286,25 @@ button { cursor:pointer; color:inherit; }
   color:inherit;
   text-decoration:none;
 }
+
 .profile-name {
   display:inline-block;
   overflow-wrap:anywhere;
   color:var(--text);
   text-decoration:none;
 }
-.profile-link:active,.profile-name:active { opacity:.7; }
+
+.profile-link:active,
+.profile-name:active {
+  opacity:.7;
+}
+
 .time {
   font-size:12px;
   color:var(--muted);
   margin-top:4px;
 }
+
 .content {
   padding:0 14px 12px;
   white-space:pre-wrap;
@@ -192,37 +312,46 @@ button { cursor:pointer; color:inherit; }
   line-height:1.5;
   font-size:14px;
 }
+
 .media {
   width:100%;
-  background:#000;
+  background:#080914;
   display:flex;
   align-items:center;
   justify-content:center;
+  position:relative;
 }
+
 .media video {
   display:block;
   width:100%;
-  max-height:480px;
+  max-height:75vh;
   object-fit:contain;
-  background:#000;
+  background:#080914;
 }
+
 .stats {
   display:flex;
   align-items:center;
   justify-content:space-between;
   flex-wrap:wrap;
   gap:8px;
-  padding:10px 14px;
+  padding:11px 14px;
   color:var(--muted);
   font-size:12px;
   border-top:1px solid var(--border);
 }
-.stats i { color:var(--green); }
 
-/*
- * The Android NativeAdView overlays this reserved slot.
- * The larger height provides room for the complete native card.
- */
+.stats i {
+  color:var(--blue);
+}
+
+.stats .comments-icon {
+  color:var(--pink);
+}
+
+/* Native ad reservation: Android bridge remains active */
+
 .native-ad-slot {
   display:none;
   width:100%;
@@ -235,27 +364,46 @@ button { cursor:pointer; color:inherit; }
   background:transparent;
   position:relative;
 }
+
 .native-ad-slot.android-ad-enabled {
   display:block;
 }
+
 .native-ad-label,
 .native-ad-placeholder {
   display:none!important;
 }
+
+/* Status messages */
 
 .state {
   text-align:center;
   padding:38px 18px;
   color:var(--muted);
   line-height:1.8;
+  background:#191b3580;
+  margin:0 10px 12px;
+  border:1px solid var(--border);
+  border-radius:16px;
 }
+
+.state>i {
+  font-size:25px;
+  color:var(--cyan);
+  margin-bottom:8px;
+}
+
 .secondary {
   padding:10px 15px;
   border-radius:10px;
-  background:var(--panel2);
+  background:linear-gradient(110deg,#168cff,#862dff,#ff248c);
   color:white;
-  border:1px solid var(--border);
+  border:0;
+  font-weight:700;
 }
+
+/* Bottom navigation */
+
 .bottom-nav {
   position:fixed;
   bottom:0;
@@ -268,10 +416,11 @@ button { cursor:pointer; color:inherit; }
   justify-content:space-around;
   align-items:center;
   padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,41,31,.92);
+  background:linear-gradient(110deg,#121a35f5,#29172ff5,#351735f5);
   backdrop-filter:blur(22px);
-  border-top:1px solid rgba(255,255,255,.15);
+  border-top:1px solid var(--border);
 }
+
 .nav-item {
   flex:1;
   min-width:0;
@@ -282,14 +431,22 @@ button { cursor:pointer; color:inherit; }
   gap:5px;
   background:transparent;
   border:0;
-  color:var(--muted);
+  color:#ffffffb8;
   font-size:11px;
 }
-.nav-item i { font-size:21px; }
-.nav-item.active { color:var(--green); }
-.nav-item.active i {
-  filter:drop-shadow(0 0 5px rgba(0,233,145,.3));
+
+.nav-item i {
+  font-size:21px;
 }
+
+.nav-item.active {
+  color:var(--pink);
+}
+
+.nav-item.active i {
+  filter:drop-shadow(0 0 7px #ff248c77);
+}
+
 .toast {
   position:fixed;
   bottom:90px;
@@ -297,56 +454,98 @@ button { cursor:pointer; color:inherit; }
   transform:translateX(-50%);
   z-index:50;
   display:none;
-  background:rgba(32,57,45,.96);
+  background:#202345f5;
   padding:12px 16px;
-  border-radius:10px;
+  border-radius:12px;
   border:1px solid var(--border);
   max-width:90%;
   font-size:13px;
   text-align:center;
+  box-shadow:0 6px 22px #0004;
 }
-.toast.show { display:block; }
+
+.toast.show {
+  display:block;
+}
 
 @media(max-width:360px) {
-  .brand { font-size:23px; }
-  .nav-item { font-size:10px; }
-  .nav-item i { font-size:20px; }
-  .filter-btn { padding:9px 15px; }
+  .brand {
+    font-size:20px;
+  }
+
+  .nav-item {
+    font-size:10px;
+  }
+
+  .nav-item i {
+    font-size:20px;
+  }
+
+  .filter-btn {
+    padding:9px 15px;
+  }
+
+  .page-title {
+    font-size:23px;
+  }
 }
 </style>
 </head>
 
 <body>
 <div class="app">
+
   <header class="topbar">
     <div class="brand">
-      <i class="fa-solid fa-play"></i> Free<span>Tube</span>
+      Boys <span>vs</span> Girls 💙💗
     </div>
-    <button class="icon-btn" onclick="go('inbox.html')" aria-label="Messages">
-      <i class="fa-brands fa-facebook-messenger"></i>
-    </button>
+
+    <div class="top-actions">
+      <button class="icon-btn"
+        onclick="go('inbox.html')"
+        aria-label="Love Messenger">
+        <i class="fa-solid fa-heart love-messenger"></i>
+      </button>
+    </div>
   </header>
 
   <section class="search-area">
-    <h1 class="page-title">Pulse</h1>
+    <h1 class="page-title">
+      <i class="fa-solid fa-compass" style="color:var(--cyan)"></i>
+      Pulse
+    </h1>
+    <p class="page-subtitle">
+      Discover videos and moments from your community.
+    </p>
+
     <form id="searchForm" class="search-box">
       <i class="fa-solid fa-magnifying-glass"></i>
-      <input id="searchInput" type="search"
+      <input id="searchInput"
+        type="search"
         placeholder="Search videos, people..."
-        autocomplete="off" aria-label="Search videos and people">
+        autocomplete="off"
+        aria-label="Search videos and people">
+
       <button type="button" id="clearButton"
-        class="clear-btn" aria-label="Clear search">
+        class="clear-btn"
+        aria-label="Clear search">
         <i class="fa-solid fa-xmark"></i>
       </button>
     </form>
   </section>
 
   <div class="filters" aria-label="Video filters">
-    <button class="filter-btn active" data-filter="all">All videos</button>
-    <button class="filter-btn" data-filter="recent">Recent</button>
+    <button class="filter-btn active" data-filter="all">
+      <i class="fa-solid fa-clapperboard"></i> All videos
+    </button>
+    <button class="filter-btn" data-filter="recent">
+      <i class="fa-solid fa-clock"></i> Recent
+    </button>
   </div>
 
-  <div id="resultsInfo" class="results-info">Loading videos...</div>
+  <div id="resultsInfo" class="results-info">
+    Loading videos...
+  </div>
 
   <main id="results">
     <div class="state">
@@ -357,18 +556,28 @@ button { cursor:pointer; color:inherit; }
 
   <nav class="bottom-nav" aria-label="Main navigation">
     <button class="nav-item" onclick="go('home.html')">
-      <i class="fa-solid fa-house"></i><span>Home</span>
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
     </button>
-    <button class="nav-item active" onclick="go('discover.html')" aria-current="page">
-      <i class="fa-solid fa-compass"></i><span>Pulse</span>
+
+    <button class="nav-item active"
+      onclick="go('discover.html')"
+      aria-current="page">
+      <i class="fa-solid fa-compass"></i>
+      <span>Pulse</span>
     </button>
+
     <button class="nav-item" onclick="go('notifications.html')">
-      <i class="fa-solid fa-bell"></i><span>Notifications</span>
+      <i class="fa-solid fa-bell"></i>
+      <span>Notifications</span>
     </button>
+
     <button class="nav-item" onclick="go('profile.html')">
-      <i class="fa-regular fa-user"></i><span>Profile</span>
+      <i class="fa-regular fa-user"></i>
+      <span>Profile</span>
     </button>
   </nav>
+
 </div>
 
 <div id="toast" class="toast" role="status"></div>
@@ -379,7 +588,7 @@ button { cursor:pointer; color:inherit; }
 const API_BASE = "https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY = "freetube_access_token";
 const FALLBACK_AVATAR =
-  "https://placehold.co/120x120/244b37/ffffff?text=FT";
+  "https://placehold.co/120x120/173d76/ffffff?text=BG";
 
 let allVideos = [];
 let activeFilter = "all";
@@ -419,8 +628,11 @@ function showToast(message) {
   const el = document.getElementById("toast");
   el.textContent = String(message || "Something went wrong.");
   el.classList.add("show");
+
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("show"), 2800);
+  toastTimer = setTimeout(() => {
+    el.classList.remove("show");
+  }, 2800);
 }
 
 async function api(path) {
@@ -440,7 +652,7 @@ async function api(path) {
     });
   } catch (_) {
     throw new Error(
-      "Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করো।"
+      "Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।"
     );
   }
 
@@ -459,7 +671,7 @@ async function api(path) {
     } catch (_) {}
 
     go("auth.html?mode=login");
-    throw new Error("সেশন শেষ হয়েছে। আবার লগইন করো।");
+    throw new Error("সেশন শেষ হয়েছে। আবার লগইন করুন।");
   }
 
   if (!response.ok) {
@@ -474,33 +686,60 @@ async function api(path) {
 function normalize(post) {
   const src = post.media_url || post.mediaUrl || post.src || "";
   let type = String(post.media_type || post.type || "").toLowerCase();
+  const author = post.author || post.user || {};
 
-  if (type === "photo") type = "image";
+  if (["photo","png","jpg","jpeg","webp","gif"].includes(type)) {
+    type = "image";
+  }
+
+  if (["mp4","webm","quicktime","mov"].includes(type)) {
+    type = "video";
+  }
 
   if (!type && src) {
     type = /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(src)
-      ? "video" : "image";
+      ? "video"
+      : "image";
   }
 
   return {
     id: String(post.id ?? post.post_id ?? ""),
     userId: String(
-      post.user_id ?? post.author_id ?? post.owner_id ??
-      post.userId ?? post.author?.id ?? ""
+      post.user_id ??
+      post.author_id ??
+      post.owner_id ??
+      post.userId ??
+      author.id ??
+      ""
     ),
     profileUsername: String(
-      post.username || post.author_username ||
-      post.profile_username || post.author?.username || ""
-    ),
-    username: post.display_name || post.username ||
-      post.author_name || post.author?.display_name || "FreeTube User",
-    avatar: post.avatar_url || post.avatar ||
-      post.profile_picture || post.author?.avatar_url || FALLBACK_AVATAR,
+      post.username ||
+      post.author_username ||
+      post.profile_username ||
+      author.username ||
+      ""
+    ).replace(/^@/, ""),
+    username:
+      post.display_name ||
+      post.full_name ||
+      post.username ||
+      post.author_name ||
+      author.display_name ||
+      author.username ||
+      "Boys vs Girls User",
+    avatar:
+      post.avatar_url ||
+      post.avatar ||
+      post.profile_picture ||
+      author.avatar_url ||
+      FALLBACK_AVATAR,
     content: post.content || post.text || "",
     src,
     type,
     likes: count(post.like_count ?? post.likes_count ?? post.likes),
-    comments: count(post.comment_count ?? post.comments_count ?? post.comments),
+    comments: count(
+      post.comment_count ?? post.comments_count ?? post.comments
+    ),
     views: count(post.view_count ?? post.views_count ?? post.views),
     created: post.created_at || post.createdAt || post.time || ""
   };
@@ -510,10 +749,14 @@ function timeAgo(value) {
   if (!value) return "Recently";
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return String(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
 
   const minutes = Math.max(
-    0, Math.floor((Date.now() - date.getTime()) / 60000)
+    0,
+    Math.floor((Date.now() - date.getTime()) / 60000)
   );
 
   if (minutes < 1) return "Just now";
@@ -528,6 +771,10 @@ function timeAgo(value) {
   return date.toLocaleDateString();
 }
 
+/*
+ * Keep the existing Android Native Ads bridge.
+ * The app's MainActivity handles loading and positioning ads.
+ */
 function nativeAdsAvailable() {
   return !!(
     window.FreeTubeAds &&
@@ -536,7 +783,9 @@ function nativeAdsAvailable() {
 }
 
 function setupNativeAdSlots() {
-  const slots = [...document.querySelectorAll(".native-ad-slot")];
+  const slots = [
+    ...document.querySelectorAll(".native-ad-slot")
+  ];
 
   if (!nativeAdsAvailable()) {
     slots.forEach(slot => {
@@ -556,6 +805,7 @@ function setupNativeAdSlots() {
 
     document.querySelectorAll(".native-ad-slot").forEach(slot => {
       const rect = slot.getBoundingClientRect();
+
       const visible =
         rect.bottom > 0 &&
         rect.top < window.innerHeight &&
@@ -574,9 +824,15 @@ function setupNativeAdSlots() {
   };
 
   window.updateNativeAdSlots();
-  requestAnimationFrame(() => window.updateNativeAdSlots());
+
+  requestAnimationFrame(() => {
+    if (window.updateNativeAdSlots) {
+      window.updateNativeAdSlots();
+    }
+  });
 
   clearTimeout(nativeAdRefreshTimer);
+
   nativeAdRefreshTimer = setTimeout(() => {
     if (window.updateNativeAdSlots) {
       window.updateNativeAdSlots();
@@ -586,13 +842,13 @@ function setupNativeAdSlots() {
 
 function makeAdSlot(index) {
   return `
-    <section class="native-ad-slot"
+    <section
+      class="native-ad-slot"
       id="native-ad-slot-${index}"
-      aria-label="Advertisement"
+      aria-label="Sponsored content"
       hidden>
       <div class="native-ad-label">ADVERTISEMENT</div>
       <div class="native-ad-placeholder">
-        <i class="fa-solid fa-rectangle-ad"></i>
         <span>Advertisement</span>
       </div>
     </section>`;
@@ -601,12 +857,17 @@ function makeAdSlot(index) {
 function getProfileUrl(video) {
   const params = new URLSearchParams();
 
-  if (video.userId) params.set("userId", video.userId);
+  if (video.userId) {
+    params.set("userId", video.userId);
+  }
+
   if (video.profileUsername) {
     params.set("username", video.profileUsername);
   }
 
-  if (!video.userId && !video.profileUsername) return "";
+  if (!video.userId && !video.profileUsername) {
+    return "";
+  }
 
   return "profile.html?" + params.toString();
 }
@@ -615,16 +876,18 @@ function render() {
   const query = document.getElementById("searchInput")
     .value.trim().toLowerCase();
 
-  let videos = allVideos.filter(video => {
-    const searchable =
-      (video.username + " " + video.profileUsername + " " +
-       video.content).toLowerCase();
+  let filtered = allVideos.filter(video => {
+    const searchable = (
+      video.username + " " +
+      video.profileUsername + " " +
+      video.content
+    ).toLowerCase();
 
     return !query || searchable.includes(query);
   });
 
   if (activeFilter === "recent") {
-    videos = videos.slice().sort((a, b) => {
+    filtered = filtered.slice().sort((a, b) => {
       const dateA = new Date(a.created || 0).getTime() || 0;
       const dateB = new Date(b.created || 0).getTime() || 0;
       return dateB - dateA;
@@ -632,7 +895,8 @@ function render() {
   }
 
   document.getElementById("resultsInfo").textContent =
-    videos.length + " video" + (videos.length === 1 ? "" : "s");
+    filtered.length + " video" +
+    (filtered.length === 1 ? "" : "s");
 
   const root = document.getElementById("results");
 
@@ -651,7 +915,7 @@ function render() {
     });
   }
 
-  if (!videos.length) {
+  if (!filtered.length) {
     root.innerHTML = `
       <div class="state">
         <i class="fa-solid fa-video-slash"></i><br>
@@ -663,46 +927,40 @@ function render() {
 
   let html = "";
 
-  videos.forEach((video, index) => {
+  filtered.forEach((video, index) => {
     const profile = getProfileUrl(video);
 
     const avatar = profile
-      ? `<a class="profile-link"
-            href="${esc(profile)}"
-            aria-label="Open ${esc(video.username)} profile">
-           <img class="avatar"
-             src="${esc(video.avatar)}"
-             alt=""
-             loading="lazy"
-             onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
-         </a>`
-      : `<img class="avatar"
-           src="${esc(video.avatar)}"
-           alt=""
-           loading="lazy"
-           onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">`;
+      ? `
+        <a class="profile-link"
+          href="${esc(profile)}"
+          aria-label="Open ${esc(video.username)} profile">
+          <img class="avatar"
+            src="${esc(video.avatar)}"
+            alt=""
+            loading="lazy"
+            onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
+        </a>`
+      : `
+        <img class="avatar"
+          src="${esc(video.avatar)}"
+          alt=""
+          loading="lazy"
+          onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">`;
 
     const name = profile
-      ? `<a class="username profile-name"
-           href="${esc(profile)}">${esc(video.username)}</a>`
+      ? `
+        <a class="username profile-name"
+          href="${esc(profile)}">${esc(video.username)}</a>`
       : `<div class="username">${esc(video.username)}</div>`;
 
-    html += `
-      <article class="card" id="video-${esc(video.id)}">
-        <header class="card-head">
-          ${avatar}
-          <div class="user-info">
-            ${name}
-            <div class="time">${esc(timeAgo(video.created))}</div>
-          </div>
-        </header>
+    let media = "";
 
-        ${video.content
-          ? `<div class="content">${esc(video.content)}</div>`
-          : ""}
-
+    if (video.src && video.type === "video") {
+      media = `
         <div class="media">
           <video
+            class="feed-video"
             controls
             playsinline
             webkit-playsinline
@@ -711,20 +969,56 @@ function render() {
             loop
             preload="metadata"
             src="${esc(video.src)}"
-            aria-label="Video by ${esc(video.username)}"
-          ></video>
-        </div>
+            aria-label="Video by ${esc(video.username)}">
+          </video>
+        </div>`;
+    } else {
+      media = `
+        <div class="state">
+          <i class="fa-solid fa-video-slash"></i><br>
+          This video is not available.
+        </div>`;
+    }
+
+    html += `
+      <article class="card" id="video-${esc(video.id)}">
+        <header class="card-head">
+          ${avatar}
+
+          <div class="user-info">
+            ${name}
+            <div class="time">
+              ${esc(timeAgo(video.created))}
+              · <i class="fa-solid fa-earth-americas"></i>
+            </div>
+          </div>
+        </header>
+
+        ${video.content
+          ? `<div class="content">${esc(video.content)}</div>`
+          : ""}
+
+        ${media}
 
         <div class="stats">
-          <span><i class="fa-solid fa-thumbs-up"></i> ${video.likes} likes</span>
-          <span><i class="fa-regular fa-eye"></i> ${video.views} views</span>
-          <span>${video.comments} comments</span>
+          <span>
+            <i class="fa-solid fa-heart"></i>
+            ${video.likes} likes
+          </span>
+          <span>
+            <i class="fa-regular fa-eye"></i>
+            ${video.views} views
+          </span>
+          <span>
+            <i class="fa-regular fa-comment comments-icon"></i>
+            ${video.comments} comments
+          </span>
         </div>
       </article>`;
 
     const number = index + 1;
 
-    if (number % 2 === 0 && number < videos.length) {
+    if (number % 2 === 0 && number < filtered.length) {
       html += makeAdSlot(number / 2);
     }
   });
@@ -736,21 +1030,26 @@ function render() {
 }
 
 function setupVideoPlayback() {
-  if (videoObserver) videoObserver.disconnect();
+  if (videoObserver) {
+    videoObserver.disconnect();
+    videoObserver = null;
+  }
 
-  const videos = [...document.querySelectorAll(".media video")];
+  const feedVideos = [
+    ...document.querySelectorAll(".feed-video")
+  ];
 
-  videos.forEach(video => {
+  feedVideos.forEach(video => {
     video.muted = true;
     video.playsInline = true;
     video.loop = true;
   });
 
   if (!("IntersectionObserver" in window)) {
-    videos.forEach(video => {
-      const playPromise = video.play();
-      if (playPromise && playPromise.catch) {
-        playPromise.catch(() => {});
+    feedVideos.forEach(video => {
+      const promise = video.play();
+      if (promise && promise.catch) {
+        promise.catch(() => {});
       }
     });
     return;
@@ -760,24 +1059,32 @@ function setupVideoPlayback() {
     entries.forEach(entry => {
       const video = entry.target;
 
-      if (entry.isIntersecting && entry.intersectionRatio >= 0.55) {
-        videos.forEach(other => {
-          if (other !== video) other.pause();
+      if (
+        entry.isIntersecting &&
+        entry.intersectionRatio >= 0.55
+      ) {
+        feedVideos.forEach(other => {
+          if (other !== video) {
+            other.pause();
+          }
         });
 
-        const playPromise = video.play();
-        if (playPromise && playPromise.catch) {
-          playPromise.catch(() => {});
+        const promise = video.play();
+
+        if (promise && promise.catch) {
+          promise.catch(() => {});
         }
       } else {
         video.pause();
       }
     });
   }, {
-    threshold: [0, 0.25, 0.55, 0.75, 1]
+    threshold:[0,0.25,0.55,0.75,1]
   });
 
-  videos.forEach(video => videoObserver.observe(video));
+  feedVideos.forEach(video => {
+    videoObserver.observe(video);
+  });
 }
 
 async function loadVideos() {
@@ -789,16 +1096,23 @@ async function loadVideos() {
       Loading videos...
     </div>`;
 
-  document.getElementById("resultsInfo").textContent = "Loading videos...";
+  document.getElementById("resultsInfo").textContent =
+    "Loading videos...";
 
   try {
     const data = await api("/posts");
+
     const posts = Array.isArray(data)
-      ? data : (data.posts || data.items || []);
+      ? data
+      : (data.posts || data.items || []);
 
     allVideos = posts
       .map(normalize)
-      .filter(post => post.id && post.src && post.type === "video");
+      .filter(post =>
+        post.id &&
+        post.src &&
+        post.type === "video"
+      );
 
     render();
   } catch (error) {
@@ -806,7 +1120,9 @@ async function loadVideos() {
       <div class="state">
         <i class="fa-solid fa-triangle-exclamation"></i><br>
         ${esc(error.message)}<br><br>
-        <button class="secondary" onclick="loadVideos()">Retry</button>
+        <button class="secondary" onclick="loadVideos()">
+          Retry
+        </button>
       </div>`;
 
     document.getElementById("resultsInfo").textContent =
@@ -816,40 +1132,51 @@ async function loadVideos() {
   }
 }
 
-document.getElementById("searchInput").addEventListener("input", () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(render, 120);
-});
+/* Search */
 
-document.getElementById("searchForm").addEventListener("submit", event => {
-  event.preventDefault();
-  render();
-});
+document.getElementById("searchInput")
+  .addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(render, 120);
+  });
 
-document.getElementById("clearButton").addEventListener("click", () => {
-  const input = document.getElementById("searchInput");
-  input.value = "";
-  render();
-  input.focus();
-});
-
-document.querySelectorAll("[data-filter]").forEach(button => {
-  button.addEventListener("click", () => {
-    activeFilter = button.dataset.filter;
-
-    document.querySelectorAll("[data-filter]").forEach(item => {
-      item.classList.toggle("active", item === button);
-    });
-
+document.getElementById("searchForm")
+  .addEventListener("submit", event => {
+    event.preventDefault();
     render();
   });
-});
+
+document.getElementById("clearButton")
+  .addEventListener("click", () => {
+    const input = document.getElementById("searchInput");
+    input.value = "";
+    render();
+    input.focus();
+  });
+
+/* Filters */
+
+document.querySelectorAll("[data-filter]")
+  .forEach(button => {
+    button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+
+      document.querySelectorAll("[data-filter]")
+        .forEach(item => {
+          item.classList.toggle("active", item === button);
+        });
+
+      render();
+    });
+  });
+
+/* Keep Android native ad positions updated */
 
 window.addEventListener("scroll", () => {
   if (window.updateNativeAdSlots) {
     window.updateNativeAdSlots();
   }
-}, { passive:true });
+}, {passive:true});
 
 window.addEventListener("resize", () => {
   if (window.updateNativeAdSlots) {
@@ -859,9 +1186,11 @@ window.addEventListener("resize", () => {
 
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    document.querySelectorAll(".media video").forEach(video => video.pause());
+    document.querySelectorAll(".feed-video")
+      .forEach(video => video.pause());
   } else {
     setupVideoPlayback();
+
     if (window.updateNativeAdSlots) {
       window.updateNativeAdSlots();
     }
