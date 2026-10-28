@@ -1,1341 +1,935 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#111027">
-<title>Create post — Boys vs Girls 💙💗</title>
+<meta name="theme-color" content="#242526">
+<title>New post — Boys vs Girls</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
-:root {
-  --bg: #0b0a18;
-  --surface: #151329;
-  --surface2: #1c1935;
-  --border: rgba(255,255,255,.09);
-  --text: #f7f5ff;
-  --muted: #a6a1bf;
-  --blue: #5794ff;
-  --purple: #9364ff;
-  --pink: #ff5fa2;
-  --gradient: linear-gradient(120deg,#4f8dff,#9560ff 55%,#ff5fa2);
-  --radius: 20px;
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body {
-  margin: 0;
-  color: var(--text);
-  background:
-    radial-gradient(ellipse at 10% 0%,rgba(78,103,255,.13),transparent 35%),
-    radial-gradient(ellipse at 100% 30%,rgba(255,75,164,.08),transparent 30%),
-    var(--bg);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  min-height: 100vh;
-  padding-bottom: 100px;
-}
-
-button, textarea, select, input {
-  font: inherit;
-}
-
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-.topbar {
-  position: sticky;
-  top: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 17px;
-  padding-top: max(14px,env(safe-area-inset-top));
-  background: rgba(11,10,24,.88);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(18px);
-}
-
-.top-left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.icon-btn {
-  width: 42px;
-  height: 42px;
-  flex-shrink: 0;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: white;
-  font-size: 17px;
-}
-
-.brand-mark {
-  width: 39px;
-  height: 39px;
-  border-radius: 13px;
-  display: grid;
-  place-items: center;
-  background: var(--gradient);
-  box-shadow: 0 5px 20px rgba(120,90,255,.25);
-  font-size: 19px;
-}
-
-.brand-name {
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.3;
-}
-
-.brand-sub {
-  color: var(--muted);
-  font-size: 11px;
-  margin-top: 2px;
-}
-
-.top-actions {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-}
-
-.draft-btn {
-  background: transparent;
-  border: 0;
-  color: #c9c2e6;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 10px 4px;
-}
-
-.publish-btn {
-  border: 0;
-  border-radius: 13px;
-  padding: 12px 17px;
-  color: white;
-  font-size: 13px;
-  font-weight: 800;
-  background: var(--gradient);
-  box-shadow: 0 6px 20px rgba(120,85,255,.2);
-}
-
-.publish-btn i {
-  margin-right: 5px;
-}
-
-main {
-  width: min(100% - 26px, 680px);
-  margin: 23px auto 0;
-}
-
-.page-heading {
-  margin: 0 0 20px;
-}
-
-.page-heading h1 {
-  margin: 0;
-  font-size: 26px;
-  letter-spacing: -.7px;
-  font-weight: 850;
-}
-
-.page-heading p {
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
-  margin: 7px 0 0;
-}
-
-.card {
-  background: linear-gradient(145deg,rgba(26,23,52,.97),rgba(17,15,36,.98));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 17px;
-  margin-bottom: 15px;
-  box-shadow: 0 12px 35px rgba(0,0,0,.12);
-}
-
-.profile-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.avatar {
-  width: 47px;
-  height: 47px;
-  flex-shrink: 0;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--gradient);
-  overflow: hidden;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.avatar img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-details {
-  min-width: 0;
-  flex: 1;
-}
-
-.profile-name {
-  font-size: 14px;
-  font-weight: 800;
-  overflow-wrap: anywhere;
-}
-
-.profile-caption {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-}
-
-.audience-wrap {
-  position: relative;
-}
-
-.audience-select {
-  color: #e7e1ff;
-  background: rgba(255,255,255,.05);
-  border: 1px solid var(--border);
-  border-radius: 11px;
-  padding: 9px 10px;
-  max-width: 145px;
-  font-size: 12px;
-  outline: none;
-}
-
-.audience-select option {
-  color: #fff;
-  background: #19162e;
-}
-
-.composer {
-  padding: 0;
-  overflow: hidden;
-}
-
-.composer textarea {
-  display: block;
-  width: 100%;
-  min-height: 165px;
-  resize: vertical;
-  padding: 19px 17px 13px;
-  border: 0;
-  outline: 0;
-  color: var(--text);
-  background: transparent;
-  font-size: 16px;
-  line-height: 1.7;
-}
-
-.composer textarea::placeholder {
-  color: #77718f;
-}
-
-.composer-bottom {
-  padding: 11px 16px 13px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  border-top: 1px solid rgba(255,255,255,.045);
-}
-
-.mood-label {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.char-count {
-  color: var(--muted);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-}
-
-.section-title {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-size: 14px;
-  font-weight: 800;
-  margin: 0 0 14px;
-}
-
-.section-title i {
-  color: #b5a2ff;
-  margin-right: 7px;
-}
-
-.section-hint {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.media-grid {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 11px;
-}
-
-.media-option {
-  min-height: 116px;
-  border: 1px dashed rgba(164,146,255,.32);
-  border-radius: 16px;
-  background: rgba(255,255,255,.025);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 9px;
-  color: #eeeaff;
-  transition: .2s ease;
-  padding: 14px 8px;
-}
-
-.media-option:active {
-  transform: scale(.98);
-}
-
-.media-icon {
-  width: 43px;
-  height: 43px;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  font-size: 18px;
-}
-
-.photo-icon {
-  background: rgba(77,144,255,.16);
-  color: #72aaff;
-}
-
-.video-icon {
-  background: rgba(255,95,162,.14);
-  color: #ff82b7;
-}
-
-.media-option strong {
-  font-size: 13px;
-}
-
-.media-option small {
-  font-size: 11px;
-  color: var(--muted);
-}
-
-.media-preview {
-  display: none;
-  position: relative;
-  margin-top: 13px;
-  border: 1px solid var(--border);
-  border-radius: 15px;
-  overflow: hidden;
-  background: #080713;
-}
-
-.media-preview.show {
-  display: block;
-}
-
-.media-preview img,
-.media-preview video {
-  display: block;
-  max-height: 380px;
-  width: 100%;
-  object-fit: contain;
-}
-
-.remove-media {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 35px;
-  height: 35px;
-  border: 1px solid rgba(255,255,255,.15);
-  border-radius: 50%;
-  color: white;
-  background: rgba(0,0,0,.72);
-}
-
-.file-info {
-  color: var(--muted);
-  font-size: 11px;
-  padding: 9px 11px;
-  overflow-wrap: anywhere;
-}
-
-.tools-list {
-  display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 9px;
-}
-
-.tool-btn {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  text-align: left;
-  padding: 13px 11px;
-  min-height: 60px;
-  border-radius: 14px;
-  background: rgba(255,255,255,.025);
-  border: 1px solid var(--border);
-  color: var(--text);
-}
-
-.tool-btn i {
-  width: 33px;
-  height: 33px;
-  display: grid;
-  place-items: center;
-  border-radius: 11px;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.tool-btn span {
-  min-width: 0;
-}
-
-.tool-btn strong {
-  display: block;
-  font-size: 12px;
-}
-
-.tool-btn small {
-  display: block;
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 4px;
-  line-height: 1.4;
-}
-
-.tool-music i { background: rgba(178,112,255,.14); color: #c39aff; }
-.tool-tag i { background: rgba(255,95,162,.14); color: #ff83b7; }
-.tool-location i { background: rgba(75,200,163,.13); color: #67dbb9; }
-.tool-gif i { background: rgba(255,193,91,.13); color: #ffce76; }
-.tool-live i { background: rgba(255,87,87,.13); color: #ff8585; }
-.tool-poll i { background: rgba(84,150,255,.14); color: #80b4ff; }
-
-.tool-btn:active {
-  background: rgba(145,104,255,.1);
-}
-
-.notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 11px;
-  border: 1px solid rgba(103,137,255,.18);
-  border-radius: 15px;
-  background: rgba(80,111,255,.065);
-  padding: 14px;
-  margin-bottom: 15px;
-}
-
-.notice i {
-  color: #8aabff;
-  margin-top: 2px;
-}
-
-.notice strong {
-  display: block;
-  font-size: 12px;
-  margin-bottom: 5px;
-}
-
-.notice p {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.6;
-  margin: 0;
-}
-
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 30;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 10px 8px calc(10px + env(safe-area-inset-bottom));
-  background: rgba(14,12,29,.94);
-  border-top: 1px solid var(--border);
-  backdrop-filter: blur(18px);
-}
-
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  text-decoration: none;
-  color: #89839f;
-  min-width: 52px;
-  font-size: 10px;
-  font-weight: 650;
-}
-
-.nav-item i {
-  font-size: 19px;
-}
-
-.nav-item.active {
-  color: #b9a2ff;
-}
-
-.nav-item.create i {
-  width: 42px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: var(--gradient);
-  color: white;
-  box-shadow: 0 4px 16px rgba(129,91,255,.23);
-}
-
-.status-message {
-  display: none;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  border-radius: 13px;
-  font-size: 12px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.status-message.show {
-  display: block;
-}
-
-.status-message.error {
-  background: rgba(255,80,113,.1);
-  border: 1px solid rgba(255,80,113,.25);
-  color: #ff9daf;
-}
-
-.status-message.success {
-  background: rgba(69,210,158,.1);
-  border: 1px solid rgba(69,210,158,.25);
-  color: #8deac7;
-}
-
-.status-message.info {
-  background: rgba(90,139,255,.1);
-  border: 1px solid rgba(90,139,255,.25);
-  color: #aac6ff;
-}
-
-.progress-wrap {
-  display: none;
-  margin: 0 0 15px;
-}
-
-.progress-wrap.show {
-  display: block;
-}
-
-.progress-text {
-  display: flex;
-  justify-content: space-between;
-  color: var(--muted);
-  font-size: 11px;
-  margin-bottom: 8px;
-}
-
-.progress-track {
-  height: 5px;
-  border-radius: 20px;
-  background: rgba(255,255,255,.08);
-  overflow: hidden;
-}
-
-.progress-bar {
-  width: 0;
-  height: 100%;
-  border-radius: 20px;
-  background: var(--gradient);
-  transition: width .2s;
-}
-
-.hidden-input {
-  display: none;
-}
-
-@media (min-width: 600px) {
-  main {
-    margin-top: 32px;
-  }
-  .page-heading h1 {
-    font-size: 30px;
-  }
-  .card {
-    padding: 20px;
-  }
-  .composer textarea {
-    min-height: 190px;
-    padding: 22px 20px 14px;
-    font-size: 17px;
-  }
-}
-
-@media (max-width: 360px) {
-  .topbar {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .brand-name {
-    font-size: 13px;
-  }
-  .draft-btn {
-    font-size: 12px;
-  }
-  .publish-btn {
-    padding: 11px 12px;
-  }
-  .audience-select {
-    max-width: 115px;
-  }
-  .tools-list {
-    grid-template-columns: 1fr;
-  }
+:root{
+  --bg:#242526;
+  --panel:#303133;
+  --panel-hover:#393a3c;
+  --border:rgba(255,255,255,.07);
+  --text:#f5f5f5;
+  --muted:#b0b3b8;
+  --blue:#4598ff;
+  --purple:#9564ff;
+  --pink:#f05bb8;
+  --gradient:linear-gradient(120deg,#458bff,#9360ff 55%,#f05bb8);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+body{min-height:100dvh;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+button,textarea,input,select{font:inherit}
+button{color:inherit;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+[hidden]{display:none!important}
+
+.app{width:100%;max-width:700px;margin:auto;min-height:100dvh}
+.topbar{
+  position:sticky;top:0;z-index:10;
+  display:grid;grid-template-columns:48px 1fr 90px;
+  align-items:center;gap:8px;
+  padding:calc(10px + env(safe-area-inset-top)) 15px 10px;
+  background:var(--bg);
+}
+.close-btn{
+  width:42px;height:42px;border:0;border-radius:50%;
+  background:transparent;color:#f5f5f5;font-size:26px;
+  display:grid;place-items:center;
+}
+.close-btn:active{background:#ffffff13}
+.top-title{text-align:center;font-size:21px;font-weight:800}
+.next-btn{
+  justify-self:end;border:0;border-radius:12px;
+  padding:12px 17px;background:#414244;color:#a4a5a8;
+  font-size:15px;font-weight:800;
+}
+.next-btn.enabled{background:#3578e5;color:#fff}
+
+.profile-row{
+  display:flex;align-items:center;gap:12px;
+  padding:24px 20px 17px;
+}
+.avatar{
+  width:62px;height:62px;flex-shrink:0;
+  border-radius:50%;overflow:hidden;
+  display:grid;place-items:center;
+  background:var(--gradient);font-size:22px;font-weight:800;
+}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.profile-info{min-width:0;flex:1}
+.profile-name{font-size:19px;font-weight:800;overflow-wrap:anywhere}
+.profile-hint{margin-top:5px;font-size:12px;color:var(--muted)}
+.privacy{
+  display:flex;align-items:center;gap:6px;
+  margin-top:9px;padding:7px 10px;
+  border-radius:9px;border:0;
+  background:#3a3b3d;color:#f0f0f0;
+  font-size:12px;font-weight:700;
+}
+.privacy i{font-size:12px}
+.privacy .caret{font-size:10px;color:#c5c6c8;margin-left:3px}
+
+.privacy-menu{
+  position:relative;z-index:5;
+  margin:0 20px 10px;padding:7px;
+  border:1px solid var(--border);border-radius:14px;
+  background:#303133;box-shadow:0 10px 30px #0005;
+}
+.privacy-option{
+  width:100%;display:flex;align-items:center;gap:12px;
+  padding:13px 12px;border:0;border-radius:10px;
+  background:transparent;text-align:left;
+}
+.privacy-option:active,.privacy-option.selected{background:#444548}
+.privacy-option>i:first-child{
+  width:37px;height:37px;display:grid;place-items:center;
+  border-radius:50%;background:#46474a;font-size:16px;
+}
+.privacy-option span{flex:1}
+.privacy-option strong{display:block;font-size:14px}
+.privacy-option small{display:block;margin-top:4px;color:var(--muted);font-size:11px}
+.privacy-option .fa-check{color:#68a6ff}
+
+.composer{padding:0 20px}
+#postContent{
+  display:block;width:100%;min-height:210px;
+  resize:vertical;border:0;outline:0;
+  background:transparent;color:#fff;
+  font-size:23px;line-height:1.55;padding:13px 0;
+}
+#postContent::placeholder{color:#b0b3b8;opacity:1}
+.caption-meta{display:flex;justify-content:flex-end;color:var(--muted);font-size:12px;padding-bottom:12px}
+
+.quick-actions{
+  display:flex;align-items:center;gap:9px;
+  overflow-x:auto;scrollbar-width:none;
+  padding:7px 20px 17px;
+}
+.quick-actions::-webkit-scrollbar{display:none}
+.pill{
+  flex:0 0 auto;display:flex;align-items:center;gap:9px;
+  min-height:45px;padding:0 15px;
+  border:1px solid var(--border);border-radius:28px;
+  background:#303133;color:#f3f3f3;
+  font-size:14px;font-weight:750;white-space:nowrap;
+}
+.pill i{font-size:18px}
+.pill:active{background:#414244}
+.pill.music i{color:#f5c55d}
+.pill.tag i{color:#8db7ff}
+.pill.location i{color:#ff818b}
+
+.section-divider{height:1px;background:#ffffff14;margin:5px 0 16px}
+.section-title{padding:0 20px 13px;font-size:14px;font-weight:800}
+
+.media-tools{
+  display:grid;grid-template-columns:repeat(4,minmax(90px,1fr));
+  gap:10px;padding:0 20px 18px;
+  overflow-x:auto;
+}
+.media-tool{
+  min-height:104px;min-width:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  border:1px solid var(--border);border-radius:18px;
+  background:#303133;box-shadow:0 4px 10px #0002;
+  font-size:13px;font-weight:750;
+}
+.media-tool i{font-size:25px}
+.media-tool:active{background:#414244;transform:scale(.98)}
+.media-tool.gallery i{color:#d6d6ff}
+.media-tool.gif i{color:#a5d2ff}
+.media-tool.live i{color:#ff9098}
+.media-tool.more i{color:#d4b0ff}
+
+.media-preview{
+  display:none;position:relative;
+  margin:0 20px 17px;overflow:hidden;
+  border-radius:15px;background:#101010;
+  border:1px solid var(--border);
+}
+.media-preview.show{display:block}
+.media-preview img,.media-preview video{
+  display:block;width:100%;max-height:440px;
+  object-fit:contain;background:#101010;
+}
+.remove-media{
+  position:absolute;right:10px;top:10px;z-index:2;
+  width:37px;height:37px;border:0;border-radius:50%;
+  background:#000b;color:white;font-size:17px;
+}
+.file-info{padding:10px 12px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+
+.status{
+  display:none;margin:0 20px 15px;
+  padding:12px 14px;border-radius:12px;
+  font-size:13px;line-height:1.5;overflow-wrap:anywhere;
+}
+.status.show{display:block}
+.status.error{background:#5b262c;color:#ffb7bd}
+.status.success{background:#164e39;color:#a6ffd7}
+.status.info{background:#243b60;color:#c6dcff}
+
+.progress{display:none;margin:0 20px 14px}
+.progress.show{display:block}
+.progress-label{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:7px}
+.progress-track{height:5px;background:#414244;border-radius:9px;overflow:hidden}
+.progress-bar{height:100%;width:0;background:var(--gradient);transition:width .2s}
+
+.bottom-privacy{
+  position:fixed;left:0;right:0;bottom:0;z-index:8;
+  padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+  background:rgba(36,37,38,.97);
+  border-top:1px solid #ffffff18;
+}
+.bottom-inner{
+  max-width:660px;margin:auto;
+  display:flex;align-items:center;gap:10px;overflow-x:auto;
+  scrollbar-width:none;
+}
+.bottom-inner::-webkit-scrollbar{display:none}
+.bottom-pill{
+  flex:0 0 auto;display:flex;align-items:center;gap:8px;
+  padding:11px 15px;border:0;border-radius:25px;
+  background:#3a3b3d;color:#f3f3f3;
+  font-size:14px;font-weight:750;white-space:nowrap;
+}
+.bottom-pill i{font-size:17px}
+.bottom-pill.active{background:#414d65}
+.bottom-pill.active i{color:#86b5ff}
+.bottom-post{
+  margin-left:auto;flex:0 0 auto;
+  padding:11px 17px;border:0;border-radius:25px;
+  background:#3578e5;color:#fff;font-weight:800;
+}
+.bottom-post:disabled{background:#414244;color:#999}
+
+.modal-backdrop{
+  position:fixed;inset:0;z-index:50;
+  display:flex;align-items:flex-end;justify-content:center;
+  background:#0009;
+}
+.modal{
+  width:100%;max-width:650px;
+  max-height:85dvh;overflow:auto;
+  padding:20px 18px calc(24px + env(safe-area-inset-bottom));
+  background:#303133;border-radius:22px 22px 0 0;
+}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-head h2{font-size:19px}
+.modal-close{width:36px;height:36px;border:0;border-radius:50%;background:#444548}
+.modal-input{
+  width:100%;padding:13px;border:1px solid #55565a;
+  border-radius:12px;background:#242526;color:#fff;outline:none;
+}
+.modal-input::placeholder{color:#aaa}
+.modal-actions{display:flex;gap:10px;margin-top:15px}
+.modal-actions button{flex:1;padding:13px;border:0;border-radius:12px;font-weight:800}
+.cancel-btn{background:#454649}
+.confirm-btn{background:#3578e5;color:white}
+
+@media(min-width:600px){
+  .app{border-left:1px solid #ffffff08;border-right:1px solid #ffffff08}
+  .top-title{font-size:23px}
+  .profile-row{padding-top:28px}
+  #postContent{min-height:260px;font-size:25px}
+}
+@media(max-width:380px){
+  .topbar{grid-template-columns:42px 1fr 75px;padding-left:9px;padding-right:9px}
+  .top-title{font-size:18px}
+  .next-btn{padding:11px 13px;font-size:14px}
+  .profile-row{padding-left:14px;padding-right:14px}
+  .composer{padding-left:15px;padding-right:15px}
+  #postContent{font-size:21px}
+  .quick-actions{padding-left:14px;padding-right:14px}
+  .media-tools{padding-left:14px;padding-right:14px;grid-template-columns:repeat(4,94px)}
+  .bottom-privacy{padding-left:10px;padding-right:10px}
 }
 </style>
 </head>
 
 <body>
+<div class="app">
 
-<header class="topbar">
-  <div class="top-left">
-    <button class="icon-btn" id="backBtn" type="button" aria-label="Go back">
-      <i class="fa-solid fa-arrow-left"></i>
+  <header class="topbar">
+    <button class="close-btn" id="closeBtn" type="button" aria-label="Close post composer">
+      <i class="fa-solid fa-xmark"></i>
     </button>
+    <div class="top-title">New post</div>
+    <button class="next-btn" id="nextBtn" type="button" disabled>Next</button>
+  </header>
 
-    <div class="brand-mark">💙</div>
-
-    <div>
-      <div class="brand-name">Boys vs Girls 💙💗</div>
-      <div class="brand-sub">Share your moment</div>
+  <section class="profile-row">
+    <div class="avatar" id="userAvatar">B</div>
+    <div class="profile-info">
+      <div class="profile-name" id="userName">Your profile</div>
+      <div class="profile-hint">Create a post for your community</div>
+      <button class="privacy" id="privacyBtn" type="button" aria-expanded="false">
+        <i class="fa-solid fa-earth-americas" id="privacyIcon"></i>
+        <span id="privacyText">Public</span>
+        <i class="fa-solid fa-caret-down caret"></i>
+      </button>
     </div>
-  </div>
+  </section>
 
-  <div class="top-actions">
-    <button class="draft-btn" id="saveDraftBtn" type="button">Save draft</button>
-    <button class="publish-btn" id="publishTopBtn" type="button">
-      <i class="fa-solid fa-paper-plane"></i> Post
+  <div class="privacy-menu" id="privacyMenu" hidden>
+    <button class="privacy-option selected" data-audience="public" type="button">
+      <i class="fa-solid fa-earth-americas"></i>
+      <span><strong>Public</strong><small>Anyone can see this post</small></span>
+      <i class="fa-solid fa-check"></i>
+    </button>
+    <button class="privacy-option" data-audience="friends" type="button">
+      <i class="fa-solid fa-user-group"></i>
+      <span><strong>Friends</strong><small>Share with your friends</small></span>
+      <i class="fa-solid fa-check" hidden></i>
     </button>
   </div>
-</header>
 
-<main>
-  <div class="page-heading">
-    <h1>Create post <span>✨</span></h1>
-    <p>What's happening? Share your thoughts with the community.</p>
+  <section class="composer">
+    <textarea id="postContent" maxlength="5000" placeholder="What's on your mind?" aria-label="What's on your mind?"></textarea>
+    <div class="caption-meta"><span id="charCount">0/5000</span></div>
+  </section>
+
+  <div class="quick-actions">
+    <button class="pill music" type="button" data-feature="Music">
+      <i class="fa-solid fa-music"></i> Music
+    </button>
+    <button class="pill tag" type="button" data-feature="Tag/Collaborate">
+      <i class="fa-solid fa-user-tag"></i> Tag/Collaborate
+    </button>
+    <button class="pill location" type="button" data-feature="Location">
+      <i class="fa-solid fa-location-dot"></i> Location
+    </button>
   </div>
 
-  <div id="statusMessage" class="status-message" role="status" aria-live="polite"></div>
+  <div class="media-preview" id="mediaPreview">
+    <button class="remove-media" id="removeMediaBtn" type="button" aria-label="Remove media">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div id="previewContent"></div>
+    <div class="file-info" id="fileInfo"></div>
+  </div>
 
-  <div class="progress-wrap" id="progressWrap">
-    <div class="progress-text">
-      <span id="progressLabel">Preparing your post...</span>
+  <div class="status" id="statusMessage" role="status" aria-live="polite"></div>
+
+  <div class="progress" id="progressWrap">
+    <div class="progress-label">
+      <span id="progressLabel">Preparing post...</span>
       <span id="progressPercent">0%</span>
     </div>
-    <div class="progress-track">
-      <div class="progress-bar" id="progressBar"></div>
-    </div>
+    <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
   </div>
 
-  <section class="card">
-    <div class="profile-row">
-      <div class="avatar" id="userAvatar">💙</div>
+  <div class="section-divider"></div>
+  <div class="section-title">Add to your post</div>
 
-      <div class="profile-details">
-        <div class="profile-name" id="profileName">Your profile</div>
-        <div class="profile-caption">Creating a new post</div>
-      </div>
+  <div class="media-tools">
+    <button class="media-tool gallery" id="galleryBtn" type="button">
+      <i class="fa-regular fa-image"></i><span>Gallery</span>
+    </button>
+    <button class="media-tool gif" type="button" data-feature="GIF">
+      <i class="fa-solid fa-icons"></i><span>GIF</span>
+    </button>
+    <button class="media-tool live" type="button" data-feature="Live">
+      <i class="fa-solid fa-video"></i><span>Live</span>
+    </button>
+    <button class="media-tool more" id="videoBtn" type="button">
+      <i class="fa-solid fa-film"></i><span>Video</span>
+    </button>
+  </div>
 
-      <div class="audience-wrap">
-        <select class="audience-select" id="audience" aria-label="Post audience">
-          <option value="public">🌍 Public</option>
-          <option value="followers">👥 Followers</option>
-          <option value="private">🔒 Only me</option>
-        </select>
-      </div>
-    </div>
-  </section>
+  <input id="photoInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+  <input id="videoInput" type="file" accept="video/mp4,video/webm,video/quicktime" hidden>
 
-  <section class="card composer">
-    <textarea
-      id="postContent"
-      maxlength="5000"
-      placeholder="Write something amazing... 💭&#10;&#10;Share a thought, a story, or a moment with your friends."
-      aria-label="Post text"
-    ></textarea>
+</div>
 
-    <div class="composer-bottom">
-      <span class="mood-label"><i class="fa-regular fa-face-smile"></i> Express yourself</span>
-      <span class="char-count" id="charCount">0 / 5000</span>
-    </div>
-  </section>
+<footer class="bottom-privacy">
+  <div class="bottom-inner">
+    <button class="bottom-pill active" id="bottomPrivacyBtn" type="button">
+      <i class="fa-solid fa-earth-americas" id="bottomPrivacyIcon"></i>
+      <span id="bottomPrivacyText">Public</span>
+      <i class="fa-solid fa-caret-down" style="font-size:11px"></i>
+    </button>
+    <button class="bottom-pill" id="audienceShortcut" type="button">
+      <i class="fa-solid fa-user-group"></i><span id="audienceShortcutText">Friends</span>
+    </button>
+    <button class="bottom-post" id="bottomPostBtn" type="button" disabled>Post</button>
+  </div>
+</footer>
 
-  <section class="card">
-    <h2 class="section-title">
-      <span><i class="fa-regular fa-images"></i> Add to your post</span>
-      <span class="section-hint">Photo or video</span>
-    </h2>
-
-    <div class="media-grid">
-      <button class="media-option" id="photoBtn" type="button">
-        <span class="media-icon photo-icon"><i class="fa-regular fa-image"></i></span>
-        <strong>Add photos</strong>
-        <small>JPG, PNG, WEBP, GIF</small>
-      </button>
-
-      <button class="media-option" id="videoBtn" type="button">
-        <span class="media-icon video-icon"><i class="fa-solid fa-film"></i></span>
-        <strong>Add video</strong>
-        <small>MP4, WEBM, MOV</small>
-      </button>
-    </div>
-
-    <input
-      type="file"
-      id="photoInput"
-      class="hidden-input"
-      accept="image/jpeg,image/png,image/webp,image/gif"
-    >
-
-    <input
-      type="file"
-      id="videoInput"
-      class="hidden-input"
-      accept="video/mp4,video/webm,video/quicktime"
-    >
-
-    <div class="media-preview" id="mediaPreview">
-      <button class="remove-media" id="removeMediaBtn" type="button" aria-label="Remove selected media">
+<div class="modal-backdrop" id="featureModal" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle">Add details</h2>
+      <button class="modal-close" id="modalClose" type="button" aria-label="Close dialog">
         <i class="fa-solid fa-xmark"></i>
       </button>
-      <div id="previewContent"></div>
-      <div class="file-info" id="fileInfo"></div>
+    </div>
+    <div id="modalBody"></div>
+    <div class="modal-actions">
+      <button class="cancel-btn" id="modalCancel" type="button">Cancel</button>
+      <button class="confirm-btn" id="modalConfirm" type="button">Add</button>
     </div>
   </section>
-
-  <section class="card">
-    <h2 class="section-title">
-      <span><i class="fa-solid fa-wand-magic-sparkles"></i> Make it special</span>
-    </h2>
-
-    <div class="tools-list">
-      <button class="tool-btn tool-music" type="button" data-feature="Music">
-        <i class="fa-solid fa-music"></i>
-        <span><strong>Add music</strong><small>Set the mood</small></span>
-      </button>
-
-      <button class="tool-btn tool-tag" type="button" data-feature="Tag people">
-        <i class="fa-solid fa-user-plus"></i>
-        <span><strong>Tag people</strong><small>Include your friends</small></span>
-      </button>
-
-      <button class="tool-btn tool-location" type="button" data-feature="Location">
-        <i class="fa-solid fa-location-dot"></i>
-        <span><strong>Add location</strong><small>Where are you?</small></span>
-      </button>
-
-      <button class="tool-btn tool-gif" type="button" data-feature="GIF">
-        <i class="fa-solid fa-icons"></i>
-        <span><strong>Add GIF</strong><small>Bring it to life</small></span>
-      </button>
-
-      <button class="tool-btn tool-live" type="button" data-feature="Live video">
-        <i class="fa-solid fa-tower-broadcast"></i>
-        <span><strong>Go live</strong><small>Connect in real time</small></span>
-      </button>
-
-      <button class="tool-btn tool-poll" type="button" data-feature="Poll">
-        <i class="fa-solid fa-square-poll-vertical"></i>
-        <span><strong>Create a poll</strong><small>Ask the community</small></span>
-      </button>
-    </div>
-  </section>
-
-  <div class="notice">
-    <i class="fa-solid fa-shield-heart"></i>
-    <div>
-      <strong>Share responsibly</strong>
-      <p>Be kind to others. Only share photos and videos you have permission to post. Check your audience before publishing.</p>
-    </div>
-  </div>
-
-  <button class="publish-btn" id="publishBottomBtn" type="button" style="width:100%;padding:15px;font-size:14px;margin-bottom:12px">
-    <i class="fa-solid fa-paper-plane"></i> Publish post
-  </button>
-</main>
-
-<nav class="bottom-nav" aria-label="Main navigation">
-  <a class="nav-item" href="home.html">
-    <i class="fa-solid fa-house"></i>
-    <span>Home</span>
-  </a>
-
-  <a class="nav-item" href="discover.html">
-    <i class="fa-solid fa-compass"></i>
-    <span>Pulse</span>
-  </a>
-
-  <a class="nav-item create active" href="create.html" aria-current="page">
-    <i class="fa-solid fa-plus"></i>
-    <span>Create</span>
-  </a>
-
-  <a class="nav-item" href="notifications.html">
-    <i class="fa-regular fa-bell"></i>
-    <span>Alerts</span>
-  </a>
-
-  <a class="nav-item" href="profile.html">
-    <i class="fa-regular fa-user"></i>
-    <span>Profile</span>
-  </a>
-</nav>
+</div>
 
 <script>
 "use strict";
 
-const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
-const PROFILE_KEY = "freetube_profile_data";
-const DRAFT_KEY = "boysvsgirls_post_draft";
+(() => {
+  const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+  const TOKEN_KEY = "freetube_access_token";
+  const PROFILE_KEY = "freetube_profile_data";
 
-const $ = (id) => document.getElementById(id);
+  const $ = id => document.getElementById(id);
 
-const postContent = $("postContent");
-const audience = $("audience");
-const photoInput = $("photoInput");
-const videoInput = $("videoInput");
-const mediaPreview = $("mediaPreview");
-const previewContent = $("previewContent");
-const fileInfo = $("fileInfo");
-const statusMessage = $("statusMessage");
-const progressWrap = $("progressWrap");
-const progressBar = $("progressBar");
-const progressLabel = $("progressLabel");
-const progressPercent = $("progressPercent");
+  let currentUser = null;
+  let selectedFile = null;
+  let selectedMediaType = null;
+  let objectUrl = null;
+  let audience = "public";
+  let posting = false;
+  let featureName = "";
 
-let selectedFile = null;
-let selectedMediaType = null;
-let previewObjectUrl = null;
-let isPublishing = false;
-let currentUser = null;
-
-function getToken() {
-  return localStorage.getItem(TOKEN_KEY) ||
-         sessionStorage.getItem(TOKEN_KEY) ||
-         "";
-}
-
-function getSavedProfile() {
-  try {
-    return JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
-  } catch {
-    return null;
-  }
-}
-
-function setStatus(message, type = "info") {
-  statusMessage.textContent = message;
-  statusMessage.className = "status-message show " + type;
-}
-
-function clearStatus() {
-  statusMessage.textContent = "";
-  statusMessage.className = "status-message";
-}
-
-function setProgress(percent, label) {
-  progressWrap.classList.add("show");
-  const safePercent = Math.max(0, Math.min(100, percent));
-  progressBar.style.width = safePercent + "%";
-  progressPercent.textContent = Math.round(safePercent) + "%";
-  progressLabel.textContent = label;
-}
-
-function hideProgress() {
-  progressWrap.classList.remove("show");
-  progressBar.style.width = "0%";
-}
-
-function updateCharCount() {
-  $("charCount").textContent = postContent.value.length + " / 5000";
-}
-
-function displayUser(profile) {
-  if (!profile) return;
-
-  const name =
-    profile.display_name ||
-    profile.displayName ||
-    profile.full_name ||
-    profile.fullName ||
-    profile.name ||
-    profile.username ||
-    profile.email ||
-    "Your profile";
-
-  $("profileName").textContent = name;
-
-  const avatarUrl =
-    profile.avatar_url ||
-    profile.avatarUrl ||
-    profile.profile_picture ||
-    profile.profilePicture ||
-    profile.photo_url ||
-    profile.photoUrl ||
-    profile.avatar ||
-    "";
-
-  const avatar = $("userAvatar");
-
-  if (avatarUrl && typeof avatarUrl === "string") {
-    avatar.innerHTML = "";
-    const img = document.createElement("img");
-    img.src = avatarUrl;
-    img.alt = "Profile picture";
-    img.onerror = () => {
-      avatar.textContent = String(name).trim().charAt(0).toUpperCase() || "💙";
-    };
-    avatar.appendChild(img);
-  } else {
-    avatar.textContent = String(name).trim().charAt(0).toUpperCase() || "💙";
-  }
-}
-
-async function apiRequest(path, options = {}) {
-  const token = getToken();
-  const headers = new Headers(options.headers || {});
-
-  if (token) {
-    headers.set("Authorization", "Bearer " + token);
-  }
-
-  if (options.body && !(options.body instanceof FormData) &&
-      !headers.has("Content-Type")) {
-    headers.set("Content-Type", "application/json");
-  }
-
-  const response = await fetch(API_BASE + path, {
-    ...options,
-    headers
-  });
-
-  const rawText = await response.text();
-  let data = {};
-
-  if (rawText) {
-    try {
-      data = JSON.parse(rawText);
-    } catch {
-      data = { message: rawText };
-    }
-  }
-
-  if (!response.ok) {
-    const message =
-      data.message ||
-      data.error ||
-      data.detail ||
-      "Request failed (" + response.status + ").";
-
-    const error = new Error(message);
-    error.status = response.status;
-    error.data = data;
-    throw error;
-  }
-
-  return data;
-}
-
-async function loadCurrentUser() {
-  const cachedProfile = getSavedProfile();
-
-  if (cachedProfile) {
-    displayUser(cachedProfile);
-  }
-
-  if (!getToken()) {
-    setStatus("Please log in before publishing a post.", "error");
-    return;
-  }
-
-  try {
-    const result = await apiRequest("/auth/me");
-    const user = result.user || result.profile || result.data || result;
-    currentUser = user;
-
-    if (user && typeof user === "object") {
-      displayUser(user);
-      try {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(user));
-      } catch {}
-    }
-  } catch (error) {
-    if (error.status === 401 || error.status === 403) {
-      setStatus("Your login session may have expired. Please log in again.", "error");
-    } else if (!cachedProfile) {
-      setStatus("Could not load your profile. You can retry or continue after checking your connection.", "info");
-    }
-  }
-}
-
-function revokePreviewUrl() {
-  if (previewObjectUrl) {
-    URL.revokeObjectURL(previewObjectUrl);
-    previewObjectUrl = null;
-  }
-}
-
-function clearSelectedMedia() {
-  selectedFile = null;
-  selectedMediaType = null;
-  photoInput.value = "";
-  videoInput.value = "";
-  revokePreviewUrl();
-
-  previewContent.innerHTML = "";
-  fileInfo.textContent = "";
-  mediaPreview.classList.remove("show");
-}
-
-function formatFileSize(bytes) {
-  if (bytes < 1024 * 1024) {
-    return (bytes / 1024).toFixed(0) + " KB";
-  }
-
-  return (bytes / (1024 * 1024)).toFixed(2) + " MB";
-}
-
-function handleFileSelection(file, type) {
-  clearStatus();
-
-  if (!file) return;
-
-  const maxSize = 50 * 1024 * 1024;
-
-  if (file.size > maxSize) {
-    setStatus("This file is larger than 50 MB. Please choose a smaller file.", "error");
-    photoInput.value = "";
-    videoInput.value = "";
-    return;
-  }
-
-  if (type === "image" && !file.type.startsWith("image/")) {
-    setStatus("Please choose a valid image file.", "error");
-    return;
-  }
-
-  if (type === "video" && !file.type.startsWith("video/")) {
-    setStatus("Please choose a valid video file.", "error");
-    return;
-  }
-
-  clearSelectedMedia();
-
-  selectedFile = file;
-  selectedMediaType = type;
-  previewObjectUrl = URL.createObjectURL(file);
-
-  if (type === "image") {
-    const img = document.createElement("img");
-    img.src = previewObjectUrl;
-    img.alt = "Selected image preview";
-    previewContent.appendChild(img);
-  } else {
-    const video = document.createElement("video");
-    video.src = previewObjectUrl;
-    video.controls = true;
-    video.playsInline = true;
-    video.preload = "metadata";
-    previewContent.appendChild(video);
-  }
-
-  fileInfo.textContent = file.name + " · " + formatFileSize(file.size);
-  mediaPreview.classList.add("show");
-}
-
-function saveDraft() {
-  const draft = {
-    content: postContent.value,
-    audience: audience.value,
-    savedAt: new Date().toISOString()
+  const featureValues = {
+    location: "",
+    tags: [],
+    music: ""
   };
 
-  try {
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    setStatus("Draft saved on this device.", "success");
-  } catch {
-    setStatus("Could not save the draft on this device.", "error");
-  }
-}
-
-function loadDraft() {
-  try {
-    const raw = localStorage.getItem(DRAFT_KEY);
-    if (!raw) return;
-
-    const draft = JSON.parse(raw);
-
-    if (typeof draft.content === "string") {
-      postContent.value = draft.content;
-    }
-
-    if (["public", "followers", "private"].includes(draft.audience)) {
-      audience.value = draft.audience;
-    }
-
-    updateCharCount();
-  } catch {}
-}
-
-async function uploadSelectedMedia() {
-  if (!selectedFile) return null;
-
-  setProgress(5, "Uploading your media...");
-
-  const formData = new FormData();
-  formData.append("file", selectedFile);
-
-  const token = getToken();
-  const headers = {};
-
-  if (token) {
-    headers.Authorization = "Bearer " + token;
-  }
-
-  const response = await fetch(API_BASE + "/media/upload", {
-    method: "POST",
-    headers,
-    body: formData
-  });
-
-  const rawText = await response.text();
-  let data = {};
-
-  if (rawText) {
+  function getToken() {
     try {
-      data = JSON.parse(rawText);
-    } catch {
-      data = { message: rawText };
+      return localStorage.getItem(TOKEN_KEY) ||
+        sessionStorage.getItem(TOKEN_KEY) || "";
+    } catch (_) {
+      return "";
     }
   }
 
-  if (!response.ok) {
-    throw new Error(
-      data.message ||
-      data.error ||
-      "Media upload failed (" + response.status + ")."
+  function showStatus(message, type = "info") {
+    const el = $("statusMessage");
+    el.textContent = message;
+    el.className = "status show " + type;
+  }
+
+  function clearStatus() {
+    $("statusMessage").textContent = "";
+    $("statusMessage").className = "status";
+  }
+
+  function updatePostButtons() {
+    const hasContent = Boolean(
+      $("postContent").value.trim() || selectedFile
     );
+    $("nextBtn").disabled = !hasContent || posting;
+    $("nextBtn").classList.toggle("enabled", hasContent && !posting);
+    $("bottomPostBtn").disabled = !hasContent || posting;
   }
 
-  const mediaUrl =
-    data.media_url ||
-    data.mediaUrl ||
-    data.url ||
-    (data.media && (data.media.url || data.media.media_url)) ||
-    (data.data && (data.data.media_url || data.data.url)) ||
-    "";
-
-  const publicId =
-    data.media_public_id ||
-    data.public_id ||
-    data.publicId ||
-    (data.media && (data.media.public_id || data.media.publicId)) ||
-    (data.data && (data.data.media_public_id || data.data.public_id)) ||
-    "";
-
-  if (!mediaUrl) {
-    throw new Error("The upload completed, but the server did not return a media URL.");
+  function setProgress(value, label) {
+    $("progressWrap").classList.add("show");
+    $("progressBar").style.width = Math.max(0, Math.min(100, value)) + "%";
+    $("progressPercent").textContent = Math.round(value) + "%";
+    $("progressLabel").textContent = label;
   }
 
-  setProgress(65, "Media uploaded. Publishing your post...");
-
-  return {
-    media_url: mediaUrl,
-    media_type: selectedMediaType,
-    media_public_id: publicId || null
-  };
-}
-
-async function publishPost() {
-  if (isPublishing) return;
-
-  clearStatus();
-
-  const content = postContent.value.trim();
-
-  if (!content && !selectedFile) {
-    setStatus("Write something or add a photo/video before publishing.", "error");
-    postContent.focus();
-    return;
+  function hideProgress() {
+    $("progressWrap").classList.remove("show");
+    $("progressBar").style.width = "0%";
   }
 
-  if (!getToken()) {
-    setStatus("Please log in before publishing a post.", "error");
-    return;
+  function displayUser(user) {
+    if (!user) return;
+
+    const name =
+      user.display_name ||
+      user.displayName ||
+      user.full_name ||
+      user.fullName ||
+      user.name ||
+      user.username ||
+      user.email ||
+      "Your profile";
+
+    $("userName").textContent = name;
+
+    const avatarUrl =
+      user.avatar_url ||
+      user.avatarUrl ||
+      user.profile_picture ||
+      user.profilePicture ||
+      user.photo_url ||
+      user.avatar ||
+      "";
+
+    const avatar = $("userAvatar");
+    avatar.replaceChildren();
+
+    if (avatarUrl) {
+      const img = document.createElement("img");
+      img.src = avatarUrl;
+      img.alt = "Profile";
+      img.onerror = () => {
+        avatar.textContent = String(name).trim().charAt(0).toUpperCase() || "B";
+      };
+      avatar.appendChild(img);
+    } else {
+      avatar.textContent = String(name).trim().charAt(0).toUpperCase() || "B";
+    }
   }
 
-  isPublishing = true;
-  $("publishTopBtn").disabled = true;
-  $("publishBottomBtn").disabled = true;
-  $("saveDraftBtn").disabled = true;
+  async function apiRequest(path, options = {}) {
+    const headers = new Headers(options.headers || {});
+    const token = getToken();
 
-  try {
-    let media = null;
+    if (token) headers.set("Authorization", "Bearer " + token);
 
-    if (selectedFile) {
-      media = await uploadSelectedMedia();
+    if (options.body && !(options.body instanceof FormData) &&
+        !headers.has("Content-Type")) {
+      headers.set("Content-Type", "application/json");
     }
 
-    setProgress(media ? 75 : 35, "Publishing your post...");
+    let response;
 
-    const payload = {
-      content: content,
-      media_url: media ? media.media_url : null,
-      media_type: media ? media.media_type : null,
-      media_public_id: media ? media.media_public_id : null
-    };
+    try {
+      response = await fetch(API_BASE + path, {
+        ...options,
+        headers,
+        cache: "no-store"
+      });
+    } catch (_) {
+      throw new Error("Could not connect to the server. Check your internet connection.");
+    }
 
-    /*
-      Audience is kept in the UI and local draft. It is intentionally not
-      sent as a privacy guarantee unless your backend supports and enforces
-      an audience/visibility field.
-    */
+    const raw = await response.text();
+    let data = {};
 
-    const result = await apiRequest("/posts", {
-      method: "POST",
-      body: JSON.stringify(payload)
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      data = { message: raw };
+    }
+
+    if (!response.ok) {
+      const error = new Error(
+        data.error || data.message || "Request failed (" + response.status + ")."
+      );
+      error.status = response.status;
+      throw error;
+    }
+
+    return data;
+  }
+
+  async function loadProfile() {
+    try {
+      const cached = JSON.parse(localStorage.getItem(PROFILE_KEY) || "null");
+      if (cached) displayUser(cached);
+    } catch (_) {}
+
+    if (!getToken()) {
+      showStatus("Please log in before publishing a post.", "error");
+      updatePostButtons();
+      return;
+    }
+
+    try {
+      const result = await apiRequest("/auth/me");
+      currentUser = result.user || result.profile || result.data || result;
+      displayUser(currentUser);
+
+      try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(currentUser));
+      } catch (_) {}
+    } catch (error) {
+      if (error.status === 401 || error.status === 403) {
+        showStatus("Your session has expired. Please log in again.", "error");
+      }
+    }
+  }
+
+  function updateAudienceUI() {
+    const isFriends = audience === "friends";
+    $("privacyText").textContent = isFriends ? "Friends" : "Public";
+    $("bottomPrivacyText").textContent = isFriends ? "Friends" : "Public";
+    $("privacyIcon").className = isFriends
+      ? "fa-solid fa-user-group"
+      : "fa-solid fa-earth-americas";
+    $("bottomPrivacyIcon").className = isFriends
+      ? "fa-solid fa-user-group"
+      : "fa-solid fa-earth-americas";
+
+    document.querySelectorAll("[data-audience]").forEach(button => {
+      const selected = button.dataset.audience === audience;
+      button.classList.toggle("selected", selected);
+      const check = button.querySelector(".fa-check");
+      if (check) check.hidden = !selected;
     });
 
-    setProgress(100, "Post published!");
+    $("bottomPrivacyBtn").classList.toggle("active", true);
+    $("privacyBtn").setAttribute("aria-expanded",
+      String(!$("privacyMenu").hidden));
+  }
+
+  function togglePrivacyMenu(force) {
+    const menu = $("privacyMenu");
+    const shouldOpen = typeof force === "boolean" ? force : menu.hidden;
+    menu.hidden = !shouldOpen;
+    $("privacyBtn").setAttribute("aria-expanded", String(shouldOpen));
+  }
+
+  function selectAudience(value) {
+    if (!["public", "friends"].includes(value)) return;
+    audience = value;
+    updateAudienceUI();
+    togglePrivacyMenu(false);
+  }
+
+  function clearMedia() {
+    selectedFile = null;
+    selectedMediaType = null;
+
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
+      objectUrl = null;
+    }
+
+    $("photoInput").value = "";
+    $("videoInput").value = "";
+    $("previewContent").replaceChildren();
+    $("fileInfo").textContent = "";
+    $("mediaPreview").classList.remove("show");
+    updatePostButtons();
+  }
+
+  function chooseMedia(file, type) {
+    clearStatus();
+    if (!file) return;
+
+    if (file.size > 50 * 1024 * 1024) {
+      showStatus("Maximum file size is 50 MB.", "error");
+      return;
+    }
+
+    if (type === "image" && !file.type.startsWith("image/")) {
+      showStatus("Choose a valid image file.", "error");
+      return;
+    }
+
+    if (type === "video" && !file.type.startsWith("video/")) {
+      showStatus("Choose a valid video file.", "error");
+      return;
+    }
+
+    clearMedia();
+
+    selectedFile = file;
+    selectedMediaType = type;
+    objectUrl = URL.createObjectURL(file);
+
+    if (type === "image") {
+      const img = document.createElement("img");
+      img.src = objectUrl;
+      img.alt = "Post image preview";
+      $("previewContent").appendChild(img);
+    } else {
+      const video = document.createElement("video");
+      video.src = objectUrl;
+      video.controls = true;
+      video.playsInline = true;
+      video.preload = "metadata";
+      $("previewContent").appendChild(video);
+    }
+
+    $("fileInfo").textContent =
+      file.name + " · " + (file.size / (1024 * 1024)).toFixed(2) + " MB";
+
+    $("mediaPreview").classList.add("show");
+    updatePostButtons();
+  }
+
+  async function uploadMedia() {
+    if (!selectedFile) return null;
+
+    setProgress(5, "Uploading media...");
+
+    const form = new FormData();
+    form.append("file", selectedFile);
+
+    const token = getToken();
+    const headers = {};
+    if (token) headers.Authorization = "Bearer " + token;
+
+    const response = await fetch(API_BASE + "/media/upload", {
+      method: "POST",
+      headers,
+      body: form
+    });
+
+    const raw = await response.text();
+    let data = {};
 
     try {
-      localStorage.removeItem(DRAFT_KEY);
-    } catch {}
-
-    setStatus("Your post has been published successfully! Redirecting...", "success");
-
-    postContent.value = "";
-    updateCharCount();
-    clearSelectedMedia();
-
-    setTimeout(() => {
-      window.location.href = "home.html";
-    }, 900);
-
-    return result;
-  } catch (error) {
-    hideProgress();
-
-    if (error.status === 401 || error.status === 403) {
-      setStatus("Your login session may have expired. Please log in again.", "error");
-    } else {
-      setStatus(error.message || "Could not publish your post. Please try again.", "error");
+      data = raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      data = { message: raw };
     }
-  } finally {
-    isPublishing = false;
-    $("publishTopBtn").disabled = false;
-    $("publishBottomBtn").disabled = false;
-    $("saveDraftBtn").disabled = false;
-  }
-}
 
-function goBack() {
-  if (postContent.value.trim() || selectedFile) {
-    const shouldLeave = confirm("Leave this page? Your unsaved changes may be lost.");
-    if (!shouldLeave) return;
+    if (!response.ok) {
+      throw new Error(data.error || data.message || "Media upload failed.");
+    }
+
+    const media = data.media || data.data || data;
+    const url = media.url || media.media_url || media.mediaUrl;
+    const publicId = media.public_id || media.publicId || media.media_public_id || null;
+
+    if (!url) {
+      throw new Error("Upload completed, but the server did not return a media URL.");
+    }
+
+    return {
+      media_url: url,
+      media_type: selectedMediaType,
+      media_public_id: publicId
+    };
   }
 
-  if (window.history.length > 1) {
-    window.history.back();
-  } else {
+  async function publishPost() {
+    if (posting) return;
+
+    clearStatus();
+
+    const content = $("postContent").value.trim();
+
+    if (!content && !selectedFile) {
+      showStatus("Write something or choose a photo/video first.", "error");
+      $("postContent").focus();
+      return;
+    }
+
+    if (!getToken()) {
+      showStatus("Please log in before publishing a post.", "error");
+      return;
+    }
+
+    posting = true;
+    updatePostButtons();
+
+    try {
+      const media = await uploadMedia();
+      setProgress(media ? 75 : 35, "Publishing post...");
+
+      const payload = {
+        content,
+        media_url: media ? media.media_url : null,
+        media_type: media ? media.media_type : null,
+        media_public_id: media ? media.media_public_id : null,
+        audience,
+        visibility: audience
+      };
+
+      const result = await apiRequest("/posts", {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+
+      setProgress(100, "Post published.");
+      showStatus(result.message || "Your post has been published.", "success");
+
+      $("postContent").value = "";
+      $("charCount").textContent = "0/5000";
+      clearMedia();
+
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 900);
+    } catch (error) {
+      hideProgress();
+
+      if (error.status === 401 || error.status === 403) {
+        showStatus("Your login session may have expired. Please log in again.", "error");
+      } else {
+        showStatus("Could not publish post: " + error.message, "error");
+      }
+    } finally {
+      posting = false;
+      updatePostButtons();
+    }
+  }
+
+  function openFeature(feature) {
+    featureName = feature;
+    $("modalTitle").textContent = feature;
+    const body = $("modalBody");
+    body.replaceChildren();
+
+    if (feature === "Location") {
+      const input = document.createElement("input");
+      input.className = "modal-input";
+      input.id = "featureInput";
+      input.placeholder = "Enter a location";
+      input.value = featureValues.location;
+      body.appendChild(input);
+      $("modalConfirm").textContent = "Add location";
+    } else if (feature === "Tag/Collaborate") {
+      const input = document.createElement("input");
+      input.className = "modal-input";
+      input.id = "featureInput";
+      input.placeholder = "Enter usernames, separated by commas";
+      input.value = featureValues.tags.join(", ");
+      body.appendChild(input);
+      $("modalConfirm").textContent = "Add tags";
+    } else if (feature === "Music") {
+      const input = document.createElement("input");
+      input.className = "modal-input";
+      input.id = "featureInput";
+      input.placeholder = "Enter a song title (label only)";
+      input.value = featureValues.music;
+      body.appendChild(input);
+
+      const note = document.createElement("p");
+      note.style.cssText = "color:#b0b3b8;font-size:12px;line-height:1.5;margin-top:10px";
+      note.textContent = "This records the song title in the caption; music playback is not connected yet.";
+      body.appendChild(note);
+      $("modalConfirm").textContent = "Add";
+    } else {
+      const note = document.createElement("p");
+      note.style.cssText = "color:#d0d0d0;font-size:14px;line-height:1.7";
+      note.textContent =
+        feature + " requires additional backend or media-provider support. You can still publish a regular photo, video, or text post.";
+      body.appendChild(note);
+      $("modalConfirm").textContent = "OK";
+    }
+
+    $("modalConfirm").hidden =
+      !["Location", "Tag/Collaborate", "Music"].includes(feature);
+
+    $("modalCancel").textContent = "Close";
+    $("featureModal").hidden = false;
+
+    const input = $("featureInput");
+    if (input) setTimeout(() => input.focus(), 50);
+  }
+
+  function closeFeature() {
+    $("featureModal").hidden = true;
+  }
+
+  function saveFeature() {
+    const input = $("featureInput");
+
+    if (input) {
+      const value = input.value.trim();
+
+      if (featureName === "Location") {
+        featureValues.location = value;
+        if (value) {
+          $("postContent").value =
+            $("postContent").value.replace(/\n?📍 .+$/m, "").trimEnd() +
+            "\n📍 " + value;
+        }
+      } else if (featureName === "Tag/Collaborate") {
+        featureValues.tags = value
+          .split(",")
+          .map(name => name.trim().replace(/^@/, ""))
+          .filter(Boolean);
+
+        if (featureValues.tags.length) {
+          const tagsText = featureValues.tags.map(name => "@" + name).join(" ");
+          $("postContent").value =
+            $("postContent").value.replace(/\n?Tagged: .+$/m, "").trimEnd() +
+            "\nTagged: " + tagsText;
+        }
+      } else if (featureName === "Music") {
+        featureValues.music = value;
+        if (value) {
+          $("postContent").value =
+            $("postContent").value.replace(/\n?🎵 Music: .+$/m, "").trimEnd() +
+            "\n🎵 Music: " + value;
+        }
+      }
+
+      $("charCount").textContent =
+        $("postContent").value.length + "/5000";
+      updatePostButtons();
+    }
+
+    closeFeature();
+  }
+
+  function closeComposer() {
+    if ($("postContent").value.trim() || selectedFile) {
+      if (!confirm("Discard this post and close?")) return;
+    }
+
     window.location.href = "home.html";
   }
-}
 
-$("backBtn").addEventListener("click", goBack);
-
-$("photoBtn").addEventListener("click", () => photoInput.click());
-$("videoBtn").addEventListener("click", () => videoInput.click());
-
-photoInput.addEventListener("change", () => {
-  handleFileSelection(photoInput.files && photoInput.files[0], "image");
-});
-
-videoInput.addEventListener("change", () => {
-  handleFileSelection(videoInput.files && videoInput.files[0], "video");
-});
-
-$("removeMediaBtn").addEventListener("click", clearSelectedMedia);
-
-postContent.addEventListener("input", updateCharCount);
-
-$("saveDraftBtn").addEventListener("click", saveDraft);
-$("publishTopBtn").addEventListener("click", publishPost);
-$("publishBottomBtn").addEventListener("click", publishPost);
-
-document.querySelectorAll("[data-feature]").forEach((button) => {
-  button.addEventListener("click", () => {
-    const feature = button.dataset.feature;
-
-    const messages = {
-      "Music": "Music attachment needs a music search or media service to be connected.",
-      "Tag people": "People tagging needs a user search feature in the backend.",
-      "Location": "Location tagging can be added when a location picker is connected.",
-      "GIF": "GIF search needs a GIF provider or a GIF upload option.",
-      "Live video": "Live video needs a streaming service and backend support.",
-      "Poll": "Polls need poll creation and voting support in the backend."
-    };
-
-    setStatus(messages[feature] || "This feature is not connected yet.", "info");
+  $("postContent").addEventListener("input", () => {
+    $("charCount").textContent =
+      $("postContent").value.length + "/5000";
+    updatePostButtons();
   });
-});
 
-window.addEventListener("beforeunload", () => {
-  revokePreviewUrl();
-});
+  $("privacyBtn").addEventListener("click", () => togglePrivacyMenu());
+  $("bottomPrivacyBtn").addEventListener("click", () => togglePrivacyMenu());
 
-loadDraft();
-updateCharCount();
-loadCurrentUser();
+  document.querySelectorAll("[data-audience]").forEach(button => {
+    button.addEventListener("click", () => {
+      selectAudience(button.dataset.audience);
+    });
+  });
+
+  $("audienceShortcut").addEventListener("click", () => {
+    selectAudience(audience === "public" ? "friends" : "public");
+  });
+
+  $("galleryBtn").addEventListener("click", () => $("photoInput").click());
+  $("videoBtn").addEventListener("click", () => $("videoInput").click());
+
+  $("photoInput").addEventListener("change", event => {
+    chooseMedia(event.target.files[0], "image");
+  });
+
+  $("videoInput").addEventListener("change", event => {
+    chooseMedia(event.target.files[0], "video");
+  });
+
+  $("removeMediaBtn").addEventListener("click", clearMedia);
+
+  document.querySelectorAll("[data-feature]").forEach(button => {
+    button.addEventListener("click", () => openFeature(button.dataset.feature));
+  });
+
+  $("modalClose").addEventListener("click", closeFeature);
+  $("modalCancel").addEventListener("click", closeFeature);
+  $("modalConfirm").addEventListener("click", saveFeature);
+
+  $("featureModal").addEventListener("click", event => {
+    if (event.target === $("featureModal")) closeFeature();
+  });
+
+  $("closeBtn").addEventListener("click", closeComposer);
+  $("nextBtn").addEventListener("click", publishPost);
+  $("bottomPostBtn").addEventListener("click", publishPost);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      if (!$("featureModal").hidden) closeFeature();
+      else if (!$("privacyMenu").hidden) togglePrivacyMenu(false);
+    }
+  });
+
+  updateAudienceUI();
+  updatePostButtons();
+  loadProfile();
+})();
 </script>
-
 </body>
 </html>
