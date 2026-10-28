@@ -212,6 +212,44 @@ button { cursor:pointer; color:inherit; }
   border-top:1px solid var(--border);
   font-size:13px;
 }
+
+/* Native Ad slot: actual ad is supplied by Android */
+.native-ad-slot {
+  display:none;
+  width:100%;
+  min-height:230px;
+  margin:10px 0 14px;
+  padding:10px;
+  background:rgba(23,47,36,.85);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.native-ad-slot.android-ad-enabled {
+  display:block;
+}
+.native-ad-label {
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:.5px;
+  margin-bottom:8px;
+}
+.native-ad-placeholder {
+  height:190px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border-radius:10px;
+  color:var(--muted);
+  background:rgba(255,255,255,.035);
+  font-size:12px;
+}
+.native-ad-placeholder i {
+  font-size:24px;
+  color:var(--green);
+}
 .state {
   text-align:center;
   padding:38px 18px;
@@ -286,7 +324,6 @@ button { cursor:pointer; color:inherit; }
 
 <body>
 <div class="app">
-
   <header class="topbar">
     <div class="brand">
       <i class="fa-solid fa-play"></i> Free<span>Tube</span>
@@ -355,6 +392,7 @@ let activeFilter = "all";
 let searchTimer = null;
 let toastTimer = null;
 let videoObserver = null;
+let nativeAdRefreshTimer = null;
 
 function go(page) {
   location.href = page;
@@ -490,6 +528,79 @@ function timeAgo(value) {
   return date.toLocaleDateString();
 }
 
+/*
+ * Native Ad slots are created after each pair of videos.
+ * Android must implement window.FreeTubeAds.updateSlot().
+ */
+function nativeAdsAvailable() {
+  return !!(
+    window.FreeTubeAds &&
+    typeof window.FreeTubeAds.updateSlot === "function"
+  );
+}
+
+function setupNativeAdSlots() {
+  const slots = [...document.querySelectorAll(".native-ad-slot")];
+
+  if (!nativeAdsAvailable()) {
+    slots.forEach(slot => {
+      slot.classList.remove("android-ad-enabled");
+      slot.hidden = true;
+    });
+    return;
+  }
+
+  slots.forEach(slot => {
+    slot.hidden = false;
+    slot.classList.add("android-ad-enabled");
+  });
+
+  window.updateNativeAdSlots = function() {
+    if (!nativeAdsAvailable()) return;
+
+    document.querySelectorAll(".native-ad-slot").forEach(slot => {
+      const rect = slot.getBoundingClientRect();
+      const visible =
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight &&
+        rect.right > 0 &&
+        rect.left < window.innerWidth;
+
+      window.FreeTubeAds.updateSlot(
+        slot.id,
+        rect.left,
+        rect.top,
+        rect.width,
+        rect.height,
+        visible
+      );
+    });
+  };
+
+  window.updateNativeAdSlots();
+  requestAnimationFrame(() => window.updateNativeAdSlots());
+
+  clearTimeout(nativeAdRefreshTimer);
+  nativeAdRefreshTimer = setTimeout(() => {
+    if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+  }, 350);
+}
+
+function makeAdSlot(index) {
+  return `
+    <section
+      class="native-ad-slot"
+      id="native-ad-slot-${index}"
+      aria-label="Advertisement"
+      hidden>
+      <div class="native-ad-label">ADVERTISEMENT</div>
+      <div class="native-ad-placeholder">
+        <i class="fa-solid fa-rectangle-ad"></i>
+        <span>Advertisement</span>
+      </div>
+    </section>`;
+}
+
 function render() {
   const query = document.getElementById("searchInput")
     .value.trim().toLowerCase();
@@ -512,6 +623,21 @@ function render() {
 
   const root = document.getElementById("results");
 
+  if (videoObserver) {
+    videoObserver.disconnect();
+    videoObserver = null;
+  }
+
+  if (window.updateNativeAdSlots && nativeAdsAvailable()) {
+    document.querySelectorAll(".native-ad-slot").forEach(slot => {
+      try {
+        window.FreeTubeAds.updateSlot(
+          slot.id, 0, 0, 0, 0, false
+        );
+      } catch (_) {}
+    });
+  }
+
   if (!videos.length) {
     root.innerHTML = `
       <div class="state">
@@ -522,23 +648,10 @@ function render() {
     return;
   }
 
-  root.innerHTML = videos.map(video => {
-    const media = `
-      <div class="media">
-        <video
-          controls
-          playsinline
-          webkit-playsinline
-          muted
-          autoplay
-          loop
-          preload="metadata"
-          src="${esc(video.src)}"
-          aria-label="Video by ${esc(video.username)}"
-        ></video>
-      </div>`;
+  let html = "";
 
-    return `
+  videos.forEach((video, index) => {
+    html += `
       <article class="card" id="video-${esc(video.id)}">
         <header class="card-head">
           <img class="avatar"
@@ -556,7 +669,19 @@ function render() {
           ? `<div class="content">${esc(video.content)}</div>`
           : ""}
 
-        ${media}
+        <div class="media">
+          <video
+            controls
+            playsinline
+            webkit-playsinline
+            muted
+            autoplay
+            loop
+            preload="metadata"
+            src="${esc(video.src)}"
+            aria-label="Video by ${esc(video.username)}"
+          ></video>
+        </div>
 
         <div class="stats">
           <span><i class="fa-solid fa-thumbs-up"></i> ${video.likes} likes</span>
@@ -570,15 +695,25 @@ function render() {
           <i class="fa-solid fa-arrow-up-right-from-square"></i>
         </a>
       </article>`;
-  }).join("");
+
+    /*
+     * Insert a slot after every two videos, but not after the last video.
+     * Example: video 1, video 2, ad, video 3, video 4, ad.
+     */
+    const number = index + 1;
+    if (number % 2 === 0 && number < videos.length) {
+      html += makeAdSlot(number / 2);
+    }
+  });
+
+  root.innerHTML = html;
 
   setupVideoPlayback();
+  setupNativeAdSlots();
 }
 
 function setupVideoPlayback() {
-  if (videoObserver) {
-    videoObserver.disconnect();
-  }
+  if (videoObserver) videoObserver.disconnect();
 
   const videos = [...document.querySelectorAll(".media video")];
 
@@ -608,11 +743,8 @@ function setupVideoPlayback() {
         });
 
         const playPromise = video.play();
-
         if (playPromise && playPromise.catch) {
-          playPromise.catch(() => {
-            // Browser settings may block automatic playback.
-          });
+          playPromise.catch(() => {});
         }
       } else {
         video.pause();
@@ -691,11 +823,20 @@ document.querySelectorAll("[data-filter]").forEach(button => {
   });
 });
 
+window.addEventListener("scroll", () => {
+  if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+}, { passive:true });
+
+window.addEventListener("resize", () => {
+  if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+});
+
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     document.querySelectorAll(".media video").forEach(video => video.pause());
   } else {
     setupVideoPlayback();
+    if (window.updateNativeAdSlots) window.updateNativeAdSlots();
   }
 });
 
