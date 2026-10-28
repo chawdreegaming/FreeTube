@@ -7,444 +7,211 @@
 <meta name="theme-color" content="#101329">
 <title>Boys vs Girls 💙💗 — Settings</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
 <style>
 :root{
-  --blue:#168cff;
-  --pink:#ff248c;
-  --purple:#862dff;
-  --cyan:#37d7ff;
-  --bg:#101329;
-  --panel:#191b35;
-  --panel2:#24203f;
-  --text:#fff;
-  --muted:#c8c9e3;
+  --blue:#168cff;--pink:#ff248c;--purple:#862dff;--cyan:#37d7ff;
+  --bg:#101329;--panel:#191b35;--text:#fff;--muted:#c8c9e3;
   --border:#ffffff20;
   --gradient:linear-gradient(120deg,#168cff,#862dff 48%,#ff248c);
 }
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  -webkit-tap-highlight-color:transparent;
-}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{
-  min-height:100vh;
-  color:var(--text);
-  font-family:Arial,sans-serif;
-  background:
-    radial-gradient(ellipse at 0% 0%,#173e81 0,transparent 38%),
-    radial-gradient(ellipse at 100% 30%,#741c65 0,transparent 38%),
-    linear-gradient(145deg,#101329,#24152f 55%,#101c3b);
-  background-attachment:fixed;
+  min-height:100vh;color:var(--text);font-family:Arial,Helvetica,sans-serif;
+  background:radial-gradient(ellipse at 0% 0%,#173e81 0,transparent 38%),
+  radial-gradient(ellipse at 100% 30%,#741c65 0,transparent 38%),
+  linear-gradient(145deg,#101329,#24152f 55%,#101c3b);
+  background-attachment:fixed
 }
 button,input,textarea,select{font:inherit}
 button{color:inherit;cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
+button:disabled{opacity:.5;cursor:not-allowed}
 a{color:inherit;text-decoration:none}
 [hidden]{display:none!important}
-
-.app{
-  max-width:650px;
-  margin:auto;
-  min-height:100dvh;
-  padding-bottom:100px;
-  background:#101329e8;
-  border-inline:1px solid #ffffff08;
-}
+.app{max-width:650px;margin:auto;min-height:100dvh;padding-bottom:90px;background:#101329e8;border-inline:1px solid #ffffff08}
 
 /* Header */
 .topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:14px 16px;
-  background:linear-gradient(110deg,#102c54f5,#3a1a48f5,#641d4bf5);
-  backdrop-filter:blur(20px);
-  border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:11px;
+  padding:12px 14px;background:linear-gradient(110deg,#102c54f5,#3a1a48f5,#641d4bf5);
+  backdrop-filter:blur(20px);border-bottom:1px solid var(--border)
 }
 .back-btn,.icon-btn{
-  width:42px;
-  height:42px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border-radius:50%;
-  background:linear-gradient(145deg,#ffffff18,#168cff20);
-  border:1px solid #ffffff26;
+  width:39px;height:39px;flex-shrink:0;display:grid;place-items:center;
+  border-radius:50%;background:#ffffff12;border:1px solid #ffffff26
 }
-.back-btn{font-size:16px}
 .page-heading{flex:1;min-width:0}
 .page-heading h1{font-size:20px;font-weight:900}
 .page-heading p{font-size:11px;color:var(--muted);margin-top:4px}
-.brand-mark{
-  background:var(--gradient);
-  -webkit-background-clip:text;
-  background-clip:text;
-  color:transparent;
-}
-.top-actions{display:flex;gap:8px}
-.love-icon{color:var(--pink);font-size:19px}
+.brand-mark{background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
+.love-icon{color:var(--pink);font-size:18px}
 
-/* Profile card */
-.user-card{
-  display:flex;
-  align-items:center;
-  gap:13px;
-  margin:15px 13px;
-  padding:16px;
-  border:1px solid var(--border);
-  border-radius:17px;
-  background:linear-gradient(125deg,#162b4bdc,#321b40dc,#421a39dc);
-  box-shadow:0 7px 24px #0002;
-}
-.avatar{
-  width:58px;
-  height:58px;
-  flex-shrink:0;
-  border-radius:50%;
-  object-fit:cover;
-  background:#22274b;
-  border:2px solid var(--blue);
-}
-.user-info{flex:1;min-width:0}
-.user-name{font-weight:800;font-size:17px;overflow-wrap:anywhere}
-.user-handle{color:var(--muted);font-size:12px;margin-top:5px;overflow-wrap:anywhere}
-.edit-badge{
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:9px 11px;
-  border:1px solid #ffffff26;
-  border-radius:20px;
-  background:#ffffff0c;
-  color:#fff;
-  font-size:11px;
-  white-space:nowrap;
-}
-
-/* Sections */
+/* Compact setting cards */
 .section-title{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  padding:20px 17px 9px;
-  font-size:12px;
-  text-transform:uppercase;
-  letter-spacing:.9px;
-  font-weight:800;
-  color:#e0dfff;
+  display:flex;align-items:center;gap:8px;padding:17px 16px 8px;
+  font-size:12px;text-transform:uppercase;letter-spacing:.8px;font-weight:800;color:#e0dfff
 }
-.section-title i{
-  font-size:14px;
-  color:var(--cyan);
-}
+.section-title i{font-size:14px;color:var(--cyan)}
 .group{
-  margin:0 13px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  background:linear-gradient(145deg,#191c35f5,#24203af5);
-  box-shadow:0 6px 22px #0002;
+  margin:0 13px;border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;background:linear-gradient(145deg,#191c35f5,#24203af5);
+  box-shadow:0 5px 18px #0002
 }
 .item{
-  width:100%;
-  min-height:67px;
-  padding:13px 14px;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  text-align:left;
-  border:0;
-  border-bottom:1px solid #ffffff12;
-  background:transparent;
-  color:#fff;
-  font-size:14px;
-  transition:background .2s;
+  width:100%;min-height:57px;padding:9px 11px;display:flex;align-items:center;gap:10px;
+  text-align:left;border:0;border-bottom:1px solid #ffffff12;background:transparent;
+  color:#fff;font-size:13px
 }
 .item:last-child{border-bottom:0}
-.item:hover,.item:active{background:#ffffff0c}
+.item:active{background:#ffffff0c}
 .item-icon{
-  width:39px;
-  height:39px;
-  flex-shrink:0;
-  display:grid;
-  place-items:center;
-  border:1px solid #ffffff18;
-  border-radius:12px;
-  background:linear-gradient(145deg,#168cff25,#862dff22,#ff248c18);
-  color:#fff;
-  font-size:16px;
+  width:34px;height:34px;flex-shrink:0;display:grid;place-items:center;
+  border:1px solid #ffffff18;border-radius:10px;
+  background:linear-gradient(145deg,#168cff25,#862dff22,#ff248c18);font-size:14px
 }
 .item-text{flex:1;min-width:0;font-weight:700}
-.desc{
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  font-weight:400;
-  margin-top:5px;
-  line-height:1.45;
-}
-.arrow{color:#aaaed0;font-size:12px}
+.desc{display:block;color:var(--muted);font-size:10.5px;font-weight:400;margin-top:3px;line-height:1.4}
+.arrow{color:#aaaed0;font-size:11px}
 .danger{color:#ff999f!important}
 .pink{color:#ff72b6!important}
 .blue{color:#73c1ff!important}
+.green{color:#55f0a5!important}
 
 /* Panels and forms */
 .panel{
-  margin:14px 13px;
-  padding:17px;
-  border:1px solid var(--border);
-  border-radius:17px;
-  background:linear-gradient(145deg,#191c35f5,#24203af5);
-  box-shadow:0 6px 22px #0002;
+  margin:12px 13px;padding:14px;border:1px solid var(--border);border-radius:15px;
+  background:linear-gradient(145deg,#191c35f5,#24203af5);box-shadow:0 5px 18px #0002
 }
-.panel h2{font-size:17px;margin-bottom:10px}
-.panel h3{font-size:14px;margin-bottom:8px}
-.muted{
-  font-size:12px;
-  color:var(--muted);
-  line-height:1.7;
-}
-.field{
-  display:block;
-  margin:15px 0;
-  font-size:13px;
-  color:#f0efff;
-}
+.panel h2{font-size:16px;margin-bottom:8px}
+.panel h3{font-size:13px;margin-bottom:7px}
+.muted{font-size:11.5px;color:var(--muted);line-height:1.65}
+.field{display:block;margin:13px 0;font-size:12px;color:#f0efff}
 .field input,.field textarea,.field select{
-  display:block;
-  width:100%;
-  margin-top:8px;
-  padding:13px;
-  color:#fff;
-  background:#11152c;
-  border:1px solid #ffffff25;
-  border-radius:11px;
-  outline:none;
-  transition:border-color .2s;
+  display:block;width:100%;margin-top:7px;padding:11px;color:#fff;
+  background:#11152c;border:1px solid #ffffff25;border-radius:10px;outline:none
 }
-.field input:focus,.field textarea:focus,.field select:focus{
-  border-color:var(--blue);
-}
-.field input[type="checkbox"]{
-  display:inline-block;
-  width:18px;
-  height:18px;
-  margin:0 8px 0 0;
-  vertical-align:middle;
-  accent-color:var(--pink);
-}
-.field textarea{min-height:110px;resize:vertical}
-.field select option{background:#191b35;color:white}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--blue)}
+.field input[type=checkbox]{display:inline-block;width:17px;height:17px;margin:0 7px 0 0;vertical-align:middle;accent-color:var(--pink)}
+.field textarea{min-height:95px;resize:vertical}
+.field select option{background:#191b35;color:#fff}
 .primary,.secondary{
-  width:100%;
-  padding:13px;
-  border-radius:11px;
-  font-weight:800;
-  font-size:13px;
+  width:100%;padding:12px;border-radius:10px;font-weight:800;font-size:12px
 }
-.primary{
-  color:white;
-  background:var(--gradient);
-  border:0;
-  box-shadow:0 5px 15px #862dff25;
-}
-.secondary{
-  color:#fff;
-  background:#ffffff0c;
-  border:1px solid var(--border);
-  margin-top:10px;
-}
-.primary:active,.secondary:active{transform:scale(.99)}
-.status{
-  margin-top:11px;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.6;
-  overflow-wrap:anywhere;
-}
-.status.error{color:#ff999f}
-.status.success{color:#60ffbb}
-
-/* View switching */
+.primary{color:white;background:var(--gradient);border:0}
+.secondary{color:#fff;background:#ffffff0c;border:1px solid var(--border);margin-top:9px}
+.status{margin-top:9px;font-size:11.5px;line-height:1.55;overflow-wrap:anywhere}
+.status.error{color:#ff707e}
+.status.success{color:#55f0a5}
+.status.info{color:#91caff}
+.status.checking{color:#d5d6f0}
 .view{display:none}
 .view.active{display:block}
 
+/* Username */
+.username-current{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 11px;border-radius:10px;background:#ffffff09;border:1px solid #ffffff13;
+  font-size:12px;margin:12px 0
+}
+.username-current strong{color:#a9d5ff;overflow-wrap:anywhere}
+.username-rules{font-size:10.5px;line-height:1.6;color:var(--muted);margin-top:-5px;margin-bottom:10px}
+.availability{display:flex;align-items:flex-start;gap:7px;font-size:11.5px;line-height:1.5;margin:8px 0 12px}
+.availability.available{color:#55f0a5}
+.availability.taken,.availability.invalid{color:#ff707e}
+.availability.checking{color:#d5d6f0}
+.availability.neutral{color:var(--muted)}
+
 /* Bottom navigation */
 .bottom-nav{
-  position:fixed;
-  bottom:0;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:30;
-  width:100%;
-  max-width:650px;
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  padding:9px 5px calc(9px + env(safe-area-inset-bottom));
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:100%;max-width:650px;
+  display:flex;justify-content:space-around;align-items:center;padding:8px 5px calc(8px + env(safe-area-inset-bottom));
   background:linear-gradient(110deg,#121a35f8,#29172ff8,#351735f8);
-  backdrop-filter:blur(24px);
-  border-top:1px solid var(--border);
+  backdrop-filter:blur(24px);border-top:1px solid var(--border)
 }
 .nav-item{
-  flex:1;
-  min-width:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:5px;
-  padding:3px 0;
-  background:transparent;
-  border:0;
-  color:#ffffffb8;
-  font-size:11px;
+  flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:3px 0;background:transparent;border:0;color:#ffffffb8;font-size:10.5px
 }
-.nav-item i{font-size:20px}
+.nav-item i{font-size:19px}
 .nav-item.active{color:var(--pink)}
 .nav-item.active i{filter:drop-shadow(0 0 7px #ff248c77)}
 
-/* Logout dialog */
+/* Confirmation */
 .confirm{
-  position:fixed;
-  inset:0;
-  z-index:80;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:18px;
-  background:#000b;
-  backdrop-filter:blur(5px);
+  position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+  padding:18px;background:#000b;backdrop-filter:blur(5px)
 }
 .confirm.open{display:flex}
 .confirm-card{
-  width:100%;
-  max-width:370px;
-  padding:22px;
-  border:1px solid var(--border);
-  border-radius:20px;
-  background:linear-gradient(145deg,#173d76,#44205c 55%,#761d54);
-  box-shadow:0 15px 45px #0007;
+  width:100%;max-width:370px;padding:20px;border:1px solid var(--border);border-radius:18px;
+  background:linear-gradient(145deg,#173d76,#44205c 55%,#761d54);box-shadow:0 15px 45px #0007
 }
-.confirm-card h2{font-size:19px;margin-bottom:10px}
-.confirm-card p{font-size:13px;color:#e2e1f5;line-height:1.7}
-.confirm-actions{display:flex;gap:10px;margin-top:20px}
-.confirm-actions button{
-  flex:1;
-  padding:12px;
-  border:1px solid var(--border);
-  border-radius:10px;
-  background:#ffffff10;
-}
-.confirm-actions .logout-confirm{
-  background:linear-gradient(110deg,#d91d62,#ff248c);
-  border:0;
-  font-weight:800;
-}
-
-/* Toast */
+.confirm-card h2{font-size:18px;margin-bottom:9px}
+.confirm-card p{font-size:12px;color:#e2e1f5;line-height:1.65}
+.confirm-actions{display:flex;gap:9px;margin-top:17px}
+.confirm-actions button{flex:1;padding:11px;border:1px solid var(--border);border-radius:10px;background:#ffffff10}
+.confirm-actions .logout-confirm{background:linear-gradient(110deg,#d91d62,#ff248c);border:0;font-weight:800}
 .toast{
-  position:fixed;
-  z-index:100;
-  bottom:95px;
-  left:50%;
-  transform:translateX(-50%);
-  max-width:90%;
-  width:max-content;
-  padding:12px 16px;
-  color:white;
-  background:#202345f5;
-  border:1px solid var(--border);
-  border-radius:12px;
-  display:none;
-  font-size:12px;
-  line-height:1.5;
-  text-align:center;
-  box-shadow:0 8px 25px #0004;
+  position:fixed;z-index:100;bottom:90px;left:50%;transform:translateX(-50%);
+  max-width:90%;width:max-content;padding:11px 14px;color:white;background:#202345f5;
+  border:1px solid var(--border);border-radius:11px;display:none;font-size:11.5px;line-height:1.5;
+  text-align:center;box-shadow:0 8px 25px #0004
 }
 .toast.show{display:block}
-
-.footer-note{
-  margin:18px 14px;
-  padding:15px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:linear-gradient(110deg,#162344bb,#321b3cbb);
-  text-align:center;
-}
-.footer-note .heart{color:var(--pink)}
+.footer-note{margin:16px 13px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#162344bb;text-align:center}
 @media(max-width:380px){
-  .page-heading h1{font-size:17px}
-  .user-card{padding:12px}
-  .avatar{width:50px;height:50px}
-  .item{padding:12px 10px;gap:9px}
-  .item-icon{width:35px;height:35px}
-  .edit-badge{padding:8px;font-size:10px}
+  .page-heading h1{font-size:18px}
+  .item{min-height:53px;padding:8px 9px;gap:8px}
+  .item-icon{width:31px;height:31px;font-size:13px}
+  .desc{font-size:10px}
   .nav-item{font-size:10px}
   .nav-item i{font-size:18px}
 }
-@media(min-width:651px){
-  .app{border-inline:1px solid var(--border)}
-}
+@media(min-width:651px){.app{border-inline:1px solid var(--border)}}
 </style>
 </head>
-
 <body>
 <div class="app">
-
 <header class="topbar">
-  <button class="back-btn" id="backButton" aria-label="Back">
-    <i class="fa-solid fa-arrow-left"></i>
-  </button>
+  <button class="back-btn" id="backButton" type="button" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
   <div class="page-heading">
     <h1 id="pageTitle">Settings <span class="brand-mark">⚙</span></h1>
     <p>Boys vs Girls 💙💗 · Account center</p>
   </div>
-  <div class="top-actions">
-    <button class="icon-btn" onclick="go('inbox.html')" aria-label="Love Messenger">
-      <i class="fa-solid fa-heart love-icon"></i>
-    </button>
-  </div>
+  <button class="icon-btn" id="messengerButton" type="button" aria-label="Love Messenger">
+    <i class="fa-solid fa-heart love-icon"></i>
+  </button>
 </header>
 
-<div class="user-card">
-  <img id="userAvatar" class="avatar"
-       src="https://placehold.co/120x120/173d76/ffffff?text=BG"
-       alt="Profile picture">
-  <div class="user-info">
-    <div class="user-name" id="userName">Boys vs Girls User</div>
-    <div class="user-handle" id="userHandle">@username</div>
-  </div>
-  <button class="edit-badge" onclick="showView('editprofile')">
-    <i class="fa-solid fa-pen"></i> Edit
-  </button>
-</div>
-
-<!-- Main settings -->
+<!-- Main settings: the old profile-name card has been removed -->
 <div id="mainView" class="view active">
-
   <div class="section-title"><i class="fa-solid fa-user-gear"></i> Account</div>
   <div class="group">
-    <button class="item" data-view="editprofile">
+    <button class="item" data-view="editprofile" type="button">
       <span class="item-icon"><i class="fa-solid fa-user-pen"></i></span>
       <span class="item-text">Edit profile<span class="desc">Name, bio and personal details</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="privacy">
+    <button class="item" data-view="username" type="button">
+      <span class="item-icon"><i class="fa-solid fa-at blue"></i></span>
+      <span class="item-text">Change username<span class="desc">Check availability and update your username</span></span>
+      <i class="fa-solid fa-chevron-right arrow"></i>
+    </button>
+    <button class="item" id="blueBadgeLink" type="button">
+      <span class="item-icon"><i class="fa-solid fa-circle-check blue"></i></span>
+      <span class="item-text">Blue Badge Verification<span class="desc">Apply for a verified blue badge</span></span>
+      <i class="fa-solid fa-chevron-right arrow"></i>
+    </button>
+    <button class="item" data-view="privacy" type="button">
       <span class="item-icon"><i class="fa-solid fa-shield-halved"></i></span>
       <span class="item-text">Privacy Center<span class="desc">Account safety and privacy information</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="language">
+    <button class="item" data-view="language" type="button">
       <span class="item-icon"><i class="fa-solid fa-globe"></i></span>
       <span class="item-text">Language<span class="desc">Choose your preferred language</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="time">
+    <button class="item" data-view="time" type="button">
       <span class="item-icon"><i class="fa-regular fa-clock"></i></span>
       <span class="item-text">Time management<span class="desc">Manage your reminder preference</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
@@ -453,22 +220,22 @@ a{color:inherit;text-decoration:none}
 
   <div class="section-title"><i class="fa-solid fa-layer-group"></i> Activity and services</div>
   <div class="group">
-    <button class="item" data-view="devices">
+    <button class="item" data-view="devices" type="button">
       <span class="item-icon"><i class="fa-solid fa-mobile-screen-button"></i></span>
       <span class="item-text">Device requests<span class="desc">Device request availability</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="ads">
+    <button class="item" data-view="ads" type="button">
       <span class="item-icon"><i class="fa-solid fa-rectangle-ad"></i></span>
       <span class="item-text">Your Ad Activity<span class="desc">Advertising activity information</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="payments">
+    <button class="item" data-view="payments" type="button">
       <span class="item-icon"><i class="fa-regular fa-credit-card"></i></span>
       <span class="item-text">Orders and payments<span class="desc">Payment service information</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="links">
+    <button class="item" data-view="links" type="button">
       <span class="item-icon"><i class="fa-solid fa-link"></i></span>
       <span class="item-text">Link history<span class="desc">Link history availability</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
@@ -477,22 +244,22 @@ a{color:inherit;text-decoration:none}
 
   <div class="section-title"><i class="fa-solid fa-circle-question"></i> Help and support</div>
   <div class="group">
-    <button class="item" data-view="scam">
+    <button class="item" data-view="scam" type="button">
       <span class="item-icon"><i class="fa-solid fa-shield-heart"></i></span>
       <span class="item-text">Scam Protection Center<span class="desc">Protect your account from scams</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="support">
+    <button class="item" data-view="support" type="button">
       <span class="item-icon"><i class="fa-solid fa-life-ring"></i></span>
       <span class="item-text">Support<span class="desc">Help using Boys vs Girls</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="report">
+    <button class="item" data-view="report" type="button">
       <span class="item-icon"><i class="fa-regular fa-flag"></i></span>
       <span class="item-text">Report a problem<span class="desc">Prepare a report about an issue</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
-    <button class="item" data-view="terms">
+    <button class="item" data-view="terms" type="button">
       <span class="item-icon"><i class="fa-solid fa-book-open"></i></span>
       <span class="item-text">Terms and Policies<span class="desc">Community guidelines and policies</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
@@ -501,16 +268,42 @@ a{color:inherit;text-decoration:none}
 
   <div class="section-title"><i class="fa-solid fa-right-from-bracket"></i> Session</div>
   <div class="group">
-    <button class="item" id="logoutButton">
+    <button class="item" id="logoutButton" type="button">
       <span class="item-icon"><i class="fa-solid fa-right-from-bracket danger"></i></span>
       <span class="item-text danger">Log out<span class="desc">Log out of this account on this device</span></span>
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
   </div>
+  <div class="footer-note"><p class="muted">Made with <i class="fa-solid fa-heart pink"></i> for Boys vs Girls 💙💗</p></div>
+</div>
 
-  <div class="footer-note">
-    <p class="muted">Made with <i class="fa-solid fa-heart heart"></i> for Boys vs Girls 💙💗</p>
-    <p class="muted" style="margin-top:5px">Settings · Account and preferences</p>
+<!-- Change username -->
+<div id="usernameView" class="view">
+  <div class="panel">
+    <h2><i class="fa-solid fa-at blue"></i> Change username</h2>
+    <p class="muted">Your username helps people find your account. It must be unique.</p>
+    <div class="username-current">
+      <span>Current username</span>
+      <strong id="currentUsername">@loading</strong>
+    </div>
+    <form id="usernameForm">
+      <label class="field" for="newUsername">New username
+        <input id="newUsername" name="username" type="text" minlength="3" maxlength="50"
+          autocomplete="off" autocapitalize="none" spellcheck="false"
+          placeholder="e.g. rubel_123" required>
+      </label>
+      <p class="username-rules">Use 3–50 characters. Only English letters (a–z), numbers (0–9) and underscores (_) are allowed. Do not include @ or spaces.</p>
+      <div id="usernameAvailability" class="availability neutral" role="status" aria-live="polite">
+        <i class="fa-solid fa-circle-info"></i><span>Enter a username to check availability.</span>
+      </div>
+      <button class="primary" id="checkUsernameButton" type="button">Check availability</button>
+      <button class="primary" id="saveUsernameButton" type="submit" style="margin-top:9px" disabled>Save username</button>
+      <p class="status" id="usernameStatus" role="status"></p>
+    </form>
+  </div>
+  <div class="panel">
+    <h3><i class="fa-solid fa-circle-info blue"></i> Before you change it</h3>
+    <p class="muted">Your new username is saved to your account. If other pages display a cached username, they may need to reload to show the update.</p>
   </div>
 </div>
 
@@ -518,7 +311,7 @@ a{color:inherit;text-decoration:none}
 <div id="editprofileView" class="view">
   <div class="panel">
     <h2><i class="fa-solid fa-user-pen blue"></i> Edit profile</h2>
-    <p class="muted">Update your profile information. Changes are sent to your account API.</p>
+    <p class="muted">Update your profile information.</p>
     <form id="profileForm">
       <label class="field">Full name
         <input id="fullName" maxlength="80" required>
@@ -530,16 +323,16 @@ a{color:inherit;text-decoration:none}
         <input id="city" maxlength="120" placeholder="Your city">
       </label>
       <label class="field">From
-        <input id="home" maxlength="200" placeholder="Your hometown">
+        <input id="home" maxlength="120" placeholder="Your hometown">
       </label>
       <label class="field">Birthday
         <input id="birthday" type="date">
       </label>
       <label class="field">Work
-        <input id="work" maxlength="200" placeholder="Where you work">
+        <input id="work" maxlength="160" placeholder="Where you work">
       </label>
       <label class="field">Education
-        <input id="education" maxlength="200" placeholder="Your education">
+        <input id="education" maxlength="160" placeholder="Your education">
       </label>
       <button class="primary" id="saveProfile" type="submit">Save profile</button>
       <p class="status" id="profileStatus" role="status"></p>
@@ -547,105 +340,64 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<!-- Privacy -->
 <div id="privacyView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-lock blue"></i> Privacy Center</h2>
+  <div class="panel"><h2><i class="fa-solid fa-lock blue"></i> Privacy Center</h2>
     <p class="muted">Keep your password, verification codes and login token private. Avoid signing in on devices you do not trust.</p>
   </div>
-  <div class="panel">
-    <h2>Public profile</h2>
+  <div class="panel"><h2>Public profile</h2>
     <p class="muted">Your name, bio, profile photo and posts may be visible to other users depending on the backend privacy rules. This page does not independently change server-side privacy settings.</p>
   </div>
-  <div class="panel">
-    <h2>Account data</h2>
-    <p class="muted">Use the account features provided by the service to manage your information. Logging out removes the local session token from this browser.</p>
+  <div class="panel"><h2>Account data</h2>
+    <p class="muted">Logging out removes the local session token from this browser.</p>
   </div>
 </div>
 
-<!-- Language -->
 <div id="languageView" class="view">
   <div class="panel">
     <h2><i class="fa-solid fa-globe pink"></i> Language</h2>
     <p class="muted">Choose a language preference for this device.</p>
     <label class="field">Preferred language
-      <select id="languageSelect">
-        <option value="en">English</option>
-        <option value="bn">বাংলা (Bangla)</option>
-      </select>
+      <select id="languageSelect"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select>
     </label>
-    <button class="primary" id="saveLanguage">Save language</button>
+    <button class="primary" id="saveLanguage" type="button">Save language</button>
     <p class="status" id="languageStatus" role="status"></p>
-    <p class="muted" style="margin-top:12px">This saves your preference locally. Pages must support the selected language to display fully translated content.</p>
+    <p class="muted" style="margin-top:10px">Pages must support the selected language to display fully translated content.</p>
   </div>
 </div>
 
-<!-- Time -->
 <div id="timeView" class="view">
   <div class="panel">
     <h2><i class="fa-regular fa-clock blue"></i> Time management</h2>
-    <p class="muted">Save a reminder preference on this device. This setting does not create operating-system notifications or track server activity.</p>
-    <label class="field">
-      <input id="timeReminder" type="checkbox">
-      Enable reminder preference
-    </label>
-    <button class="primary" id="saveTime">Save preference</button>
+    <p class="muted">Save a reminder preference on this device. This does not create operating-system notifications.</p>
+    <label class="field"><input id="timeReminder" type="checkbox"> Enable reminder preference</label>
+    <button class="primary" id="saveTime" type="button">Save preference</button>
     <p class="status" id="timeStatus" role="status"></p>
   </div>
 </div>
 
-<div id="devicesView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-mobile-screen-button blue"></i> Device requests</h2>
-    <p class="muted">Device requests are not connected in this version of Boys vs Girls.</p>
-  </div>
-</div>
-
-<div id="adsView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-rectangle-ad pink"></i> Your Ad Activity</h2>
-    <p class="muted">Ad activity history is not available in this version of the application.</p>
-  </div>
-</div>
-
-<div id="paymentsView" class="view">
-  <div class="panel">
-    <h2><i class="fa-regular fa-credit-card blue"></i> Orders and payments</h2>
-    <p class="muted">Payment and order services are not connected in this version of the application.</p>
-  </div>
-</div>
-
-<div id="linksView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-link blue"></i> Link history</h2>
-    <p class="muted">This version does not record link history.</p>
-  </div>
-</div>
+<div id="devicesView" class="view"><div class="panel"><h2>Device requests</h2><p class="muted">Device requests are not connected in this version.</p></div></div>
+<div id="adsView" class="view"><div class="panel"><h2>Your Ad Activity</h2><p class="muted">Ad activity history is not available in this version.</p></div></div>
+<div id="paymentsView" class="view"><div class="panel"><h2>Orders and payments</h2><p class="muted">Payment and order services are not connected in this version.</p></div></div>
+<div id="linksView" class="view"><div class="panel"><h2>Link history</h2><p class="muted">This version does not record link history.</p></div></div>
 
 <div id="scamView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-shield-heart pink"></i> Scam Protection Center</h2>
+  <div class="panel"><h2><i class="fa-solid fa-shield-heart pink"></i> Scam Protection Center</h2>
     <p class="muted">Never share your password, access token or verification codes. Be cautious of links asking you to log in again.</p>
   </div>
-  <div class="panel">
-    <h2>Safety tips</h2>
-    <p class="muted">Use a strong password, verify suspicious messages and report abusive or misleading content through the available reporting features.</p>
-  </div>
+  <div class="panel"><h2>Safety tips</h2><p class="muted">Use a strong password, verify suspicious messages and report abusive or misleading content.</p></div>
 </div>
 
 <div id="supportView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-life-ring blue"></i> Help and support</h2>
-    <p class="muted">If a feature fails, note what you were doing and the error message. Use Report a problem to prepare a report on this device.</p>
-    <button class="primary" style="margin-top:16px" onclick="showView('report')">Report a problem</button>
+  <div class="panel"><h2><i class="fa-solid fa-life-ring blue"></i> Help and support</h2>
+    <p class="muted">If a feature fails, note what you were doing and the error message.</p>
+    <button class="primary" style="margin-top:12px" id="supportReportButton" type="button">Report a problem</button>
   </div>
 </div>
 
-<!-- Report -->
 <div id="reportView" class="view">
   <div class="panel">
     <h2><i class="fa-regular fa-flag pink"></i> Report a problem</h2>
-    <p class="muted">Describe the issue. This form prepares a report locally and does not send it to a server.</p>
+    <p class="muted">This prepares a report locally; it does not send it to a server.</p>
     <form id="reportForm">
       <label class="field">Problem details
         <textarea id="reportText" maxlength="1500" required placeholder="Tell us what went wrong..."></textarea>
@@ -658,43 +410,31 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <div id="termsView" class="view">
-  <div class="panel">
-    <h2><i class="fa-solid fa-book-open blue"></i> Terms and Policies</h2>
+  <div class="panel"><h2><i class="fa-solid fa-book-open blue"></i> Terms and Policies</h2>
     <p class="muted">Use Boys vs Girls respectfully. Do not post unlawful, harmful, deceptive or abusive content. Respect other users' privacy and intellectual property.</p>
-    <p class="muted" style="margin-top:12px">These are basic in-app guidelines, not a replacement for the official legal terms of the service.</p>
+    <p class="muted" style="margin-top:10px">These are basic in-app guidelines, not a replacement for official legal terms.</p>
   </div>
 </div>
 
-<!-- Bottom navigation: matches the supplied home page -->
 <nav class="bottom-nav" aria-label="Main navigation">
-  <button class="nav-item" onclick="go('home.html')">
-    <i class="fa-solid fa-house"></i><span>Home</span>
-  </button>
-  <button class="nav-item" onclick="go('discover.html')">
-    <i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span>
-  </button>
-  <button class="nav-item" onclick="go('notifications.html')">
-    <i class="fa-solid fa-bell"></i><span>Notifications</span>
-  </button>
-  <button class="nav-item active" onclick="go('profile.html')" aria-current="page">
-    <i class="fa-regular fa-user"></i><span>Profile</span>
-  </button>
+  <button class="nav-item" type="button" data-page="home.html"><i class="fa-solid fa-house"></i><span>Home</span></button>
+  <button class="nav-item" type="button" data-page="discover.html"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span></button>
+  <button class="nav-item" type="button" data-page="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></button>
+  <button class="nav-item active" type="button" data-page="profile.html" aria-current="page"><i class="fa-regular fa-user"></i><span>Profile</span></button>
 </nav>
 </div>
 
-<!-- Logout confirmation -->
 <div class="confirm" id="logoutConfirm" role="dialog" aria-modal="true" aria-labelledby="logoutTitle">
   <div class="confirm-card">
     <h2 id="logoutTitle"><i class="fa-solid fa-right-from-bracket danger"></i> Log out?</h2>
     <p>Are you sure you want to log out of this account on this device?</p>
     <div class="confirm-actions">
-      <button id="cancelLogout">Cancel</button>
-      <button class="logout-confirm" id="confirmLogout">Log out</button>
+      <button id="cancelLogout" type="button">Cancel</button>
+      <button class="logout-confirm" id="confirmLogout" type="button">Log out</button>
     </div>
     <p class="status" id="logoutStatus"></p>
   </div>
 </div>
-
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -704,494 +444,443 @@ const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const PROFILE_KEY="freetube_profile_data";
 const DEFAULT_AVATAR="https://placehold.co/120x120/173d76/ffffff?text=BG";
+const $=id=>document.getElementById(id);
 
 let toastTimer=null;
 let reportDraft="";
+let currentUsername="";
+let usernameCheckTimer=null;
+let usernameCheckSequence=0;
+let usernameAvailable=false;
+let usernameCheckedValue="";
+let usernameSaving=false;
 
-function go(page){
-  location.href=page;
-}
-
+function go(page){location.href=page}
 function getToken(){
-  try{
-    return localStorage.getItem(TOKEN_KEY)||"";
-  }catch(_){
-    return "";
-  }
+  try{return localStorage.getItem(TOKEN_KEY)||sessionStorage.getItem(TOKEN_KEY)||""}
+  catch(_){return ""}
 }
-
 function getCachedProfile(){
-  try{
-    return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{};
-  }catch(_){
-    return {};
-  }
+  try{return JSON.parse(localStorage.getItem(PROFILE_KEY)||"{}")||{}}
+  catch(_){return {}}
 }
-
+function saveCachedProfile(profile){
+  try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profile))}
+  catch(_){}
+}
 function notify(message){
-  const el=document.getElementById("toast");
+  const el=$("toast");
   el.textContent=String(message||"Something went wrong.");
   el.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove("show"),3000);
 }
-
 function setStatus(id,message,type=""){
-  const el=document.getElementById(id);
+  const el=$(id);
   if(!el)return;
   el.textContent=message;
   el.className="status"+(type?" "+type:"");
 }
-
 async function apiRequest(path,options={}){
   const headers=new Headers(options.headers||{});
-  const accessToken=getToken();
-
-  if(accessToken)headers.set("Authorization","Bearer "+accessToken);
-
-  if(options.body!==undefined &&
-     !(options.body instanceof FormData) &&
-     !headers.has("Content-Type")){
+  const token=getToken();
+  if(token)headers.set("Authorization","Bearer "+token);
+  if(options.body!==undefined&&!(options.body instanceof FormData)&&!headers.has("Content-Type")){
     headers.set("Content-Type","application/json");
   }
-
   let response;
-
   try{
-    response=await fetch(API_BASE_URL+path,{
-      ...options,
-      headers,
-      cache:"no-store"
-    });
+    response=await fetch(API_BASE_URL+path,{...options,headers,cache:"no-store"});
   }catch(_){
-    throw new Error("Backend-এর সঙ্গে সংযোগ হচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।");
+    throw new Error("Could not connect to the server. Check your internet connection.");
   }
-
   let data={};
-  try{
-    data=await response.json();
-  }catch(_){}
-
-  if(response.status===401){
-    try{
-      localStorage.removeItem(TOKEN_KEY);
-    }catch(_){}
-    throw new Error("আপনার লগইন সেশন শেষ হয়েছে। আবার লগইন করুন।");
-  }
-
+  try{data=await response.json()}catch(_){}
   if(!response.ok){
-    throw new Error(data.error||data.message||("HTTP "+response.status));
+    const error=new Error(data.error||data.message||("Request failed ("+response.status+")."));
+    error.status=response.status;
+    throw error;
   }
-
   return data;
 }
-
 function setImage(img,url){
   img.onerror=null;
   img.src=DEFAULT_AVATAR;
-
   if(url){
-    img.onerror=function(){
-      this.onerror=null;
-      this.src=DEFAULT_AVATAR;
-    };
+    img.onerror=function(){this.onerror=null;this.src=DEFAULT_AVATAR};
     img.src=url;
   }
 }
-
 function fillProfile(user={},profile={}){
   const local=getCachedProfile();
-
   const value=(...values)=>{
     for(const v of values){
-      if(v!==undefined && v!==null && String(v).trim()!==""){
-        return v;
-      }
+      if(v!==undefined&&v!==null&&String(v).trim()!=="")return v;
     }
     return "";
   };
-
-  const name=value(
-    profile.display_name,profile.full_name,
-    user.display_name,user.full_name,user.name,
-    local.name,"Boys vs Girls User"
-  );
-
-  const username=String(value(
-    profile.username,user.username,user.handle,
-    local.username,"username"
-  )).replace(/^@/,"");
-
-  document.getElementById("fullName").value=value(
-    profile.display_name,profile.full_name,
-    user.display_name,user.full_name,user.name,local.name
-  );
-
-  document.getElementById("bio").value=value(
-    profile.bio,user.bio,local.bio
-  );
-
-  document.getElementById("city").value=value(
-    profile.city,user.city,local.city
-  );
-
-  document.getElementById("home").value=value(
-    profile.home,user.home,local.home
-  );
-
-  document.getElementById("birthday").value=
-    String(value(profile.birthday,user.birthday,local.birthday)).slice(0,10);
-
-  document.getElementById("work").value=value(
-    profile.work,user.work,local.work
-  );
-
-  document.getElementById("education").value=value(
-    profile.education,user.education,local.education
-  );
-
-  document.getElementById("userName").textContent=name;
-  document.getElementById("userHandle").textContent="@"+username;
-
-  setImage(
-    document.getElementById("userAvatar"),
-    value(
-      profile.avatar_url,profile.avatarUrl,
-      user.avatar_url,user.avatarUrl,
-      local.avatar_url,local.avatarUrl
-    )
-  );
+  const username=String(value(user.username,profile.username,local.username,"")).replace(/^@/,"");
+  currentUsername=username.toLowerCase();
+  $("currentUsername").textContent=username?"@"+username:"Not available";
+  $("fullName").value=value(profile.display_name,profile.full_name,user.display_name,user.full_name,user.name,local.name);
+  $("bio").value=value(profile.bio,user.bio,local.bio);
+  $("city").value=value(profile.location,profile.city,user.location,user.city,local.location,local.city);
+  $("home").value=value(profile.hometown,profile.home,user.hometown,user.home,local.hometown,local.home);
+  $("birthday").value=String(value(profile.birthday,user.birthday,local.birthday)).slice(0,10);
+  $("work").value=value(profile.work,user.work,local.work);
+  $("education").value=value(profile.education,user.education,local.education);
+  resetUsernameChecker();
 }
-
 async function loadSettings(){
   const local=getCachedProfile();
   fillProfile(local,local);
-
   if(!getToken()){
-    setStatus(
-      "profileStatus",
-      "You are not logged in. Sign in to save account changes.",
-      "error"
-    );
+    setStatus("profileStatus","Please log in to load and save account changes.","error");
+    setStatus("usernameStatus","Please log in before changing your username.","error");
     return;
   }
-
   try{
     const data=await apiRequest("/auth/me");
     const user=data.user||data.profile||data.data?.user||data.data||data;
-
     let profile={};
-
     try{
       const result=await apiRequest("/profile");
-      profile=result.profile||result.data?.profile||
-        result.user||result.data||result;
+      profile=result.profile||result.data?.profile||result.user||result.data||result;
     }catch(error){
-      console.warn("Could not load profile details:",error.message);
+      console.warn("Profile details could not be loaded:",error.message);
     }
-
     fillProfile(user,profile);
+    saveCachedProfile({...local,...user,...profile,username:user.username||profile.username||local.username});
   }catch(error){
     console.error(error);
-    setStatus(
-      "profileStatus",
-      "Could not load account information: "+error.message,
-      "error"
-    );
+    setStatus("profileStatus","Could not load account information: "+error.message,"error");
+    setStatus("usernameStatus","Could not load your account: "+error.message,"error");
   }
 }
 
 const viewTitles={
-  main:"Settings",
-  editprofile:"Edit profile",
-  privacy:"Privacy Center",
-  language:"Language",
-  time:"Time management",
-  devices:"Device requests",
-  ads:"Your Ad Activity",
-  payments:"Orders and payments",
-  links:"Link history",
-  scam:"Scam Protection",
-  support:"Help and support",
-  report:"Report a problem",
-  terms:"Terms and Policies"
+  main:"Settings",editprofile:"Edit profile",username:"Change username",
+  privacy:"Privacy Center",language:"Language",time:"Time management",
+  devices:"Device requests",ads:"Your Ad Activity",payments:"Orders and payments",
+  links:"Link history",scam:"Scam Protection",support:"Help and support",
+  report:"Report a problem",terms:"Terms and Policies"
 };
-
 function showView(key){
-  const view=document.getElementById(key+"View");
+  const view=$(key+"View");
   if(!view)return;
-
-  document.querySelectorAll(".view").forEach(el=>{
-    el.classList.remove("active");
-  });
-
+  document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
   view.classList.add("active");
-  document.getElementById("pageTitle").textContent=viewTitles[key]||"Settings";
-
+  $("pageTitle").textContent=viewTitles[key]||"Settings";
   window.scrollTo({top:0,behavior:"auto"});
-
-  try{
-    history.replaceState(null,"",key==="main"?"settings.html":"settings.html?page="+encodeURIComponent(key));
-  }catch(_){}
+  try{history.replaceState(null,"",key==="main"?"settings.html":"settings.html?page="+encodeURIComponent(key))}
+  catch(_){}
 }
-
 window.showView=showView;
 
 document.querySelectorAll("[data-view]").forEach(button=>{
-  button.addEventListener("click",()=>{
-    showView(button.dataset.view);
-  });
+  button.addEventListener("click",()=>showView(button.dataset.view));
+});
+document.querySelectorAll("[data-page]").forEach(button=>{
+  button.addEventListener("click",()=>go(button.dataset.page));
+});
+$("messengerButton").addEventListener("click",()=>go("inbox.html"));
+$("blueBadgeLink").addEventListener("click",()=>go("blue-badge.html"));
+$("supportReportButton").addEventListener("click",()=>showView("report"));
+
+$("backButton").addEventListener("click",()=>{
+  const active=document.querySelector(".view.active");
+  if(active&&active.id!=="mainView")showView("main");
+  else go("profile.html");
 });
 
-document.getElementById("backButton").addEventListener("click",()=>{
-  const active=document.querySelector(".view.active");
+/* Username availability */
+function setAvailability(message,type="neutral",icon="fa-circle-info"){
+  const el=$("usernameAvailability");
+  el.className="availability "+type;
+  el.replaceChildren();
+  const i=document.createElement("i");
+  i.className="fa-solid "+icon;
+  const span=document.createElement("span");
+  span.textContent=message;
+  el.append(i,span);
+}
+function resetUsernameChecker(){
+  clearTimeout(usernameCheckTimer);
+  usernameCheckSequence++;
+  usernameAvailable=false;
+  usernameCheckedValue="";
+  $("saveUsernameButton").disabled=true;
+  const input=$("newUsername");
+  if(!input)return;
+  input.value="";
+  setAvailability("Enter a username to check availability.","neutral","fa-circle-info");
+  setStatus("usernameStatus","");
+}
+function validateUsername(value){
+  if(value.length<3)return "Username must contain at least 3 characters.";
+  if(value.length>50)return "Username cannot exceed 50 characters.";
+  if(!/^[a-z0-9_]+$/.test(value))return "Use only English letters, numbers and underscores.";
+  return "";
+}
+async function checkUsernameAvailability(){
+  const input=$("newUsername");
+  const username=input.value.trim().replace(/^@/,"").toLowerCase();
+  input.value=username;
+  usernameAvailable=false;
+  usernameCheckedValue="";
+  $("saveUsernameButton").disabled=true;
 
-  if(active && active.id!=="mainView"){
-    showView("main");
-  }else{
-    go("profile.html");
+  const invalid=validateUsername(username);
+  if(invalid){
+    setAvailability(invalid,"invalid","fa-circle-xmark");
+    return false;
+  }
+  if(username===currentUsername){
+    setAvailability("This is already your current username.","neutral","fa-circle-info");
+    return false;
+  }
+  if(!getToken()){
+    setAvailability("Please log in to check username availability.","invalid","fa-circle-xmark");
+    return false;
+  }
+
+  const seq=++usernameCheckSequence;
+  setAvailability("Checking username availability...","checking","fa-spinner fa-spin");
+  try{
+    const data=await apiRequest("/users/search?q="+encodeURIComponent(username));
+    if(seq!==usernameCheckSequence)return false;
+    const users=Array.isArray(data.users)?data.users:[];
+    const taken=users.some(user=>String(user.username||"").toLowerCase()===username);
+    if(taken){
+      setAvailability("Username is already taken. Please try another one.","taken","fa-circle-xmark");
+      return false;
+    }
+    usernameAvailable=true;
+    usernameCheckedValue=username;
+    setAvailability("Username available! You can use this username.","available","fa-circle-check");
+    $("saveUsernameButton").disabled=false;
+    return true;
+  }catch(error){
+    if(seq!==usernameCheckSequence)return false;
+    setAvailability("Could not verify availability. Try again or save to let the server check.","invalid","fa-triangle-exclamation");
+    setStatus("usernameStatus",error.message,"error");
+    return false;
+  }
+}
+$("newUsername").addEventListener("input",()=>{
+  clearTimeout(usernameCheckTimer);
+  usernameCheckSequence++;
+  usernameAvailable=false;
+  usernameCheckedValue="";
+  $("saveUsernameButton").disabled=true;
+  setStatus("usernameStatus","");
+  const username=$("newUsername").value.trim().replace(/^@/,"").toLowerCase();
+  const invalid=validateUsername(username);
+  if(!username){
+    setAvailability("Enter a username to check availability.","neutral","fa-circle-info");
+    return;
+  }
+  if(invalid){
+    setAvailability(invalid,"invalid","fa-circle-xmark");
+    return;
+  }
+  if(username===currentUsername){
+    setAvailability("This is already your current username.","neutral","fa-circle-info");
+    return;
+  }
+  setAvailability("Waiting to check...","checking","fa-clock");
+  usernameCheckTimer=setTimeout(checkUsernameAvailability,500);
+});
+$("checkUsernameButton").addEventListener("click",checkUsernameAvailability);
+
+$("usernameForm").addEventListener("submit",async event=>{
+  event.preventDefault();
+  if(usernameSaving)return;
+  const username=$("newUsername").value.trim().replace(/^@/,"").toLowerCase();
+  const invalid=validateUsername(username);
+  if(invalid){
+    setAvailability(invalid,"invalid","fa-circle-xmark");
+    return;
+  }
+  if(username===currentUsername){
+    setStatus("usernameStatus","This is already your current username.","error");
+    return;
+  }
+  if(!usernameAvailable||usernameCheckedValue!==username){
+    const ok=await checkUsernameAvailability();
+    if(!ok)return;
+  }
+  if(!usernameAvailable||usernameCheckedValue!==username)return;
+  usernameSaving=true;
+  const button=$("saveUsernameButton");
+  button.disabled=true;
+  button.textContent="Saving...";
+  setStatus("usernameStatus","Saving your new username...","checking");
+  try{
+    const result=await apiRequest("/account/username",{
+      method:"PATCH",body:JSON.stringify({username})
+    });
+    const updatedUser=result.user||{};
+    currentUsername=String(updatedUser.username||username).toLowerCase();
+    const cached=getCachedProfile();
+    saveCachedProfile({...cached,username:currentUsername});
+    $("currentUsername").textContent="@"+currentUsername;
+    $("newUsername").value="";
+    usernameAvailable=false;
+    usernameCheckedValue="";
+    setAvailability("Username changed successfully!","available","fa-circle-check");
+    setStatus("usernameStatus",result.message||"Username updated successfully.","success");
+    notify("Username updated successfully.");
+  }catch(error){
+    if(error.status===409){
+      setAvailability("Username is already taken. Please choose another.","taken","fa-circle-xmark");
+    }
+    setStatus("usernameStatus",error.message||"Could not update username.","error");
+  }finally{
+    usernameSaving=false;
+    button.textContent="Save username";
+    button.disabled=true;
   }
 });
 
 /* Save profile */
-document.getElementById("profileForm").addEventListener("submit",async event=>{
+$("profileForm").addEventListener("submit",async event=>{
   event.preventDefault();
-
   if(!getToken()){
     setStatus("profileStatus","Please log in before saving your profile.","error");
-    notify("Please log in first.");
     return;
   }
-
-  const button=document.getElementById("saveProfile");
-  const oldText=button.textContent;
-
-  const payload={
-    display_name:document.getElementById("fullName").value.trim(),
-    bio:document.getElementById("bio").value.trim(),
-    city:document.getElementById("city").value.trim(),
-    home:document.getElementById("home").value.trim(),
-    birthday:document.getElementById("birthday").value||null,
-    work:document.getElementById("work").value.trim(),
-    education:document.getElementById("education").value.trim(),
-    avatar_url:getCachedProfile().avatar_url||"",
-    cover_url:getCachedProfile().cover_url||""
-  };
-
-  if(!payload.display_name){
-    setStatus("profileStatus","Please enter your name.","error");
-    return;
-  }
-
+  const button=$("saveProfile");
   button.disabled=true;
   button.textContent="Saving...";
-
+  const cached=getCachedProfile();
+  const payload={
+    display_name:$("fullName").value.trim(),
+    bio:$("bio").value.trim(),
+    location:$("city").value.trim(),
+    hometown:$("home").value.trim(),
+    birthday:$("birthday").value||null,
+    work:$("work").value.trim(),
+    education:$("education").value.trim(),
+    avatar_url:cached.avatar_url||"",
+    cover_url:cached.cover_url||""
+  };
+  if(!payload.display_name){
+    setStatus("profileStatus","Please enter your name.","error");
+    button.disabled=false;
+    button.textContent="Save profile";
+    return;
+  }
   try{
-    const result=await apiRequest("/profile",{
-      method:"PUT",
-      body:JSON.stringify(payload)
-    });
-
-    const profile=result.profile||result.data?.profile||
-      result.user||result.data||{};
-
-    const old=getCachedProfile();
-
-    const saved={
-      ...old,
-      ...payload,
-      ...profile,
-      name:profile.display_name||profile.full_name||payload.display_name
-    };
-
-    localStorage.setItem(PROFILE_KEY,JSON.stringify(saved));
-
-    fillProfile(saved,saved);
+    const result=await apiRequest("/profile",{method:"PUT",body:JSON.stringify(payload)});
+    const profile=result.profile||result.data?.profile||result.user||result.data||{};
+    const saved={...cached,...payload,...profile,name:profile.display_name||profile.full_name||payload.display_name};
+    saveCachedProfile(saved);
     setStatus("profileStatus","Profile saved successfully.","success");
     notify("Profile updated successfully.");
   }catch(error){
-    console.error(error);
     setStatus("profileStatus","Could not save profile: "+error.message,"error");
   }finally{
     button.disabled=false;
-    button.textContent=oldText;
+    button.textContent="Save profile";
   }
 });
 
 /* Language preference */
-const langSelect=document.getElementById("languageSelect");
-
-try{
-  langSelect.value=localStorage.getItem("freetube_language")||"en";
-}catch(_){}
-
-document.getElementById("saveLanguage").addEventListener("click",()=>{
+try{$("languageSelect").value=localStorage.getItem("freetube_language")||"en"}catch(_){}
+$("saveLanguage").addEventListener("click",()=>{
   try{
-    localStorage.setItem("freetube_language",langSelect.value);
-
-    const message=langSelect.value==="bn"
-      ?"ভাষার পছন্দ এই ডিভাইসে সংরক্ষণ করা হয়েছে।"
-      :"Language preference saved on this device.";
-
+    localStorage.setItem("freetube_language",$("languageSelect").value);
+    const message=$("languageSelect").value==="bn"?"ভাষার পছন্দ এই ডিভাইসে সংরক্ষণ করা হয়েছে।":"Language preference saved on this device.";
     setStatus("languageStatus",message,"success");
     notify(message);
-  }catch(_){
-    setStatus("languageStatus","Could not save language preference.","error");
-  }
+  }catch(_){setStatus("languageStatus","Could not save language preference.","error")}
 });
 
 /* Time preference */
-const timeCheckbox=document.getElementById("timeReminder");
-
-try{
-  timeCheckbox.checked=localStorage.getItem("freetube_time_reminder")==="on";
-}catch(_){}
-
-document.getElementById("saveTime").addEventListener("click",()=>{
+try{$("timeReminder").checked=localStorage.getItem("freetube_time_reminder")==="on"}catch(_){}
+$("saveTime").addEventListener("click",()=>{
   try{
-    localStorage.setItem(
-      "freetube_time_reminder",
-      timeCheckbox.checked?"on":"off"
-    );
-
+    localStorage.setItem("freetube_time_reminder",$("timeReminder").checked?"on":"off");
     setStatus("timeStatus","Preference saved on this device.","success");
     notify("Preference saved.");
-  }catch(_){
-    setStatus("timeStatus","Could not save preference.","error");
-  }
+  }catch(_){setStatus("timeStatus","Could not save preference.","error")}
 });
 
-/* Prepare local report */
-document.getElementById("reportForm").addEventListener("submit",event=>{
+/* Local report */
+$("reportForm").addEventListener("submit",event=>{
   event.preventDefault();
-
-  const message=document.getElementById("reportText").value.trim();
+  const message=$("reportText").value.trim();
   if(!message)return;
-
-  reportDraft=
-    "Boys vs Girls problem report\n\n"+
-    message+
-    "\n\nPage: "+location.href+
-    "\nDate: "+new Date().toISOString();
-
-  setStatus(
-    "reportStatus",
-    "Report prepared on this device. It has not been sent to a server.",
-    "success"
-  );
-
+  reportDraft="Boys vs Girls problem report\n\n"+message+"\n\nPage: "+location.href+"\nDate: "+new Date().toISOString();
+  setStatus("reportStatus","Report prepared on this device. It has not been sent to a server.","success");
   notify("Report prepared.");
 });
-
-document.getElementById("copyReport").addEventListener("click",async()=>{
+$("copyReport").addEventListener("click",async()=>{
   if(!reportDraft){
-    const message=document.getElementById("reportText").value.trim();
-
-    if(!message){
-      notify("Write your report first.");
-      return;
-    }
-
-    reportDraft=
-      "Boys vs Girls problem report\n\n"+
-      message+
-      "\n\nPage: "+location.href+
-      "\nDate: "+new Date().toISOString();
+    const message=$("reportText").value.trim();
+    if(!message){notify("Write your report first.");return}
+    reportDraft="Boys vs Girls problem report\n\n"+message+"\n\nPage: "+location.href+"\nDate: "+new Date().toISOString();
   }
-
   try{
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      await navigator.clipboard.writeText(reportDraft);
-    }else{
-      throw new Error("Clipboard API unavailable");
-    }
-
+    if(!navigator.clipboard?.writeText)throw new Error("Clipboard unavailable");
+    await navigator.clipboard.writeText(reportDraft);
     notify("Report copied.");
   }catch(_){
-    const textarea=document.createElement("textarea");
-    textarea.value=reportDraft;
-    textarea.style.position="fixed";
-    textarea.style.opacity="0";
-    document.body.appendChild(textarea);
-    textarea.select();
-
+    const area=document.createElement("textarea");
+    area.value=reportDraft;
+    area.style.position="fixed";
+    area.style.opacity="0";
+    document.body.appendChild(area);
+    area.select();
     let copied=false;
-    try{
-      copied=document.execCommand("copy");
-    }catch(_){}
-
-    textarea.remove();
-
-    if(copied){
-      notify("Report copied.");
-    }else{
-      notify("Copy failed. Please copy the report manually.");
-    }
+    try{copied=document.execCommand("copy")}catch(_){}
+    area.remove();
+    notify(copied?"Report copied.":"Copy failed. Please copy the report manually.");
   }
 });
 
 /* Logout */
-const logoutConfirm=document.getElementById("logoutConfirm");
-
-document.getElementById("logoutButton").addEventListener("click",()=>{
-  document.getElementById("logoutStatus").textContent="";
+const logoutConfirm=$("logoutConfirm");
+$("logoutButton").addEventListener("click",()=>{
+  $("logoutStatus").textContent="";
   logoutConfirm.classList.add("open");
 });
-
-document.getElementById("cancelLogout").addEventListener("click",()=>{
-  logoutConfirm.classList.remove("open");
-});
-
+$("cancelLogout").addEventListener("click",()=>logoutConfirm.classList.remove("open"));
 logoutConfirm.addEventListener("click",event=>{
-  if(event.target===logoutConfirm){
-    logoutConfirm.classList.remove("open");
-  }
+  if(event.target===logoutConfirm)logoutConfirm.classList.remove("open");
 });
-
-document.getElementById("confirmLogout").addEventListener("click",()=>{
-  const button=document.getElementById("confirmLogout");
+$("confirmLogout").addEventListener("click",()=>{
+  const button=$("confirmLogout");
   button.disabled=true;
   button.textContent="Logging out...";
-
   try{
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(PROFILE_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(PROFILE_KEY);
-
     location.replace("auth.html?mode=login");
   }catch(error){
-    console.error(error);
     setStatus("logoutStatus","Could not clear the local session. Please try again.","error");
     button.disabled=false;
     button.textContent="Log out";
   }
 });
 
-/* Keyboard and modal handling */
 document.addEventListener("keydown",event=>{
   if(event.key==="Escape"){
-    if(logoutConfirm.classList.contains("open")){
-      logoutConfirm.classList.remove("open");
-    }else{
+    if(logoutConfirm.classList.contains("open"))logoutConfirm.classList.remove("open");
+    else{
       const active=document.querySelector(".view.active");
-      if(active && active.id!=="mainView"){
-        showView("main");
-      }
+      if(active&&active.id!=="mainView")showView("main");
     }
   }
 });
 
-/* Initialize */
 document.addEventListener("DOMContentLoaded",()=>{
   loadSettings();
-
-  const params=new URLSearchParams(location.search);
-  const requested=params.get("page");
-
-  if(requested && document.getElementById(requested+"View")){
-    showView(requested);
-  }
+  const page=new URLSearchParams(location.search).get("page");
+  if(page&&$(page+"View"))showView(page);
 });
 </script>
 </body>
