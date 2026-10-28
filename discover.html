@@ -180,7 +180,6 @@ button { cursor:pointer; color:inherit; }
   text-decoration:none;
 }
 .profile-link:active,.profile-name:active { opacity:.7; }
-
 .time {
   font-size:12px;
   color:var(--muted);
@@ -220,42 +219,28 @@ button { cursor:pointer; color:inherit; }
 }
 .stats i { color:var(--green); }
 
-/* Native Ad slots are supplied by the Android app */
+/*
+ * The Android NativeAdView overlays this reserved slot.
+ * The larger height provides room for the complete native card.
+ */
 .native-ad-slot {
   display:none;
   width:100%;
-  min-height:320px;
+  height:430px;
+  min-height:430px;
   margin:10px 0 14px;
-  padding:10px;
-  background:rgba(23,47,36,.85);
-  border-top:1px solid var(--border);
-  border-bottom:1px solid var(--border);
+  padding:0;
+  border:0;
   overflow:hidden;
+  background:transparent;
+  position:relative;
 }
 .native-ad-slot.android-ad-enabled {
   display:block;
 }
-.native-ad-label {
-  color:var(--muted);
-  font-size:11px;
-  letter-spacing:.5px;
-  margin-bottom:8px;
-}
+.native-ad-label,
 .native-ad-placeholder {
-  height:270px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border-radius:10px;
-  color:var(--muted);
-  background:rgba(255,255,255,.035);
-  font-size:12px;
-}
-.native-ad-placeholder i {
-  font-size:24px;
-  color:var(--green);
+  display:none!important;
 }
 
 .state {
@@ -494,8 +479,7 @@ function normalize(post) {
 
   if (!type && src) {
     type = /\.(mp4|webm|mov|m4v|ogv)(\?|$)/i.test(src)
-      ? "video"
-      : "image";
+      ? "video" : "image";
   }
 
   return {
@@ -617,17 +601,12 @@ function makeAdSlot(index) {
 function getProfileUrl(video) {
   const params = new URLSearchParams();
 
-  if (video.userId) {
-    params.set("userId", video.userId);
-  }
-
+  if (video.userId) params.set("userId", video.userId);
   if (video.profileUsername) {
     params.set("username", video.profileUsername);
   }
 
-  if (!video.userId && !video.profileUsername) {
-    return "";
-  }
+  if (!video.userId && !video.profileUsername) return "";
 
   return "profile.html?" + params.toString();
 }
@@ -662,7 +641,7 @@ function render() {
     videoObserver = null;
   }
 
-  if (window.updateNativeAdSlots && nativeAdsAvailable()) {
+  if (nativeAdsAvailable()) {
     document.querySelectorAll(".native-ad-slot").forEach(slot => {
       try {
         window.FreeTubeAds.updateSlot(
@@ -743,7 +722,6 @@ function render() {
         </div>
       </article>`;
 
-    // Insert a Native Ad slot after every two videos.
     const number = index + 1;
 
     if (number % 2 === 0 && number < videos.length) {
@@ -771,7 +749,6 @@ function setupVideoPlayback() {
   if (!("IntersectionObserver" in window)) {
     videos.forEach(video => {
       const playPromise = video.play();
-
       if (playPromise && playPromise.catch) {
         playPromise.catch(() => {});
       }
@@ -789,7 +766,6 @@ function setupVideoPlayback() {
         });
 
         const playPromise = video.play();
-
         if (playPromise && playPromise.catch) {
           playPromise.catch(() => {});
         }
@@ -818,8 +794,7 @@ async function loadVideos() {
   try {
     const data = await api("/posts");
     const posts = Array.isArray(data)
-      ? data
-      : (data.posts || data.items || []);
+      ? data : (data.posts || data.items || []);
 
     allVideos = posts
       .map(normalize)
@@ -887,7 +862,6 @@ document.addEventListener("visibilitychange", () => {
     document.querySelectorAll(".media video").forEach(video => video.pause());
   } else {
     setupVideoPlayback();
-
     if (window.updateNativeAdSlots) {
       window.updateNativeAdSlots();
     }
