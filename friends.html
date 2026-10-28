@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#17142e">
+<title>Friends · Boys ♡ Girls</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root {
+  --blue:#60a5fa;
+  --purple:#a78bfa;
+  --pink:#fb7185;
+  --bg:#100f20;
+  --panel:#19182e;
+  --panel2:#22203b;
+  --text:#f8f7ff;
+  --muted:#aaa7c7;
+  --border:rgba(255,255,255,.11);
+  --gradient:linear-gradient(120deg,var(--blue),var(--purple),var(--pink));
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;background:radial-gradient(ellipse at 0 0,#60a5fa22,transparent 40%),radial-gradient(ellipse at 100% 20%,#fb718522,transparent 35%),var(--bg);color:var(--text);padding-bottom:95px}
+.app{max-width:600px;margin:auto}
+.top{position:sticky;top:0;background:#100f20ed;backdrop-filter:blur(18px);padding:16px;border-bottom:1px solid var(--border);z-index:5;display:flex;align-items:center;gap:12px}
+.logo{width:40px;height:40px;border-radius:13px;background:var(--gradient);display:grid;place-items:center;color:#17142e}
+.title{font-weight:900;font-size:20px}
+.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.content{padding:16px}
+.search{display:flex;gap:8px;margin-bottom:14px}
+.search input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:13px;color:white;outline:none}
+.btn{border:0;border-radius:11px;padding:11px 13px;font-weight:800;background:var(--gradient);color:#17142e}
+.tabs{display:flex;gap:7px;margin:10px 0 16px}
+.tab{flex:1;padding:11px 5px;border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--muted);font-weight:800}
+.tab.active{background:#a78bfa22;color:#d9ccff;border-color:#a78bfa77}
+.list{display:grid;gap:10px}
+.person{display:flex;align-items:center;gap:11px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:15px}
+.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--panel2);display:grid;place-items:center;color:var(--purple);flex-shrink:0}
+.details{flex:1;min-width:0}
+.name{font-weight:800;overflow-wrap:anywhere}
+.handle{font-size:12px;color:var(--muted);margin-top:4px}
+.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.small{padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:white;font-size:12px;font-weight:800}
+.accept{background:var(--gradient);color:#17142e;border:0}
+.danger{color:#ff9eae}
+.empty,.status{padding:24px 12px;text-align:center;color:var(--muted);line-height:1.6}
+.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;display:flex;justify-content:space-around;padding:10px 3px calc(10px + env(safe-area-inset-bottom));background:#100f20ed;border-top:1px solid var(--border);backdrop-filter:blur(18px);z-index:8}
+.nav{flex:1;text-align:center;color:var(--muted);font-size:10px;font-weight:700;text-decoration:none;display:flex;flex-direction:column;gap:5px;align-items:center}
+.nav i{font-size:19px}
+.nav.active{color:var(--purple)}
+@media(max-width:390px){.person{gap:8px;padding:9px}.avatar{width:40px;height:40px}.small{padding:8px;font-size:11px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="logo"><i class="fa-solid fa-user-group"></i></div>
+  <div>
+    <div class="title">Friends <span style="color:#60a5fa">♡</span></div>
+    <div class="sub">Find your people · Boys ♡ Girls 💙💗</div>
+  </div>
+</header>
+
+<main class="content">
+  <form id="searchForm" class="search">
+    <input id="searchInput" placeholder="Search by username…" minlength="2" autocomplete="off">
+    <button class="btn" type="submit" aria-label="Search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
+  </form>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="friends">My Friends</button>
+    <button class="tab" data-tab="received">Requests <span id="receivedCount"></span></button>
+    <button class="tab" data-tab="sent">Sent</button>
+  </div>
+
+  <div id="status" class="status">Loading your friends…</div>
+  <div id="list" class="list"></div>
+</main>
+
+<nav class="bottom">
+  <a class="nav" href="home.html"><i class="fa-solid fa-house"></i>Home</a>
+  <a class="nav" href="discover.html"><i class="fa-solid fa-compass"></i>Pulse</a>
+  <a class="nav active" href="friends.html"><i class="fa-solid fa-user-group"></i>Friends</a>
+  <a class="nav" href="notifications.html"><i class="fa-regular fa-bell"></i>Notifications</a>
+  <a class="nav" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
+</nav>
+</div>
+
+<script>
+const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+let currentTab = "friends";
+
+const $ = id => document.getElementById(id);
+
+function token() {
+  return localStorage.getItem(TOKEN_KEY) || "";
+}
+
+async function api(path, options = {}) {
+  const headers = {
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  if (token()) {
+    headers.Authorization = "Bearer " + token();
+  }
+
+  const response = await fetch(API_BASE + path, {
+    ...options,
+    headers,
+    cache: "no-store"
+  });
+
+  let data = {};
+  try {
+    data = await response.json();
+  } catch (_) {}
+
+  if (!response.ok) {
+    throw new Error(data.error || data.message || "Request failed (" + response.status + ")");
+  }
+
+  return data;
+}
+
+function esc(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function avatar(user) {
+  if (user.avatar_url) {
+    return `<img class="avatar" src="${esc(user.avatar_url)}" alt="">`;
+  }
+
+  return `<div class="avatar"><i class="fa-solid fa-user"></i></div>`;
+}
+
+function button(label, action, id, className = "") {
+  return `<button type="button" class="small ${className}" data-action="${action}" data-id="${esc(id)}">${label}</button>`;
+}
+
+function person(user, actions) {
+  return `
+    <article class="person">
+      ${avatar(user)}
+      <div class="details">
+        <div class="name">${esc(user.display_name || user.username || "User")}</div>
+        <div class="handle">@${esc(user.username || "")}</div>
+      </div>
+      <div class="actions">${actions}</div>
+    </article>
+  `;
+}
+
+async function load() {
+  if (!token()) {
+    $("status").innerHTML = 'Please <a href="auth.html" style="color:#a78bfa">log in</a> to use Friends.';
+    $("list").innerHTML = "";
+    return;
+  }
+
+  $("status").textContent = "Loading…";
+  $("list").innerHTML = "";
+
+  try {
+    let data;
+
+    if (currentTab === "friends") {
+      data = await api("/friends");
+
+      $("list").innerHTML = (data.friends || []).map(user =>
+        person(
+          user,
+          button("Profile", "profile", user.username) +
+          button("Remove", "remove", user.id, "danger")
+        )
+      ).join("");
+    } else {
+      data = await api("/friends/requests?direction=" + currentTab);
+      const requests = data.requests || [];
+
+      $("list").innerHTML = requests.map(user =>
+        person(
+          user,
+          currentTab === "received"
+            ? button("Accept", "accept", user.request_id, "accept") +
+              button("Reject", "reject", user.request_id, "danger")
+            : button("Cancel", "cancel", user.request_id, "danger")
+        )
+      ).join("");
+
+      if (currentTab === "received") {
+        $("receivedCount").textContent = requests.length ? "(" + requests.length + ")" : "";
+      }
+    }
+
+    $("status").textContent = $("list").children.length ? "" : "Nothing here yet.";
+  } catch (error) {
+    $("status").textContent = error.message;
+    $("list").innerHTML = "";
+  }
+}
+
+async function searchUsers(query) {
+  if (query.trim().length < 2) {
+    $("status").textContent = "Type at least 2 characters to find people.";
+    $("list").innerHTML = "";
+    return;
+  }
+
+  if (!token()) {
+    $("status").innerHTML = 'Please <a href="auth.html" style="color:#a78bfa">log in</a> first.';
+    return;
+  }
+
+  $("status").textContent = "Searching…";
+  $("list").innerHTML = "";
+
+  try {
+    const data = await api("/users/search?q=" + encodeURIComponent(query.trim()));
+
+    $("list").innerHTML = (data.users || []).map(user =>
+      person(
+        user,
+        button("Add Friend", "add", user.id, "accept") +
+        button("Profile", "profile", user.username)
+      )
+    ).join("");
+
+    $("status").textContent = $("list").children.length ? "" : "No users found.";
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+document.querySelectorAll("[data-tab]").forEach(buttonElement => {
+  buttonElement.addEventListener("click", () => {
+    document.querySelectorAll("[data-tab]").forEach(item => {
+      item.classList.toggle("active", item === buttonElement);
+    });
+
+    currentTab = buttonElement.dataset.tab;
+    load();
+  });
+});
+
+$("searchForm").addEventListener("submit", event => {
+  event.preventDefault();
+  searchUsers($("searchInput").value);
+});
+
+$("list").addEventListener("click", async event => {
+  const buttonElement = event.target.closest("button[data-action]");
+  if (!buttonElement) return;
+
+  const action = buttonElement.dataset.action;
+  const id = buttonElement.dataset.id;
+
+  try {
+    if (action === "profile") {
+      location.href = "profile.html?username=" + encodeURIComponent(id);
+      return;
+    }
+
+    if (action === "add") {
+      await api("/friends/requests", {
+        method: "POST",
+        body: JSON.stringify({ user_id: id })
+      });
+
+      $("status").textContent = "Friend request sent.";
+      await searchUsers($("searchInput").value);
+      return;
+    }
+
+    if (action === "remove") {
+      if (!confirm("Remove this friend?")) return;
+
+      await api("/friends/" + encodeURIComponent(id), {
+        method: "DELETE"
+      });
+    } else {
+      const requestAction = action === "accept" ? "accept" :
+                            action === "reject" ? "reject" : "cancel";
+
+      await api("/friends/requests/" + encodeURIComponent(id), {
+        method: "PATCH",
+        body: JSON.stringify({ action: requestAction })
+      });
+    }
+
+    $("status").textContent = "Updated successfully.";
+    await load();
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+});
+
+load();
+</script>
+</body>
+</html>
