@@ -1,28 +1,34 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#10291f">
-<title>Notifications — FreeTube</title>
+<meta name="theme-color" content="#17132f">
+<title>Notifications — Boys vs Girls</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
-  --bg:#10291f;
-  --panel:#172f24;
-  --green:#00e991;
-  --red:#ff5369;
-  --text:#f6fff9;
-  --muted:#a9bdb2;
-  --border:rgba(255,255,255,.12);
+  --bg:#100f24;
+  --panel:#191832;
+  --panel2:#211d42;
+  --blue:#4295ff;
+  --purple:#9565ff;
+  --pink:#ff5ebc;
+  --text:#f8f7ff;
+  --muted:#aaa8c6;
+  --border:rgba(255,255,255,.11);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;background:var(--bg)}
 body{
   font-family:Arial,Helvetica,sans-serif;
   color:var(--text);
-  background:linear-gradient(145deg,#65172f 0%,#35233a 35%,#123e2b 70%,#007b48 100%);
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(71,91,255,.25),transparent 42%),
+    radial-gradient(ellipse at 100% 30%,rgba(255,69,177,.18),transparent 42%),
+    linear-gradient(145deg,#111126,#19132f 55%,#11152b);
   background-attachment:fixed;
 }
 button,a{font:inherit}
@@ -31,158 +37,192 @@ button{cursor:pointer;color:inherit}
   max-width:650px;
   min-height:100dvh;
   margin:auto;
-  padding-bottom:90px;
-  background:rgba(16,41,31,.18);
+  padding-bottom:94px;
 }
 .topbar{
   position:sticky;top:0;z-index:20;
   display:flex;align-items:center;gap:12px;
-  padding:calc(12px + env(safe-area-inset-top)) 16px 14px;
-  background:rgba(30,30,33,.80);
-  backdrop-filter:blur(20px);
-  -webkit-backdrop-filter:blur(20px);
+  padding:calc(12px + env(safe-area-inset-top)) 15px 14px;
+  background:rgba(20,18,43,.84);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
   border-bottom:1px solid var(--border);
 }
 .menu-btn,.search-btn{
-  flex-shrink:0;width:38px;height:42px;
+  flex-shrink:0;width:40px;height:42px;
   display:grid;place-items:center;
-  background:transparent;border:0;font-size:23px;
+  background:transparent;border:0;
+  border-radius:13px;font-size:20px;
 }
+.menu-btn:active,.search-btn:active{background:rgba(255,255,255,.1)}
 .topbar h1{
   flex:1;min-width:0;
-  font-size:clamp(23px,6vw,34px);
-  font-weight:850;letter-spacing:-.7px;
+  font-size:clamp(22px,5.8vw,30px);
+  font-weight:900;letter-spacing:-.7px;
+  background:linear-gradient(100deg,#fff 8%,#b8caff 48%,#ff91d1 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 .search-panel{
   display:none;padding:12px 15px;
-  background:rgba(23,47,36,.85);
+  background:rgba(25,24,50,.92);
   border-bottom:1px solid var(--border);
 }
 .search-panel.open{display:block}
 .search-box{
   display:flex;align-items:center;gap:10px;
-  padding:0 12px;
-  border:1px solid var(--border);
-  border-radius:14px;
-  background:rgba(10,35,25,.55);
+  padding:0 13px;
+  border:1px solid rgba(151,115,255,.4);
+  border-radius:15px;
+  background:rgba(10,10,29,.58);
 }
-.search-box i{color:var(--green)}
+.search-box i{color:#b29aff}
 .search-box input{
-  width:100%;min-width:0;padding:13px 0;
+  width:100%;min-width:0;padding:14px 0;
   background:transparent;border:0;outline:0;color:#fff;
 }
 .search-box input::placeholder{color:var(--muted)}
 .section-title{
-  padding:14px 16px;
-  font-size:20px;font-weight:850;
-  background:rgba(24,28,28,.65);
-  border-bottom:1px solid rgba(255,255,255,.04);
+  display:flex;align-items:center;gap:9px;
+  padding:17px 16px 12px;
+  font-size:19px;font-weight:850;
 }
-.notification-list{padding:0}
+.section-title i{
+  color:#b39aff;
+  font-size:17px;
+}
+.section-count{
+  display:inline-grid;place-items:center;
+  min-width:23px;height:23px;padding:0 6px;
+  border-radius:20px;
+  background:linear-gradient(120deg,var(--blue),var(--purple));
+  color:white;font-size:12px;
+}
+.notification-list{padding:0 10px}
 .notification{
   display:flex;align-items:flex-start;gap:12px;
-  padding:16px 15px 18px;
-  background:rgba(31,48,61,.88);
-  border-bottom:1px solid rgba(255,255,255,.04);
+  margin:0 0 9px;padding:15px 12px;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:18px;
+  background:linear-gradient(120deg,rgba(37,34,70,.94),rgba(31,27,57,.94));
+  box-shadow:0 5px 18px rgba(0,0,0,.12);
+  transition:background .2s,border-color .2s;
 }
-.notification.unread{background:rgba(36,57,70,.96)}
-.avatar-wrap{position:relative;flex-shrink:0;width:62px;height:62px}
+.notification.unread{
+  background:linear-gradient(115deg,rgba(40,49,95,.98),rgba(65,36,83,.96));
+  border-color:rgba(139,121,255,.28);
+}
+.avatar-wrap{position:relative;flex-shrink:0;width:54px;height:54px}
 .avatar{
-  display:block;width:62px;height:62px;
+  display:block;width:54px;height:54px;
   object-fit:cover;border-radius:50%;
-  background:#20392d;
-  border:1px solid rgba(255,255,255,.15);
+  background:#29264d;
+  border:2px solid rgba(184,166,255,.45);
 }
 .avatar-fallback{
   display:grid;place-items:center;
-  width:62px;height:62px;border-radius:50%;
-  background:linear-gradient(140deg,#164d39,#263d54);
-  color:#fff;font-size:25px;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(140deg,#477eff,#955cff 60%,#f35db7);
+  color:#fff;font-size:22px;
 }
 .action-badge{
-  position:absolute;right:-3px;bottom:-2px;
-  width:30px;height:30px;
+  position:absolute;right:-4px;bottom:-3px;
+  width:25px;height:25px;
   display:grid;place-items:center;
-  border:2px solid #243946;border-radius:50%;
-  background:#269b48;color:#fff;font-size:14px;
+  border:2px solid #211d42;border-radius:50%;
+  background:#4696ff;color:#fff;font-size:11px;
 }
-.action-badge.like{background:#168dff}
-.action-badge.love{background:#e52e55}
-.action-badge.comment{background:#269b48}
-.action-badge.follow{background:#269b48}
-.action-badge.message{background:#168dff}
-.action-badge.other{background:#6d7480}
+.action-badge.like{background:#398cff}
+.action-badge.love{background:#f34eac}
+.action-badge.comment{background:#9565ff}
+.action-badge.follow{background:#4b9dff}
+.action-badge.message{background:#438bff}
+.action-badge.story{background:#a25dff}
+.action-badge.other{background:#777991}
 .notification-body{flex:1;min-width:0;padding-top:1px}
 .message{
-  font-size:16px;line-height:1.48;
-  overflow-wrap:anywhere;color:#f6f8fb;
+  font-size:15px;line-height:1.55;
+  overflow-wrap:anywhere;color:#efedff;
 }
-.user-name,.action-name{
-  font-weight:900;
-  color:#fff;
-}
-.time{margin-top:5px;color:#b6c0c9;font-size:14px}
+.user-name,.action-name{font-weight:850;color:#fff}
+.time{margin-top:7px;color:#aaa8c6;font-size:12px}
 .notification-actions{
-  flex-shrink:0;display:flex;align-items:center;gap:5px;
+  flex-shrink:0;display:flex;align-items:center;gap:3px;
 }
 .more-btn,.read-btn{
-  width:28px;height:28px;
+  width:29px;height:29px;
   display:grid;place-items:center;
   border:0;border-radius:50%;
-  background:transparent;color:#e0e7ed;
+  background:transparent;color:#d6d3ed;
 }
 .more-btn{font-size:16px}
-.read-btn{color:var(--green);font-size:14px}
+.read-btn{color:#85b7ff;font-size:14px}
 .more-btn:active,.read-btn:active{background:rgba(255,255,255,.12)}
 .empty-state,.loading-state{
-  padding:42px 18px;text-align:center;
-  color:var(--muted);line-height:1.8;
+  margin:8px 5px;padding:36px 18px;
+  text-align:center;color:var(--muted);
+  line-height:1.8;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(30,27,58,.65);
 }
 .empty-state>i,.loading-state>i{
-  color:var(--green);font-size:35px;margin-bottom:12px;
+  display:inline-block;
+  color:#b49aff;font-size:34px;margin-bottom:12px;
 }
-.empty-state h2{color:#fff;font-size:19px;margin-bottom:6px}
+.empty-state h2{color:#fff;font-size:18px;margin-bottom:7px}
+.empty-state p{font-size:14px}
 .primary-btn,.secondary-btn{
   margin-top:14px;padding:11px 17px;
-  border:1px solid var(--border);border-radius:11px;
-  font-weight:750;
+  border:1px solid var(--border);border-radius:12px;
+  font-weight:800;
 }
-.primary-btn{background:linear-gradient(110deg,var(--red),#00bd78)}
-.secondary-btn{background:#20392d}
+.primary-btn{
+  background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));
+  border:0;color:#fff;
+}
+.secondary-btn{background:#282447}
 .bottom-nav{
   position:fixed;left:50%;bottom:0;transform:translateX(-50%);
   z-index:30;width:100%;max-width:650px;
   display:flex;align-items:center;justify-content:space-around;
   padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,41,31,.65);
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
-  border-top:1px solid rgba(255,255,255,.15);
+  background:rgba(20,18,43,.88);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.12);
 }
 .nav-item{
   flex:1;min-width:0;
   display:flex;flex-direction:column;align-items:center;
   justify-content:center;gap:5px;
-  color:var(--muted);text-decoration:none;font-size:11px;
+  color:#9996b8;text-decoration:none;font-size:11px;
 }
 .nav-item i{font-size:21px}
-.nav-item.active{color:var(--green)}
+.nav-item.active{color:#b59aff}
+.nav-item.active i{
+  filter:drop-shadow(0 0 7px rgba(164,120,255,.45));
+}
 .toast{
-  position:fixed;left:50%;bottom:90px;transform:translateX(-50%);
+  position:fixed;left:50%;bottom:95px;transform:translateX(-50%);
   z-index:60;display:none;max-width:90%;
-  padding:12px 16px;border:1px solid var(--border);
-  border-radius:12px;background:rgba(23,47,36,.97);
+  padding:12px 16px;border:1px solid rgba(165,136,255,.3);
+  border-radius:13px;background:rgba(30,26,60,.98);
+  box-shadow:0 8px 30px rgba(0,0,0,.3);
   font-size:13px;text-align:center;
 }
 .toast.show{display:block}
 @media(max-width:380px){
   .topbar{gap:7px;padding-left:10px;padding-right:10px}
-  .topbar h1{font-size:23px}
-  .notification{padding:13px 10px;gap:9px}
-  .avatar-wrap,.avatar,.avatar-fallback{width:50px;height:50px}
-  .action-badge{width:25px;height:25px;font-size:11px}
+  .topbar h1{font-size:22px}
+  .notification{padding:12px 9px;gap:9px}
+  .notification-list{padding:0 7px}
+  .avatar-wrap,.avatar,.avatar-fallback{width:46px;height:46px}
+  .action-badge{width:23px;height:23px;font-size:10px}
   .message{font-size:14px}
   .section-title{font-size:18px}
+  .notification-actions{gap:0}
+  .more-btn,.read-btn{width:25px;height:28px}
 }
 </style>
 </head>
@@ -208,7 +248,11 @@ button{cursor:pointer;color:inherit}
 </section>
 
 <section>
-  <h2 class="section-title">New</h2>
+  <h2 class="section-title">
+    <i class="fa-solid fa-sparkles"></i>
+    New
+    <span class="section-count" id="newCount">0</span>
+  </h2>
   <div id="newList" class="notification-list">
     <div class="loading-state">
       <i class="fa-solid fa-spinner fa-spin"></i><br>
@@ -218,7 +262,11 @@ button{cursor:pointer;color:inherit}
 </section>
 
 <section>
-  <h2 class="section-title">Earlier</h2>
+  <h2 class="section-title">
+    <i class="fa-regular fa-clock"></i>
+    Earlier
+    <span class="section-count" id="earlierCount">0</span>
+  </h2>
   <div id="earlierList" class="notification-list"></div>
 </section>
 
@@ -251,6 +299,8 @@ const earlierList=document.getElementById("earlierList");
 const searchPanel=document.getElementById("searchPanel");
 const searchInput=document.getElementById("searchInput");
 const toast=document.getElementById("toast");
+const newCount=document.getElementById("newCount");
+const earlierCount=document.getElementById("earlierCount");
 
 let notifications=[];
 let loading=false;
@@ -275,51 +325,37 @@ function showToast(message){
 }
 
 function getActor(item){
+  const actor=item.actor||item.sender||item.user||{};
   return String(
-    item.actor_display_name ||
-    item.actor_username ||
-    item.username ||
-    item.display_name ||
-    item.sender_name ||
+    item.actor_display_name||
+    item.actor_username||
+    item.username||
+    item.display_name||
+    item.sender_name||
+    actor.display_name||
+    actor.username||
     ""
   ).trim();
 }
 
-/*
-  Determine the exact action from the notification type and message.
-  Love reactions are recognized if the backend sends a love-specific type
-  or a message explicitly describing a love reaction.
-*/
 function getAction(item){
   const type=String(item.type||item.notification_type||"").toLowerCase();
-  const message=String(item.message||"").toLowerCase();
+  const message=String(item.message||item.body||"").toLowerCase();
   const combined=type+" "+message;
 
-  if(/\blove\b|\bloved\b|\bhearts?\b/.test(combined) &&
-     /(react|reaction|love|heart)/.test(combined)){
-    return "love";
-  }
+  if(/\blove\b|\bloved\b|\bhearts?\b/.test(combined)&&
+     /(react|reaction|love|heart)/.test(combined))return "love";
 
-  if(type.includes("comment") || type.includes("mention") ||
-     /\bcommented\b|\bcomment\b|\bmentioned you\b/.test(message)){
-    return "comment";
-  }
+  if(type.includes("comment")||type.includes("mention")||
+     /\bcommented\b|\bcomment\b|\bmentioned you\b/.test(message))return "comment";
 
-  if(type.includes("like") || /\bliked your post\b/.test(message)){
-    return "like";
-  }
+  if(type.includes("like")||/\bliked your post\b/.test(message))return "like";
 
-  if(type.includes("follow") || /\bstarted following\b|\bfollowed you\b/.test(message)){
-    return "follow";
-  }
+  if(type.includes("follow")||/\bstarted following\b|\bfollowed you\b/.test(message))return "follow";
 
-  if(type.includes("message") || /\bnew message\b|\bsent you a message\b/.test(message)){
-    return "message";
-  }
+  if(type.includes("message")||/\bnew message\b|\bsent you a message\b/.test(message))return "message";
 
-  if(type.includes("story") || message.includes("story")){
-    return "story";
-  }
+  if(type.includes("story")||message.includes("story"))return "story";
 
   return "other";
 }
@@ -342,7 +378,7 @@ function actionLabel(action){
     comment:"Comment",
     like:"Like",
     love:"Love",
-    follow:"Following",
+    follow:"Follow",
     message:"Message",
     story:"Story",
     other:"Notification"
@@ -368,10 +404,6 @@ function timeAgo(value){
   return date.toLocaleDateString();
 }
 
-/*
-  Prefer the API message, but bold the actor's name and action words.
-  If no message exists, construct one from the known notification type.
-*/
 function buildMessage(item){
   const actor=getActor(item);
   const action=getAction(item);
@@ -395,41 +427,35 @@ function buildMessage(item){
 
   let output=escapeHTML(raw);
 
-  // Highlight the username returned by the API.
   if(actor){
     const escaped=escapeHTML(actor).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-    output=output.replace(
-      new RegExp(escaped,"ig"),
-      match=>'<strong class="user-name">'+match+"</strong>"
+    output=output.replace(new RegExp(escaped,"ig"),match=>
+      '<strong class="user-name">'+match+"</strong>"
     );
   }
 
-  // Highlight action phrases, including phrases such as "reacted love".
   const phrases=[
     /\bstarted following\b/gi,
     /\breacted love\b/gi,
     /\breacted like\b/gi,
+    /\bsent you a message\b/gi,
     /\breacted\b/gi,
     /\bcommented\b/gi,
     /\bcomment\b/gi,
     /\bmentioned\b/gi,
     /\bliked\b/gi,
-    /\blike\b/gi,
     /\bfollowing\b/gi,
     /\bfollowed\b/gi,
     /\blove\b/gi,
     /\bshared\b/gi,
-    /\breplied\b/gi,
-    /\bsent you a message\b/gi
+    /\breplied\b/gi
   ];
 
   for(const regex of phrases){
-    output=output.replace(regex,match=>{
-      if(match.includes('class="action-name"'))return match;
-      return '<strong class="action-name">'+match+"</strong>";
-    });
+    output=output.replace(regex,match=>
+      '<strong class="action-name">'+match+"</strong>"
+    );
   }
-
   return output;
 }
 
@@ -438,9 +464,7 @@ function normalize(item,index){
   return {
     id:String(item.id??item.notification_id??index),
     type:String(item.type||item.notification_type||"notification").toLowerCase(),
-    actorName:getActor(item)||String(
-      actorObject.display_name||actorObject.username||""
-    ),
+    actorName:getActor(item)||String(actorObject.display_name||actorObject.username||""),
     avatar:
       item.actor_avatar_url||
       item.actor_avatar||
@@ -461,8 +485,7 @@ function renderItem(item){
   const action=getAction(item);
   const icon=actionIcon(action);
   const avatarHTML=item.avatar
-    ?'<img class="avatar" src="'+escapeHTML(item.avatar)+
-      '" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">'+
+    ?'<img class="avatar" src="'+escapeHTML(item.avatar)+'" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">'+
       '<span class="avatar-fallback" hidden><i class="fa-solid fa-user"></i></span>'
     :'<span class="avatar-fallback"><i class="fa-solid fa-user"></i></span>';
 
@@ -500,25 +523,24 @@ function render(){
   const query=searchInput.value.trim().toLowerCase();
 
   const filtered=notifications.filter(item=>{
-    const text=[
-      item.actorName,
-      item.message,
-      item.type,
-      getAction(item)
-    ].join(" ").toLowerCase();
+    const text=[item.actorName,item.message,item.type,getAction(item.original)]
+      .join(" ").toLowerCase();
     return !query||text.includes(query);
   });
 
   const newItems=filtered.filter(item=>!item.read);
   const earlierItems=filtered.filter(item=>item.read);
 
+  newCount.textContent=String(newItems.length);
+  earlierCount.textContent=String(earlierItems.length);
+
   newList.innerHTML=newItems.length
     ?newItems.map(renderItem).join("")
-    :'<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><br><h2>No new notifications</h2></div>';
+    :'<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><br><h2>No new notifications</h2><p>You are all caught up.</p></div>';
 
   earlierList.innerHTML=earlierItems.length
     ?earlierItems.map(renderItem).join("")
-    :'<div class="empty-state">No earlier notifications.</div>';
+    :'<div class="empty-state"><i class="fa-regular fa-clock"></i><br><p>No earlier notifications.</p></div>';
 
   document.querySelectorAll("[data-read]").forEach(button=>{
     button.addEventListener("click",()=>markOneAsRead(button.dataset.read));
@@ -579,6 +601,9 @@ function showError(title,description,login=false){
       <button class="primary-btn" id="retryBtn">${login?"Login":"Try again"}</button>
     </div>`;
   earlierList.innerHTML="";
+  newCount.textContent="0";
+  earlierCount.textContent="0";
+
   document.getElementById("retryBtn").addEventListener("click",()=>{
     if(login)location.href="auth.html?mode=login";
     else loadNotifications();
@@ -603,7 +628,7 @@ async function loadNotifications(){
       ?data
       :(data.notifications||data.data||data.items||[]);
 
-    notifications=items.map(normalize);
+    notifications=Array.isArray(items)?items.map(normalize):[];
     render();
   }catch(error){
     console.error("Notification loading failed:",error);
@@ -623,10 +648,7 @@ async function markOneAsRead(id){
   if(!item||item.read)return;
 
   try{
-    await apiRequest(
-      "/notifications/"+encodeURIComponent(id)+"/read",
-      {method:"PATCH"}
-    );
+    await apiRequest("/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});
     item.read=true;
     item.original.read_at=new Date().toISOString();
     render();
