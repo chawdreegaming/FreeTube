@@ -137,6 +137,7 @@ button { cursor:pointer; color:inherit; }
   font-size:13px;
 }
 #results { padding:0 0 10px; }
+
 .card {
   background:rgba(23,47,36,.85);
   margin-bottom:11px;
@@ -165,6 +166,21 @@ button { cursor:pointer; color:inherit; }
   font-size:14px;
   overflow-wrap:anywhere;
 }
+.profile-link {
+  display:flex;
+  align-items:center;
+  flex-shrink:0;
+  color:inherit;
+  text-decoration:none;
+}
+.profile-name {
+  display:inline-block;
+  overflow-wrap:anywhere;
+  color:var(--text);
+  text-decoration:none;
+}
+.profile-link:active,.profile-name:active { opacity:.7; }
+
 .time {
   font-size:12px;
   color:var(--muted);
@@ -203,21 +219,12 @@ button { cursor:pointer; color:inherit; }
   border-top:1px solid var(--border);
 }
 .stats i { color:var(--green); }
-.open-post {
-  display:block;
-  text-decoration:none;
-  text-align:center;
-  color:var(--green);
-  padding:12px;
-  border-top:1px solid var(--border);
-  font-size:13px;
-}
 
-/* Native Ad slot: actual ad is supplied by Android */
+/* Native Ad slots are supplied by the Android app */
 .native-ad-slot {
   display:none;
   width:100%;
-  min-height:230px;
+  min-height:320px;
   margin:10px 0 14px;
   padding:10px;
   background:rgba(23,47,36,.85);
@@ -235,7 +242,7 @@ button { cursor:pointer; color:inherit; }
   margin-bottom:8px;
 }
 .native-ad-placeholder {
-  height:190px;
+  height:270px;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -250,6 +257,7 @@ button { cursor:pointer; color:inherit; }
   font-size:24px;
   color:var(--green);
 }
+
 .state {
   text-align:center;
   padding:38px 18px;
@@ -313,6 +321,7 @@ button { cursor:pointer; color:inherit; }
   text-align:center;
 }
 .toast.show { display:block; }
+
 @media(max-width:360px) {
   .brand { font-size:23px; }
   .nav-item { font-size:10px; }
@@ -491,11 +500,18 @@ function normalize(post) {
 
   return {
     id: String(post.id ?? post.post_id ?? ""),
-    userId: String(post.user_id ?? post.author_id ?? post.owner_id ?? ""),
+    userId: String(
+      post.user_id ?? post.author_id ?? post.owner_id ??
+      post.userId ?? post.author?.id ?? ""
+    ),
+    profileUsername: String(
+      post.username || post.author_username ||
+      post.profile_username || post.author?.username || ""
+    ),
     username: post.display_name || post.username ||
-      post.author_name || "FreeTube User",
+      post.author_name || post.author?.display_name || "FreeTube User",
     avatar: post.avatar_url || post.avatar ||
-      post.profile_picture || FALLBACK_AVATAR,
+      post.profile_picture || post.author?.avatar_url || FALLBACK_AVATAR,
     content: post.content || post.text || "",
     src,
     type,
@@ -528,10 +544,6 @@ function timeAgo(value) {
   return date.toLocaleDateString();
 }
 
-/*
- * Native Ad slots are created after each pair of videos.
- * Android must implement window.FreeTubeAds.updateSlot().
- */
 function nativeAdsAvailable() {
   return !!(
     window.FreeTubeAds &&
@@ -582,14 +594,15 @@ function setupNativeAdSlots() {
 
   clearTimeout(nativeAdRefreshTimer);
   nativeAdRefreshTimer = setTimeout(() => {
-    if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+    if (window.updateNativeAdSlots) {
+      window.updateNativeAdSlots();
+    }
   }, 350);
 }
 
 function makeAdSlot(index) {
   return `
-    <section
-      class="native-ad-slot"
+    <section class="native-ad-slot"
       id="native-ad-slot-${index}"
       aria-label="Advertisement"
       hidden>
@@ -601,12 +614,33 @@ function makeAdSlot(index) {
     </section>`;
 }
 
+function getProfileUrl(video) {
+  const params = new URLSearchParams();
+
+  if (video.userId) {
+    params.set("userId", video.userId);
+  }
+
+  if (video.profileUsername) {
+    params.set("username", video.profileUsername);
+  }
+
+  if (!video.userId && !video.profileUsername) {
+    return "";
+  }
+
+  return "profile.html?" + params.toString();
+}
+
 function render() {
   const query = document.getElementById("searchInput")
     .value.trim().toLowerCase();
 
   let videos = allVideos.filter(video => {
-    const searchable = (video.username + " " + video.content).toLowerCase();
+    const searchable =
+      (video.username + " " + video.profileUsername + " " +
+       video.content).toLowerCase();
+
     return !query || searchable.includes(query);
   });
 
@@ -651,16 +685,35 @@ function render() {
   let html = "";
 
   videos.forEach((video, index) => {
+    const profile = getProfileUrl(video);
+
+    const avatar = profile
+      ? `<a class="profile-link"
+            href="${esc(profile)}"
+            aria-label="Open ${esc(video.username)} profile">
+           <img class="avatar"
+             src="${esc(video.avatar)}"
+             alt=""
+             loading="lazy"
+             onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
+         </a>`
+      : `<img class="avatar"
+           src="${esc(video.avatar)}"
+           alt=""
+           loading="lazy"
+           onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">`;
+
+    const name = profile
+      ? `<a class="username profile-name"
+           href="${esc(profile)}">${esc(video.username)}</a>`
+      : `<div class="username">${esc(video.username)}</div>`;
+
     html += `
       <article class="card" id="video-${esc(video.id)}">
         <header class="card-head">
-          <img class="avatar"
-            src="${esc(video.avatar)}"
-            alt=""
-            loading="lazy"
-            onerror="this.onerror=null;this.src='${FALLBACK_AVATAR}'">
+          ${avatar}
           <div class="user-info">
-            <div class="username">${esc(video.username)}</div>
+            ${name}
             <div class="time">${esc(timeAgo(video.created))}</div>
           </div>
         </header>
@@ -688,19 +741,11 @@ function render() {
           <span><i class="fa-regular fa-eye"></i> ${video.views} views</span>
           <span>${video.comments} comments</span>
         </div>
-
-        <a class="open-post"
-          href="home.html#post-${encodeURIComponent(video.id)}">
-          View post
-          <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        </a>
       </article>`;
 
-    /*
-     * Insert a slot after every two videos, but not after the last video.
-     * Example: video 1, video 2, ad, video 3, video 4, ad.
-     */
+    // Insert a Native Ad slot after every two videos.
     const number = index + 1;
+
     if (number % 2 === 0 && number < videos.length) {
       html += makeAdSlot(number / 2);
     }
@@ -726,6 +771,7 @@ function setupVideoPlayback() {
   if (!("IntersectionObserver" in window)) {
     videos.forEach(video => {
       const playPromise = video.play();
+
       if (playPromise && playPromise.catch) {
         playPromise.catch(() => {});
       }
@@ -743,6 +789,7 @@ function setupVideoPlayback() {
         });
 
         const playPromise = video.play();
+
         if (playPromise && playPromise.catch) {
           playPromise.catch(() => {});
         }
@@ -824,11 +871,15 @@ document.querySelectorAll("[data-filter]").forEach(button => {
 });
 
 window.addEventListener("scroll", () => {
-  if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+  if (window.updateNativeAdSlots) {
+    window.updateNativeAdSlots();
+  }
 }, { passive:true });
 
 window.addEventListener("resize", () => {
-  if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+  if (window.updateNativeAdSlots) {
+    window.updateNativeAdSlots();
+  }
 });
 
 document.addEventListener("visibilitychange", () => {
@@ -836,7 +887,10 @@ document.addEventListener("visibilitychange", () => {
     document.querySelectorAll(".media video").forEach(video => video.pause());
   } else {
     setupVideoPlayback();
-    if (window.updateNativeAdSlots) window.updateNativeAdSlots();
+
+    if (window.updateNativeAdSlots) {
+      window.updateNativeAdSlots();
+    }
   }
 });
 
