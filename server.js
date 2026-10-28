@@ -427,6 +427,23 @@ async function initializeDatabase() {
       reviewed_at TIMESTAMPTZ,
       UNIQUE(method,transaction_ref)
     );
+    CREATE TABLE IF NOT EXISTS ft_payment_methods (
+      id BIGSERIAL PRIMARY KEY,
+      code VARCHAR(50) NOT NULL UNIQUE,
+      name VARCHAR(80) NOT NULL,
+      region VARCHAR(20) NOT NULL DEFAULT 'global' CHECK(region IN ('bangladesh','india','global')),
+      currency VARCHAR(8) NOT NULL DEFAULT 'BDT',
+      price_amount NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK(price_amount >= 0),
+      account_name VARCHAR(160) NOT NULL DEFAULT '',
+      account_details VARCHAR(500) NOT NULL DEFAULT '',
+      instructions VARCHAR(1500) NOT NULL DEFAULT '',
+      qr_image_url TEXT NOT NULL DEFAULT '',
+      enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      sort_order INTEGER NOT NULL DEFAULT 100,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
     CREATE TABLE IF NOT EXISTS ft_password_resets (
       id BIGSERIAL PRIMARY KEY,
       user_id TEXT NOT NULL,
@@ -457,6 +474,25 @@ async function initializeDatabase() {
     CREATE INDEX IF NOT EXISTS ft_post_views_post_idx
       ON ft_post_views(post_id);
   `);
+
+  const defaultPaymentMethods = [
+    ['bkash','bKash','bangladesh','BDT',10],
+    ['nagad','Nagad','bangladesh','BDT',20],
+    ['rocket','Rocket','bangladesh','BDT',30],
+    ['upi','UPI','india','INR',40],
+    ['phonepe','PhonePe','india','INR',50],
+    ['google_pay','Google Pay','india','INR',60],
+    ['paytm','Paytm','india','INR',70],
+    ['binance','Binance Crypto','global','USDT',80],
+    ['redotpay','RedotPay','global','USDT',90]
+  ];
+  for (const [code,name,region,currency,sortOrder] of defaultPaymentMethods) {
+    await pool.query(
+      `INSERT INTO ft_payment_methods(code,name,region,currency,sort_order,enabled)
+       VALUES($1,$2,$3,$4,$5,FALSE) ON CONFLICT(code) DO NOTHING`,
+      [code,name,region,currency,sortOrder]
+    );
+  }
 
   const adminEmail = cleanText(process.env.ADMIN_EMAIL, 255).toLowerCase();
   if (adminEmail) {
@@ -1626,10 +1662,108 @@ app.delete("/api/friends/:userId", requireAuth, async(req,res,next)=>{try{const 
 app.post("/api/admin/notices", requireAuth, requireAdmin, async(req,res,next)=>{try{const title=cleanText(req.body.title,160),body=cleanText(req.body.body,3000);if(!title||!body)return res.status(400).json({error:'Title and notice text are required.'});const n=await pool.query("INSERT INTO ft_admin_notices(admin_id,title,body) VALUES($1,$2,$3) RETURNING *",[String(req.user.id),title,body]);await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'admin_notice',$2 FROM users WHERE account_status='active'`,[String(req.user.id),`${title}: ${body}`]);res.status(201).json({notice:n.rows[0],notified:true});}catch(e){next(e);}});
 app.get("/api/admin/notices", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query("SELECT * FROM ft_admin_notices ORDER BY created_at DESC LIMIT 100");res.json({notices:r.rows});}catch(e){next(e);}});
 
-// Manual payments are submissions only; badge/monetization is activated after admin review.
-app.post("/api/payments/manual", requireAuth, async(req,res,next)=>{try{const purpose=cleanText(req.body.purpose,30),amount=Number(req.body.amount),currency=cleanText(req.body.currency||'BDT',8).toUpperCase(),method=cleanText(req.body.method,40),ref=cleanText(req.body.transaction_ref,160),payer=cleanText(req.body.payer_account,160);if(!['blue_badge','monetization','other'].includes(purpose)||!Number.isFinite(amount)||amount<=0||!method||!ref)return res.status(400).json({error:'Purpose, valid amount, payment method and transaction reference are required.'});const r=await pool.query(`INSERT INTO ft_manual_payments(user_id,purpose,amount,currency,method,transaction_ref,payer_account) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id::text AS id,purpose,amount,currency,method,transaction_ref,status,created_at`,[String(req.user.id),purpose,amount,currency,method,ref,payer]);if(purpose==='blue_badge')await pool.query("UPDATE ft_profiles SET blue_badge_status='pending' WHERE user_id=$1",[String(req.user.id)]);if(purpose==='monetization')await pool.query("INSERT INTO ft_monetization(user_id,status) VALUES($1,'pending') ON CONFLICT(user_id) DO UPDATE SET status='pending',updated_at=NOW()",[String(req.user.id)]);await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'payment', $2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Manual payment submission (${purpose}) requires review.`]);res.status(201).json({payment:r.rows[0],message:'Payment submitted for manual verification.'});}catch(e){if(e.code==='23505')return res.status(409).json({error:'This transaction reference has already been submitted.'});next(e);}});
-app.get("/api/admin/payments", requireAuth, requireAdmin, async(req,res,next)=>{try{const status=cleanText(req.query.status||'pending',20);const r=await pool.query(`SELECT m.*,u.username,u.email FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id WHERE ($1='all' OR m.status=$1) ORDER BY m.created_at DESC LIMIT 200`,[status]);res.json({payments:r.rows});}catch(e){next(e);}});
-app.patch("/api/admin/payments/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action,note=cleanText(req.body.admin_note,500);if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query(`UPDATE ft_manual_payments SET status=$1,admin_note=$2,reviewed_at=NOW() WHERE id=$3 AND status='pending' RETURNING *`,[status,note,id]);if(!r.rowCount)return res.status(404).json({error:'Pending payment not found.'});const p=r.rows[0];if(p.purpose==='blue_badge')await pool.query("UPDATE ft_profiles SET blue_badge_status=$1 WHERE user_id=$2",[status==='approved'?'verified':'rejected',p.user_id]);if(p.purpose==='monetization')await pool.query("INSERT INTO ft_monetization(user_id,enabled,status) VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET enabled=EXCLUDED.enabled,status=EXCLUDED.status,updated_at=NOW()",[p.user_id,status==='approved',status]);await notifyUser(p.user_id,req.user.id,'payment',`Your ${p.purpose} payment was ${status}.`);res.json({payment:p});}catch(e){next(e);}});
+// Payment methods are configured by admins. Card payments are intentionally not supported.
+app.get('/api/payments/methods', async (req,res,next) => {
+  try {
+    const r = await pool.query(`SELECT id,code,name,region,currency,price_amount,account_name,account_details,instructions,qr_image_url
+      FROM ft_payment_methods WHERE enabled=TRUE AND price_amount>0 ORDER BY sort_order,name`);
+    res.json({methods:r.rows});
+  } catch(e) { next(e); }
+});
+
+app.get('/api/admin/payment-methods', requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const r = await pool.query('SELECT * FROM ft_payment_methods ORDER BY sort_order,name');
+    res.json({methods:r.rows});
+  } catch(e) { next(e); }
+});
+
+app.post('/api/admin/payment-methods', requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const code=cleanText(req.body.code,50).toLowerCase().replace(/[^a-z0-9_]/g,'_');
+    const name=cleanText(req.body.name,80), region=cleanText(req.body.region,20), currency=cleanText(req.body.currency,8).toUpperCase();
+    const price=Number(req.body.price_amount), accountName=cleanText(req.body.account_name,160), details=cleanText(req.body.account_details,500), instructions=cleanText(req.body.instructions,1500), qr=cleanText(req.body.qr_image_url,2000), order=Number.parseInt(req.body.sort_order,10)||100;
+    if(!code||!name||!['bangladesh','india','global'].includes(region)||!currency||!Number.isFinite(price)||price<0) return res.status(400).json({error:'Valid code, name, region, currency and non-negative price are required.'});
+    if(qr && !/^https:\/\//i.test(qr)) return res.status(400).json({error:'QR image URL must use HTTPS.'});
+    const enabled=Boolean(req.body.enabled) && price>0 && Boolean(details);
+    const r=await pool.query(`INSERT INTO ft_payment_methods(code,name,region,currency,price_amount,account_name,account_details,instructions,qr_image_url,enabled,sort_order,updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,NOW()) RETURNING *`,[code,name,region,currency,price,accountName,details,instructions,qr,enabled,order]);
+    res.status(201).json({method:r.rows[0]});
+  } catch(e) { if(e.code==='23505') return res.status(409).json({error:'Payment method code already exists.'}); next(e); }
+});
+
+app.patch('/api/admin/payment-methods/:id', requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const id=Number.parseInt(req.params.id,10);
+    if(!Number.isSafeInteger(id)) return res.status(400).json({error:'Invalid payment method ID.'});
+    const current=await pool.query('SELECT * FROM ft_payment_methods WHERE id=$1',[id]);
+    if(!current.rowCount) return res.status(404).json({error:'Payment method not found.'});
+    const old=current.rows[0], b=req.body;
+    const name=b.name===undefined?old.name:cleanText(b.name,80);
+    const region=b.region===undefined?old.region:cleanText(b.region,20);
+    const currency=b.currency===undefined?old.currency:cleanText(b.currency,8).toUpperCase();
+    const price=b.price_amount===undefined?Number(old.price_amount):Number(b.price_amount);
+    const accountName=b.account_name===undefined?old.account_name:cleanText(b.account_name,160);
+    const details=b.account_details===undefined?old.account_details:cleanText(b.account_details,500);
+    const instructions=b.instructions===undefined?old.instructions:cleanText(b.instructions,1500);
+    const qr=b.qr_image_url===undefined?old.qr_image_url:cleanText(b.qr_image_url,2000);
+    const order=b.sort_order===undefined?old.sort_order:(Number.parseInt(b.sort_order,10)||100);
+    const requestedEnabled=b.enabled===undefined?old.enabled:Boolean(b.enabled);
+    if(!name||!['bangladesh','india','global'].includes(region)||!currency||!Number.isFinite(price)||price<0) return res.status(400).json({error:'Invalid payment method details.'});
+    if(qr && !/^https:\/\//i.test(qr)) return res.status(400).json({error:'QR image URL must use HTTPS.'});
+    const enabled=requestedEnabled && price>0 && Boolean(details);
+    const r=await pool.query(`UPDATE ft_payment_methods SET name=$1,region=$2,currency=$3,price_amount=$4,account_name=$5,account_details=$6,instructions=$7,qr_image_url=$8,enabled=$9,sort_order=$10,updated_at=NOW() WHERE id=$11 RETURNING *`,[name,region,currency,price,accountName,details,instructions,qr,enabled,order,id]);
+    res.json({method:r.rows[0]});
+  } catch(e) { next(e); }
+});
+
+app.delete('/api/admin/payment-methods/:id', requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const id=Number.parseInt(req.params.id,10);
+    if(!Number.isSafeInteger(id)) return res.status(400).json({error:'Invalid payment method ID.'});
+    const r=await pool.query('UPDATE ft_payment_methods SET enabled=FALSE,updated_at=NOW() WHERE id=$1 RETURNING id,code,enabled',[id]);
+    if(!r.rowCount) return res.status(404).json({error:'Payment method not found.'});
+    res.json({method:r.rows[0],message:'Payment method disabled.'});
+  } catch(e) { next(e); }
+});
+
+// Manual submissions are reviewed by an admin before Blue Badge activation.
+app.post('/api/payments/manual', requireAuth, async(req,res,next) => {
+  try {
+    const purpose=cleanText(req.body.purpose,30), amount=Number(req.body.amount), currency=cleanText(req.body.currency||'BDT',8).toUpperCase();
+    const method=cleanText(req.body.method,80), ref=cleanText(req.body.transaction_ref,160), payer=cleanText(req.body.payer_account,160);
+    if(!['blue_badge','monetization','other'].includes(purpose)||!Number.isFinite(amount)||amount<=0||!method||!ref) return res.status(400).json({error:'Purpose, valid amount, payment method and transaction reference are required.'});
+    if(/card|visa|mastercard|cvv|credit|debit/i.test(method)) return res.status(400).json({error:'Card payments are not supported.'});
+    if(purpose==='blue_badge') {
+      const pm=await pool.query("SELECT name,currency,price_amount FROM ft_payment_methods WHERE enabled=TRUE AND price_amount>0 AND account_details<>'' AND LOWER(name)=LOWER($1)",[method]);
+      if(!pm.rowCount) return res.status(400).json({error:'This payment method is not currently available. Please choose an enabled method.'});
+      if(Number(pm.rows[0].price_amount)!==amount || pm.rows[0].currency!==currency) return res.status(400).json({error:'Payment amount or currency does not match the current Blue Badge price.'});
+    }
+    const r=await pool.query(`INSERT INTO ft_manual_payments(user_id,purpose,amount,currency,method,transaction_ref,payer_account) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id::text AS id,purpose,amount,currency,method,transaction_ref,status,created_at`,[String(req.user.id),purpose,amount,currency,method,ref,payer]);
+    if(purpose==='blue_badge') await pool.query("UPDATE ft_profiles SET blue_badge_status='pending' WHERE user_id=$1",[String(req.user.id)]);
+    if(purpose==='monetization') await pool.query("INSERT INTO ft_monetization(user_id,status) VALUES($1,'pending') ON CONFLICT(user_id) DO UPDATE SET status='pending',updated_at=NOW()",[String(req.user.id)]);
+    await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'payment',$2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Manual payment submission (${purpose}) requires review.`]);
+    res.status(201).json({payment:r.rows[0],message:'Payment submitted for manual verification.'});
+  } catch(e) { if(e.code==='23505') return res.status(409).json({error:'This transaction reference has already been submitted.'}); next(e); }
+});
+app.get('/api/admin/payments', requireAuth, requireAdmin, async(req,res,next) => {
+  try { const status=cleanText(req.query.status||'pending',20); const r=await pool.query(`SELECT m.*,u.username,u.email FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id WHERE ($1='all' OR m.status=$1) ORDER BY m.created_at DESC LIMIT 200`,[status]); res.json({payments:r.rows}); }
+  catch(e) { next(e); }
+});
+app.patch('/api/admin/payments/:id', requireAuth, requireAdmin, async(req,res,next) => {
+  try {
+    const id=Number.parseInt(req.params.id,10),action=req.body.action,note=cleanText(req.body.admin_note,500);
+    if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action)) return res.status(400).json({error:'Action must be approve or reject.'});
+    const status=action==='approve'?'approved':'rejected';
+    const r=await pool.query(`UPDATE ft_manual_payments SET status=$1,admin_note=$2,reviewed_at=NOW() WHERE id=$3 AND status='pending' RETURNING *`,[status,note,id]);
+    if(!r.rowCount) return res.status(404).json({error:'Pending payment not found.'});
+    const p=r.rows[0];
+    if(p.purpose==='blue_badge') await pool.query("UPDATE ft_profiles SET blue_badge_status=$1 WHERE user_id=$2",[status==='approved'?'verified':'rejected',p.user_id]);
+    if(p.purpose==='monetization') await pool.query("INSERT INTO ft_monetization(user_id,enabled,status) VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET enabled=EXCLUDED.enabled,status=EXCLUDED.status,updated_at=NOW()",[p.user_id,status==='approved',status]);
+    await notifyUser(p.user_id,req.user.id,'payment',`Your ${p.purpose} payment was ${status}.`);
+    res.json({payment:p});
+  } catch(e) { next(e); }
+});
 app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const r=await pool.query("SELECT enabled,status,updated_at FROM ft_monetization WHERE user_id=$1",[String(req.user.id)]);res.json({monetization:r.rows[0]||{enabled:false,status:'not_applied'}});}catch(e){next(e);}});
 
 // Message media uses the same authenticated Cloudinary upload endpoint; send its URL as media_url.
