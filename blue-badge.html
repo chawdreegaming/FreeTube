@@ -1,28 +1,367 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Blue Badge — Boys vs Girls</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091326">
+<title>Blue Badge — Boys vs Girls</title>
 <style>
-:root{color-scheme:dark;--bg:#07111f;--card:#101e32;--line:#243650;--text:#f3f7ff;--muted:#9fb0c8;--blue:#4b8dff;--pink:#fa5da9;--good:#42d39a;--bad:#ff7185}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 0 0,#122d50 0,transparent 38%),var(--bg);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}.wrap{max-width:760px;margin:auto;padding:22px 15px 50px}.top{display:flex;align-items:center;gap:12px;margin:10px 0 22px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,var(--blue),var(--pink));display:grid;place-items:center;font-size:23px;font-weight:900}.muted{color:var(--muted)}h1{font-size:clamp(25px,5vw,34px);margin:0}h2{font-size:19px;margin:0 0 12px}.card{background:linear-gradient(160deg,#13243a,#0d192b);border:1px solid var(--line);border-radius:20px;padding:19px;margin:14px 0;box-shadow:0 14px 40px #0002}.field{margin:13px 0}label{display:block;font-size:14px;color:#cbd7e8;margin-bottom:6px}input,select,textarea{width:100%;padding:12px 13px;border-radius:12px;border:1px solid #30435e;background:#081426;color:var(--text);font:inherit;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--blue)}button{border:0;border-radius:13px;padding:12px 16px;font:700 15px system-ui;cursor:pointer;background:linear-gradient(100deg,var(--blue),#8a71ff);color:white}button:disabled{opacity:.5;cursor:not-allowed}.full{width:100%}.method-info{padding:14px;border:1px dashed #395477;border-radius:14px;background:#0a1729;margin-top:12px;display:none;overflow-wrap:anywhere}.price{font-size:26px;font-weight:800;color:#8bb7ff}.notice{display:none;border-radius:12px;padding:11px 13px;margin:12px 0}.success{background:#103c32;color:#b4ffe2}.error{background:#421e2a;color:#ffd0d7}.qr{max-width:190px;max-height:190px;display:block;border-radius:12px;margin-top:10px}.small{font-size:13px}.status{display:inline-block;padding:5px 10px;border-radius:999px;background:#24344d;color:#c5d8f3;font-size:12px}
-</style></head>
-<body><main class="wrap">
-<div class="top"><div class="logo">B<span style="color:#ffd3e9">G</span></div><div><div class="muted small">BOYS VS GIRLS</div><h1>Get your Blue Badge ✓</h1></div></div>
-<div class="card"><div class="status">Manual payment verification</div><p class="muted">Choose an available payment method, send the exact amount shown, then submit your transaction reference. Your badge will activate only after an admin verifies the payment.</p><p class="small muted">Card payments are not accepted. Never share a PIN, password, OTP, CVV or recovery phrase.</p></div>
+:root{color-scheme:dark;--bg:#07111f;--card:#101e32;--line:#293d59;--text:#f3f7ff;--muted:#9fb0c8;--blue:#4b8dff;--green:#30c997;--red:#ff7185}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 0 0,#142d50,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,sans-serif}
+.wrap{max-width:900px;margin:auto;padding:20px 14px 50px}
+.head{display:flex;align-items:center;gap:13px;margin:6px 0 20px}
+.logo{display:grid;place-items:center;width:54px;height:54px;border-radius:17px;background:linear-gradient(135deg,#4b8dff,#8864ff);font-weight:900;font-size:25px}
+.muted{color:var(--muted)}
+h1{font-size:clamp(25px,5vw,35px);margin:0}
+h2{font-size:20px;margin:0 0 12px}
+.card{background:linear-gradient(160deg,#13243a,#0d192b);border:1px solid var(--line);border-radius:20px;padding:19px;margin:14px 0;box-shadow:0 14px 40px #0002}
+.field{margin:13px 0}
+label{display:block;font-size:14px;color:#cbd7e8;margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px 13px;border-radius:12px;border:1px solid #30435e;background:#081426;color:var(--text);font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+button{border:0;border-radius:13px;padding:12px 16px;font:700 15px system-ui;cursor:pointer;background:linear-gradient(100deg,var(--blue),#8a71ff);color:white}
+button:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.method-info{padding:14px;border:1px dashed #395477;border-radius:14px;background:#0a1729;margin-top:12px;overflow-wrap:anywhere}
+.price{font-size:27px;font-weight:850;color:#8bb7ff}
+.notice{display:none;border-radius:12px;padding:11px 13px;margin:12px 0}
+.success{background:#103c32;color:#b4ffe2}
+.error{background:#421e2a;color:#ffd0d7}
+.qr{max-width:190px;max-height:190px;display:block;border-radius:12px;margin-top:10px}
+.small{font-size:13px}
+.status{display:inline-block;padding:5px 10px;border-radius:999px;background:#24344d;color:#c5d8f3;font-size:12px}
+.item{border:1px solid var(--line);border-radius:13px;padding:13px;margin:9px 0;background:#0a1729}
+.pill{display:inline-block;padding:3px 8px;border-radius:999px;background:#263952;font-size:12px}
+.pill.approved{background:#12533f;color:#b9ffe6}
+.pill.rejected{background:#532432;color:#ffd0d7}
+.empty{color:var(--muted);padding:12px}
+.termnote{font-size:13px;color:#b9c8dc}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<header class="head">
+<div class="logo">✓</div>
+<div>
+<div class="muted small">BOYS VS GIRLS</div>
+<h1>Get your Blue Badge</h1>
+<div class="muted">Choose your duration and submit your payment reference.</div>
+</div>
+</header>
+
+<section class="card">
+<span class="status">Manual payment verification</span>
+<p class="muted">Your badge activates only after an admin verifies the payment and approves your application. If you already have an active badge, an approved renewal extends its expiry date.</p>
+<p class="small muted">Card payments are not accepted. Never share a PIN, password, OTP, CVV, card number or crypto recovery phrase.</p>
+</section>
+
 <div id="message" class="notice"></div>
-<section class="card"><h2>1. Choose payment method</h2><div class="field"><label for="method">Available method</label><select id="method"><option value="">Loading payment methods…</option></select></div><div id="paymentInfo" class="method-info"><div id="methodName" style="font-weight:800;font-size:18px"></div><div class="price" id="price"></div><p id="accountName"></p><p id="accountDetails" style="font-weight:700;white-space:pre-wrap"></p><p id="instructions" class="muted" style="white-space:pre-wrap"></p><img id="qr" class="qr" alt="Payment QR code" hidden></div></section>
-<form id="paymentForm" class="card"><h2>2. Submit payment reference</h2><div class="field"><label for="payer">Your sending account / wallet (optional)</label><input id="payer" maxlength="160" autocomplete="off" placeholder="Account or wallet used to pay"></div><div class="field"><label for="reference">Transaction ID / reference *</label><input id="reference" maxlength="160" required autocomplete="off" placeholder="Enter transaction reference"></div><div class="field"><label for="proofNote">Additional note (optional)</label><textarea id="proofNote" rows="2" maxlength="500" placeholder="Any useful payment details (do not enter secrets)"></textarea></div><p class="muted small">Submitting this form does not instantly verify the payment. Please wait for admin review.</p><button id="submitBtn" class="full" type="submit" disabled>Submit for verification</button></form>
-<p class="muted small">If no methods appear, the admin has not configured an active payment method yet.</p>
+
+<section class="card">
+<h2>Your Blue Badge status</h2>
+<div id="badgeStatus" class="muted">Loading status…</div>
+</section>
+
+<section class="card">
+<h2>1. Choose badge duration</h2>
+<div class="grid">
+<div class="field">
+<label for="duration">Duration</label>
+<select id="duration">
+<option value="1">1 month</option>
+<option value="3">3 months</option>
+<option value="6">6 months</option>
+<option value="12">1 year (12 months)</option>
+</select>
+</div>
+<div class="field">
+<label for="method">Payment method</label>
+<select id="method">
+<option value="">Loading payment methods…</option>
+</select>
+</div>
+</div>
+
+<div id="paymentInfo" class="method-info" hidden>
+<div id="methodName" style="font-weight:800;font-size:18px"></div>
+<div class="price" id="price"></div>
+<p id="accountName"></p>
+<p id="accountDetails" style="font-weight:700;white-space:pre-wrap"></p>
+<p id="instructions" class="muted" style="white-space:pre-wrap"></p>
+<img id="qr" class="qr" alt="Payment QR code" hidden>
+</div>
+
+<p class="termnote">Prices are set by the administrator. Send the exact amount displayed for your selected duration.</p>
+</section>
+
+<form id="paymentForm" class="card">
+<h2>2. Submit payment reference</h2>
+
+<div class="field">
+<label for="payer">Your sending account / wallet (optional)</label>
+<input id="payer" maxlength="160" autocomplete="off" placeholder="Account or wallet used to pay">
+</div>
+
+<div class="field">
+<label for="reference">Transaction ID / reference *</label>
+<input id="reference" maxlength="160" required autocomplete="off" placeholder="Enter transaction reference">
+</div>
+
+<div class="field">
+<label for="proofNote">Additional note (optional)</label>
+<textarea id="proofNote" rows="2" maxlength="500" placeholder="Any useful payment details (never enter secrets)"></textarea>
+</div>
+
+<p class="muted small">Submitting this form does not instantly verify the payment. Wait for an admin review.</p>
+<button id="submitBtn" class="full" type="submit" disabled>Submit for verification</button>
+</form>
+
+<section class="card">
+<h2>Your payment applications</h2>
+<div id="history" class="muted">Log in to see your applications.</div>
+</section>
+
+<p class="muted small">If no methods appear, an admin has not configured an active payment method yet.</p>
 </main>
+
 <script>
 const API='https://freetube-backend-a222.onrender.com/api';
-const token=localStorage.getItem('freetube_access_token');
-const $=id=>document.getElementById(id);let methods=[];
-function showMessage(text,type='error'){const el=$('message');el.textContent=text;el.className='notice '+(type==='success'?'success':'error');el.style.display='block';el.scrollIntoView({behavior:'smooth',block:'center'});}
-function money(amount,currency){return new Intl.NumberFormat('en-US',{style:'currency',currency:currency==='USDT'?'USD':currency,maximumFractionDigits:2}).format(Number(amount))+(currency==='USDT'?' USDT':'');}
-function selected(){return methods.find(m=>String(m.id)===$('method').value)||null;}
-function renderMethod(){const m=selected(),info=$('paymentInfo');if(!m){info.style.display='none';$('submitBtn').disabled=true;return}info.style.display='block';$('methodName').textContent=m.name;$('price').textContent=`${Number(m.price_amount).toFixed(2)} ${m.currency}`;$('accountName').textContent=m.account_name?`Account name: ${m.account_name}`:'';$('accountDetails').textContent=m.account_details||'';$('instructions').textContent=m.instructions||'Send the exact amount and submit the transaction reference.';const qr=$('qr');if(m.qr_image_url){qr.src=m.qr_image_url;qr.hidden=false}else{qr.removeAttribute('src');qr.hidden=true}$('submitBtn').disabled=!token;}
-async function loadMethods(){try{const r=await fetch(API+'/payments/methods');const d=await r.json();if(!r.ok)throw Error(d.error||'Unable to load methods');methods=d.methods||[];const sel=$('method');sel.innerHTML='<option value="">Select a payment method</option>';const groups={bangladesh:'Bangladesh wallets',india:'India wallets',global:'Crypto / international'};for(const region of ['bangladesh','india','global']){const list=methods.filter(m=>m.region===region);if(!list.length)continue;const group=document.createElement('optgroup');group.label=groups[region];for(const m of list){const op=document.createElement('option');op.value=m.id;op.textContent=`${m.name} — ${m.price_amount} ${m.currency}`;group.appendChild(op)}sel.appendChild(group)}$('submitBtn').disabled=!token||!methods.length;if(!token)showMessage('Please log in to your Boys vs Girls account before submitting a payment.');if(!methods.length)showMessage('No payment methods are active yet. Please try again later.');}catch(e){$('method').innerHTML='<option value="">Could not load payment methods</option>';showMessage(e.message)} }
+const token=localStorage.getItem('freetube_access_token')||'';
+const $=id=>document.getElementById(id);
+let methods=[];
+
+function showMessage(text,type='error'){
+ const el=$('message');
+ el.textContent=text;
+ el.className='notice '+(type==='success'?'success':'error');
+ el.style.display='block';
+ el.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function selected(){
+ return methods.find(m=>String(m.id)===$('method').value)||null;
+}
+
+function priceFor(m){
+ if(!m)return 0;
+ const k={
+  '1':'price_1_month',
+  '3':'price_3_months',
+  '6':'price_6_months',
+  '12':'price_12_months'
+ }[$('duration').value];
+ return Number(m[k]||m.price_amount||0);
+}
+
+function renderMethod(){
+ const m=selected();
+ const info=$('paymentInfo');
+
+ if(!m){
+  info.hidden=true;
+  $('submitBtn').disabled=!token;
+  return;
+ }
+
+ info.hidden=false;
+ $('methodName').textContent=m.name;
+ $('price').textContent=`${priceFor(m).toFixed(2)} ${m.currency}`;
+ $('accountName').textContent=m.account_name?`Account name: ${m.account_name}`:'';
+ $('accountDetails').textContent=m.account_details||'';
+ $('instructions').textContent=m.instructions||'Send the exact amount and submit the transaction reference.';
+
+ const qr=$('qr');
+ if(m.qr_image_url){
+  qr.src=m.qr_image_url;
+  qr.hidden=false;
+ }else{
+  qr.removeAttribute('src');
+  qr.hidden=true;
+ }
+
+ $('submitBtn').disabled=!token||priceFor(m)<=0;
+}
+
+async function loadMethods(){
+ try{
+  const r=await fetch(API+'/payments/methods');
+  const d=await r.json();
+  if(!r.ok)throw Error(d.error||'Unable to load methods');
+
+  methods=d.methods||[];
+  const sel=$('method');
+  sel.innerHTML='<option value="">Select a payment method</option>';
+
+  const groups={
+   bangladesh:'Bangladesh wallets',
+   india:'India wallets',
+   global:'Crypto / international'
+  };
+
+  for(const region of ['bangladesh','india','global']){
+   const list=methods.filter(m=>m.region===region);
+   if(!list.length)continue;
+
+   const group=document.createElement('optgroup');
+   group.label=groups[region];
+
+   for(const m of list){
+    const op=document.createElement('option');
+    op.value=m.id;
+    op.textContent=m.name;
+    group.appendChild(op);
+   }
+
+   sel.appendChild(group);
+  }
+
+  if(!methods.length){
+   showMessage('No payment methods are active yet. Please try again later.');
+  }
+
+  renderMethod();
+ }catch(e){
+  $('method').innerHTML='<option value="">Could not load payment methods</option>';
+  showMessage(e.message);
+ }
+}
+
+function dateText(v){
+ if(!v)return 'Not set';
+ const d=new Date(v);
+ return Number.isNaN(d.getTime())?String(v):d.toLocaleString();
+}
+
+function safeText(v){
+ return String(v??'').replace(/[&<>"']/g,c=>({
+  '&':'&amp;',
+  '<':'&lt;',
+  '>':'&gt;',
+  '"':'&quot;',
+  "'":'&#39;'
+ }[c]));
+}
+
+async function loadMine(){
+ if(!token){
+  $('badgeStatus').textContent='Please log in to your account first.';
+  $('history').textContent='Log in to see your applications.';
+  $('submitBtn').disabled=true;
+  return;
+ }
+
+ try{
+  const r=await fetch(API+'/payments/mine',{
+   headers:{Authorization:'Bearer '+token}
+  });
+
+  const d=await r.json();
+  if(!r.ok)throw Error(d.error||'Unable to load your status');
+
+  const b=d.blue_badge||{};
+
+  $('badgeStatus').innerHTML=b.blue_badge_active
+   ?`<span class="pill approved">Active</span> Badge expires: ${safeText(dateText(b.blue_badge_expires_at))} · Duration: ${Number(b.blue_badge_duration_months||0)} month(s)`
+   :`<span class="pill">${safeText(b.blue_badge_status||'none')}</span> ${b.blue_badge_status==='pending'?'Your application is waiting for admin review.':'No active Blue Badge.'}`;
+
+  const list=d.payments||[];
+  const badge=list.filter(p=>p.purpose==='blue_badge');
+
+  $('history').innerHTML=badge.length
+   ?badge.map(p=>`
+    <article class="item">
+     <div>
+      <b>Application #${safeText(p.id)}</b>
+      <span class="pill ${p.status==='approved'?'approved':p.status==='rejected'?'rejected':''}">${safeText(p.status)}</span>
+     </div>
+     <p>${Number(p.duration_months||1)} month(s) · ${safeText(p.amount)} ${safeText(p.currency)} · ${safeText(p.method)}</p>
+     <p class="small muted">Submitted: ${safeText(dateText(p.created_at))}${p.admin_note?' · Admin note: '+safeText(p.admin_note):''}</p>
+    </article>
+   `).join('')
+   :'<div class="empty">No Blue Badge applications yet.</div>';
+
+ }catch(e){
+  $('badgeStatus').textContent=e.message;
+  $('history').textContent='Could not load applications.';
+ }
+}
+
 $('method').addEventListener('change',renderMethod);
-$('paymentForm').addEventListener('submit',async e=>{e.preventDefault();const m=selected();if(!token){showMessage('Please log in first.');return}if(!m){showMessage('Please select an available payment method.');return}const btn=$('submitBtn');btn.disabled=true;btn.textContent='Submitting…';try{const r=await fetch(API+'/payments/manual',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({purpose:'blue_badge',amount:Number(m.price_amount),currency:m.currency,method:m.name,transaction_ref:$('reference').value.trim(),payer_account:[$('payer').value.trim(),$('proofNote').value.trim()].filter(Boolean).join(' | ')})});const d=await r.json();if(!r.ok)throw Error(d.error||'Submission failed');showMessage('Payment reference submitted. Your Blue Badge is pending admin verification. Reference: '+d.payment.id,'success');$('paymentForm').reset();}catch(err){showMessage(err.message)}finally{btn.textContent='Submit for verification';btn.disabled=!token||!methods.length}});
+$('duration').addEventListener('change',renderMethod);
+
+$('paymentForm').addEventListener('submit',async e=>{
+ e.preventDefault();
+
+ const m=selected();
+
+ if(!token){
+  showMessage('Please log in first.');
+  return;
+ }
+
+ if(!m){
+  showMessage('Please select an available payment method.');
+  return;
+ }
+
+ const amount=priceFor(m);
+ const durationMonths=Number($('duration').value);
+
+ if(!amount||amount<=0){
+  showMessage('The administrator has not configured a price for this duration.');
+  return;
+ }
+
+ const btn=$('submitBtn');
+ btn.disabled=true;
+ btn.textContent='Submitting…';
+
+ try{
+  const r=await fetch(API+'/payments/manual',{
+   method:'POST',
+   headers:{
+    'Content-Type':'application/json',
+    'Authorization':'Bearer '+token
+   },
+   body:JSON.stringify({
+    purpose:'blue_badge',
+    duration_months:durationMonths,
+    amount,
+    currency:m.currency,
+    method:m.name,
+    transaction_ref:$('reference').value.trim(),
+    payer_account:[
+     $('payer').value.trim(),
+     $('proofNote').value.trim()
+    ].filter(Boolean).join(' | ')
+   })
+  });
+
+  const d=await r.json();
+  if(!r.ok)throw Error(d.error||'Submission failed');
+
+  showMessage(
+   `Application submitted for ${durationMonths} month(s). Your Blue Badge will activate only after admin approval. Application reference: ${d.payment.id}`,
+   'success'
+  );
+
+  $('paymentForm').reset();
+  $('duration').value=String(durationMonths);
+  await loadMine();
+
+ }catch(err){
+  showMessage(err.message);
+ }finally{
+  btn.textContent='Submit for verification';
+  renderMethod();
+ }
+});
+
 loadMethods();
-</script></body></html>
+loadMine();
+</script>
+</body>
+</html>
