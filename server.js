@@ -244,7 +244,13 @@ function sendCloudinaryUpload(buffer, mimetype) {
   return new Promise((resolve, reject) => {
     const resourceType = mimetype.startsWith("video/") ? "video" : "image";
     const stream = cloudinary.uploader.upload_stream(
-      { folder: "freetube", resource_type: resourceType },
+      {
+        folder: "freetube", resource_type: resourceType,
+        quality: "auto:good", fetch_format: "auto",
+        ...(resourceType === "image"
+          ? { transformation: [{ width: 1920, height: 1920, crop: "limit" }] }
+          : { transformation: [{ width: 1280, crop: "limit" }] })
+      },
       (error, result) => {
         if (error) return reject(error);
         resolve({
@@ -343,6 +349,98 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY(post_id, user_id, view_day)
     );
+
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS location VARCHAR(120);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS hometown VARCHAR(120);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS birthday DATE;
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS work VARCHAR(160);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS education VARCHAR(160);
+    ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS blue_badge_status VARCHAR(20) NOT NULL DEFAULT 'none';
+
+    ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS moderation_status VARCHAR(20) NOT NULL DEFAULT 'approved';
+    ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS moderation_result JSONB;
+    ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS reaction_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
+
+    ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_url TEXT;
+    ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_type VARCHAR(20);
+    ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_public_id TEXT;
+    CREATE INDEX IF NOT EXISTS ft_messages_expiry_idx ON ft_messages(created_at);
+
+    CREATE TABLE IF NOT EXISTS ft_post_reactions (
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      reaction VARCHAR(16) NOT NULL CHECK (reaction IN ('love','haha','sad','angry')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY(post_id,user_id)
+    );
+    CREATE TABLE IF NOT EXISTS ft_stories (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      media_url TEXT NOT NULL,
+      media_public_id TEXT,
+      media_type VARCHAR(20) NOT NULL,
+      caption VARCHAR(500) NOT NULL DEFAULT '',
+      moderation_status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
+    );
+    CREATE TABLE IF NOT EXISTS ft_friend_requests (
+      id BIGSERIAL PRIMARY KEY,
+      sender_id TEXT NOT NULL,
+      recipient_id TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','accepted','declined','cancelled')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(sender_id,recipient_id), CHECK(sender_id <> recipient_id)
+    );
+    CREATE TABLE IF NOT EXISTS ft_friends (
+      user_id TEXT NOT NULL,
+      friend_id TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY(user_id,friend_id), CHECK(user_id <> friend_id)
+    );
+    CREATE TABLE IF NOT EXISTS ft_admin_notices (
+      id BIGSERIAL PRIMARY KEY,
+      admin_id TEXT NOT NULL,
+      title VARCHAR(160) NOT NULL,
+      body VARCHAR(3000) NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS ft_monetization (
+      user_id TEXT PRIMARY KEY,
+      enabled BOOLEAN NOT NULL DEFAULT FALSE,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS ft_manual_payments (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      purpose VARCHAR(30) NOT NULL CHECK(purpose IN ('blue_badge','monetization','other')),
+      amount NUMERIC(12,2) NOT NULL CHECK(amount > 0),
+      currency VARCHAR(8) NOT NULL DEFAULT 'BDT',
+      method VARCHAR(40) NOT NULL,
+      transaction_ref VARCHAR(160) NOT NULL,
+      payer_account VARCHAR(160) NOT NULL DEFAULT '',
+      status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+      admin_note VARCHAR(500),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      reviewed_at TIMESTAMPTZ,
+      UNIQUE(method,transaction_ref)
+    );
+    CREATE TABLE IF NOT EXISTS ft_password_resets (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      token_hash TEXT NOT NULL UNIQUE,
+      expires_at TIMESTAMPTZ NOT NULL,
+      used_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS ft_stories_expiry_idx ON ft_stories(expires_at);
+    CREATE INDEX IF NOT EXISTS ft_story_user_idx ON ft_stories(user_id,created_at DESC);
+    CREATE INDEX IF NOT EXISTS ft_reactions_post_idx ON ft_post_reactions(post_id);
+    CREATE INDEX IF NOT EXISTS ft_friend_requests_recipient_idx ON ft_friend_requests(recipient_id,status,created_at DESC);
+    CREATE INDEX IF NOT EXISTS ft_manual_payments_status_idx ON ft_manual_payments(status,created_at DESC);
 
     CREATE INDEX IF NOT EXISTS ft_posts_created_idx
       ON ft_posts(created_at DESC);
@@ -571,7 +669,8 @@ app.get("/api/profile/:username", async (req, res, next) => {
   try {
     const result = await pool.query(
       `SELECT u.id::text AS id,u.username,u.email,
-              p.display_name,p.bio,p.avatar_url,p.cover_url,p.updated_at
+              p.display_name,p.bio,p.avatar_url,p.cover_url,p.location,p.hometown,
+              p.birthday,p.work,p.education,p.blue_badge_status,p.updated_at,u.created_at AS account_created_at
        FROM users u LEFT JOIN ft_profiles p ON p.user_id=u.id::text
        WHERE LOWER(u.username)=LOWER($1)
          AND u.account_status='active'
@@ -606,23 +705,24 @@ app.put("/api/profile", requireAuth, async (req, res, next) => {
     const bio = cleanText(req.body.bio, 500);
     const avatarUrl = cleanText(req.body.avatar_url, 2000);
     const coverUrl = cleanText(req.body.cover_url, 2000);
+    const location = cleanText(req.body.location, 120);
+    const hometown = cleanText(req.body.hometown, 120);
+    const birthday = cleanText(req.body.birthday, 10);
+    const work = cleanText(req.body.work, 160);
+    const education = cleanText(req.body.education, 160);
 
     await pool.query(
-      `INSERT INTO ft_profiles(user_id,display_name,bio,avatar_url,cover_url,updated_at)
-       VALUES($1,$2,$3,$4,$5,NOW())
+      `INSERT INTO ft_profiles(user_id,display_name,bio,avatar_url,cover_url,location,hometown,birthday,work,education,updated_at)
+       VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,NOW())
        ON CONFLICT(user_id) DO UPDATE SET
          display_name=EXCLUDED.display_name,
          bio=EXCLUDED.bio,
-         avatar_url=EXCLUDED.avatar_url,
-         cover_url=EXCLUDED.cover_url,
-         updated_at=NOW()`,
-      [
-        String(req.user.id),
-        displayName || req.user.username,
-        bio,
-        avatarUrl || null,
-        coverUrl || null
-      ]
+         avatar_url=COALESCE(EXCLUDED.avatar_url,ft_profiles.avatar_url),
+         cover_url=COALESCE(EXCLUDED.cover_url,ft_profiles.cover_url),
+         location=EXCLUDED.location,hometown=EXCLUDED.hometown,birthday=EXCLUDED.birthday,
+         work=EXCLUDED.work,education=EXCLUDED.education,updated_at=NOW()`,
+      [String(req.user.id),displayName || req.user.username,bio,avatarUrl || null,coverUrl || null,
+       location || null,hometown || null,(birthday && /^\d{4}-\d{2}-\d{2}$/.test(birthday)) ? birthday : null,work || null,education || null]
     );
 
     res.json({ message: "Profile updated." });
@@ -662,15 +762,19 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
     const result = await pool.query(
       `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,
               p.created_at,u.username,pr.display_name,pr.avatar_url,
-              (SELECT COUNT(*) FROM ft_likes l WHERE l.post_id=p.id) AS like_count,
+              (SELECT COUNT(*) FROM ft_post_reactions r WHERE r.post_id=p.id) AS reaction_count,
+              (SELECT COALESCE(jsonb_object_agg(rc.reaction,rc.cnt),'{}'::jsonb)
+                 FROM (SELECT reaction,COUNT(*)::int AS cnt FROM ft_post_reactions
+                       WHERE post_id=p.id GROUP BY reaction) rc) AS reaction_counts,
+              (SELECT COUNT(*) FROM ft_post_reactions r WHERE r.post_id=p.id) AS like_count,
               (SELECT COUNT(*) FROM ft_comments c WHERE c.post_id=p.id) AS comment_count,
               (SELECT COUNT(*) FROM ft_post_views v WHERE v.post_id=p.id) AS view_count,
-              EXISTS(SELECT 1 FROM ft_likes l
-                     WHERE l.post_id=p.id AND l.user_id=$1) AS liked
+              EXISTS(SELECT 1 FROM ft_post_reactions r
+                     WHERE r.post_id=p.id AND r.user_id=$1) AS liked
        FROM ft_posts p
        JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
-       WHERE u.account_status='active'
+       WHERE u.account_status='active' AND p.moderation_status='approved'
        ORDER BY p.created_at DESC LIMIT 100`,
       [String(req.user.id)]
     );
@@ -698,19 +802,25 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
       return res.status(400).json({ error: "Invalid media type." });
     }
 
+    // Media posts are not public until moderation is completed. Text-only posts
+    // preserve the existing immediate-publish behavior.
+    const moderationStatus = mediaUrl ? "pending" : "approved";
     const result = await pool.query(
-      `INSERT INTO ft_posts(user_id,content,media_url,media_type,media_public_id)
-       VALUES($1,$2,$3,$4,$5) RETURNING *`,
-      [
-        String(req.user.id),
-        content,
-        mediaUrl || null,
-        mediaType || null,
-        publicId || null
-      ]
+      `INSERT INTO ft_posts(user_id,content,media_url,media_type,media_public_id,moderation_status)
+       VALUES($1,$2,$3,$4,$5,$6) RETURNING *`,
+      [String(req.user.id),content,mediaUrl || null,mediaType || null,publicId || null,moderationStatus]
     );
-
-    res.status(201).json({ message: "Post published.", post: result.rows[0] });
+    if (moderationStatus === "pending") {
+      await pool.query(
+        `INSERT INTO ft_notifications(recipient_id,actor_id,type,post_id,message)
+         SELECT id::text,$1,'moderation_pending',$2,$3 FROM users WHERE LOWER(role)='admin'`,
+        [String(req.user.id),result.rows[0].id,`A media post from ${req.user.username} is waiting for moderation.`]
+      );
+    }
+    res.status(201).json({
+      message: moderationStatus === "pending" ? "Post submitted and is awaiting moderation." : "Post published.",
+      post: result.rows[0]
+    });
   } catch (e) {
     next(e);
   }
@@ -813,71 +923,29 @@ app.post("/api/posts/:id/view", requireAuth, async (req, res, next) => {
   }
 });
 
+// Backward-compatible route: the old Like action now means Love reaction.
+// New clients should use POST /api/posts/:id/reaction with love|haha|sad|angry.
 app.post("/api/posts/:id/like", requireAuth, async (req, res, next) => {
   const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isSafeInteger(id) || id <= 0) {
-    return res.status(400).json({ error: "Invalid post ID." });
-  }
-
-  let client;
+  if (!Number.isSafeInteger(id) || id <= 0) return res.status(400).json({ error: "Invalid post ID." });
   try {
-    client = await pool.connect();
-    await client.query("BEGIN");
-
-    const post = await client.query(
-      "SELECT id,user_id FROM ft_posts WHERE id=$1 FOR UPDATE", [id]
-    );
-    if (!post.rowCount) {
-      await client.query("ROLLBACK");
-      return res.status(404).json({ error: "Post not found." });
-    }
-
+    const post = await pool.query("SELECT id,user_id FROM ft_posts WHERE id=$1 AND moderation_status='approved'", [id]);
+    if (!post.rowCount) return res.status(404).json({ error: "Post not found." });
     const userId = String(req.user.id);
-    const existing = await client.query(
-      "SELECT 1 FROM ft_likes WHERE post_id=$1 AND user_id=$2",
-      [id, userId]
-    );
-
-    let liked;
-    if (existing.rowCount) {
-      await client.query(
-        "DELETE FROM ft_likes WHERE post_id=$1 AND user_id=$2",
-        [id, userId]
-      );
-      liked = false;
+    const existing = await pool.query("SELECT reaction FROM ft_post_reactions WHERE post_id=$1 AND user_id=$2", [id,userId]);
+    let reaction = "love";
+    if (existing.rowCount && existing.rows[0].reaction === "love") {
+      await pool.query("DELETE FROM ft_post_reactions WHERE post_id=$1 AND user_id=$2", [id,userId]);
+      reaction = null;
     } else {
-      await client.query(
-        "INSERT INTO ft_likes(post_id,user_id) VALUES($1,$2)",
-        [id, userId]
-      );
-      liked = true;
-
-      if (String(post.rows[0].user_id) !== userId) {
-        await client.query(
-          `INSERT INTO ft_notifications(recipient_id,actor_id,type,post_id,message)
-           VALUES($1,$2,'like',$3,$4)`,
-          [
-            String(post.rows[0].user_id),
-            userId,
-            id,
-            `${req.user.username} liked your post.`
-          ]
-        );
-      }
+      await pool.query(`INSERT INTO ft_post_reactions(post_id,user_id,reaction) VALUES($1,$2,'love')
+        ON CONFLICT(post_id,user_id) DO UPDATE SET reaction='love',created_at=NOW()`, [id,userId]);
+      if (String(post.rows[0].user_id) !== userId) await notifyUser(post.rows[0].user_id,userId,'reaction',`${req.user.username} loved your post.`,id);
     }
-
-    const count = await client.query(
-      "SELECT COUNT(*) FROM ft_likes WHERE post_id=$1", [id]
-    );
-    await client.query("COMMIT");
-
-    res.json({ liked, like_count: Number(count.rows[0].count) });
-  } catch (e) {
-    if (client) await client.query("ROLLBACK").catch(() => {});
-    next(e);
-  } finally {
-    if (client) client.release();
-  }
+    const counts = await pool.query("SELECT reaction,COUNT(*)::int AS count FROM ft_post_reactions WHERE post_id=$1 GROUP BY reaction", [id]);
+    const reactionCounts = Object.fromEntries(counts.rows.map(x=>[x.reaction,x.count]));
+    res.json({ liked: reaction === "love", reaction, like_count: counts.rows.reduce((n,x)=>n+x.count,0), reaction_count: counts.rows.reduce((n,x)=>n+x.count,0), reaction_counts: reactionCounts });
+  } catch (e) { next(e); }
 });
 
 app.get("/api/posts/:id/comments", async (req, res, next) => {
@@ -1059,6 +1127,7 @@ app.post("/api/posts/:id/report", requireAuth, async (req, res, next) => {
 
 app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
   try {
+    await purgeExpiredMessages();
     const me = String(req.user.id);
     const other = cleanText(req.params.userId, 100);
     if (!other || other === me) {
@@ -1078,10 +1147,11 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
     );
 
     const result = await pool.query(
-      `SELECT id,sender_id,recipient_id,content,created_at,read_at
+      `SELECT id,sender_id,recipient_id,content,media_url,media_type,created_at,read_at
        FROM ft_messages
-       WHERE (sender_id=$1 AND recipient_id=$2)
-          OR (sender_id=$2 AND recipient_id=$1)
+       WHERE created_at > NOW() - INTERVAL '72 hours'
+         AND ((sender_id=$1 AND recipient_id=$2)
+          OR (sender_id=$2 AND recipient_id=$1))
        ORDER BY id DESC LIMIT 100`,
       [me, other]
     );
@@ -1094,6 +1164,7 @@ app.get("/api/messages/:userId", requireAuth, async (req, res, next) => {
 
 app.post("/api/messages", requireAuth, async (req, res, next) => {
   try {
+    await purgeExpiredMessages();
     const recipientId = cleanText(req.body.recipient_id, 100);
     const content = cleanText(req.body.content, 5000);
     const senderId = String(req.user.id);
@@ -1128,13 +1199,15 @@ app.post("/api/messages", requireAuth, async (req, res, next) => {
 
 app.get("/api/messages", requireAuth, async (req, res, next) => {
   try {
+    await purgeExpiredMessages();
     const me = String(req.user.id);
     const result = await pool.query(
       `WITH cm AS (
          SELECT *,CASE WHEN sender_id=$1 THEN recipient_id ELSE sender_id END AS other_id
-         FROM ft_messages WHERE sender_id=$1 OR recipient_id=$1
+         FROM ft_messages WHERE created_at > NOW() - INTERVAL '72 hours'
+           AND (sender_id=$1 OR recipient_id=$1)
        ), latest AS (
-         SELECT DISTINCT ON(other_id) other_id,id,sender_id,recipient_id,content,created_at
+         SELECT DISTINCT ON(other_id) other_id,id,sender_id,recipient_id,content,media_url,media_type,created_at
          FROM cm ORDER BY other_id,id DESC
        )
        SELECT l.*,u.username,p.display_name,p.avatar_url,
@@ -1305,7 +1378,7 @@ app.get("/api/admin/posts", requireAuth, requireAdmin, async (req, res, next) =>
     const result = await pool.query(
       `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.created_at,
               u.username,pr.display_name,
-              (SELECT COUNT(*)::int FROM ft_likes l WHERE l.post_id=p.id) AS like_count,
+              (SELECT COUNT(*)::int FROM ft_post_reactions l WHERE l.post_id=p.id) AS like_count,
               (SELECT COUNT(*)::int FROM ft_comments c WHERE c.post_id=p.id) AS comment_count
        FROM ft_posts p JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
@@ -1369,6 +1442,136 @@ app.patch("/api/admin/reports/:id", requireAuth, requireAdmin, async (req, res, 
   }
 });
 
+// ADDITIVE FEATURES: all original routes above are retained.
+function notifyUser(recipientId, actorId, type, message, postId = null) {
+  return pool.query(
+    `INSERT INTO ft_notifications(recipient_id,actor_id,type,message,post_id)
+     VALUES($1,$2,$3,$4,$5)`,
+    [String(recipientId),String(actorId),type,message,postId]
+  );
+}
+
+// Distinct public display name; username remains the login/URL identifier.
+app.patch("/api/account/username", requireAuth, async (req,res,next) => {
+  try {
+    const username = cleanText(req.body.username,50).toLowerCase();
+    if (!/^[a-z0-9_]{3,50}$/.test(username)) return res.status(400).json({error:"Username must be 3-50 characters using English letters, numbers or underscores."});
+    const r = await pool.query("UPDATE users SET username=$1 WHERE id=$2 RETURNING id::text AS id,username",[username,String(req.user.id)]);
+    res.json({message:"Username updated.",user:r.rows[0]});
+  } catch(e) { if(e.code === "23505") return res.status(409).json({error:"Username is already taken."}); next(e); }
+});
+
+app.get("/api/users/:userId/posts", requireAuth, async (req,res,next) => {
+  try {
+    const uid=cleanText(req.params.userId,100);
+    const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.created_at,
+      u.username,pr.display_name,pr.avatar_url,
+      (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS reaction_count,
+      (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS like_count,
+      (SELECT COUNT(*) FROM ft_comments x WHERE x.post_id=p.id) AS comment_count,
+      (SELECT COUNT(*) FROM ft_post_views x WHERE x.post_id=p.id) AS view_count
+      FROM ft_posts p JOIN users u ON u.id::text=p.user_id LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
+      WHERE p.user_id=$1 AND u.account_status='active' AND p.moderation_status='approved'
+      ORDER BY p.created_at DESC LIMIT 100`,[uid]);
+    res.json({posts:r.rows});
+  } catch(e){next(e);}
+});
+
+// Reactions: love/haha/sad/angry. Legacy /like API remains untouched for old clients.
+app.post("/api/posts/:id/reaction", requireAuth, async(req,res,next)=>{
+  const id=Number.parseInt(req.params.id,10), reaction=cleanText(req.body.reaction,16).toLowerCase();
+  if(!Number.isSafeInteger(id)||id<=0||!['love','haha','sad','angry'].includes(reaction)) return res.status(400).json({error:"Choose love, haha, sad or angry."});
+  try{
+    const post=await pool.query("SELECT id,user_id FROM ft_posts WHERE id=$1 AND moderation_status='approved'",[id]);
+    if(!post.rowCount)return res.status(404).json({error:"Post not found."});
+    const old=await pool.query("SELECT reaction FROM ft_post_reactions WHERE post_id=$1 AND user_id=$2",[id,String(req.user.id)]);
+    let mine=null;
+    if(old.rowCount && old.rows[0].reaction===reaction){await pool.query("DELETE FROM ft_post_reactions WHERE post_id=$1 AND user_id=$2",[id,String(req.user.id)]);}
+    else {await pool.query(`INSERT INTO ft_post_reactions(post_id,user_id,reaction) VALUES($1,$2,$3)
+      ON CONFLICT(post_id,user_id) DO UPDATE SET reaction=EXCLUDED.reaction,created_at=NOW()`,[id,String(req.user.id),reaction]);mine=reaction;
+      if(String(post.rows[0].user_id)!==String(req.user.id)) await notifyUser(post.rows[0].user_id,req.user.id,'reaction',`${req.user.username} reacted ${reaction} to your post.`,id);
+    }
+    const counts=await pool.query("SELECT reaction,COUNT(*)::int AS count FROM ft_post_reactions WHERE post_id=$1 GROUP BY reaction",[id]);
+    res.json({reaction:mine,reaction_counts:Object.fromEntries(counts.rows.map(x=>[x.reaction,x.count])),reaction_count:counts.rows.reduce((n,x)=>n+x.count,0)});
+  }catch(e){next(e);}
+});
+
+// Messages are retained for 72 hours only. Database rows and message media assets are deleted.
+// Cloudinary public IDs are stored separately so assets can be deleted through the authenticated server API.
+async function purgeExpiredMessages(){
+  if(!pool)return;
+  const expired=await pool.query(`SELECT id,media_public_id,media_type FROM ft_messages
+    WHERE created_at <= NOW() - INTERVAL '72 hours'`);
+  if(cloudinaryConfigured){
+    for(const row of expired.rows){
+      if(!row.media_public_id)continue;
+      try{
+        await cloudinary.uploader.destroy(row.media_public_id,{resource_type:row.media_type==='video'?'video':'image',invalidate:true});
+      }catch(e){console.error('Expired message media cleanup failed:',e.message);}
+    }
+  }
+  await pool.query("DELETE FROM ft_messages WHERE created_at <= NOW() - INTERVAL '72 hours'");
+  // Remove old message-only notifications as well, so they do not leave a stale inbox trace.
+  await pool.query("DELETE FROM ft_notifications WHERE type='message' AND created_at <= NOW() - INTERVAL '72 hours'");
+}
+
+// Stories expire after 24 hours; expired rows and Cloudinary assets are removed on access and periodically.
+async function purgeExpiredStories(){
+  if(!pool)return;
+  const r=await pool.query("DELETE FROM ft_stories WHERE expires_at<=NOW() RETURNING media_public_id,media_type");
+  if(cloudinaryConfigured) for(const row of r.rows){if(row.media_public_id) cloudinary.uploader.destroy(row.media_public_id,{resource_type:row.media_type==='video'?'video':'image'}).catch(()=>{});}
+}
+app.post("/api/stories", requireAuth, async(req,res,next)=>{
+  try{
+    const url=cleanText(req.body.media_url,2000), publicId=cleanText(req.body.media_public_id,500), type=cleanText(req.body.media_type,20), caption=cleanText(req.body.caption,500);
+    if(!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type))return res.status(400).json({error:"Upload a valid image/video to Cloudinary first."});
+    // Fail closed for media until moderation has been configured and verified.
+    const moderationReady=String(process.env.CLOUDINARY_MODERATION_ENABLED||'').toLowerCase()==='true';
+    const status=moderationReady?'pending':'pending';
+    const r=await pool.query(`INSERT INTO ft_stories(user_id,media_url,media_public_id,media_type,caption,moderation_status)
+      VALUES($1,$2,$3,$4,$5,$6) RETURNING id::text AS id,user_id,media_url,media_type,caption,moderation_status,created_at,expires_at`,[String(req.user.id),url,publicId||null,type,caption,status]);
+    res.status(201).json({story:r.rows[0],message:"Story submitted for moderation; it will not be public until approved."});
+  }catch(e){next(e);}
+});
+app.get("/api/stories", requireAuth, async(req,res,next)=>{
+  try{await purgeExpiredStories();const r=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.caption,s.created_at,s.expires_at,u.username,p.display_name,p.avatar_url
+    FROM ft_stories s JOIN users u ON u.id::text=s.user_id LEFT JOIN ft_profiles p ON p.user_id=s.user_id
+    WHERE s.expires_at>NOW() AND s.moderation_status='approved' AND u.account_status='active' ORDER BY s.created_at DESC LIMIT 100`);res.json({stories:r.rows});}catch(e){next(e);}
+});
+
+// Friend request and friend list APIs.
+app.post("/api/friends/request", requireAuth, async(req,res,next)=>{
+  try{const target=cleanText(req.body.user_id,100),me=String(req.user.id);if(!target||target===me)return res.status(400).json({error:"Choose another user."});
+    const u=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[target]);if(!u.rowCount)return res.status(404).json({error:"User not found."});
+    const reciprocal=await pool.query("SELECT id FROM ft_friend_requests WHERE sender_id=$1 AND recipient_id=$2 AND status='pending'",[target,me]);
+    if(reciprocal.rowCount){await pool.query("UPDATE ft_friend_requests SET status='accepted',updated_at=NOW() WHERE sender_id=$1 AND recipient_id=$2",[target,me]);await pool.query("INSERT INTO ft_friends(user_id,friend_id) VALUES($1,$2),($2,$1) ON CONFLICT DO NOTHING",[me,target]);await notifyUser(target,me,'friend',`${req.user.username} accepted your friend request.`);return res.json({status:'accepted'});}
+    const r=await pool.query(`INSERT INTO ft_friend_requests(sender_id,recipient_id) VALUES($1,$2) ON CONFLICT(sender_id,recipient_id) DO UPDATE SET status='pending',updated_at=NOW() RETURNING id,status`,[me,target]);await notifyUser(target,me,'friend_request',`${req.user.username} sent you a friend request.`);res.status(201).json({request:r.rows[0]});
+  }catch(e){next(e);}
+});
+app.get("/api/friends/requests", requireAuth, async(req,res,next)=>{try{const r=await pool.query(`SELECT f.id::text AS id,f.sender_id,u.username,p.display_name,p.avatar_url,f.created_at FROM ft_friend_requests f JOIN users u ON u.id::text=f.sender_id LEFT JOIN ft_profiles p ON p.user_id=f.sender_id WHERE f.recipient_id=$1 AND f.status='pending' ORDER BY f.created_at DESC`,[String(req.user.id)]);res.json({requests:r.rows});}catch(e){next(e);}});
+app.patch("/api/friends/requests/:id", requireAuth, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['accept','decline'].includes(action))return res.status(400).json({error:'Action must be accept or decline.'});const status=action==='accept'?'accepted':'declined';const r=await pool.query(`UPDATE ft_friend_requests SET status=$1,updated_at=NOW() WHERE id=$2 AND recipient_id=$3 AND status='pending' RETURNING sender_id,recipient_id`,[status,id,String(req.user.id)]);if(!r.rowCount)return res.status(404).json({error:'Pending request not found.'});if(action==='accept')await pool.query("INSERT INTO ft_friends(user_id,friend_id) VALUES($1,$2),($2,$1) ON CONFLICT DO NOTHING",[String(req.user.id),r.rows[0].sender_id]);await notifyUser(r.rows[0].sender_id,req.user.id,'friend',action==='accept'?'Your friend request was accepted.':'Your friend request was declined.');res.json({status});}catch(e){next(e);}});
+app.get("/api/friends", requireAuth, async(req,res,next)=>{try{const r=await pool.query(`SELECT u.id::text AS id,u.username,p.display_name,p.avatar_url,f.created_at AS friends_since FROM ft_friends f JOIN users u ON u.id::text=f.friend_id LEFT JOIN ft_profiles p ON p.user_id=f.friend_id WHERE f.user_id=$1 AND u.account_status='active' ORDER BY f.created_at DESC`,[String(req.user.id)]);res.json({friends:r.rows});}catch(e){next(e);}});
+app.delete("/api/friends/:userId", requireAuth, async(req,res,next)=>{try{const other=cleanText(req.params.userId,100),me=String(req.user.id);await pool.query("DELETE FROM ft_friends WHERE (user_id=$1 AND friend_id=$2) OR (user_id=$2 AND friend_id=$1)",[me,other]);res.json({message:'Friend removed.'});}catch(e){next(e);}});
+
+// Admin notices are broadcast to every active user as in-app notifications.
+app.post("/api/admin/notices", requireAuth, requireAdmin, async(req,res,next)=>{try{const title=cleanText(req.body.title,160),body=cleanText(req.body.body,3000);if(!title||!body)return res.status(400).json({error:'Title and notice text are required.'});const n=await pool.query("INSERT INTO ft_admin_notices(admin_id,title,body) VALUES($1,$2,$3) RETURNING *",[String(req.user.id),title,body]);await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'admin_notice',$2 FROM users WHERE account_status='active'`,[String(req.user.id),`${title}: ${body}`]);res.status(201).json({notice:n.rows[0],notified:true});}catch(e){next(e);}});
+app.get("/api/admin/notices", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query("SELECT * FROM ft_admin_notices ORDER BY created_at DESC LIMIT 100");res.json({notices:r.rows});}catch(e){next(e);}});
+
+// Manual payments are submissions only; badge/monetization is activated after admin review.
+app.post("/api/payments/manual", requireAuth, async(req,res,next)=>{try{const purpose=cleanText(req.body.purpose,30),amount=Number(req.body.amount),currency=cleanText(req.body.currency||'BDT',8).toUpperCase(),method=cleanText(req.body.method,40),ref=cleanText(req.body.transaction_ref,160),payer=cleanText(req.body.payer_account,160);if(!['blue_badge','monetization','other'].includes(purpose)||!Number.isFinite(amount)||amount<=0||!method||!ref)return res.status(400).json({error:'Purpose, valid amount, payment method and transaction reference are required.'});const r=await pool.query(`INSERT INTO ft_manual_payments(user_id,purpose,amount,currency,method,transaction_ref,payer_account) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING id::text AS id,purpose,amount,currency,method,transaction_ref,status,created_at`,[String(req.user.id),purpose,amount,currency,method,ref,payer]);if(purpose==='blue_badge')await pool.query("UPDATE ft_profiles SET blue_badge_status='pending' WHERE user_id=$1",[String(req.user.id)]);if(purpose==='monetization')await pool.query("INSERT INTO ft_monetization(user_id,status) VALUES($1,'pending') ON CONFLICT(user_id) DO UPDATE SET status='pending',updated_at=NOW()",[String(req.user.id)]);await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'payment', $2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Manual payment submission (${purpose}) requires review.`]);res.status(201).json({payment:r.rows[0],message:'Payment submitted for manual verification.'});}catch(e){if(e.code==='23505')return res.status(409).json({error:'This transaction reference has already been submitted.'});next(e);}});
+app.get("/api/admin/payments", requireAuth, requireAdmin, async(req,res,next)=>{try{const status=cleanText(req.query.status||'pending',20);const r=await pool.query(`SELECT m.*,u.username,u.email FROM ft_manual_payments m LEFT JOIN users u ON u.id::text=m.user_id WHERE ($1='all' OR m.status=$1) ORDER BY m.created_at DESC LIMIT 200`,[status]);res.json({payments:r.rows});}catch(e){next(e);}});
+app.patch("/api/admin/payments/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action,note=cleanText(req.body.admin_note,500);if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query(`UPDATE ft_manual_payments SET status=$1,admin_note=$2,reviewed_at=NOW() WHERE id=$3 AND status='pending' RETURNING *`,[status,note,id]);if(!r.rowCount)return res.status(404).json({error:'Pending payment not found.'});const p=r.rows[0];if(p.purpose==='blue_badge')await pool.query("UPDATE ft_profiles SET blue_badge_status=$1 WHERE user_id=$2",[status==='approved'?'verified':'rejected',p.user_id]);if(p.purpose==='monetization')await pool.query("INSERT INTO ft_monetization(user_id,enabled,status) VALUES($1,$2,$3) ON CONFLICT(user_id) DO UPDATE SET enabled=EXCLUDED.enabled,status=EXCLUDED.status,updated_at=NOW()",[p.user_id,status==='approved',status]);await notifyUser(p.user_id,req.user.id,'payment',`Your ${p.purpose} payment was ${status}.`);res.json({payment:p});}catch(e){next(e);}});
+app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const r=await pool.query("SELECT enabled,status,updated_at FROM ft_monetization WHERE user_id=$1",[String(req.user.id)]);res.json({monetization:r.rows[0]||{enabled:false,status:'not_applied'}});}catch(e){next(e);}});
+
+// Message media uses the same authenticated Cloudinary upload endpoint; send its URL as media_url.
+// This endpoint extends existing text messages without removing the old payload contract.
+app.post("/api/messages/media", requireAuth, async(req,res,next)=>{try{await purgeExpiredMessages();const recipientId=cleanText(req.body.recipient_id,100),url=cleanText(req.body.media_url,2000),type=cleanText(req.body.media_type,20),publicId=cleanText(req.body.media_public_id,500),content=cleanText(req.body.content,5000);if(!recipientId||recipientId===String(req.user.id)||!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type)||!publicId)return res.status(400).json({error:'Valid recipient, Cloudinary image/video URL and media_public_id are required.'});const recipient=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[recipientId]);if(!recipient.rowCount)return res.status(404).json({error:'Recipient not found.'});const r=await pool.query("INSERT INTO ft_messages(sender_id,recipient_id,content,media_url,media_type,media_public_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,sender_id,recipient_id,content,media_url,media_type,created_at,read_at",[String(req.user.id),recipientId,content,url,type,publicId]);await notifyUser(recipientId,req.user.id,'message',`New message from ${req.user.username}.`);res.status(201).json({item:r.rows[0],expires_at:new Date(Date.now()+72*60*60*1000).toISOString()});}catch(e){next(e);}});
+
+// Fail-closed moderation helper endpoints. No claim of AI protection until provider/add-on is configured.
+app.get("/api/admin/moderation/pending", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
+app.patch("/api/admin/moderation/posts/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_posts SET moderation_status=$1,moderation_result=$2::jsonb WHERE id=$3 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,JSON.stringify({reviewed_by:String(req.user.id),reviewed_at:new Date().toISOString(),method:'manual_admin_review'}),id]);if(!r.rowCount)return res.status(404).json({error:'Pending post not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your post was ${status}.`,id);res.json({post:r.rows[0]});}catch(e){next(e);}});
+app.patch("/api/admin/moderation/stories/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_stories SET moderation_status=$1 WHERE id=$2 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,id]);if(!r.rowCount)return res.status(404).json({error:'Pending story not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your story was ${status}.`);res.json({story:r.rows[0]});}catch(e){next(e);}});
+
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
 });
@@ -1398,7 +1601,13 @@ app.use((error, req, res, next) => {
 
 async function startServer() {
   try {
-    if (pool) await initializeDatabase();
+    if (pool) {
+      await initializeDatabase();
+      setInterval(() => purgeExpiredStories().catch(e => console.error("Story cleanup failed:", e.message)), 15 * 60 * 1000).unref();
+      setInterval(() => purgeExpiredMessages().catch(e => console.error("Message cleanup failed:", e.message)), 5 * 60 * 1000).unref();
+      await purgeExpiredStories().catch(e => console.error("Initial story cleanup failed:", e.message));
+      await purgeExpiredMessages().catch(e => console.error("Initial message cleanup failed:", e.message));
+    }
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`FreeTube API listening on port ${PORT}`);
     });
