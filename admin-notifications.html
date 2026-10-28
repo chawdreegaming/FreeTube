@@ -1,0 +1,500 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<title>Notification Management — Boys vs Girls</title>
+
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#07111f;
+  --card:#101e32;
+  --line:#293d59;
+  --text:#f3f7ff;
+  --muted:#9fb0c8;
+  --blue:#4b8dff;
+  --green:#30c997;
+  --red:#ff7185;
+  --purple:#a78bfa;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left,#17365d,transparent 38%),
+    var(--bg);
+  color:var(--text);
+  font:15px/1.55 system-ui,-apple-system,sans-serif;
+}
+.container{max-width:1050px;margin:auto;padding:22px 14px 45px}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:15px;margin-bottom:20px
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:52px;height:52px;display:grid;place-items:center;
+  border-radius:16px;background:linear-gradient(135deg,#4b8dff,#a78bfa);
+  font-size:19px;font-weight:900
+}
+.eyebrow{font-size:11px;letter-spacing:2px;color:var(--muted);font-weight:800}
+h1{margin:0;font-size:clamp(25px,5vw,34px)}
+h2{font-size:20px;margin:0 0 14px}
+h3{font-size:16px;margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+button,input,select,textarea{font:inherit}
+button{
+  border:0;border-radius:10px;padding:11px 14px;
+  background:var(--blue);color:#fff;font-weight:750;cursor:pointer
+}
+button.secondary{background:#263a56;border:1px solid #3b5272}
+button.danger{background:#a82d48}
+button:disabled{opacity:.5;cursor:not-allowed}
+a{text-decoration:none;color:inherit}
+.card{
+  padding:17px;margin:14px 0;border:1px solid var(--line);
+  border-radius:18px;background:linear-gradient(155deg,#13243a,#0d192b)
+}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.field{margin:12px 0}
+label{display:block;margin-bottom:6px;font-size:13px;color:#cbd7e8}
+input,select,textarea{
+  width:100%;padding:11px 12px;border:1px solid #30435e;
+  border-radius:10px;background:#081426;color:var(--text);outline:none
+}
+textarea{resize:vertical;min-height:120px}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.notice{
+  display:none;padding:12px 14px;margin:12px 0;
+  border-radius:11px;background:#42232c;color:#ffd5dc;overflow-wrap:anywhere
+}
+.notice.success{background:#103c32;color:#b4ffe2}
+.pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#263952;font-size:12px}
+.list{display:grid;gap:10px}
+.item{padding:14px;border:1px solid var(--line);border-radius:13px;background:#0a1729;overflow-wrap:anywhere}
+.item-top{display:flex;justify-content:space-between;align-items:start;gap:10px;flex-wrap:wrap}
+.empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed #30435e;border-radius:13px}
+.preview{
+  padding:15px;border:1px solid #395477;border-radius:13px;
+  background:#0a1729;margin-top:12px
+}
+.preview-title{font-weight:800;font-size:17px}
+.preview-body{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px}
+footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.container{padding:16px 11px 35px}}
+</style>
+</head>
+
+<body>
+<main class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">BvG</div>
+    <div>
+      <div class="eyebrow">BOYS VS GIRLS / ADMIN</div>
+      <h1>Notification Management</h1>
+      <div class="muted small">Compose and manage app notifications</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <a href="admin.html">
+      <button type="button" class="secondary">← Dashboard</button>
+    </a>
+    <button type="button" class="secondary" id="refreshBtn">Refresh</button>
+  </div>
+</header>
+
+<div id="notice" class="notice" role="status"></div>
+
+<section class="card">
+  <div class="item-top">
+    <div>
+      <h2>Admin Access</h2>
+      <p class="muted small">
+        Uses the existing freetube_access_token saved in this browser.
+        Only an authorized admin should send notifications.
+      </p>
+    </div>
+    <button type="button" class="secondary" id="tokenBtn">Set Token</button>
+  </div>
+  <div id="connection" class="muted small">Checking token...</div>
+</section>
+
+<section class="card">
+  <h2>Compose Notification</h2>
+
+  <form id="notificationForm">
+    <div class="field">
+      <label for="recipient">Recipient</label>
+      <select id="recipient" name="recipient" required>
+        <option value="all">All users</option>
+        <option value="user">A specific user</option>
+      </select>
+    </div>
+
+    <div class="field" id="userField" hidden>
+      <label for="userId">User ID or username</label>
+      <input
+        id="userId"
+        name="userId"
+        maxlength="160"
+        placeholder="Enter the target user ID"
+      >
+      <p class="muted small">
+        Enter a user ID only if your backend's notification endpoint
+        accepts this recipient format.
+      </p>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label for="type">Notification Type</label>
+        <select id="type" name="type" required>
+          <option value="announcement">Announcement</option>
+          <option value="system">System</option>
+          <option value="account">Account</option>
+          <option value="blue_badge">Blue Badge</option>
+          <option value="security">Security</option>
+          <option value="update">App Update</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="priority">Priority</label>
+        <select id="priority" name="priority">
+          <option value="normal">Normal</option>
+          <option value="important">Important</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="title">Notification Title</label>
+      <input
+        id="title"
+        name="title"
+        maxlength="160"
+        required
+        placeholder="Enter notification title"
+      >
+    </div>
+
+    <div class="field">
+      <label for="body">Notification Message</label>
+      <textarea
+        id="body"
+        name="body"
+        maxlength="3000"
+        required
+        placeholder="Write your notification message..."
+      ></textarea>
+      <div class="muted small">
+        <span id="charCount">0</span>/3000 characters
+      </div>
+    </div>
+
+    <div class="preview">
+      <div class="muted small">LIVE PREVIEW</div>
+      <div class="preview-title" id="previewTitle">Notification title</div>
+      <div class="preview-body" id="previewBody">Your notification message will appear here.</div>
+      <div style="margin-top:10px">
+        <span class="pill" id="previewType">Announcement</span>
+      </div>
+    </div>
+
+    <p class="muted small">
+      Sending a notification may immediately reach users. Check the
+      recipient and message before submitting.
+    </p>
+
+    <div class="row">
+      <button id="sendBtn" type="submit">Send Notification</button>
+      <button id="clearBtn" class="secondary" type="button">Clear Form</button>
+    </div>
+  </form>
+</section>
+
+<section class="card">
+  <div class="item-top">
+    <div>
+      <h2>Notification History</h2>
+      <p class="muted small">
+        Loads history only if the backend provides a compatible admin endpoint.
+      </p>
+    </div>
+    <button type="button" id="historyBtn">Load History</button>
+  </div>
+
+  <div id="history" class="list">
+    <div class="empty">Click Load History to view available records.</div>
+  </div>
+</section>
+
+<footer>
+  Boys vs Girls 💙💗 — Notification Management<br>
+  This page requires server-side admin authorization. Never share your access token.
+</footer>
+
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const API = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
+const $ = id => document.getElementById(id);
+
+function token(){
+  return localStorage.getItem(TOKEN_KEY) || "";
+}
+
+function esc(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  }[char]));
+}
+
+function showNotice(message, success){
+  const el = $("notice");
+  el.textContent = message;
+  el.className = "notice" + (success ? " success" : "");
+  el.style.display = "block";
+  el.scrollIntoView({behavior:"smooth", block:"center"});
+}
+
+function updateConnection(){
+  $("connection").textContent = token()
+    ? "An access token is saved in this browser."
+    : "No access token is saved.";
+}
+
+async function api(path, options){
+  options = options || {};
+  const headers = Object.assign({}, options.headers || {});
+
+  if(token()){
+    headers.Authorization = "Bearer " + token();
+  }
+
+  if(options.body && !headers["Content-Type"]){
+    headers["Content-Type"] = "application/json";
+  }
+
+  const response = await fetch(API + path, {
+    ...options,
+    headers
+  });
+
+  const data = await response.json().catch(() => ({}));
+
+  if(!response.ok){
+    throw new Error(
+      data.error || data.message || ("Request failed: " + response.status)
+    );
+  }
+
+  return data;
+}
+
+function updatePreview(){
+  $("previewTitle").textContent =
+    $("title").value.trim() || "Notification title";
+
+  $("previewBody").textContent =
+    $("body").value.trim() || "Your notification message will appear here.";
+
+  $("previewType").textContent =
+    $("type").options[$("type").selectedIndex].text;
+
+  $("charCount").textContent = $("body").value.length;
+}
+
+$("recipient").addEventListener("change", function(){
+  const specific = this.value === "user";
+  $("userField").hidden = !specific;
+  $("userId").required = specific;
+});
+
+$("title").addEventListener("input", updatePreview);
+$("body").addEventListener("input", updatePreview);
+$("type").addEventListener("change", updatePreview);
+
+$("tokenBtn").addEventListener("click", function(){
+  const value = prompt(
+    "Paste your existing access token. Keep it private.",
+    token()
+  );
+
+  if(value === null) return;
+
+  if(value.trim()){
+    localStorage.setItem(TOKEN_KEY, value.trim());
+  }else{
+    localStorage.removeItem(TOKEN_KEY);
+  }
+
+  updateConnection();
+  showNotice("Local token setting updated.", true);
+});
+
+$("clearBtn").addEventListener("click", function(){
+  if(!confirm("Clear the notification form?")) return;
+
+  $("notificationForm").reset();
+  $("userField").hidden = true;
+  $("userId").required = false;
+  updatePreview();
+});
+
+$("notificationForm").addEventListener("submit", async function(event){
+  event.preventDefault();
+
+  if(!token()){
+    showNotice("Please set your existing admin access token first.", false);
+    return;
+  }
+
+  const recipient = $("recipient").value;
+  const userId = $("userId").value.trim();
+
+  if(recipient === "user" && !userId){
+    showNotice("Enter a user ID for a specific recipient.", false);
+    return;
+  }
+
+  const title = $("title").value.trim();
+  const body = $("body").value.trim();
+
+  if(!title || !body){
+    showNotice("Enter both a title and a message.", false);
+    return;
+  }
+
+  const payload = {
+    title: title,
+    message: body,
+    type: $("type").value,
+    priority: $("priority").value
+  };
+
+  if(recipient === "all"){
+    payload.recipient = "all";
+    payload.broadcast = true;
+  }else{
+    payload.recipient = "user";
+    payload.user_id = userId;
+  }
+
+  if(!confirm(
+    recipient === "all"
+      ? "Send this notification to ALL users?"
+      : "Send this notification to the selected user?"
+  )){
+    return;
+  }
+
+  const button = $("sendBtn");
+  button.disabled = true;
+  button.textContent = "Sending...";
+
+  try{
+    /*
+      This endpoint and payload must match your backend.
+      The route is intentionally not guessed: a failed request
+      will show the server response instead of claiming success.
+    */
+    const result = await api("/admin/notifications", {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    showNotice(
+      result.message || "The server accepted the notification request.",
+      true
+    );
+
+    await loadHistory();
+
+  }catch(error){
+    showNotice(
+      "Notification was not confirmed. Check whether your backend supports POST /api/admin/notifications and the expected payload. Server response: " + error.message,
+      false
+    );
+  }finally{
+    button.disabled = false;
+    button.textContent = "Send Notification";
+  }
+});
+
+async function loadHistory(){
+  $("history").innerHTML =
+    '<div class="empty">Loading notification history...</div>';
+
+  try{
+    const data = await api("/admin/notifications");
+    const items = Array.isArray(data)
+      ? data
+      : (data.notifications || data.items || data.results || []);
+
+    const root = $("history");
+    root.innerHTML = "";
+
+    if(!items.length){
+      root.innerHTML =
+        '<div class="empty">No notification history was returned.</div>';
+      return;
+    }
+
+    items.forEach(item => {
+      const card = document.createElement("article");
+      card.className = "item";
+
+      card.innerHTML = `
+        <div class="item-top">
+          <h3>${esc(item.title || "Notification")}</h3>
+          <span class="pill">${esc(item.type || "general")}</span>
+        </div>
+        <p style="white-space:pre-wrap">${esc(item.message || item.body || "")}</p>
+        <div class="muted small">
+          Recipient: ${esc(item.recipient || item.user_id || "not provided")}
+          · Status: ${esc(item.status || "not provided")}
+          · Date: ${esc(item.created_at || item.createdAt || "not provided")}
+        </div>
+      `;
+
+      root.appendChild(card);
+    });
+
+  }catch(error){
+    $("history").innerHTML =
+      '<div class="empty">Could not load history. Check whether your backend supports GET /api/admin/notifications. ' +
+      esc(error.message) + '</div>';
+  }
+}
+
+$("historyBtn").addEventListener("click", loadHistory);
+$("refreshBtn").addEventListener("click", function(){
+  updateConnection();
+  loadHistory();
+});
+
+updateConnection();
+updatePreview();
+
+})();
+</script>
+</body>
+</html>
