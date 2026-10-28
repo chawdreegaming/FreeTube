@@ -1,28 +1,29 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#101914">
-<title>Admin Dashboard | FreeTube</title>
+<meta name="theme-color" content="#17142e">
+<title>Admin Dashboard | Boys vs Girls 💙💗</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
-  --bg:#101914;
-  --surface:#17231c;
-  --surface2:#1d2c23;
-  --surface3:#24372b;
-  --green:#00e991;
-  --green-dark:#0b704b;
-  --red:#ff6574;
-  --yellow:#ffd166;
-  --blue:#67b7ff;
-  --text:#f4fff7;
-  --muted:#98ada0;
-  --border:rgba(255,255,255,.09);
+  --bg:#100f20;
+  --surface:#19182e;
+  --surface2:#22203b;
+  --surface3:#302c50;
+  --blue:#60a5fa;
+  --purple:#a78bfa;
+  --pink:#fb7185;
+  --green:#55e6b0;
+  --yellow:#fcd783;
+  --text:#f8f7ff;
+  --muted:#aaa7c7;
+  --border:rgba(255,255,255,.10);
   --radius:17px;
-  --shadow:0 12px 32px rgba(0,0,0,.13);
+  --shadow:0 12px 32px rgba(0,0,0,.20);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
@@ -31,8 +32,9 @@ body{
   min-height:100vh;
   color:var(--text);
   background:
-    radial-gradient(ellipse at 0% 0%,rgba(0,233,145,.08),transparent 35%),
-    radial-gradient(ellipse at 100% 10%,rgba(255,101,116,.055),transparent 30%),
+    radial-gradient(ellipse at 0% 0%,rgba(96,165,250,.17),transparent 38%),
+    radial-gradient(ellipse at 100% 10%,rgba(251,113,133,.12),transparent 34%),
+    radial-gradient(ellipse at 50% 100%,rgba(167,139,250,.10),transparent 45%),
     var(--bg);
   font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
   font-size:14px;
@@ -48,8 +50,8 @@ a{color:inherit;text-decoration:none}
 .topbar{
   position:sticky;top:0;z-index:30;
   display:flex;align-items:center;justify-content:space-between;
-  gap:14px;padding:13px 22px;
-  background:rgba(16,25,20,.88);
+  gap:12px;padding:12px 18px;
+  background:rgba(16,15,32,.88);
   border-bottom:1px solid var(--border);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
@@ -57,44 +59,50 @@ a{color:inherit;text-decoration:none}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .brand-logo{
   width:42px;height:42px;display:grid;place-items:center;
-  border-radius:13px;background:linear-gradient(135deg,#00e991,#0a8757);
-  color:#062b1c;font-size:20px;
-  box-shadow:0 5px 20px rgba(0,233,145,.14);
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+  color:white;font-size:20px;
+  box-shadow:0 5px 20px rgba(167,139,250,.2);
 }
-.brand-name{font-size:19px;font-weight:900;letter-spacing:-.5px}
-.brand-name span{color:var(--green)}
+.brand-name{font-size:18px;font-weight:900;letter-spacing:-.5px;white-space:nowrap}
+.brand-name .boys{color:var(--blue)}
+.brand-name .girls{color:var(--pink)}
 .admin-label{
   display:inline-flex;align-items:center;gap:5px;
-  padding:5px 8px;border-radius:7px;
-  background:rgba(0,233,145,.10);
-  color:var(--green);font-size:9px;font-weight:900;letter-spacing:1px;
+  margin-top:4px;padding:4px 7px;border-radius:7px;
+  background:rgba(167,139,250,.12);
+  color:#c8b5ff;font-size:9px;font-weight:900;letter-spacing:1px;
 }
-.header-right{display:flex;align-items:center;gap:10px}
+.header-right{display:flex;align-items:center;gap:8px}
 .status-pill{
   display:flex;align-items:center;gap:7px;
-  color:var(--muted);font-size:11px;
-  padding:9px 11px;border:1px solid var(--border);
+  color:var(--muted);font-size:10px;
+  padding:9px 10px;border:1px solid var(--border);
   border-radius:10px;background:rgba(255,255,255,.025);
 }
-.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 9px rgba(0,233,145,.55)}
+.status-dot{width:7px;height:7px;flex-shrink:0;border-radius:50%;background:var(--yellow)}
 .icon-button{
   width:39px;height:39px;display:grid;place-items:center;
   background:var(--surface2);border:1px solid var(--border);
   border-radius:12px;color:var(--text);
 }
-.icon-button:hover{border-color:rgba(0,233,145,.4);color:var(--green)}
+.icon-button:hover{border-color:var(--purple);color:var(--purple)}
 
-/* Page layout */
-.page{padding:27px 22px 30px}
+/* Page */
+.page{padding:27px 22px 35px}
 .welcome{
   display:flex;justify-content:space-between;align-items:flex-start;
   gap:15px;margin-bottom:23px;
 }
 .eyebrow{
-  color:var(--green);font-size:10px;font-weight:900;
+  color:var(--purple);font-size:10px;font-weight:900;
   letter-spacing:1.8px;text-transform:uppercase;margin-bottom:9px;
 }
-.page-title{font-size:clamp(25px,4vw,34px);font-weight:850;letter-spacing:-1px;line-height:1.2}
+.page-title{font-size:clamp(25px,4vw,34px);font-weight:900;letter-spacing:-1px;line-height:1.2}
+.gradient-text{
+  background:linear-gradient(100deg,var(--blue),var(--purple),var(--pink));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
 .page-subtitle{margin-top:9px;color:var(--muted);font-size:13px;line-height:1.7}
 .refresh-button{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
@@ -102,55 +110,47 @@ a{color:inherit;text-decoration:none}
   border:1px solid var(--border);border-radius:12px;
   background:var(--surface);font-size:12px;font-weight:750;
 }
-.refresh-button:hover{border-color:var(--green);color:var(--green)}
+.refresh-button:hover{border-color:var(--purple);color:var(--purple)}
 .refresh-button:active{transform:scale(.98)}
 
-/* Stat cards */
+/* Statistics */
 .stats{
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
   gap:13px;margin-bottom:24px;
 }
 .stat-card{
-  position:relative;overflow:hidden;
-  min-width:0;padding:17px;
+  position:relative;overflow:hidden;min-width:0;padding:17px;
   border:1px solid var(--border);border-radius:var(--radius);
-  background:linear-gradient(145deg,rgba(29,44,35,.97),rgba(21,33,26,.97));
+  background:linear-gradient(145deg,rgba(34,32,59,.97),rgba(24,23,45,.97));
   box-shadow:var(--shadow);
 }
 .stat-card:after{
   content:"";position:absolute;width:100px;height:100px;
   right:-45px;top:-45px;border-radius:50%;
-  background:var(--accent,rgba(0,233,145,.08));opacity:.15;
+  background:var(--accent);opacity:.10;
 }
 .stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .stat-label{font-size:11px;font-weight:700;color:var(--muted);line-height:1.5}
 .stat-icon{
   width:38px;height:38px;display:grid;place-items:center;
   flex-shrink:0;border-radius:12px;
-  color:var(--accent-color,var(--green));
-  background:var(--accent-bg,rgba(0,233,145,.10));
+  color:var(--accent);background:color-mix(in srgb,var(--accent) 13%,transparent);
   font-size:15px;
 }
 .stat-number{font-size:clamp(25px,3vw,32px);font-weight:900;letter-spacing:-1px;margin:16px 0 5px;overflow-wrap:anywhere}
 .stat-caption{font-size:10px;color:var(--muted)}
-.stat-card.green{--accent-color:#00e991;--accent-bg:rgba(0,233,145,.10);--accent:#00e991}
-.stat-card.blue{--accent-color:#67b7ff;--accent-bg:rgba(103,183,255,.11);--accent:#67b7ff}
-.stat-card.red{--accent-color:#ff6574;--accent-bg:rgba(255,101,116,.11);--accent:#ff6574}
-.stat-card.yellow{--accent-color:#ffd166;--accent-bg:rgba(255,209,102,.11);--accent:#ffd166}
+.stat-card.blue{--accent:var(--blue)}
+.stat-card.purple{--accent:var(--purple)}
+.stat-card.pink{--accent:var(--pink)}
+.stat-card.yellow{--accent:var(--yellow)}
 
-/* Main panels */
-.section-bar{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:12px;margin-bottom:15px;
-}
+/* Tabs and panels */
 .section-heading{font-size:17px;font-weight:850;letter-spacing:-.3px}
 .section-description{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5}
 .tabs{
-  display:flex;gap:7px;overflow-x:auto;
-  padding:5px;margin-bottom:15px;
+  display:flex;gap:7px;overflow-x:auto;padding:5px;margin-bottom:15px;
   border:1px solid var(--border);border-radius:15px;
-  background:rgba(23,35,28,.8);
-  scrollbar-width:none;
+  background:rgba(25,24,46,.85);scrollbar-width:none;
 }
 .tabs::-webkit-scrollbar{display:none}
 .tab{
@@ -158,21 +158,19 @@ a{color:inherit;text-decoration:none}
   flex:1;min-width:max-content;padding:12px 15px;
   border:0;border-radius:10px;background:transparent;
   color:var(--muted);font-size:12px;font-weight:800;
-  transition:background .2s,color .2s;
 }
-.tab i{font-size:13px}
-.tab.active{background:var(--green);color:#062d1d}
+.tab.active{
+  background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));
+  color:#17142e;
+}
 .tab-count{
-  display:inline-grid;place-items:center;
-  min-width:19px;height:19px;padding:0 5px;
-  border-radius:7px;background:rgba(255,255,255,.12);
+  display:inline-grid;place-items:center;min-width:19px;height:19px;
+  padding:0 5px;border-radius:7px;background:rgba(255,255,255,.13);
   font-size:10px;
 }
-.tab.active .tab-count{background:rgba(0,0,0,.12)}
 .panel{
   padding:18px;border:1px solid var(--border);
-  border-radius:var(--radius);
-  background:rgba(23,35,28,.94);
+  border-radius:var(--radius);background:rgba(25,24,46,.94);
   box-shadow:var(--shadow);
 }
 .panel-toolbar{
@@ -180,139 +178,126 @@ a{color:inherit;text-decoration:none}
   gap:12px;flex-wrap:wrap;margin-bottom:16px;
 }
 .toolbar-title{font-size:14px;font-weight:850}
-.toolbar-note{font-size:11px;color:var(--muted);margin-top:5px}
+.toolbar-note{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.6}
 .toolbar-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .field{
-  width:100%;min-width:0;
-  padding:11px 12px;border:1px solid var(--border);
-  border-radius:11px;background:#111d16;color:var(--text);
-  outline:none;font-size:12px;
+  width:100%;min-width:0;padding:11px 12px;
+  border:1px solid var(--border);border-radius:11px;
+  background:#15142a;color:var(--text);outline:none;font-size:12px;
 }
-.field:focus{border-color:rgba(0,233,145,.65);box-shadow:0 0 0 3px rgba(0,233,145,.06)}
-.field::placeholder{color:#74867a}
+.field:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(167,139,250,.08)}
+.field::placeholder{color:#8581a6}
+select.field{width:auto;max-width:100%;min-width:145px}
 .search-field{position:relative;min-width:210px}
 .search-field i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:12px}
 .search-field input{padding-left:34px}
-select.field{width:auto;max-width:100%;min-width:145px}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:7px;
-  padding:10px 12px;border:1px solid var(--border);
-  border-radius:10px;background:var(--surface2);
-  color:var(--text);font-size:11px;font-weight:800;
-  transition:transform .15s,border-color .15s;
+  padding:10px 12px;border:1px solid var(--border);border-radius:10px;
+  background:var(--surface2);color:var(--text);font-size:11px;font-weight:800;
 }
-.btn:hover{border-color:rgba(0,233,145,.5)}
+.btn:hover{border-color:var(--purple)}
 .btn:active{transform:scale(.98)}
-.btn-green{background:var(--green);color:#062d1d;border-color:transparent}
-.btn-danger{background:rgba(255,101,116,.10);color:#ff9ba5;border-color:rgba(255,101,116,.2)}
-.btn-success{background:rgba(0,233,145,.10);color:#8affca;border-color:rgba(0,233,145,.18)}
-.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-gradient{
+  background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));
+  color:#17142e;border-color:transparent;
+}
+.btn-danger{background:rgba(251,113,133,.10);color:#ffacba;border-color:rgba(251,113,133,.22)}
+.btn-success{background:rgba(85,230,176,.10);color:#8cf5d1;border-color:rgba(85,230,176,.2)}
 
 /* Data cards */
 .data-card{
-  padding:15px;margin-top:11px;
-  border:1px solid var(--border);border-radius:14px;
-  background:linear-gradient(145deg,rgba(29,44,35,.9),rgba(19,31,24,.9));
+  padding:15px;margin-top:11px;border:1px solid var(--border);
+  border-radius:14px;background:linear-gradient(145deg,rgba(34,32,59,.9),rgba(23,22,43,.9));
   overflow-wrap:anywhere;
 }
 .data-card:first-child{margin-top:0}
 .data-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .data-title{font-size:13px;font-weight:850;line-height:1.5}
-.data-subtitle{font-size:11px;color:var(--muted);line-height:1.7;margin-top:5px;overflow-wrap:anywhere}
+.data-subtitle{font-size:11px;color:var(--muted);line-height:1.8;margin-top:5px;overflow-wrap:anywhere}
 .data-content{font-size:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:12px}
-.data-media{display:block;width:100%;max-height:360px;object-fit:contain;background:#090d0a;border-radius:11px;margin-top:12px}
+.data-media{display:block;width:100%;max-height:360px;object-fit:contain;background:#0c0b19;border-radius:11px;margin-top:12px}
 .reason-box{
-  padding:11px;margin-top:12px;
-  border:1px solid rgba(255,101,116,.13);
-  border-radius:10px;background:rgba(255,101,116,.055);
-  font-size:12px;line-height:1.7;color:#ffc3c9;
+  padding:11px;margin-top:12px;border:1px solid rgba(251,113,133,.15);
+  border-radius:10px;background:rgba(251,113,133,.055);
+  font-size:12px;line-height:1.7;color:#ffc5d0;
 }
 .badge{
-  display:inline-flex;align-items:center;gap:5px;
-  flex-shrink:0;padding:5px 8px;border-radius:8px;
-  font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.3px;
-  background:rgba(255,209,102,.10);color:var(--yellow);
+  display:inline-flex;align-items:center;gap:5px;flex-shrink:0;
+  padding:5px 8px;border-radius:8px;font-size:9px;font-weight:900;
+  text-transform:uppercase;letter-spacing:.3px;
+  background:rgba(252,215,131,.10);color:var(--yellow);
 }
-.badge.active{background:rgba(0,233,145,.10);color:#7dffc1}
-.badge.blocked{background:rgba(255,101,116,.11);color:#ff9ba5}
-.badge.reviewed{background:rgba(103,183,255,.10);color:var(--blue)}
+.badge.active{background:rgba(85,230,176,.10);color:#8cf5d1}
+.badge.blocked{background:rgba(251,113,133,.11);color:#ffacba}
+.badge.reviewed{background:rgba(96,165,250,.10);color:#9ac8ff}
 .data-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
 .data-actions .btn{flex:1;min-width:max-content}
 .user-card-row{display:flex;align-items:center;gap:12px;min-width:0}
 .user-avatar{
-  width:43px;height:43px;flex-shrink:0;
-  display:grid;place-items:center;overflow:hidden;
-  border-radius:14px;background:var(--surface3);
-  color:var(--green);font-size:16px;
+  width:43px;height:43px;flex-shrink:0;display:grid;place-items:center;
+  overflow:hidden;border-radius:14px;background:var(--surface3);
+  color:var(--purple);font-size:16px;
 }
 .user-avatar img{width:100%;height:100%;object-fit:cover}
 .user-identity{min-width:0}
 .user-identity .data-title{overflow-wrap:anywhere}
 .user-email{font-size:11px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}
 
-/* Empty/loading/error states */
+/* States */
 .state{
-  padding:37px 15px;text-align:center;
-  color:var(--muted);font-size:12px;line-height:1.8;
+  padding:37px 15px;text-align:center;color:var(--muted);
+  font-size:12px;line-height:1.8;
 }
-.state i{font-size:27px;color:var(--green);margin-bottom:13px}
+.state i{font-size:27px;color:var(--purple);margin-bottom:13px}
 .state h3{font-size:15px;color:var(--text);margin-bottom:5px}
 .state .btn{margin-top:13px}
 .spin{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .warning{
-  padding:13px 15px;margin-bottom:17px;
-  border:1px solid rgba(255,209,102,.23);
-  border-radius:12px;background:rgba(255,209,102,.07);
+  padding:13px 15px;margin-bottom:17px;border:1px solid rgba(252,215,131,.23);
+  border-radius:12px;background:rgba(252,215,131,.07);
   color:#ffe3a0;font-size:12px;line-height:1.7;
 }
 .warning i{margin-right:7px}
-.dashboard-error{color:#ff9ba5}
+.dashboard-error{color:#ffacba}
 .toast{
   position:fixed;left:50%;bottom:95px;transform:translateX(-50%);
   z-index:100;display:none;max-width:90%;width:max-content;
-  padding:12px 16px;border:1px solid var(--border);
-  border-radius:12px;background:#20372a;box-shadow:var(--shadow);
-  font-size:12px;line-height:1.6;
+  padding:12px 16px;border:1px solid var(--border);border-radius:12px;
+  background:#292546;box-shadow:var(--shadow);font-size:12px;line-height:1.6;
 }
 .toast.show{display:block}
 
-/* Shared four-item navigation */
+/* Navigation */
 .bottom-nav{
   position:fixed;left:50%;bottom:0;transform:translateX(-50%);
-  z-index:40;width:100%;max-width:1400px;
-  display:flex;justify-content:space-around;align-items:center;
+  z-index:40;width:100%;max-width:1400px;display:flex;
+  justify-content:space-around;align-items:center;
   padding:9px 4px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(16,25,20,.78);
-  border-top:1px solid rgba(255,255,255,.13);
-  backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);
+  background:rgba(16,15,32,.82);border-top:1px solid rgba(255,255,255,.13);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
 }
 .nav-item{
   flex:1;min-width:0;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:5px;
   color:var(--muted);font-size:10px;font-weight:700;
-  background:transparent;border:0;
 }
 .nav-item i{font-size:20px}
-.nav-item:hover,.nav-item.active{color:var(--green)}
-.nav-item.active i{filter:drop-shadow(0 0 6px rgba(0,233,145,.25))}
+.nav-item:hover,.nav-item.active{color:var(--purple)}
+.nav-item.active i{filter:drop-shadow(0 0 6px rgba(167,139,250,.25))}
 
-/* Responsive */
 @media(min-width:900px){
   .page{padding:35px 35px 45px}
   .topbar{padding-left:35px;padding-right:35px}
   .panel{padding:22px}
-  .data-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .data-grid .data-card{margin-top:0}
 }
 @media(max-width:650px){
-  .topbar{padding:11px 13px}
+  .topbar{padding:11px 12px}
   .brand-logo{width:37px;height:37px;border-radius:11px;font-size:17px}
-  .brand-name{font-size:17px}
-  .admin-label{font-size:8px;padding:4px 6px}
-  .status-pill{font-size:10px;padding:8px}
-  .page{padding:22px 13px}
+  .brand-name{font-size:16px}
+  .status-pill{font-size:9px;padding:8px}
+  .page{padding:22px 12px}
   .welcome{margin-bottom:19px}
   .page-title{font-size:27px}
   .page-subtitle{font-size:12px}
@@ -325,18 +310,18 @@ select.field{width:auto;max-width:100%;min-width:145px}
   .panel{padding:13px}
   .panel-toolbar{align-items:flex-start}
   .toolbar-actions{width:100%}
-  .search-field{flex:1;min-width:130px}
   .toolbar-actions select.field{flex:1;min-width:120px}
+  .search-field{flex:1;min-width:130px}
   .data-card{padding:12px}
   .data-actions .btn{font-size:10px;padding:10px 8px}
 }
 @media(max-width:380px){
-  .brand-name{font-size:15px}
-  .admin-label{display:none}
-  .status-pill{gap:5px;padding:7px;font-size:9px}
+  .brand-name{font-size:14px}
+  .admin-label{font-size:7px;padding:4px 5px}
+  .status-pill{gap:4px;padding:7px;font-size:8px}
   .welcome{gap:8px}
-  .page-title{font-size:24px}
-  .refresh-button{padding:10px;font-size:11px}
+  .page-title{font-size:23px}
+  .refresh-button{padding:10px;font-size:10px}
   .stat-label{font-size:10px}
   .stat-number{font-size:24px}
   .stat-caption{font-size:9px}
@@ -351,14 +336,13 @@ select.field{width:auto;max-width:100%;min-width:145px}
 <div class="layout">
 
 <header class="topbar">
-  <a class="brand" href="home.html" aria-label="FreeTube Home">
-    <span class="brand-logo"><i class="fa-solid fa-play"></i></span>
+  <a class="brand" href="home.html" aria-label="Boys vs Girls Home">
+    <span class="brand-logo"><i class="fa-solid fa-shield-halved"></i></span>
     <span>
-      <span class="brand-name">Free<span>Tube</span></span>
+      <span class="brand-name"><span class="boys">Boys</span> vs <span class="girls">Girls 💙💗</span></span>
       <span class="admin-label"><i class="fa-solid fa-shield-halved"></i> ADMIN PANEL</span>
     </span>
   </a>
-
   <div class="header-right">
     <div class="status-pill">
       <span class="status-dot"></span>
@@ -371,7 +355,6 @@ select.field{width:auto;max-width:100%;min-width:145px}
 </header>
 
 <main class="page">
-
   <div id="accessWarning" class="warning" hidden>
     <i class="fa-solid fa-triangle-exclamation"></i>
     <strong>Admin access required.</strong>
@@ -386,8 +369,8 @@ select.field{width:auto;max-width:100%;min-width:145px}
     <div class="welcome">
       <div>
         <div class="eyebrow"><i class="fa-solid fa-chart-line"></i> ADMINISTRATION</div>
-        <h1 class="page-title">Dashboard Overview</h1>
-        <p class="page-subtitle">Monitor your community, review reports, and manage accounts.</p>
+        <h1 class="page-title">Dashboard <span class="gradient-text">Overview</span></h1>
+        <p class="page-subtitle">Manage your Boys vs Girls community, review reports, and protect accounts.</p>
       </div>
       <button class="refresh-button" id="refreshAll" type="button">
         <i class="fa-solid fa-rotate"></i><span>Refresh</span>
@@ -395,143 +378,77 @@ select.field{width:auto;max-width:100%;min-width:145px}
     </div>
 
     <section class="stats" aria-label="Platform statistics">
-      <article class="stat-card green">
-        <div class="stat-top">
-          <span class="stat-label">Total Users</span>
-          <span class="stat-icon"><i class="fa-solid fa-users"></i></span>
-        </div>
+      <article class="stat-card blue">
+        <div class="stat-top"><span class="stat-label">Total Users</span><span class="stat-icon"><i class="fa-solid fa-users"></i></span></div>
         <strong class="stat-number" id="totalUsers">—</strong>
         <span class="stat-caption">Registered accounts</span>
       </article>
-
-      <article class="stat-card blue">
-        <div class="stat-top">
-          <span class="stat-label">Active Users</span>
-          <span class="stat-icon"><i class="fa-solid fa-user-check"></i></span>
-        </div>
+      <article class="stat-card purple">
+        <div class="stat-top"><span class="stat-label">Active Users</span><span class="stat-icon"><i class="fa-solid fa-user-check"></i></span></div>
         <strong class="stat-number" id="activeUsers">—</strong>
         <span class="stat-caption">Accounts in good standing</span>
       </article>
-
-      <article class="stat-card red">
-        <div class="stat-top">
-          <span class="stat-label">Banned Users</span>
-          <span class="stat-icon"><i class="fa-solid fa-user-slash"></i></span>
-        </div>
+      <article class="stat-card pink">
+        <div class="stat-top"><span class="stat-label">Banned Users</span><span class="stat-icon"><i class="fa-solid fa-user-slash"></i></span></div>
         <strong class="stat-number" id="bannedUsers">—</strong>
         <span class="stat-caption">Restricted accounts</span>
       </article>
-
       <article class="stat-card yellow">
-        <div class="stat-top">
-          <span class="stat-label">Pending Reports</span>
-          <span class="stat-icon"><i class="fa-solid fa-flag"></i></span>
-        </div>
+        <div class="stat-top"><span class="stat-label">Pending Reports</span><span class="stat-icon"><i class="fa-solid fa-flag"></i></span></div>
         <strong class="stat-number" id="pendingReports">—</strong>
         <span class="stat-caption">Require your review</span>
       </article>
     </section>
 
     <div class="tabs" role="tablist" aria-label="Admin sections">
-      <button class="tab active" data-section="reports" role="tab" aria-selected="true">
-        <i class="fa-solid fa-flag"></i> Reports
-        <span class="tab-count" id="reportsTabCount">—</span>
-      </button>
-      <button class="tab" data-section="posts" role="tab" aria-selected="false">
-        <i class="fa-solid fa-photo-film"></i> Posts
-      </button>
-      <button class="tab" data-section="users" role="tab" aria-selected="false">
-        <i class="fa-solid fa-users"></i> Users
-      </button>
+      <button class="tab active" data-section="reports" role="tab" aria-selected="true"><i class="fa-solid fa-flag"></i> Reports <span class="tab-count" id="reportsTabCount">—</span></button>
+      <button class="tab" data-section="posts" role="tab" aria-selected="false"><i class="fa-solid fa-photo-film"></i> Posts</button>
+      <button class="tab" data-section="users" role="tab" aria-selected="false"><i class="fa-solid fa-users"></i> Users</button>
     </div>
 
-    <!-- REPORTS -->
     <section id="reportsSection" class="panel" role="tabpanel">
       <div class="panel-toolbar">
-        <div>
-          <h2 class="toolbar-title">Report Management</h2>
-          <p class="toolbar-note">Review reported content and take action.</p>
-        </div>
+        <div><h2 class="toolbar-title">Report Management</h2><p class="toolbar-note">Review reported content and take action.</p></div>
         <div class="toolbar-actions">
           <select id="reportStatus" class="field" aria-label="Filter reports">
-            <option value="pending">Pending reports</option>
-            <option value="all">All reports</option>
-            <option value="reviewed">Reviewed</option>
-            <option value="dismissed">Dismissed</option>
+            <option value="pending">Pending reports</option><option value="all">All reports</option><option value="reviewed">Reviewed</option><option value="dismissed">Dismissed</option>
           </select>
-          <button class="btn" id="refreshReports" type="button">
-            <i class="fa-solid fa-rotate"></i> Refresh
-          </button>
+          <button class="btn" id="refreshReports" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
       </div>
-      <div id="reportsList">
-        <div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading reports...</div>
-      </div>
+      <div id="reportsList"><div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading reports...</div></div>
     </section>
 
-    <!-- POSTS -->
     <section id="postsSection" class="panel" role="tabpanel" hidden>
       <div class="panel-toolbar">
-        <div>
-          <h2 class="toolbar-title">Post Management</h2>
-          <p class="toolbar-note">Review published posts and remove inappropriate content.</p>
-        </div>
-        <button class="btn" id="refreshPosts" type="button">
-          <i class="fa-solid fa-rotate"></i> Refresh
-        </button>
+        <div><h2 class="toolbar-title">Post Management</h2><p class="toolbar-note">Review published posts and remove inappropriate content.</p></div>
+        <button class="btn" id="refreshPosts" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
       </div>
-      <div id="postsList">
-        <div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading posts...</div>
-      </div>
+      <div id="postsList"><div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading posts...</div></div>
     </section>
 
-    <!-- USERS -->
     <section id="usersSection" class="panel" role="tabpanel" hidden>
       <div class="panel-toolbar">
-        <div>
-          <h2 class="toolbar-title">User Management</h2>
-          <p class="toolbar-note">Search accounts and manage access permissions.</p>
-        </div>
-        <button class="btn" id="refreshUsers" type="button">
-          <i class="fa-solid fa-rotate"></i> Refresh
-        </button>
+        <div><h2 class="toolbar-title">User Management</h2><p class="toolbar-note">Search accounts and manage access permissions.</p></div>
+        <button class="btn" id="refreshUsers" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
       </div>
-
       <div class="toolbar-actions" style="margin-bottom:15px">
-        <label class="search-field">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input id="userSearch" class="field" placeholder="Search username or email..." autocomplete="off">
-        </label>
+        <label class="search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="userSearch" class="field" placeholder="Search username or email..." autocomplete="off"></label>
         <select id="userStatus" class="field" aria-label="Filter users">
-          <option value="all">All users</option>
-          <option value="active">Active users</option>
-          <option value="blocked">Banned users</option>
+          <option value="all">All users</option><option value="active">Active users</option><option value="blocked">Banned users</option>
         </select>
       </div>
-
-      <div id="usersList">
-        <div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading users...</div>
-      </div>
+      <div id="usersList"><div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading users...</div></div>
     </section>
-
   </section>
 </main>
 
 <nav class="bottom-nav" aria-label="Main navigation">
-  <a class="nav-item" href="home.html">
-    <i class="fa-solid fa-house"></i><span>Home</span>
-  </a>
-  <a class="nav-item" href="discover.html">
-    <i class="fa-solid fa-compass"></i><span>Pulse</span>
-  </a>
-  <a class="nav-item" href="notifications.html">
-    <i class="fa-solid fa-bell"></i><span>Notifications</span>
-  </a>
-  <a class="nav-item" href="profile.html">
-    <i class="fa-regular fa-user"></i><span>Profile</span>
-  </a>
+  <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
+  <a class="nav-item" href="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
+  <a class="nav-item" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
 </nav>
-
 </div>
 </div>
 
@@ -542,160 +459,84 @@ select.field{width:auto;max-width:100%;min-width:145px}
 
 const API_BASE="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
-
-let me=null;
-let toastTimer=null;
-let userSearchTimer=null;
-let currentSection="reports";
-let loadingAccess=false;
-let reportsRequest=0;
-let postsRequest=0;
-let usersRequest=0;
-
+let me=null,toastTimer=null,userSearchTimer=null,currentSection="reports";
+let loadingAccess=false,reportsRequest=0,postsRequest=0,usersRequest=0;
 const $=id=>document.getElementById(id);
 
 function go(page){location.href=page}
-
-function token(){
-  try{return localStorage.getItem(TOKEN_KEY)||""}
-  catch(_){return ""}
-}
-
-function esc(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  })[c]);
-}
-
-function number(value){
-  const n=Number(value);
-  return Number.isFinite(n)?Math.max(0,n):0;
-}
-
+function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
+function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function number(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,n):0}
 function toast(message){
-  const el=$("toast");
-  el.textContent=String(message||"Something went wrong.");
-  el.classList.add("show");
-  clearTimeout(toastTimer);
+  const el=$("toast");el.textContent=String(message||"Something went wrong.");
+  el.classList.add("show");clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove("show"),3200);
 }
 
 async function api(path,options={}){
   const accessToken=token();
-
-  if(!accessToken){
-    const error=new Error("Please log in to continue.");
-    error.status=401;
-    throw error;
-  }
-
+  if(!accessToken){const error=new Error("Please log in to continue.");error.status=401;throw error}
   const headers=new Headers(options.headers||{});
   headers.set("Authorization","Bearer "+accessToken);
-
-  if(options.body&&!headers.has("Content-Type")){
-    headers.set("Content-Type","application/json");
-  }
-
+  if(options.body&&!headers.has("Content-Type"))headers.set("Content-Type","application/json");
   let response;
-  try{
-    response=await fetch(API_BASE+path,{
-      ...options,headers,cache:"no-store"
-    });
-  }catch(_){
-    throw new Error("Cannot connect to the backend. Check your internet connection.");
-  }
-
-  const raw=await response.text();
-  let data={};
-
-  try{data=raw?JSON.parse(raw):{}}
-  catch(_){data={message:raw}}
-
+  try{response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"})}
+  catch(_){throw new Error("Cannot connect to the backend. Check your internet connection.")}
+  const raw=await response.text();let data={};
+  try{data=raw?JSON.parse(raw):{}}catch(_){data={message:raw}}
   if(!response.ok){
-    const error=new Error(
-      data.error||data.message||("Request failed ("+response.status+")")
-    );
-    error.status=response.status;
-    throw error;
+    const error=new Error(data.error||data.message||("Request failed ("+response.status+")"));
+    error.status=response.status;throw error;
   }
-
   return data;
 }
 
-function setCount(id,value){
-  $(id).textContent=number(value).toLocaleString();
-}
-
+function setCount(id,value){$(id).textContent=number(value).toLocaleString()}
 function setConnection(text,online=false){
   $("connectionLabel").textContent=text;
   const dot=document.querySelector(".status-dot");
   dot.style.background=online?"var(--green)":"var(--yellow)";
-  dot.style.boxShadow=online?"0 0 9px rgba(0,233,145,.55)":"none";
+  dot.style.boxShadow=online?"0 0 9px rgba(85,230,176,.5)":"none";
 }
-
 function showAccessError(message){
-  $("accessWarning").hidden=false;
-  $("dashboard").hidden=true;
+  $("accessWarning").hidden=false;$("dashboard").hidden=true;
   $("accessError").textContent=message||"Admin authorization failed.";
   setConnection("Access restricted",false);
 }
 
 async function verifyAdmin(){
   if(loadingAccess)return false;
-  loadingAccess=true;
-  $("retryAccess").disabled=true;
-  $("accessWarning").hidden=true;
-  $("dashboard").hidden=false;
+  loadingAccess=true;$("retryAccess").disabled=true;
+  $("accessWarning").hidden=true;$("dashboard").hidden=false;
   setConnection("Checking access",false);
-
   try{
-    if(!token()){
-      location.href="auth.html?mode=login";
-      return false;
-    }
-
-    const data=await api("/auth/me");
-    me=data.user||data;
-
+    if(!token()){location.href="auth.html?mode=login";return false}
+    const data=await api("/auth/me");me=data.user||data;
     if(String(me.role||"").toLowerCase()!=="admin"){
       showAccessError("Your account does not have the admin role. Admin access must be granted on the server.");
       return false;
     }
-
-    $("accessWarning").hidden=true;
-    $("dashboard").hidden=false;
-    setConnection("Admin verified",true);
-    return true;
+    $("accessWarning").hidden=true;$("dashboard").hidden=false;
+    setConnection("Admin verified",true);return true;
   }catch(error){
     if(error.status===401){
       try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
-      location.href="auth.html?mode=login";
-      return false;
+      location.href="auth.html?mode=login";return false;
     }
-
-    showAccessError(error.message);
-    return false;
-  }finally{
-    loadingAccess=false;
-    $("retryAccess").disabled=false;
-  }
+    showAccessError(error.message);return false;
+  }finally{loadingAccess=false;$("retryAccess").disabled=false}
 }
 
 async function loadDashboard(){
   try{
-    const data=await api("/admin/dashboard");
-    const stats=data.stats||{};
-
+    const data=await api("/admin/dashboard"),stats=data.stats||{};
     setCount("totalUsers",stats.total_users);
     setCount("activeUsers",stats.active_users);
     setCount("bannedUsers",stats.blocked_users);
     setCount("pendingReports",stats.pending_reports);
-
     $("reportsTabCount").textContent=number(stats.pending_reports).toLocaleString();
   }catch(error){
-    ["totalUsers","activeUsers","bannedUsers","pendingReports"].forEach(id=>{
-      $(id).textContent="—";
-    });
+    ["totalUsers","activeUsers","bannedUsers","pendingReports"].forEach(id=>$(id).textContent="—");
     $("reportsTabCount").textContent="!";
     toast(error.message||"Could not load dashboard statistics.");
   }
@@ -704,416 +545,211 @@ async function loadDashboard(){
 function mediaHTML(url,type){
   if(!url)return "";
   const safeURL=esc(url);
-
-  if(String(type||"").toLowerCase()==="video"){
+  if(String(type||"").toLowerCase()==="video")
     return '<video class="data-media" controls playsinline preload="metadata" src="'+safeURL+'"></video>';
-  }
-
   return '<img class="data-media" loading="lazy" src="'+safeURL+'" alt="Post media" onerror="this.hidden=true">';
 }
-
 function stateHTML(icon,title,description,buttonLabel,buttonId){
-  return `
-    <div class="state">
-      <i class="fa-solid ${esc(icon)}"></i>
-      <h3>${esc(title)}</h3>
-      <div>${esc(description)}</div>
-      ${buttonLabel?`<button class="btn" id="${esc(buttonId)}" type="button">${esc(buttonLabel)}</button>`:""}
-    </div>`;
+  return '<div class="state"><i class="fa-solid '+esc(icon)+'"></i><h3>'+esc(title)+'</h3><div>'+esc(description)+'</div>'+
+    (buttonLabel?'<button class="btn" id="'+esc(buttonId)+'" type="button">'+esc(buttonLabel)+'</button>':"")+'</div>';
 }
-
 function showSection(section){
   if(!["reports","posts","users"].includes(section))return;
   currentSection=section;
-
-  ["reports","posts","users"].forEach(name=>{
-    $(name+"Section").hidden=name!==section;
-  });
-
+  ["reports","posts","users"].forEach(name=>$(name+"Section").hidden=name!==section);
   document.querySelectorAll("[data-section]").forEach(button=>{
     const active=button.dataset.section===section;
-    button.classList.toggle("active",active);
-    button.setAttribute("aria-selected",String(active));
+    button.classList.toggle("active",active);button.setAttribute("aria-selected",String(active));
   });
-
   if(section==="reports")loadReports();
   if(section==="posts")loadPosts();
   if(section==="users")loadUsers();
 }
-
-document.querySelectorAll("[data-section]").forEach(button=>{
-  button.addEventListener("click",()=>showSection(button.dataset.section));
-});
+document.querySelectorAll("[data-section]").forEach(button=>button.addEventListener("click",()=>showSection(button.dataset.section)));
 
 /* REPORT MANAGEMENT */
 async function loadReports(){
-  const root=$("reportsList");
-  const requestId=++reportsRequest;
+  const root=$("reportsList"),requestId=++reportsRequest;
   root.innerHTML='<div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading reports...</div>';
-
   try{
     const status=$("reportStatus").value;
     const data=await api("/admin/reports?status="+encodeURIComponent(status));
     if(requestId!==reportsRequest)return;
-
     const reports=Array.isArray(data.reports)?data.reports:[];
-
     if(!reports.length){
-      root.innerHTML=stateHTML(
-        "fa-circle-check","All clear",
-        status==="pending"?"There are no pending reports to review.":"No reports found for this filter."
-      );
+      root.innerHTML=stateHTML("fa-circle-check","All clear",status==="pending"?"There are no pending reports to review.":"No reports found for this filter.");
       return;
     }
-
     root.innerHTML=reports.map(report=>{
       const id=report.report_id??report.id;
       const pending=String(report.status||"pending").toLowerCase()==="pending";
-      const statusClass=pending?"":(
-        String(report.status).toLowerCase()==="reviewed"?"reviewed":"active"
-      );
-
-      return `
-        <article class="data-card">
-          <div class="data-card-head">
-            <div>
-              <div class="data-title">Report #${esc(id)}</div>
-              <div class="data-subtitle">
-                Reported by <strong>@${esc(report.reporter_username||report.reporter_id||"unknown")}</strong><br>
-                Post author: <strong>@${esc(report.author_username||report.post_owner_id||"unknown")}</strong><br>
-                Post ID: ${esc(report.post_id??"unknown")}
-                ${report.reported_at?"<br>Submitted: "+esc(new Date(report.reported_at).toLocaleString()):""}
-              </div>
-            </div>
-            <span class="badge ${statusClass}">${esc(report.status||"pending")}</span>
-          </div>
-
-          <div class="reason-box">
-            <strong><i class="fa-solid fa-flag"></i> Report reason</strong><br>
-            ${esc(report.reason||"No reason supplied")}
-          </div>
-
-          ${report.content?'<div class="data-content">'+esc(report.content)+'</div>':""}
-          ${mediaHTML(report.media_url,report.media_type)}
-
-          <div class="data-actions">
-            ${pending?`
-              <button class="btn btn-success" data-report-action="approve" data-id="${esc(id)}">
-                <i class="fa-solid fa-check"></i> Mark reviewed
-              </button>
-              <button class="btn" data-report-action="dismiss" data-id="${esc(id)}">
-                <i class="fa-solid fa-xmark"></i> Dismiss
-              </button>`:""}
-            <button class="btn btn-danger" data-delete-reported="${esc(report.post_id??"")}">
-              <i class="fa-solid fa-trash"></i> Delete post
-            </button>
-          </div>
-        </article>`;
+      const statusText=String(report.status||"pending").toLowerCase();
+      const statusClass=pending?"":statusText==="reviewed"?"reviewed":"active";
+      return '<article class="data-card"><div class="data-card-head"><div>'+
+        '<div class="data-title">Report #'+esc(id)+'</div><div class="data-subtitle">'+
+        'Reported by <strong>@'+esc(report.reporter_username||report.reporter_id||"unknown")+'</strong><br>'+
+        'Post author: <strong>@'+esc(report.author_username||report.post_owner_id||"unknown")+'</strong><br>'+
+        'Post ID: '+esc(report.post_id??"unknown")+
+        (report.reported_at?"<br>Submitted: "+esc(new Date(report.reported_at).toLocaleString()):"")+
+        '</div></div><span class="badge '+statusClass+'">'+esc(report.status||"pending")+'</span></div>'+
+        '<div class="reason-box"><strong><i class="fa-solid fa-flag"></i> Report reason</strong><br>'+esc(report.reason||"No reason supplied")+'</div>'+
+        (report.content?'<div class="data-content">'+esc(report.content)+'</div>':"")+
+        mediaHTML(report.media_url,report.media_type)+
+        '<div class="data-actions">'+
+        (pending?'<button class="btn btn-success" data-report-action="approve" data-id="'+esc(id)+'"><i class="fa-solid fa-check"></i> Mark reviewed</button>'+
+        '<button class="btn" data-report-action="dismiss" data-id="'+esc(id)+'"><i class="fa-solid fa-xmark"></i> Dismiss</button>':"")+
+        '<button class="btn btn-danger" data-delete-reported="'+esc(report.post_id??"")+'"><i class="fa-solid fa-trash"></i> Delete post</button>'+
+        '</div></article>';
     }).join("");
-
   }catch(error){
     if(requestId!==reportsRequest)return;
-    root.innerHTML=stateHTML(
-      "fa-triangle-exclamation","Could not load reports",
-      error.message||"Please try again.","Retry","retryReports"
-    );
+    root.innerHTML=stateHTML("fa-triangle-exclamation","Could not load reports",error.message||"Please try again.","Retry","retryReports");
     $("retryReports").addEventListener("click",loadReports);
   }
 }
-
 async function reviewReport(id,action){
-  const prompt=action==="approve"
-    ?"Mark this report as reviewed and keep the post?"
-    :"Dismiss this report?";
-
-  if(!confirm(prompt))return;
-
+  if(!confirm(action==="approve"?"Mark this report as reviewed and keep the post?":"Dismiss this report?"))return;
   try{
-    await api("/admin/reports/"+encodeURIComponent(id),{
-      method:"PATCH",
-      body:JSON.stringify({action})
-    });
-
+    await api("/admin/reports/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({action})});
     toast(action==="approve"?"Report marked as reviewed.":"Report dismissed.");
-    await loadDashboard();
-    await loadReports();
-  }catch(error){
-    toast(error.message||"Could not update report.");
-  }
+    await loadDashboard();await loadReports();
+  }catch(error){toast(error.message||"Could not update report.")}
 }
-
 async function deleteReportedPost(id){
   if(!id){toast("Post ID is missing.");return}
   if(!confirm("Permanently delete this post? This action cannot be undone."))return;
-
   try{
     await api("/posts/"+encodeURIComponent(id),{method:"DELETE"});
-    toast("Post deleted.");
-    await loadDashboard();
-    await loadReports();
-  }catch(error){
-    toast(error.message||"Could not delete post.");
-  }
+    toast("Post deleted.");await loadDashboard();await loadReports();
+  }catch(error){toast(error.message||"Could not delete post.")}
 }
-
 $("reportsList").addEventListener("click",event=>{
   const actionButton=event.target.closest("[data-report-action]");
-  if(actionButton){
-    reviewReport(actionButton.dataset.id,actionButton.dataset.reportAction);
-    return;
-  }
-
+  if(actionButton){reviewReport(actionButton.dataset.id,actionButton.dataset.reportAction);return}
   const deleteButton=event.target.closest("[data-delete-reported]");
   if(deleteButton)deleteReportedPost(deleteButton.dataset.deleteReported);
 });
-
 $("reportStatus").addEventListener("change",loadReports);
 $("refreshReports").addEventListener("click",loadReports);
 
 /* POST MANAGEMENT */
 async function loadPosts(){
-  const root=$("postsList");
-  const requestId=++postsRequest;
+  const root=$("postsList"),requestId=++postsRequest;
   root.innerHTML='<div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading posts...</div>';
-
   try{
     const data=await api("/admin/posts");
     if(requestId!==postsRequest)return;
-
     const posts=Array.isArray(data.posts)?data.posts:[];
-
-    if(!posts.length){
-      root.innerHTML=stateHTML("fa-photo-film","No posts yet","Published posts will appear here.");
-      return;
-    }
-
-    root.innerHTML=posts.map(post=>`
-      <article class="data-card">
-        <div class="data-card-head">
-          <div>
-            <div class="data-title">Post #${esc(post.id)}</div>
-            <div class="data-subtitle">
-              Published by <strong>@${esc(post.username||post.user_id||"unknown")}</strong>
-              ${post.created_at?"<br>"+esc(new Date(post.created_at).toLocaleString()):""}
-            </div>
-          </div>
-          <span class="badge active"><i class="fa-solid fa-check"></i> Published</span>
-        </div>
-
-        <div class="data-subtitle" style="margin-top:10px">
-          <i class="fa-solid fa-heart" style="color:var(--red)"></i> ${number(post.like_count)} likes
-          &nbsp; · &nbsp;
-          <i class="fa-solid fa-comment" style="color:var(--blue)"></i> ${number(post.comment_count)} comments
-        </div>
-
-        ${post.content?'<div class="data-content">'+esc(post.content)+'</div>':""}
-        ${mediaHTML(post.media_url,post.media_type)}
-
-        <div class="data-actions">
-          <button class="btn btn-danger" data-delete-post="${esc(post.id)}">
-            <i class="fa-solid fa-trash"></i> Delete post
-          </button>
-        </div>
-      </article>
-    `).join("");
-
+    if(!posts.length){root.innerHTML=stateHTML("fa-photo-film","No posts yet","Published posts will appear here.");return}
+    root.innerHTML=posts.map(post=>'<article class="data-card"><div class="data-card-head"><div>'+
+      '<div class="data-title">Post #'+esc(post.id)+'</div><div class="data-subtitle">Published by <strong>@'+esc(post.username||post.user_id||"unknown")+'</strong>'+
+      (post.created_at?"<br>"+esc(new Date(post.created_at).toLocaleString()):"")+'</div></div>'+
+      '<span class="badge active"><i class="fa-solid fa-check"></i> Published</span></div>'+
+      '<div class="data-subtitle" style="margin-top:10px"><i class="fa-solid fa-heart" style="color:var(--pink)"></i> '+number(post.like_count)+' likes &nbsp; · &nbsp;'+
+      '<i class="fa-solid fa-comment" style="color:var(--blue)"></i> '+number(post.comment_count)+' comments</div>'+
+      (post.content?'<div class="data-content">'+esc(post.content)+'</div>':"")+
+      mediaHTML(post.media_url,post.media_type)+
+      '<div class="data-actions"><button class="btn btn-danger" data-delete-post="'+esc(post.id)+'"><i class="fa-solid fa-trash"></i> Delete post</button></div></article>'
+    ).join("");
   }catch(error){
     if(requestId!==postsRequest)return;
-    root.innerHTML=stateHTML(
-      "fa-triangle-exclamation","Could not load posts",
-      error.message||"Please try again.","Retry","retryPosts"
-    );
+    root.innerHTML=stateHTML("fa-triangle-exclamation","Could not load posts",error.message||"Please try again.","Retry","retryPosts");
     $("retryPosts").addEventListener("click",loadPosts);
   }
 }
-
 async function deletePost(id){
   if(!confirm("Permanently delete this post? This action cannot be undone."))return;
-
   try{
     await api("/posts/"+encodeURIComponent(id),{method:"DELETE"});
-    toast("Post deleted.");
-    await loadPosts();
-    await loadDashboard();
-  }catch(error){
-    toast(error.message||"Could not delete post.");
-  }
+    toast("Post deleted.");await loadPosts();await loadDashboard();
+  }catch(error){toast(error.message||"Could not delete post.")}
 }
-
 $("postsList").addEventListener("click",event=>{
   const button=event.target.closest("[data-delete-post]");
   if(button)deletePost(button.dataset.deletePost);
 });
-
 $("refreshPosts").addEventListener("click",loadPosts);
 
 /* USER MANAGEMENT */
 async function loadUsers(){
-  const root=$("usersList");
-  const requestId=++usersRequest;
-
+  const root=$("usersList"),requestId=++usersRequest;
   root.innerHTML='<div class="state"><i class="fa-solid fa-spinner spin"></i><br>Loading users...</div>';
-
   try{
-    const query=$("userSearch").value.trim();
-    const status=$("userStatus").value;
-
-    const data=await api(
-      "/admin/users?q="+encodeURIComponent(query)+
-      "&status="+encodeURIComponent(status)
-    );
-
+    const query=$("userSearch").value.trim(),status=$("userStatus").value;
+    const data=await api("/admin/users?q="+encodeURIComponent(query)+"&status="+encodeURIComponent(status));
     if(requestId!==usersRequest)return;
-
     const users=Array.isArray(data.users)?data.users:[];
-
-    if(!users.length){
-      root.innerHTML=stateHTML("fa-users","No users found","Try a different search or status filter.");
-      return;
-    }
-
+    if(!users.length){root.innerHTML=stateHTML("fa-users","No users found","Try a different search or status filter.");return}
     root.innerHTML=users.map(user=>{
       const self=String(user.id)===String(me?.id);
       const isAdmin=String(user.role||"").toLowerCase()==="admin";
       const banned=String(user.account_status||"").toLowerCase()!=="active";
-
-      const statusBadge=banned
-        ?'<span class="badge blocked">Banned</span>'
-        :'<span class="badge active">Active</span>';
-
+      const statusBadge=banned?'<span class="badge blocked">Banned</span>':'<span class="badge active">Active</span>';
       const avatar=user.avatar_url
         ?'<img src="'+esc(user.avatar_url)+'" alt="" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=&quot;fa-solid fa-user&quot;></i>\'">'
         :'<i class="fa-solid fa-user"></i>';
-
       let actionHTML="";
-
-      if(self){
-        actionHTML='<div class="data-subtitle" style="margin-top:12px">This is your admin account.</div>';
-      }else if(isAdmin){
-        actionHTML='<div class="data-subtitle" style="margin-top:12px">Admin account · Protected from user banning.</div>';
-      }else{
-        actionHTML=`
-          <div class="data-actions">
-            <button class="btn ${banned?"btn-success":"btn-danger"}"
-              data-user-action="${banned?"unban":"ban"}"
-              data-id="${esc(user.id)}">
-              <i class="fa-solid ${banned?"fa-user-check":"fa-ban"}"></i>
-              ${banned?"Unban user":"Ban user"}
-            </button>
-          </div>`;
-      }
-
-      return `
-        <article class="data-card">
-          <div class="data-card-head">
-            <div class="user-card-row">
-              <div class="user-avatar">${avatar}</div>
-              <div class="user-identity">
-                <div class="data-title">${esc(user.display_name||user.username||"User")}</div>
-                <div class="user-email">@${esc(user.username||"unknown")}</div>
-                <div class="user-email">${esc(user.email||"No email")}</div>
-              </div>
-            </div>
-            ${statusBadge}
-          </div>
-
-          <div class="data-subtitle" style="margin-top:12px">
-            Role: <strong>${esc(user.role||"user")}</strong>
-            &nbsp; · &nbsp; Posts: <strong>${number(user.posts_count)}</strong>
-            ${user.created_at?"<br>Joined: "+esc(new Date(user.created_at).toLocaleDateString()):""}
-          </div>
-
-          ${actionHTML}
-        </article>`;
+      if(self)actionHTML='<div class="data-subtitle" style="margin-top:12px">This is your admin account.</div>';
+      else if(isAdmin)actionHTML='<div class="data-subtitle" style="margin-top:12px">Admin account · Protected from user banning.</div>';
+      else actionHTML='<div class="data-actions"><button class="btn '+(banned?"btn-success":"btn-danger")+'" data-user-action="'+(banned?"unban":"ban")+'" data-id="'+esc(user.id)+'"><i class="fa-solid '+(banned?"fa-user-check":"fa-ban")+'"></i> '+(banned?"Unban user":"Ban user")+'</button></div>';
+      return '<article class="data-card"><div class="data-card-head"><div class="user-card-row"><div class="user-avatar">'+avatar+'</div>'+
+        '<div class="user-identity"><div class="data-title">'+esc(user.display_name||user.username||"User")+'</div>'+
+        '<div class="user-email">@'+esc(user.username||"unknown")+'</div><div class="user-email">'+esc(user.email||"No email")+'</div></div></div>'+
+        statusBadge+'</div><div class="data-subtitle" style="margin-top:12px">Role: <strong>'+esc(user.role||"user")+'</strong> · Posts: <strong>'+number(user.posts_count)+'</strong>'+
+        (user.created_at?"<br>Joined: "+esc(new Date(user.created_at).toLocaleDateString()):"")+'</div>'+actionHTML+'</article>';
     }).join("");
-
   }catch(error){
     if(requestId!==usersRequest)return;
-    root.innerHTML=stateHTML(
-      "fa-triangle-exclamation","Could not load users",
-      error.message||"Please try again.","Retry","retryUsers"
-    );
+    root.innerHTML=stateHTML("fa-triangle-exclamation","Could not load users",error.message||"Please try again.","Retry","retryUsers");
     $("retryUsers").addEventListener("click",loadUsers);
   }
 }
-
 async function changeStatus(id,action){
-  const question=action==="ban"
-    ?"Ban this user? They will no longer be able to use an active account."
-    :"Restore this user's account access?";
-
-  if(!confirm(question))return;
-
+  if(!confirm(action==="ban"?"Ban this user? They will no longer be able to use an active account.":"Restore this user's account access?"))return;
   try{
-    await api("/admin/users/"+encodeURIComponent(id)+"/status",{
-      method:"PATCH",
-      body:JSON.stringify({action})
-    });
-
+    await api("/admin/users/"+encodeURIComponent(id)+"/status",{method:"PATCH",body:JSON.stringify({action})});
     toast(action==="ban"?"User banned successfully.":"User unbanned successfully.");
-    await loadUsers();
-    await loadDashboard();
-  }catch(error){
-    toast(error.message||"Could not change user status.");
-  }
+    await loadUsers();await loadDashboard();
+  }catch(error){toast(error.message||"Could not change user status.")}
 }
-
 $("usersList").addEventListener("click",event=>{
   const button=event.target.closest("[data-user-action]");
   if(button)changeStatus(button.dataset.id,button.dataset.userAction);
 });
-
 $("userSearch").addEventListener("input",()=>{
-  clearTimeout(userSearchTimer);
-  userSearchTimer=setTimeout(loadUsers,350);
+  clearTimeout(userSearchTimer);userSearchTimer=setTimeout(loadUsers,350);
 });
-
 $("userStatus").addEventListener("change",loadUsers);
 $("refreshUsers").addEventListener("click",loadUsers);
 
 /* GLOBAL REFRESH */
 async function refreshAll(){
   const button=$("refreshAll");
-  button.disabled=true;
-  button.innerHTML='<i class="fa-solid fa-rotate spin"></i><span>Refreshing</span>';
-
+  button.disabled=true;button.innerHTML='<i class="fa-solid fa-rotate spin"></i><span>Refreshing</span>';
   try{
     const authorized=await verifyAdmin();
     if(!authorized)return;
-
     await loadDashboard();
-
     if(currentSection==="reports")await loadReports();
     else if(currentSection==="posts")await loadPosts();
     else await loadUsers();
-
     toast("Dashboard refreshed.");
   }finally{
-    button.disabled=false;
-    button.innerHTML='<i class="fa-solid fa-rotate"></i><span>Refresh</span>';
+    button.disabled=false;button.innerHTML='<i class="fa-solid fa-rotate"></i><span>Refresh</span>';
   }
 }
-
 $("homeButton").addEventListener("click",()=>go("home.html"));
 $("refreshAll").addEventListener("click",refreshAll);
 $("retryAccess").addEventListener("click",async()=>{
   const authorized=await verifyAdmin();
-  if(authorized){
-    await loadDashboard();
-    showSection("reports");
-  }
+  if(authorized){await loadDashboard();showSection("reports")}
 });
 
 async function initialize(){
   const authorized=await verifyAdmin();
   if(!authorized)return;
-
-  await Promise.all([
-    loadDashboard(),
-    loadReports()
-  ]);
+  await Promise.all([loadDashboard(),loadReports()]);
 }
-
 initialize();
 </script>
 </body>
