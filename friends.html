@@ -1,313 +1,185 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#17142e">
-<title>Friends · Boys ♡ Girls</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#100f20">
+<title>Boys vs Girls 💙💗 - Friends</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root {
-  --blue:#60a5fa;
-  --purple:#a78bfa;
-  --pink:#fb7185;
-  --bg:#100f20;
-  --panel:#19182e;
-  --panel2:#22203b;
-  --text:#f8f7ff;
-  --muted:#aaa7c7;
-  --border:rgba(255,255,255,.11);
-  --gradient:linear-gradient(120deg,var(--blue),var(--purple),var(--pink));
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;background:radial-gradient(ellipse at 0 0,#60a5fa22,transparent 40%),radial-gradient(ellipse at 100% 20%,#fb718522,transparent 35%),var(--bg);color:var(--text);padding-bottom:95px}
-.app{max-width:600px;margin:auto}
-.top{position:sticky;top:0;background:#100f20ed;backdrop-filter:blur(18px);padding:16px;border-bottom:1px solid var(--border);z-index:5;display:flex;align-items:center;gap:12px}
-.logo{width:40px;height:40px;border-radius:13px;background:var(--gradient);display:grid;place-items:center;color:#17142e}
-.title{font-weight:900;font-size:20px}
-.sub{font-size:11px;color:var(--muted);margin-top:3px}
-.content{padding:16px}
-.search{display:flex;gap:8px;margin-bottom:14px}
-.search input{flex:1;min-width:0;background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:13px;color:white;outline:none}
-.btn{border:0;border-radius:11px;padding:11px 13px;font-weight:800;background:var(--gradient);color:#17142e}
-.tabs{display:flex;gap:7px;margin:10px 0 16px}
-.tab{flex:1;padding:11px 5px;border:1px solid var(--border);border-radius:11px;background:var(--panel);color:var(--muted);font-weight:800}
-.tab.active{background:#a78bfa22;color:#d9ccff;border-color:#a78bfa77}
-.list{display:grid;gap:10px}
-.person{display:flex;align-items:center;gap:11px;padding:12px;background:var(--panel);border:1px solid var(--border);border-radius:15px}
-.avatar{width:48px;height:48px;border-radius:50%;object-fit:cover;background:var(--panel2);display:grid;place-items:center;color:var(--purple);flex-shrink:0}
-.details{flex:1;min-width:0}
-.name{font-weight:800;overflow-wrap:anywhere}
-.handle{font-size:12px;color:var(--muted);margin-top:4px}
-.actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.small{padding:9px 10px;border:1px solid var(--border);border-radius:10px;background:var(--panel2);color:white;font-size:12px;font-weight:800}
-.accept{background:var(--gradient);color:#17142e;border:0}
-.danger{color:#ff9eae}
-.empty,.status{padding:24px 12px;text-align:center;color:var(--muted);line-height:1.6}
-.bottom{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;display:flex;justify-content:space-around;padding:10px 3px calc(10px + env(safe-area-inset-bottom));background:#100f20ed;border-top:1px solid var(--border);backdrop-filter:blur(18px);z-index:8}
-.nav{flex:1;text-align:center;color:var(--muted);font-size:10px;font-weight:700;text-decoration:none;display:flex;flex-direction:column;gap:5px;align-items:center}
-.nav i{font-size:19px}
-.nav.active{color:var(--purple)}
-@media(max-width:390px){.person{gap:8px;padding:9px}.avatar{width:40px;height:40px}.small{padding:8px;font-size:11px}}
+:root{--blue:#60a5fa;--purple:#a78bfa;--pink:#fb7185;--green:#55e6b0;--bg:#100f20;--panel:#19182e;--panel2:#22203b;--text:#f8f7ff;--muted:#aaa7c7;--border:rgba(255,255,255,.11);--gradient:linear-gradient(120deg,var(--blue),var(--purple),var(--pink))}
+*{box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;-webkit-tap-highlight-color:transparent}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 0 0,#60a5fa20,transparent 40%),radial-gradient(ellipse at 100% 20%,#fb71851c,transparent 35%),var(--bg);color:var(--text)}
+button,input{font:inherit}button{color:inherit;cursor:pointer}button:disabled{opacity:.55;cursor:wait}a{color:inherit;text-decoration:none}.app{max-width:600px;margin:auto;min-height:100dvh;padding-bottom:85px}
+.topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:13px 15px;background:#100f20ed;border-bottom:1px solid var(--border);backdrop-filter:blur(18px)}
+.back{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--border);border-radius:11px;background:var(--panel2);font-size:16px}.title{font-size:18px;font-weight:900;flex:1}.title span{color:var(--pink)}.subtitle{font-size:11px;color:var(--muted);margin-top:4px}
+.tabs{display:flex;gap:6px;padding:12px 10px;overflow-x:auto;border-bottom:1px solid var(--border);scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}
+.tab{white-space:nowrap;border:1px solid var(--border);border-radius:22px;background:#ffffff05;color:var(--muted);padding:10px 13px;font-size:12px;font-weight:800}.tab.active{background:#60a5fa25;color:#a7d0ff;border-color:#60a5fa55}
+.search-wrap{display:flex;gap:8px;margin:13px 12px 8px}.search-wrap input{min-width:0;flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--panel);color:var(--text);outline:none;font-size:13px}.search-wrap input:focus{border-color:var(--purple)}
+.count{padding:6px 14px;font-size:12px;color:var(--muted)}.list{margin:0 10px}.person{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--border);min-width:0}.avatar{width:48px;height:48px;flex-shrink:0;object-fit:cover;border-radius:50%;background:var(--panel2);border:1px solid var(--border)}
+.person-info{flex:1;min-width:0}.person-name{font-size:13px;font-weight:850;overflow-wrap:anywhere}.person-handle{font-size:11px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere}.person-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 10px;border:1px solid var(--border);border-radius:9px;background:#ffffff07;font-size:11px;font-weight:800;white-space:nowrap}.btn.primary{background:var(--gradient);color:#17142e;border:0}.btn.accept{color:var(--green);border-color:#55e6b066;background:#55e6b012}.btn.danger{color:#ff9cac;border-color:#fb718555}
+.empty{text-align:center;padding:36px 14px;color:var(--muted);font-size:12px;line-height:1.8}.empty i{font-size:26px;color:var(--purple);display:block;margin-bottom:12px}
+.status{margin:8px 13px;font-size:11px;color:var(--muted);line-height:1.6}.status.error{color:#ffacba}.status.success{color:var(--green)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;min-height:62px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:#100f20ed;border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:20}.nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--muted);font-size:10px;font-weight:700}.nav i{font-size:18px}.nav a.active{color:var(--purple)}
+.toast{position:fixed;z-index:100;bottom:78px;left:50%;transform:translateX(-50%);display:none;max-width:90%;width:max-content;padding:11px 14px;background:#292546;border:1px solid var(--border);border-radius:10px;font-size:12px}
+@media(max-width:380px){.title{font-size:16px}.tab{padding:9px 10px;font-size:11px}.avatar{width:42px;height:42px}.person{gap:8px}.btn{padding:7px;font-size:10px}}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="top">
-  <div class="logo"><i class="fa-solid fa-user-group"></i></div>
-  <div>
-    <div class="title">Friends <span style="color:#60a5fa">♡</span></div>
-    <div class="sub">Find your people · Boys ♡ Girls 💙💗</div>
-  </div>
+<header class="topbar">
+<button class="back" id="backButton" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+<div><div class="title">Your <span>Friends</span> 💙💗</div><div class="subtitle">Connect with your people</div></div>
 </header>
 
-<main class="content">
-  <form id="searchForm" class="search">
-    <input id="searchInput" placeholder="Search by username…" minlength="2" autocomplete="off">
-    <button class="btn" type="submit" aria-label="Search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </button>
-  </form>
-
-  <div class="tabs">
-    <button class="tab active" data-tab="friends">My Friends</button>
-    <button class="tab" data-tab="received">Requests <span id="receivedCount"></span></button>
-    <button class="tab" data-tab="sent">Sent</button>
-  </div>
-
-  <div id="status" class="status">Loading your friends…</div>
-  <div id="list" class="list"></div>
-</main>
-
-<nav class="bottom">
-  <a class="nav" href="home.html"><i class="fa-solid fa-house"></i>Home</a>
-  <a class="nav" href="discover.html"><i class="fa-solid fa-compass"></i>Pulse</a>
-  <a class="nav active" href="friends.html"><i class="fa-solid fa-user-group"></i>Friends</a>
-  <a class="nav" href="notifications.html"><i class="fa-regular fa-bell"></i>Notifications</a>
-  <a class="nav" href="profile.html"><i class="fa-regular fa-user"></i>Profile</a>
-</nav>
+<div class="tabs" role="tablist">
+<button class="tab active" data-tab="friends" role="tab"><i class="fa-solid fa-users"></i> Friends</button>
+<button class="tab" data-tab="incoming" role="tab"><i class="fa-solid fa-user-plus"></i> Requests <span id="incomingBadge">0</span></button>
+<button class="tab" data-tab="sent" role="tab"><i class="fa-regular fa-clock"></i> Sent</button>
 </div>
 
+<div class="search-wrap">
+<input id="searchInput" type="search" placeholder="Search friends..." autocomplete="off" aria-label="Search friends">
+<button class="back" id="refreshButton" aria-label="Refresh"><i class="fa-solid fa-rotate"></i></button>
+</div>
+<div class="count" id="listCount">Loading...</div>
+<div class="list" id="peopleList"><div class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading friends...</div></div>
+<p class="status" id="status" role="status"></p>
+</div>
+
+<nav class="nav">
+<a href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+<a href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
+<a href="notifications.html"><i class="fa-regular fa-bell"></i><span>Notifications</span></a>
+<a href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+</nav>
+<div class="toast" id="toast" role="status"></div>
+
 <script>
-const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
-let currentTab = "friends";
+"use strict";
+const API="https://freetube-backend-a222.onrender.com/api",TOKEN_KEY="freetube_access_token";
+const $=id=>document.getElementById(id);
+const AVATAR="https://placehold.co/100x100/302c50/ffffff?text=BG";
+let currentUser=null,activeTab="friends",friends=[],requests=[],loading=false,toastTimer=null;
 
-const $ = id => document.getElementById(id);
-
-function token() {
-  return localStorage.getItem(TOKEN_KEY) || "";
+function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch{return""}}
+function toast(s){$("toast").textContent=s;$("toast").style.display="block";clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").style.display="none",3000)}
+function status(s,type=""){$("status").textContent=s;$("status").className="status "+type}
+function first(...v){return v.find(x=>x!==undefined&&x!==null&&String(x).trim()!=="")??""}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function api(path,opt={}){
+ const headers={...(opt.headers||{})};if(token())headers.Authorization="Bearer "+token();if(opt.body!==undefined&&!(opt.body instanceof FormData))headers["Content-Type"]="application/json";
+ let r;try{r=await fetch(API+path,{...opt,headers,cache:"no-store"})}catch{throw Error("Cannot connect to the server.")}
+ let d={};try{d=await r.json()}catch{}if(!r.ok){let e=Error(d.error||d.message||"HTTP "+r.status);e.status=r.status;throw e}return d
 }
-
-async function api(path, options = {}) {
-  const headers = {
-    "Content-Type": "application/json",
-    ...(options.headers || {})
-  };
-
-  if (token()) {
-    headers.Authorization = "Bearer " + token();
-  }
-
-  const response = await fetch(API_BASE + path, {
-    ...options,
-    headers,
-    cache: "no-store"
-  });
-
-  let data = {};
-  try {
-    data = await response.json();
-  } catch (_) {}
-
-  if (!response.ok) {
-    throw new Error(data.error || data.message || "Request failed (" + response.status + ")");
-  }
-
-  return data;
+function asArray(d,...keys){
+ for(const key of keys){let x=key.split(".").reduce((o,k)=>o?.[k],d);if(Array.isArray(x))return x}
+ return Array.isArray(d)?d:[]
 }
+function personObject(x){return x?.friend||x?.user||x?.profile||x?.sender||x?.requester||x?.from_user||x||{}}
+function personId(x){const p=personObject(x);return String(x?.friend_id??x?.user_id??x?.sender_id??x?.requester_id??x?.from_user_id??p.user_id??p.id??"")}
+function personName(x){const p=personObject(x);return String(first(p.display_name,p.full_name,p.fullName,p.name,p.username,x?.display_name,x?.name,"User"))}
+function personUsername(x){const p=personObject(x);return String(first(p.username,p.handle,x?.username,"")).replace(/^@/,"")}
+function personAvatar(x){const p=personObject(x);return String(first(p.avatar_url,p.avatar,p.profile_photo,x?.avatar_url,AVATAR))}
+function requestId(x){return String(x?.request_id??x?.id??"")}
+function requestSender(x){return String(x?.sender_id??x?.requester_id??x?.from_user_id??personId(x))}
+function requestReceiver(x){return String(x?.receiver_id??x?.recipient_id??x?.to_user_id??x?.target_user_id??"")}
+function isPending(x){return String(x?.status||"pending").toLowerCase()==="pending"}
 
-function esc(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  })[char]);
+async function loadData(){
+ if(loading)return;loading=true;$("refreshButton").disabled=true;$("listCount").textContent="Loading...";
+ $("peopleList").innerHTML='<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div>';
+ try{
+  const me=await api("/auth/me");currentUser=me.user||me.profile||me.data?.user||me.data||me;
+  const myId=String(currentUser.user_id??currentUser.id??"");
+  const [fd,rd]=await Promise.all([api("/friends"),api("/friends/requests")]);
+  friends=asArray(fd,"friends","data.friends","data.data.friends");
+  const allRequests=asArray(rd,"requests","data.requests","data.data.requests","incoming","data.incoming","sent","data.sent");
+  requests=allRequests.filter(isPending);
+  // Keep both incoming and outgoing request records for their respective tabs.
+  friends=friends.map(x=>({...x}));
+  window._allRequests=allRequests;
+  const incoming=allRequests.filter(x=>requestReceiver(x)===myId&&requestSender(x)!==myId&&isPending(x));
+  $("incomingBadge").textContent=String(incoming.length);
+  status("Connected to Boys vs Girls.","success");
+  render()
+ }catch(e){
+  console.error(e);if(e.status===401){location.replace("login.html");return}
+  status("Could not load friends: "+e.message,"error");$("listCount").textContent="Unavailable";$("peopleList").innerHTML='<div class="empty"><i class="fa-solid fa-triangle-exclamation"></i>Could not load your list.<br>Check your connection and try again.</div>'
+ }finally{loading=false;$("refreshButton").disabled=false}
 }
-
-function avatar(user) {
-  if (user.avatar_url) {
-    return `<img class="avatar" src="${esc(user.avatar_url)}" alt="">`;
-  }
-
-  return `<div class="avatar"><i class="fa-solid fa-user"></i></div>`;
+function selectTab(tab){
+ activeTab=tab;document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b.dataset.tab===tab));
+ $("searchInput").value="";
+ $("searchInput").placeholder=tab==="friends"?"Search friends...":tab==="incoming"?"Search friend requests...":"Search sent requests...";
+ render()
 }
-
-function button(label, action, id, className = "") {
-  return `<button type="button" class="small ${className}" data-action="${action}" data-id="${esc(id)}">${label}</button>`;
+function render(){
+ const q=$("searchInput").value.trim().toLowerCase(),box=$("peopleList");box.replaceChildren();
+ const myId=String(currentUser?.user_id??currentUser?.id??"");
+ let list=[];
+ if(activeTab==="friends"){
+  list=friends.filter(x=>{const id=personId(x);return !id||id!==myId});
+ }else{
+  const all=window._allRequests||[];
+  list=all.filter(x=>{
+   if(!isPending(x))return false;
+   const sender=requestSender(x),receiver=requestReceiver(x);
+   return activeTab==="incoming"?(receiver===myId&&sender!==myId):(sender===myId&&receiver!==myId)
+  })
+ }
+ list=list.filter(x=>(personName(x)+" "+personUsername(x)).toLowerCase().includes(q));
+ $("listCount").textContent=list.length+" "+(activeTab==="friends"?"friends":activeTab==="incoming"?"incoming requests":"sent requests");
+ if(!list.length){
+  const messages={friends:"No friends found. Your friends will appear here after you connect.",incoming:"You have no pending friend requests.",sent:"You have no pending sent requests."};
+  box.innerHTML='<div class="empty"><i class="fa-solid '+(activeTab==="friends"?"fa-users":activeTab==="incoming"?"fa-user-plus":"fa-clock")+'"></i>'+esc(q?"No matching results.":messages[activeTab])+'</div>';return
+ }
+ list.forEach(x=>{
+  const p=personObject(x),id=personId(x),uname=personUsername(x);
+  const row=document.createElement("article");row.className="person";
+  const img=document.createElement("img");img.className="avatar";img.alt="Profile photo";img.src=personAvatar(x);img.onerror=()=>{img.onerror=null;img.src=AVATAR};
+  const info=document.createElement("div");info.className="person-info";
+  const name=document.createElement("div");name.className="person-name";name.textContent=personName(x);
+  const handle=document.createElement("div");handle.className="person-handle";handle.textContent=uname?"@"+uname:(activeTab==="incoming"?"Sent you a friend request":activeTab==="sent"?"Friend request sent":"Friend");
+  info.append(name,handle);const actions=document.createElement("div");actions.className="person-actions";
+  const view=document.createElement("button");view.className="btn";view.type="button";view.innerHTML='<i class="fa-regular fa-user"></i> View';
+  view.onclick=()=>{if(uname)location.href="profile.html?username="+encodeURIComponent(uname);else if(id)location.href="profile.html?userId="+encodeURIComponent(id);else toast("This user has no profile ID or username in the API response.")};
+  actions.append(view);
+  if(activeTab==="incoming"){
+   const accept=document.createElement("button");accept.className="btn accept";accept.type="button";accept.innerHTML='<i class="fa-solid fa-check"></i> Accept';
+   const decline=document.createElement("button");decline.className="btn danger";decline.type="button";decline.innerHTML='<i class="fa-solid fa-xmark"></i>';
+   const rid=requestId(x);
+   accept.onclick=()=>respond(rid,"accept",accept,decline);decline.onclick=()=>respond(rid,"decline",accept,decline);actions.append(accept,decline)
+  }else if(activeTab==="sent"){
+   const cancel=document.createElement("button");cancel.className="btn danger";cancel.type="button";cancel.textContent="Pending";
+   cancel.title="Cancel is not available unless the server provides a cancel-request API";
+   actions.append(cancel)
+  }else{
+   const remove=document.createElement("button");remove.className="btn danger";remove.type="button";remove.innerHTML='<i class="fa-solid fa-user-minus"></i>';
+   remove.title="Remove friend";remove.onclick=()=>removeFriend(id,remove);actions.append(remove)
+  }
+  row.append(img,info,actions);box.append(row)
+ })
 }
-
-function person(user, actions) {
-  return `
-    <article class="person">
-      ${avatar(user)}
-      <div class="details">
-        <div class="name">${esc(user.display_name || user.username || "User")}</div>
-        <div class="handle">@${esc(user.username || "")}</div>
-      </div>
-      <div class="actions">${actions}</div>
-    </article>
-  `;
+async function respond(id,action,...buttons){
+ if(!id){toast("The API response did not provide a friend request ID.");return}
+ if(action==="decline"&&!confirm("Decline this friend request?"))return;
+ buttons.forEach(b=>b.disabled=true);
+ try{
+  await api("/friends/requests/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({action})});
+  toast(action==="accept"?"Friend request accepted.":"Friend request declined.");await loadData()
+ }catch(e){toast("Could not update request: "+e.message)}finally{buttons.forEach(b=>b.disabled=false)}
 }
-
-async function load() {
-  if (!token()) {
-    $("status").innerHTML = 'Please <a href="auth.html" style="color:#a78bfa">log in</a> to use Friends.';
-    $("list").innerHTML = "";
-    return;
-  }
-
-  $("status").textContent = "Loading…";
-  $("list").innerHTML = "";
-
-  try {
-    let data;
-
-    if (currentTab === "friends") {
-      data = await api("/friends");
-
-      $("list").innerHTML = (data.friends || []).map(user =>
-        person(
-          user,
-          button("Profile", "profile", user.username) +
-          button("Remove", "remove", user.id, "danger")
-        )
-      ).join("");
-    } else {
-      data = await api("/friends/requests?direction=" + currentTab);
-      const requests = data.requests || [];
-
-      $("list").innerHTML = requests.map(user =>
-        person(
-          user,
-          currentTab === "received"
-            ? button("Accept", "accept", user.request_id, "accept") +
-              button("Reject", "reject", user.request_id, "danger")
-            : button("Cancel", "cancel", user.request_id, "danger")
-        )
-      ).join("");
-
-      if (currentTab === "received") {
-        $("receivedCount").textContent = requests.length ? "(" + requests.length + ")" : "";
-      }
-    }
-
-    $("status").textContent = $("list").children.length ? "" : "Nothing here yet.";
-  } catch (error) {
-    $("status").textContent = error.message;
-    $("list").innerHTML = "";
-  }
+async function removeFriend(id,button){
+ if(!id){toast("Friend ID is missing in the server response.");return}
+ if(!confirm("Remove this friend?"))return;button.disabled=true;
+ try{await api("/friends/"+encodeURIComponent(id),{method:"DELETE"});toast("Friend removed.");await loadData()}
+ catch(e){toast("Could not remove friend: "+e.message)}finally{button.disabled=false}
 }
-
-async function searchUsers(query) {
-  if (query.trim().length < 2) {
-    $("status").textContent = "Type at least 2 characters to find people.";
-    $("list").innerHTML = "";
-    return;
-  }
-
-  if (!token()) {
-    $("status").innerHTML = 'Please <a href="auth.html" style="color:#a78bfa">log in</a> first.';
-    return;
-  }
-
-  $("status").textContent = "Searching…";
-  $("list").innerHTML = "";
-
-  try {
-    const data = await api("/users/search?q=" + encodeURIComponent(query.trim()));
-
-    $("list").innerHTML = (data.users || []).map(user =>
-      person(
-        user,
-        button("Add Friend", "add", user.id, "accept") +
-        button("Profile", "profile", user.username)
-      )
-    ).join("");
-
-    $("status").textContent = $("list").children.length ? "" : "No users found.";
-  } catch (error) {
-    $("status").textContent = error.message;
-  }
-}
-
-document.querySelectorAll("[data-tab]").forEach(buttonElement => {
-  buttonElement.addEventListener("click", () => {
-    document.querySelectorAll("[data-tab]").forEach(item => {
-      item.classList.toggle("active", item === buttonElement);
-    });
-
-    currentTab = buttonElement.dataset.tab;
-    load();
-  });
-});
-
-$("searchForm").addEventListener("submit", event => {
-  event.preventDefault();
-  searchUsers($("searchInput").value);
-});
-
-$("list").addEventListener("click", async event => {
-  const buttonElement = event.target.closest("button[data-action]");
-  if (!buttonElement) return;
-
-  const action = buttonElement.dataset.action;
-  const id = buttonElement.dataset.id;
-
-  try {
-    if (action === "profile") {
-      location.href = "profile.html?username=" + encodeURIComponent(id);
-      return;
-    }
-
-    if (action === "add") {
-      await api("/friends/requests", {
-        method: "POST",
-        body: JSON.stringify({ user_id: id })
-      });
-
-      $("status").textContent = "Friend request sent.";
-      await searchUsers($("searchInput").value);
-      return;
-    }
-
-    if (action === "remove") {
-      if (!confirm("Remove this friend?")) return;
-
-      await api("/friends/" + encodeURIComponent(id), {
-        method: "DELETE"
-      });
-    } else {
-      const requestAction = action === "accept" ? "accept" :
-                            action === "reject" ? "reject" : "cancel";
-
-      await api("/friends/requests/" + encodeURIComponent(id), {
-        method: "PATCH",
-        body: JSON.stringify({ action: requestAction })
-      });
-    }
-
-    $("status").textContent = "Updated successfully.";
-    await load();
-  } catch (error) {
-    $("status").textContent = error.message;
-  }
-});
-
-load();
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>selectTab(b.dataset.tab)));
+$("searchInput").addEventListener("input",render);$("refreshButton").addEventListener("click",loadData);
+$("backButton").addEventListener("click",()=>{if(history.length>1)history.back();else location.href="profile.html"});
+window.addEventListener("DOMContentLoaded",()=>{if(!token()){location.replace("login.html");return}loadData()});
 </script>
 </body>
 </html>
