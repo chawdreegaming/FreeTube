@@ -2,1457 +2,613 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101827">
-  <title>Blue Badge Management | Boys vs Girls</title>
-
-  <style>
-    :root {
-      --bg: #0b1120;
-      --panel: #131d30;
-      --panel2: #18253b;
-      --border: #293851;
-      --text: #edf4ff;
-      --muted: #9aabc4;
-      --blue: #3985ff;
-      --cyan: #38d9ff;
-      --green: #23c783;
-      --red: #ff5b70;
-      --yellow: #ffc857;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at top left, #142b50 0, transparent 35%),
-        var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      min-height: 100vh;
-    }
-
-    button, input, select, textarea {
-      font: inherit;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    .container {
-      width: min(1200px, 94%);
-      margin: auto;
-      padding: 24px 0 50px;
-    }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 15px;
-      display: grid;
-      place-items: center;
-      font-size: 25px;
-      background: linear-gradient(135deg, #2676ff, #44d8ff);
-      box-shadow: 0 8px 25px #1677ff30;
-    }
-
-    h1 {
-      margin: 0;
-      font-size: clamp(22px, 4vw, 30px);
-    }
-
-    .subtitle {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 6px;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      border: 1px solid var(--border);
-      background: var(--panel2);
-      color: var(--text);
-      border-radius: 10px;
-      padding: 11px 15px;
-      font-weight: 700;
-      transition: .2s;
-    }
-
-    .btn:hover {
-      filter: brightness(1.15);
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #2875ff, #27bfff);
-      border: 0;
-      color: white;
-    }
-
-    .btn-success {
-      background: #123c31;
-      color: #6df0bd;
-      border-color: #236b54;
-    }
-
-    .btn-danger {
-      background: #421e2b;
-      color: #ff9aa7;
-      border-color: #773243;
-    }
-
-    .btn-small {
-      padding: 8px 10px;
-      font-size: 12px;
-      border-radius: 8px;
-    }
-
-    .notice {
-      padding: 13px 15px;
-      border: 1px solid #315b8e;
-      background: #132a46;
-      border-radius: 12px;
-      color: #c9e3ff;
-      font-size: 13px;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .notice strong {
-      color: white;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 22px;
-    }
-
-    .stat {
-      background: linear-gradient(145deg, var(--panel), #111a2b);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 18px;
-      min-width: 0;
-    }
-
-    .stat-label {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .stat-number {
-      font-size: 28px;
-      font-weight: 800;
-      margin-top: 10px;
-      overflow-wrap: anywhere;
-    }
-
-    .stat-icon {
-      float: right;
-      font-size: 22px;
-    }
-
-    .layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr);
-      gap: 18px;
-      align-items: start;
-    }
-
-    .panel {
-      background: linear-gradient(145deg, #141f33, #101827);
-      border: 1px solid var(--border);
-      border-radius: 17px;
-      overflow: hidden;
-      margin-bottom: 18px;
-      min-width: 0;
-    }
-
-    .panel-header {
-      padding: 17px 19px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .panel-header h2 {
-      margin: 0;
-      font-size: 17px;
-    }
-
-    .panel-body {
-      padding: 19px;
-    }
-
-    .field {
-      margin-bottom: 15px;
-    }
-
-    label {
-      display: block;
-      color: #c8d5e9;
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 7px;
-    }
-
-    input, select, textarea {
-      width: 100%;
-      background: #0b1424;
-      color: var(--text);
-      border: 1px solid #30415d;
-      border-radius: 10px;
-      padding: 12px;
-      outline: none;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px #3985ff20;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 85px;
-    }
-
-    .grid2 {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .grid4 {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 9px;
-    }
-
-    .checkbox-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 12px 0 18px;
-      color: #d7e4f7;
-      font-size: 13px;
-    }
-
-    .checkbox-row input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--blue);
-    }
-
-    .checkbox-row label {
-      margin: 0;
-    }
-
-    .payment-method {
-      border: 1px solid var(--border);
-      background: #101a2b;
-      padding: 14px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-    }
-
-    .method-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
-    }
-
-    .method-name {
-      font-weight: 800;
-      overflow-wrap: anywhere;
-    }
-
-    .method-meta {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 6px;
-      line-height: 1.6;
-      overflow-wrap: anywhere;
-    }
-
-    .method-actions {
-      display: flex;
-      gap: 7px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .status {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 30px;
-      font-size: 11px;
-      font-weight: 800;
-      white-space: nowrap;
-    }
-
-    .status-pending {
-      color: #ffdc86;
-      background: #4b3817;
-    }
-
-    .status-approved {
-      color: #78f0bd;
-      background: #123c31;
-    }
-
-    .status-rejected {
-      color: #ff9eaa;
-      background: #48212d;
-    }
-
-    .status-active {
-      color: #7fecc1;
-      background: #123c31;
-    }
-
-    .status-disabled {
-      color: #c0cbe0;
-      background: #293449;
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 9px;
-      flex-wrap: wrap;
-      padding: 15px 19px 0;
-    }
-
-    .toolbar input {
-      flex: 1;
-      min-width: 160px;
-    }
-
-    .toolbar select {
-      width: auto;
-      min-width: 140px;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-      width: 100%;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 800px;
-    }
-
-    th, td {
-      padding: 13px 15px;
-      border-bottom: 1px solid #26344a;
-      text-align: left;
-      font-size: 12px;
-      vertical-align: top;
-    }
-
-    th {
-      color: #9fb3d0;
-      background: #111b2d;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: .5px;
-    }
-
-    td {
-      color: #dce7f7;
-      line-height: 1.5;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .empty {
-      text-align: center;
-      color: var(--muted);
-      padding: 30px 15px;
-    }
-
-    .message {
-      display: none;
-      padding: 12px 14px;
-      margin-bottom: 14px;
-      border-radius: 10px;
-      line-height: 1.5;
-      font-size: 13px;
-    }
-
-    .message.success {
-      display: block;
-      color: #8af0c7;
-      background: #123b30;
-      border: 1px solid #28664f;
-    }
-
-    .message.error {
-      display: block;
-      color: #ffb0b9;
-      background: #421e2b;
-      border: 1px solid #773243;
-    }
-
-    .message.info {
-      display: block;
-      color: #c4e0ff;
-      background: #142d4b;
-      border: 1px solid #315b8e;
-    }
-
-    .token-box {
-      border-top: 1px solid var(--border);
-      margin-top: 15px;
-      padding-top: 15px;
-    }
-
-    .token-box summary {
-      cursor: pointer;
-      color: #b9cce6;
-      font-size: 13px;
-    }
-
-    .footer-note {
-      text-align: center;
-      color: #71829c;
-      font-size: 12px;
-      margin-top: 20px;
-      line-height: 1.7;
-    }
-
-    @media (max-width: 850px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-
-      .stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        width: 94%;
-        padding-top: 16px;
-      }
-
-      .stats {
-        gap: 9px;
-      }
-
-      .stat {
-        padding: 13px;
-      }
-
-      .stat-number {
-        font-size: 23px;
-      }
-
-      .panel-body {
-        padding: 14px;
-      }
-
-      .grid2 {
-        grid-template-columns: 1fr;
-      }
-
-      .grid4 {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .topbar {
-        align-items: flex-start;
-      }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101827">
+<title>Blue Badge Management | Boys vs Girls</title>
+
+<style>
+:root{
+  --bg:#0b1120;--panel:#131d30;--panel2:#18253b;
+  --border:#293851;--text:#edf4ff;--muted:#9aabc4;
+  --blue:#3985ff;--green:#23c783;--red:#ff5b70;--yellow:#ffc857
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:radial-gradient(circle at top left,#142b50,transparent 35%),var(--bg);
+  color:var(--text);font:14px Arial,Helvetica,sans-serif;line-height:1.45
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:wait}
+.container{width:min(1120px,96%);margin:auto;padding:12px 0 24px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.brand{display:flex;align-items:center;gap:9px;min-width:0}
+.brand-icon{
+  width:37px;height:37px;flex-shrink:0;border-radius:11px;display:grid;place-items:center;
+  font-size:21px;background:linear-gradient(135deg,#2676ff,#44d8ff)
+}
+h1{font-size:clamp(17px,3vw,23px);margin:0}
+.subtitle{color:var(--muted);font-size:11px;margin-top:2px}
+.top-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn{
+  border:1px solid var(--border);background:var(--panel2);color:var(--text);
+  border-radius:8px;padding:8px 11px;font-size:12px;font-weight:700
+}
+.btn-primary{background:linear-gradient(135deg,#2875ff,#27bfff);border:0;color:white}
+.btn-success{background:#123c31;color:#6df0bd;border-color:#236b54}
+.btn-danger{background:#421e2b;color:#ff9aa7;border-color:#773243}
+.btn-small{padding:6px 9px;font-size:11px;border-radius:7px}
+.notice{
+  padding:9px 11px;border:1px solid #315b8e;background:#132a46;border-radius:10px;
+  color:#c9e3ff;font-size:12px;line-height:1.5;margin-bottom:12px
+}
+.notice strong{color:white}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.stat{
+  position:relative;min-width:0;background:linear-gradient(145deg,var(--panel),#111a2b);
+  border:1px solid var(--border);border-radius:12px;padding:10px 11px
+}
+.stat-label{color:var(--muted);font-size:11px;padding-right:20px;line-height:1.35}
+.stat-number{font-size:23px;font-weight:800;margin-top:5px}
+.stat-icon{position:absolute;right:10px;top:10px;font-size:17px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:start}
+.panel{
+  background:linear-gradient(145deg,#141f33,#101827);
+  border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;min-width:0
+}
+.panel-header{
+  padding:10px 12px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:8px
+}
+.panel-header h2{margin:0;font-size:14px}
+.panel-body{padding:12px}
+.field{margin-bottom:10px;min-width:0}
+label{display:block;color:#c8d5e9;font-size:12px;font-weight:700;margin-bottom:5px}
+input,select,textarea{
+  width:100%;min-width:0;background:#0b1424;color:var(--text);
+  border:1px solid #30415d;border-radius:8px;padding:9px 10px;outline:none
+}
+input,select{min-height:38px}
+input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px #3985ff20}
+textarea{resize:vertical;min-height:62px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin:8px 0 12px;color:#d7e4f7;font-size:12px}
+.checkbox-row input{width:16px;height:16px;min-height:0;accent-color:var(--blue)}
+.checkbox-row label{margin:0}
+.payment-method{border:1px solid var(--border);background:#101a2b;padding:10px;border-radius:9px;margin-bottom:8px}
+.method-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.method-name{font-weight:800;overflow-wrap:anywhere}
+.method-meta{color:var(--muted);font-size:11px;margin-top:4px;line-height:1.5;overflow-wrap:anywhere}
+.method-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.status{display:inline-block;padding:4px 7px;border-radius:20px;font-size:10px;font-weight:800;white-space:nowrap}
+.status-pending{color:#ffdc86;background:#4b3817}
+.status-approved{color:#78f0bd;background:#123c31}
+.status-rejected{color:#ff9eaa;background:#48212d}
+.status-active{color:#7fecc1;background:#123c31}
+.status-disabled{color:#c0cbe0;background:#293449}
+.toolbar{display:flex;gap:7px;flex-wrap:wrap;padding:10px 12px 0}
+.toolbar input{flex:1;min-width:120px}
+.toolbar select{width:auto;flex:0 1 135px}
+.table-wrap{overflow-x:auto;width:100%}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{padding:9px 10px;border-bottom:1px solid #26344a;text-align:left;font-size:11px;vertical-align:top}
+th{color:#9fb3d0;background:#111b2d;font-size:10px;text-transform:uppercase;letter-spacing:.3px}
+td{color:#dce7f7;line-height:1.5}
+.muted{color:var(--muted)}
+.empty{text-align:center;color:var(--muted);padding:20px 10px;font-size:12px}
+.message{display:none;padding:9px 10px;margin-bottom:10px;border-radius:8px;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.message.success{display:block;color:#8af0c7;background:#123b30;border:1px solid #28664f}
+.message.error{display:block;color:#ffb0b9;background:#421e2b;border:1px solid #773243}
+.message.info{display:block;color:#c4e0ff;background:#142d4b;border:1px solid #315b8e}
+.token-box{border-top:1px solid var(--border);margin-top:12px;padding-top:11px}
+.token-box summary{cursor:pointer;color:#b9cce6;font-size:12px;font-weight:700}
+.token-box p{font-size:11px;line-height:1.5}
+details.collapsible>summary{cursor:pointer;list-style:none}
+details.collapsible>summary::-webkit-details-marker{display:none}
+details.collapsible>summary:after{content:"＋";float:right;color:var(--muted)}
+details.collapsible[open]>summary:after{content:"−"}
+.checklist{line-height:1.7;font-size:12px;color:#cbd9ed}
+.checklist p{margin:5px 0}
+.footer-note{text-align:center;color:#71829c;font-size:11px;margin-top:12px;line-height:1.6}
+@media(max-width:760px){
+  .layout{grid-template-columns:1fr;gap:0}
+  .container{width:96%;padding-top:9px}
+  .panel{margin-bottom:9px}
+  .panel-body{padding:10px}
+  .stats{gap:7px;margin-bottom:9px}
+  .stat{padding:9px}
+  .stat-number{font-size:21px}
+  .topbar{margin-bottom:9px}
+}
+@media(max-width:380px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid2{grid-template-columns:1fr;gap:0}
+  .brand-icon{width:33px;height:33px}
+  .btn{padding:7px 8px}
+  .top-actions{gap:4px}
+}
+</style>
 </head>
-
 <body>
-  <main class="container">
-    <header class="topbar">
-      <div class="brand">
-        <div class="brand-icon">✓</div>
-        <div>
-          <h1>Blue Badge Management</h1>
-          <div class="subtitle">Boys vs Girls 💙💗 · Admin Control Panel</div>
-        </div>
-      </div>
-
-      <div class="top-actions">
-        <button class="btn" id="dashboardBtn" type="button">← Dashboard</button>
-        <button class="btn" id="refreshBtn" type="button">↻ Refresh</button>
-      </div>
-    </header>
-
-    <div id="globalMessage" class="message" role="status" aria-live="polite"></div>
-
-    <div class="notice">
-      <strong>Manual verification:</strong>
-      A Blue Badge should be activated only after an administrator verifies the
-      payment. Never request a card number, CVV, PIN, OTP, password, or crypto
-      recovery phrase. Payment approval must be enforced by the backend.
+<main class="container">
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">✓</div>
+    <div>
+      <h1>Blue Badge Management</h1>
+      <div class="subtitle">Boys vs Girls 💙💗 · Admin Panel</div>
     </div>
+  </div>
+  <div class="top-actions">
+    <button class="btn" id="dashboardBtn" type="button">← Dashboard</button>
+    <button class="btn" id="refreshBtn" type="button">↻ Refresh</button>
+  </div>
+</header>
 
-    <section class="stats">
-      <div class="stat">
-        <span class="stat-icon">⌛</span>
-        <div class="stat-label">Pending Payments</div>
-        <div class="stat-number" id="pendingCount">—</div>
-      </div>
+<div id="globalMessage" class="message" role="status" aria-live="polite"></div>
 
-      <div class="stat">
-        <span class="stat-icon">✓</span>
-        <div class="stat-label">Approved Payments</div>
-        <div class="stat-number" id="approvedCount">—</div>
-      </div>
+<div class="notice">
+  <strong>Manual verification:</strong> Verify every payment before approving a Blue Badge.
+  Never request a card number, CVV, PIN, OTP, password, or crypto recovery phrase.
+</div>
 
-      <div class="stat">
-        <span class="stat-icon">✕</span>
-        <div class="stat-label">Rejected Payments</div>
-        <div class="stat-number" id="rejectedCount">—</div>
-      </div>
+<section class="stats">
+  <div class="stat"><span class="stat-icon">⌛</span><div class="stat-label">Pending Payments</div><div class="stat-number" id="pendingCount">—</div></div>
+  <div class="stat"><span class="stat-icon">✓</span><div class="stat-label">Approved Payments</div><div class="stat-number" id="approvedCount">—</div></div>
+  <div class="stat"><span class="stat-icon">✕</span><div class="stat-label">Rejected Payments</div><div class="stat-number" id="rejectedCount">—</div></div>
+  <div class="stat"><span class="stat-icon">₿</span><div class="stat-label">Enabled Methods</div><div class="stat-number" id="methodsCount">—</div></div>
+</section>
 
-      <div class="stat">
-        <span class="stat-icon">₿</span>
-        <div class="stat-label">Enabled Methods</div>
-        <div class="stat-number" id="methodsCount">—</div>
-      </div>
-    </section>
-
-    <div class="layout">
-      <div>
-        <section class="panel">
-          <div class="panel-header">
-            <h2 id="methodFormHeading">Add Payment Method</h2>
-            <button class="btn btn-small" id="resetMethodBtn" type="button">Clear</button>
+<div class="layout">
+<div>
+  <section class="panel">
+    <div class="panel-header">
+      <h2 id="methodFormHeading">Add Payment Method</h2>
+      <button class="btn btn-small" id="resetMethodBtn" type="button">Clear</button>
+    </div>
+    <div class="panel-body">
+      <div id="methodMessage" class="message" role="status"></div>
+      <form id="methodForm">
+        <input type="hidden" id="methodId">
+        <div class="grid2">
+          <div class="field">
+            <label for="methodName">Payment Method Name *</label>
+            <input id="methodName" required maxlength="80" placeholder="e.g. bKash, UPI, Binance Pay">
           </div>
-
-          <div class="panel-body">
-            <div id="methodMessage" class="message" role="status"></div>
-
-            <form id="methodForm">
-              <input type="hidden" id="methodId">
-
-              <div class="grid2">
-                <div class="field">
-                  <label for="methodName">Payment Method Name *</label>
-                  <input id="methodName" required maxlength="80"
-                    placeholder="e.g. bKash, UPI, Binance Pay">
-                </div>
-
-                <div class="field">
-                  <label for="methodRegion">Region *</label>
-                  <select id="methodRegion" required>
-                    <option value="Bangladesh">Bangladesh</option>
-                    <option value="India">India</option>
-                    <option value="International">International</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="field">
-                <label for="methodAccount">Recipient Number / Wallet / UPI ID *</label>
-                <input id="methodAccount" required maxlength="200"
-                  placeholder="Enter payment recipient details">
-              </div>
-
-              <div class="field">
-                <label for="methodInstructions">Payment Instructions</label>
-                <textarea id="methodInstructions" maxlength="1500"
-                  placeholder="Explain how users should pay and submit their transaction reference."></textarea>
-              </div>
-
-              <div class="field">
-                <label for="methodQr">QR Image URL (optional)</label>
-                <input id="methodQr" type="url" maxlength="1000"
-                  placeholder="https://example.com/payment-qr.png">
-              </div>
-
-              <div class="checkbox-row">
-                <input id="methodEnabled" type="checkbox" checked>
-                <label for="methodEnabled">Enable this payment method</label>
-              </div>
-
-              <button class="btn btn-primary" id="saveMethodBtn" type="submit" style="width:100%">
-                Save Payment Method
-              </button>
-            </form>
-
-            <details class="token-box">
-              <summary>Admin API settings</summary>
-              <div style="margin-top:14px">
-                <div class="field">
-                  <label for="apiBase">API Base URL</label>
-                  <input id="apiBase" type="url"
-                    value="https://freetube-backend-a222.onrender.com/api">
-                </div>
-                <div class="field">
-                  <label for="adminToken">Admin Access Token</label>
-                  <input id="adminToken" type="password" autocomplete="off"
-                    placeholder="Paste your admin access token">
-                </div>
-                <button class="btn btn-primary" id="saveSettingsBtn" type="button">
-                  Save Settings for This Page
-                </button>
-                <p class="muted" style="font-size:12px;line-height:1.6">
-                  The token is kept in this page's JavaScript memory and is not
-                  written to localStorage. Refreshing the page may require you
-                  to enter it again.
-                </p>
-              </div>
-            </details>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Payment Methods</h2>
-            <span class="muted" id="methodListLabel">0 methods</span>
-          </div>
-
-          <div class="panel-body">
-            <div id="methodsList">
-              <div class="empty">Loading payment methods…</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Blue Badge Pricing</h2>
-          </div>
-
-          <div class="panel-body">
-            <div class="notice">
-              Set the prices users should see for each subscription duration.
-              This form saves prices through the API only if the backend supports
-              the pricing endpoint shown in the code.
-            </div>
-
-            <div id="priceMessage" class="message" role="status"></div>
-
-            <form id="priceForm">
-              <div class="field">
-                <label for="priceCurrency">Currency</label>
-                <select id="priceCurrency">
-                  <option value="BDT">BDT — Bangladeshi Taka</option>
-                  <option value="INR">INR — Indian Rupee</option>
-                  <option value="USD">USD — US Dollar</option>
-                </select>
-              </div>
-
-              <div class="grid2">
-                <div class="field">
-                  <label for="price1">1 Month Price</label>
-                  <input id="price1" type="number" min="0" step="0.01" required placeholder="0.00">
-                </div>
-                <div class="field">
-                  <label for="price3">3 Months Price</label>
-                  <input id="price3" type="number" min="0" step="0.01" required placeholder="0.00">
-                </div>
-                <div class="field">
-                  <label for="price6">6 Months Price</label>
-                  <input id="price6" type="number" min="0" step="0.01" required placeholder="0.00">
-                </div>
-                <div class="field">
-                  <label for="price12">12 Months Price</label>
-                  <input id="price12" type="number" min="0" step="0.01" required placeholder="0.00">
-                </div>
-              </div>
-
-              <button class="btn btn-primary" type="submit" style="width:100%">
-                Save Pricing
-              </button>
-            </form>
-          </div>
-        </section>
-      </div>
-
-      <div>
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Payment Submissions</h2>
-            <button class="btn btn-small" id="loadPaymentsBtn" type="button">Load</button>
-          </div>
-
-          <div class="toolbar">
-            <input id="paymentSearch" type="search"
-              placeholder="Search username, reference, or method">
-            <select id="paymentStatusFilter">
-              <option value="all">All statuses</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
+          <div class="field">
+            <label for="methodRegion">Region *</label>
+            <select id="methodRegion" required>
+              <option value="Bangladesh">Bangladesh</option>
+              <option value="India">India</option>
+              <option value="International">International</option>
+              <option value="Other">Other</option>
             </select>
           </div>
+        </div>
+        <div class="field">
+          <label for="methodAccount">Recipient Number / Wallet / UPI ID *</label>
+          <input id="methodAccount" required maxlength="200" placeholder="Enter recipient details">
+        </div>
+        <div class="field">
+          <label for="methodInstructions">Payment Instructions</label>
+          <textarea id="methodInstructions" maxlength="1500" placeholder="Explain how to pay and submit the transaction reference."></textarea>
+        </div>
+        <div class="field">
+          <label for="methodQr">QR Image URL (optional)</label>
+          <input id="methodQr" type="url" maxlength="1000" placeholder="https://example.com/payment-qr.png">
+        </div>
+        <div class="checkbox-row">
+          <input id="methodEnabled" type="checkbox" checked>
+          <label for="methodEnabled">Enable this payment method</label>
+        </div>
+        <button class="btn btn-primary" id="saveMethodBtn" type="submit" style="width:100%">Save Payment Method</button>
+      </form>
 
-          <div id="paymentsMessage" class="message" role="status" style="margin:15px"></div>
+      <details class="token-box">
+        <summary>Admin API Settings</summary>
+        <div style="margin-top:12px">
+          <div class="field">
+            <label for="apiBase">API Base URL</label>
+            <input id="apiBase" type="url" value="https://freetube-backend-a222.onrender.com/api">
+          </div>
+          <div class="field">
+            <label for="adminToken">Admin Access Token</label>
+            <input id="adminToken" type="password" autocomplete="off" placeholder="Paste admin access token">
+          </div>
+          <button class="btn btn-primary" id="saveSettingsBtn" type="button">Connect & Load Data</button>
+          <p class="muted">The token stays in page memory and is not saved to localStorage. Refreshing the page may require it again.</p>
+        </div>
+      </details>
+    </div>
+  </section>
 
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>User / Submission</th>
-                  <th>Payment</th>
-                  <th>Reference</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="paymentsTable">
-                <tr>
-                  <td colspan="5" class="empty">Click Load to fetch payment submissions.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Payment Methods</h2>
+      <span class="muted" id="methodListLabel">0 methods</span>
+    </div>
+    <div class="panel-body">
+      <div id="methodsList"><div class="empty">Enter admin settings to load methods.</div></div>
+    </div>
+  </section>
 
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Verification Checklist</h2>
+  <section class="panel">
+    <details class="collapsible">
+      <summary class="panel-header"><h2>Blue Badge Pricing</h2></summary>
+      <div class="panel-body">
+        <div class="notice">Pricing is saved only if the backend supports the pricing endpoint.</div>
+        <div id="priceMessage" class="message" role="status"></div>
+        <form id="priceForm">
+          <div class="field">
+            <label for="priceCurrency">Currency</label>
+            <select id="priceCurrency">
+              <option value="BDT">BDT — Bangladeshi Taka</option>
+              <option value="INR">INR — Indian Rupee</option>
+              <option value="USD">USD — US Dollar</option>
+            </select>
           </div>
-          <div class="panel-body" style="line-height:1.9;font-size:13px;color:#cbd9ed">
-            <p>1. Check the user's transaction reference.</p>
-            <p>2. Verify the amount, recipient, currency and payment status using the payment provider.</p>
-            <p>3. Approve only a genuine, confirmed payment.</p>
-            <p>4. Reject duplicate, invalid or unconfirmed submissions.</p>
-            <p>5. The backend must enforce admin authorization, badge activation, and subscription expiry.</p>
-            <p style="color:#ffc857">
-              This page cannot independently confirm a real payment. It displays
-              and submits information to your backend.
-            </p>
+          <div class="grid2">
+            <div class="field"><label for="price1">1 Month Price</label><input id="price1" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+            <div class="field"><label for="price3">3 Months Price</label><input id="price3" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+            <div class="field"><label for="price6">6 Months Price</label><input id="price6" type="number" min="0" step="0.01" required placeholder="0.00"></div>
+            <div class="field"><label for="price12">12 Months Price</label><input id="price12" type="number" min="0" step="0.01" required placeholder="0.00"></div>
           </div>
-        </section>
+          <button class="btn btn-primary" type="submit" style="width:100%">Save Pricing</button>
+        </form>
       </div>
+    </details>
+  </section>
+</div>
+
+<div>
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Payment Submissions</h2>
+      <button class="btn btn-small" id="loadPaymentsBtn" type="button">↻ Load</button>
     </div>
-
-    <div class="footer-note">
-      Boys vs Girls 💙💗 · Blue Badge Admin<br>
-      Admin actions require a secure, authenticated backend.
+    <div class="toolbar">
+      <input id="paymentSearch" type="search" placeholder="Search user, reference, method">
+      <select id="paymentStatusFilter">
+        <option value="all">All statuses</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
     </div>
-  </main>
-
-  <script>
-    (() => {
-      "use strict";
-
-      const DEFAULT_API = "https://freetube-backend-a222.onrender.com/api";
-
-      let adminToken = "";
-      let methods = [];
-      let payments = [];
-      let pricing = null;
-
-      const $ = (id) => document.getElementById(id);
-
-      function apiBase() {
-        return $("apiBase").value.trim().replace(/\/+$/, "");
-      }
-
-      function showMessage(id, message, type = "info") {
-        const el = $(id);
-        el.textContent = message;
-        el.className = "message " + type;
-      }
-
-      function clearMessage(id) {
-        const el = $(id);
-        el.textContent = "";
-        el.className = "message";
-      }
-
-      function escapeHtml(value) {
-        return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-          "&": "&amp;",
-          "<": "&lt;",
-          ">": "&gt;",
-          '"': "&quot;",
-          "'": "&#39;"
-        })[char]);
-      }
-
-      function formatDate(value) {
-        if (!value) return "—";
-        const date = new Date(value);
-        if (Number.isNaN(date.getTime())) return String(value);
-        return date.toLocaleString();
-      }
-
-      function normalizeStatus(value) {
-        const status = String(value || "pending").toLowerCase();
-        if (status.includes("approv") || status === "paid" || status === "verified") {
-          return "approved";
-        }
-        if (status.includes("reject") || status === "failed" || status === "cancelled") {
-          return "rejected";
-        }
-        if (status === "pending" || status === "submitted" || status === "under_review") {
-          return "pending";
-        }
-        return status;
-      }
-
-      function statusBadge(value) {
-        const status = normalizeStatus(value);
-        const label = status.charAt(0).toUpperCase() + status.slice(1);
-        return `<span class="status status-${escapeHtml(status)}">${escapeHtml(label)}</span>`;
-      }
-
-      async function apiRequest(path, options = {}) {
-        if (!adminToken) {
-          throw new Error("Enter your admin access token in Admin API settings first.");
-        }
-
-        const headers = {
-          "Accept": "application/json",
-          ...(options.body ? { "Content-Type": "application/json" } : {}),
-          "Authorization": "Bearer " + adminToken,
-          ...(options.headers || {})
-        };
-
-        const response = await fetch(apiBase() + path, {
-          ...options,
-          headers
-        });
-
-        const raw = await response.text();
-        let data = {};
-
-        try {
-          data = raw ? JSON.parse(raw) : {};
-        } catch {
-          data = { message: raw };
-        }
-
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-            data.error ||
-            `Request failed (${response.status}). Check the backend route and admin permission.`
-          );
-        }
-
-        return data;
-      }
-
-      function extractArray(data, possibleKeys) {
-        if (Array.isArray(data)) return data;
-
-        for (const key of possibleKeys) {
-          if (Array.isArray(data?.[key])) return data[key];
-          if (Array.isArray(data?.data?.[key])) return data.data[key];
-        }
-
-        if (Array.isArray(data?.data)) return data.data;
-        return [];
-      }
-
-      function getMethodId(method) {
-        return method.id ?? method.method_id ?? method.payment_method_id ?? "";
-      }
-
-      function getPaymentId(payment) {
-        return payment.id ?? payment.payment_id ?? payment.submission_id ?? "";
-      }
-
-      function getPaymentUser(payment) {
-        return payment.username ||
-          payment.user?.username ||
-          payment.full_name ||
-          payment.user?.full_name ||
-          payment.user_id ||
-          "Unknown user";
-      }
-
-      function getPaymentMethod(payment) {
-        return payment.payment_method_name ||
-          payment.method_name ||
-          payment.method ||
-          payment.payment_method ||
-          "—";
-      }
-
-      function getReference(payment) {
-        return payment.transaction_reference ||
-          payment.transaction_id ||
-          payment.reference ||
-          payment.trx_id ||
-          "—";
-      }
-
-      function getAmount(payment) {
-        const amount = payment.amount ?? payment.price ?? payment.payment_amount;
-        const currency = payment.currency || "";
-        return amount === undefined || amount === null
-          ? "—"
-          : `${currency} ${amount}`.trim();
-      }
-
-      function renderStats() {
-        $("pendingCount").textContent =
-          payments.filter(p => normalizeStatus(p.status) === "pending").length;
-
-        $("approvedCount").textContent =
-          payments.filter(p => normalizeStatus(p.status) === "approved").length;
-
-        $("rejectedCount").textContent =
-          payments.filter(p => normalizeStatus(p.status) === "rejected").length;
-
-        $("methodsCount").textContent =
-          methods.filter(m => m.enabled === true || m.is_enabled === true || m.active === true).length;
-      }
-
-      function renderMethods() {
-        $("methodListLabel").textContent =
-          `${methods.length} method${methods.length === 1 ? "" : "s"}`;
-
-        if (!methods.length) {
-          $("methodsList").innerHTML =
-            '<div class="empty">No payment methods found. Add a method above, or check the backend API.</div>';
-          renderStats();
-          return;
-        }
-
-        $("methodsList").innerHTML = methods.map((method) => {
-          const id = getMethodId(method);
-          const name = method.name || method.method_name || "Unnamed method";
-          const region = method.region || method.country || "—";
-          const recipient = method.account_details ||
-            method.account_number ||
-            method.recipient ||
-            method.wallet_address ||
-            method.upi_id ||
-            "Not provided";
-
-          const enabled = method.enabled === true ||
-            method.is_enabled === true ||
-            method.active === true;
-
-          return `
-            <article class="payment-method">
-              <div class="method-top">
-                <div>
-                  <div class="method-name">${escapeHtml(name)}</div>
-                  <div class="method-meta">
-                    Region: ${escapeHtml(region)}<br>
-                    Recipient: ${escapeHtml(recipient)}<br>
-                    ID: ${escapeHtml(id || "Not supplied by API")}
-                  </div>
-                </div>
-                ${enabled
-                  ? '<span class="status status-active">Enabled</span>'
-                  : '<span class="status status-disabled">Disabled</span>'}
-              </div>
-
-              <div class="method-actions">
-                <button class="btn btn-small" data-edit-method="${escapeHtml(id)}" type="button">Edit</button>
-                <button class="btn btn-small ${enabled ? "btn-danger" : "btn-success"}"
-                  data-toggle-method="${escapeHtml(id)}"
-                  data-enabled="${enabled ? "true" : "false"}"
-                  type="button">${enabled ? "Disable" : "Enable"}</button>
-                <button class="btn btn-small btn-danger"
-                  data-delete-method="${escapeHtml(id)}" type="button">Delete</button>
-              </div>
-            </article>
-          `;
-        }).join("");
-
-        renderStats();
-      }
-
-      function renderPayments() {
-        const query = $("paymentSearch").value.trim().toLowerCase();
-        const filter = $("paymentStatusFilter").value;
-
-        const filtered = payments.filter((payment) => {
-          const status = normalizeStatus(payment.status);
-          const searchable = [
-            getPaymentUser(payment),
-            getPaymentMethod(payment),
-            getReference(payment),
-            getPaymentId(payment),
-            payment.user_id,
-            payment.transaction_reference
-          ].join(" ").toLowerCase();
-
-          return (!query || searchable.includes(query)) &&
-            (filter === "all" || status === filter);
-        });
-
-        if (!filtered.length) {
-          $("paymentsTable").innerHTML =
-            '<tr><td colspan="5" class="empty">No matching payment submissions found.</td></tr>';
-          renderStats();
-          return;
-        }
-
-        $("paymentsTable").innerHTML = filtered.map((payment) => {
-          const id = getPaymentId(payment);
-          const status = normalizeStatus(payment.status);
-          const duration = payment.duration_months || payment.months || payment.duration || "—";
-          const submittedAt = payment.created_at || payment.submitted_at || payment.createdAt;
-
-          const actions = status === "pending"
-            ? `
-              <button class="btn btn-success btn-small"
-                data-payment-action="approve" data-payment-id="${escapeHtml(id)}"
-                type="button">Approve</button>
-              <button class="btn btn-danger btn-small"
-                data-payment-action="reject" data-payment-id="${escapeHtml(id)}"
-                type="button">Reject</button>
-            `
-            : `<span class="muted">No actions</span>`;
-
-          return `
-            <tr>
-              <td>
-                <strong>${escapeHtml(getPaymentUser(payment))}</strong><br>
-                <span class="muted">ID: ${escapeHtml(id || "—")}</span><br>
-                <span class="muted">${escapeHtml(formatDate(submittedAt))}</span>
-              </td>
-              <td>
-                ${escapeHtml(getPaymentMethod(payment))}<br>
-                <strong>${escapeHtml(getAmount(payment))}</strong><br>
-                <span class="muted">Duration: ${escapeHtml(duration)} month(s)</span>
-              </td>
-              <td>
-                <code>${escapeHtml(getReference(payment))}</code>
-              </td>
-              <td>${statusBadge(status)}</td>
-              <td>
-                ${actions}
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        renderStats();
-      }
-
-      async function loadMethods() {
-        $("methodsList").innerHTML = '<div class="empty">Loading payment methods…</div>';
-
-        try {
-          const data = await apiRequest("/payments/methods");
-          methods = extractArray(data, ["methods", "payment_methods", "items"]);
-          renderMethods();
-          clearMessage("methodMessage");
-        } catch (error) {
-          methods = [];
-          renderMethods();
-          showMessage(
-            "methodMessage",
-            "Could not load payment methods: " + error.message,
-            "error"
-          );
-        }
-      }
-
-      async function loadPayments() {
-        $("paymentsTable").innerHTML =
-          '<tr><td colspan="5" class="empty">Loading payment submissions…</td></tr>';
-
-        try {
-          const data = await apiRequest("/admin/payments");
-          payments = extractArray(data, ["payments", "submissions", "items"]);
-          renderPayments();
-          clearMessage("paymentsMessage");
-        } catch (error) {
-          payments = [];
-          renderPayments();
-          showMessage(
-            "paymentsMessage",
-            "Could not load submissions: " + error.message,
-            "error"
-          );
-        }
-      }
-
-      async function loadPricing() {
-        try {
-          const data = await apiRequest("/admin/payment-pricing");
-          pricing = data.pricing || data.data || data;
-
-          const currency = pricing.currency || "BDT";
-          if ([...$("priceCurrency").options].some(option => option.value === currency)) {
-            $("priceCurrency").value = currency;
-          }
-
-          $("price1").value = pricing.month_1 ?? pricing["1_month"] ?? pricing.price_1_month ?? "";
-          $("price3").value = pricing.month_3 ?? pricing["3_months"] ?? pricing.price_3_months ?? "";
-          $("price6").value = pricing.month_6 ?? pricing["6_months"] ?? pricing.price_6_months ?? "";
-          $("price12").value = pricing.month_12 ?? pricing["12_months"] ?? pricing.price_12_months ?? "";
-        } catch (error) {
-          showMessage(
-            "priceMessage",
-            "Could not load saved pricing. If your backend does not have GET /admin/payment-pricing, this endpoint must be added before prices can be saved. " + error.message,
-            "info"
-          );
-        }
-      }
-
-      function resetMethodForm() {
-        $("methodForm").reset();
-        $("methodId").value = "";
-        $("methodEnabled").checked = true;
-        $("methodFormHeading").textContent = "Add Payment Method";
-        $("saveMethodBtn").textContent = "Save Payment Method";
-        clearMessage("methodMessage");
-      }
-
-      function editMethod(id) {
-        const method = methods.find(item => String(getMethodId(item)) === String(id));
-
-        if (!method) {
-          showMessage("methodMessage", "This payment method could not be found.", "error");
-          return;
-        }
-
-        $("methodId").value = getMethodId(method);
-        $("methodName").value = method.name || method.method_name || "";
-        $("methodRegion").value = method.region || method.country || "Other";
-        $("methodAccount").value = method.account_details ||
-          method.account_number ||
-          method.recipient ||
-          method.wallet_address ||
-          method.upi_id || "";
-        $("methodInstructions").value = method.instructions || method.description || "";
-        $("methodQr").value = method.qr_url || method.qr_image_url || "";
-        $("methodEnabled").checked = method.enabled === true ||
-          method.is_enabled === true ||
-          method.active === true;
-
-        $("methodFormHeading").textContent = "Edit Payment Method";
-        $("saveMethodBtn").textContent = "Update Payment Method";
-        $("methodFormHeading").scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-
-      async function saveMethod(event) {
-        event.preventDefault();
-        clearMessage("methodMessage");
-
-        const id = $("methodId").value.trim();
-        const payload = {
-          name: $("methodName").value.trim(),
-          method_name: $("methodName").value.trim(),
-          region: $("methodRegion").value,
-          account_details: $("methodAccount").value.trim(),
-          recipient: $("methodAccount").value.trim(),
-          instructions: $("methodInstructions").value.trim(),
-          qr_url: $("methodQr").value.trim() || null,
-          enabled: $("methodEnabled").checked,
-          is_enabled: $("methodEnabled").checked
-        };
-
-        const button = $("saveMethodBtn");
-        button.disabled = true;
-        button.textContent = "Saving…";
-
-        try {
-          let result;
-
-          if (id) {
-            result = await apiRequest(
-              "/admin/payment-methods/" + encodeURIComponent(id),
-              { method: "PATCH", body: JSON.stringify(payload) }
-            );
-          } else {
-            result = await apiRequest(
-              "/admin/payment-methods",
-              { method: "POST", body: JSON.stringify(payload) }
-            );
-          }
-
-          showMessage(
-            "methodMessage",
-            result.message || (id ? "Payment method update request completed." : "Payment method creation request completed."),
-            "success"
-          );
-
-          resetMethodForm();
-          await loadMethods();
-        } catch (error) {
-          showMessage(
-            "methodMessage",
-            "Could not save payment method: " + error.message +
-            " Check whether your backend supports POST/PATCH /admin/payment-methods and these field names.",
-            "error"
-          );
-        } finally {
-          button.disabled = false;
-          button.textContent = $("methodId").value ? "Update Payment Method" : "Save Payment Method";
-        }
-      }
-
-      async function toggleMethod(id, currentlyEnabled) {
-        if (!id) {
-          showMessage("methodMessage", "The API did not provide a payment method ID.", "error");
-          return;
-        }
-
-        const action = currentlyEnabled ? "disable" : "enable";
-        if (!confirm(`Are you sure you want to ${action} this payment method?`)) return;
-
-        try {
-          await apiRequest(
-            "/admin/payment-methods/" + encodeURIComponent(id),
-            {
-              method: "PATCH",
-              body: JSON.stringify({
-                enabled: !currentlyEnabled,
-                is_enabled: !currentlyEnabled
-              })
-            }
-          );
-
-          showMessage("methodMessage", `Payment method ${action} request completed.`, "success");
-          await loadMethods();
-        } catch (error) {
-          showMessage("methodMessage", "Could not update method: " + error.message, "error");
-        }
-      }
-
-      async function deleteMethod(id) {
-        if (!id) {
-          showMessage("methodMessage", "The API did not provide a payment method ID.", "error");
-          return;
-        }
-
-        if (!confirm("Delete this payment method? This cannot be undone.")) return;
-
-        try {
-          const result = await apiRequest(
-            "/admin/payment-methods/" + encodeURIComponent(id),
-            { method: "DELETE" }
-          );
-
-          showMessage(
-            "methodMessage",
-            result.message || "Payment method delete request completed.",
-            "success"
-          );
-
-          await loadMethods();
-        } catch (error) {
-          showMessage("methodMessage", "Could not delete method: " + error.message, "error");
-        }
-      }
-
-      async function reviewPayment(id, action) {
-        if (!id) {
-          showMessage("paymentsMessage", "The API did not provide a payment submission ID.", "error");
-          return;
-        }
-
-        const isApprove = action === "approve";
-        const warning = isApprove
-          ? "Approve this payment? Only continue after verifying the transaction with the payment provider. The backend should activate the Blue Badge after successful approval."
-          : "Reject this payment submission?";
-
-        if (!confirm(warning)) return;
-
-        let reason = "";
-        if (!isApprove) {
-          reason = prompt("Optional rejection reason:") || "";
-        }
-
-        try {
-          const result = await apiRequest(
-            "/admin/payments/" + encodeURIComponent(id),
-            {
-              method: "PATCH",
-              body: JSON.stringify({
-                status: isApprove ? "approved" : "rejected",
-                action: isApprove ? "approve" : "reject",
-                rejection_reason: reason
-              })
-            }
-          );
-
-          showMessage(
-            "paymentsMessage",
-            result.message ||
-              (isApprove ? "Approval request completed." : "Rejection request completed."),
-            "success"
-          );
-
-          await loadPayments();
-        } catch (error) {
-          showMessage(
-            "paymentsMessage",
-            "Could not review this payment: " + error.message +
-            " Check the backend PATCH /admin/payments/:id route and its expected payload.",
-            "error"
-          );
-        }
-      }
-
-      async function savePricing(event) {
-        event.preventDefault();
-        clearMessage("priceMessage");
-
-        const payload = {
-          currency: $("priceCurrency").value,
-          month_1: Number($("price1").value),
-          month_3: Number($("price3").value),
-          month_6: Number($("price6").value),
-          month_12: Number($("price12").value)
-        };
-
-        if (Object.values(payload).some(value =>
-          typeof value === "number" && (!Number.isFinite(value) || value < 0)
-        )) {
-          showMessage("priceMessage", "Please enter valid non-negative prices.", "error");
-          return;
-        }
-
-        try {
-          const result = await apiRequest("/admin/payment-pricing", {
-            method: "PATCH",
-            body: JSON.stringify(payload)
-          });
-
-          showMessage(
-            "priceMessage",
-            result.message || "Pricing update request completed.",
-            "success"
-          );
-        } catch (error) {
-          showMessage(
-            "priceMessage",
-            "Could not save pricing: " + error.message +
-            " Your backend needs a matching PATCH /admin/payment-pricing endpoint for this form to work.",
-            "error"
-          );
-        }
-      }
-
-      async function refreshAll() {
-        if (!adminToken) {
-          showMessage(
-            "globalMessage",
-            "Enter your admin access token in Admin API settings, then refresh the data.",
-            "info"
-          );
-          return;
-        }
-
-        clearMessage("globalMessage");
-        await Promise.allSettled([
-          loadMethods(),
-          loadPayments(),
-          loadPricing()
-        ]);
-      }
-
-      $("dashboardBtn").addEventListener("click", () => {
-        window.location.href = "admin.html";
-      });
-
-      $("refreshBtn").addEventListener("click", refreshAll);
-      $("loadPaymentsBtn").addEventListener("click", loadPayments);
-      $("resetMethodBtn").addEventListener("click", resetMethodForm);
-      $("methodForm").addEventListener("submit", saveMethod);
-      $("priceForm").addEventListener("submit", savePricing);
-
-      $("paymentSearch").addEventListener("input", renderPayments);
-      $("paymentStatusFilter").addEventListener("change", renderPayments);
-
-      $("saveSettingsBtn").addEventListener("click", async () => {
-        const token = $("adminToken").value.trim();
-        const base = apiBase();
-
-        if (!base) {
-          showMessage("globalMessage", "Please enter the API Base URL.", "error");
-          return;
-        }
-
-        if (!token) {
-          showMessage("globalMessage", "Please enter your admin access token.", "error");
-          return;
-        }
-
-        adminToken = token;
-        showMessage("globalMessage", "Settings accepted for this page. Loading admin data…", "info");
-        await refreshAll();
-      });
-
-      $("methodsList").addEventListener("click", async (event) => {
-        const editButton = event.target.closest("[data-edit-method]");
-        const toggleButton = event.target.closest("[data-toggle-method]");
-        const deleteButton = event.target.closest("[data-delete-method]");
-
-        if (editButton) {
-          editMethod(editButton.dataset.editMethod);
-          return;
-        }
-
-        if (toggleButton) {
-          await toggleMethod(
-            toggleButton.dataset.toggleMethod,
-            toggleButton.dataset.enabled === "true"
-          );
-          return;
-        }
-
-        if (deleteButton) {
-          await deleteMethod(deleteButton.dataset.deleteMethod);
-        }
-      });
-
-      $("paymentsTable").addEventListener("click", async (event) => {
-        const button = event.target.closest("[data-payment-action]");
-        if (!button) return;
-
-        button.disabled = true;
-        try {
-          await reviewPayment(button.dataset.paymentId, button.dataset.paymentAction);
-        } finally {
-          button.disabled = false;
-        }
-      });
-
-      $("apiBase").value = DEFAULT_API;
-      renderStats();
-      renderPayments();
-      renderMethods();
-    })();
-  </script>
+    <div id="paymentsMessage" class="message" role="status" style="margin:10px 12px"></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>User / Submission</th><th>Payment</th><th>Reference</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="paymentsTable"><tr><td colspan="5" class="empty">Connect admin settings to load submissions.</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="panel">
+    <details class="collapsible">
+      <summary class="panel-header"><h2>Verification Checklist</h2></summary>
+      <div class="panel-body checklist">
+        <p>1. Check the transaction reference.</p>
+        <p>2. Verify amount, recipient, currency, and status with the payment provider.</p>
+        <p>3. Approve only confirmed payments.</p>
+        <p>4. Reject duplicate, invalid, or unconfirmed submissions.</p>
+        <p>5. Backend must enforce admin authorization, badge activation, and subscription expiry.</p>
+        <p style="color:#ffc857">This page cannot independently confirm a payment. Verification must be done with the payment provider.</p>
+      </div>
+    </details>
+  </section>
+</div>
+</div>
+
+<div class="footer-note">Boys vs Girls 💙💗 · Blue Badge Admin<br>Secure, authenticated backend required for admin actions.</div>
+</main>
+
+<script>
+(() => {
+"use strict";
+
+const DEFAULT_API="https://freetube-backend-a222.onrender.com/api";
+let adminToken="",methods=[],payments=[],pricing=null;
+const $=id=>document.getElementById(id);
+const apiBase=()=>$("apiBase").value.trim().replace(/\/+$/,"");
+
+function showMessage(id,message,type="info"){
+  const el=$(id);el.textContent=message;el.className="message "+type;
+}
+function clearMessage(id){const el=$(id);el.textContent="";el.className="message"}
+function escapeHtml(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function formatDate(value){
+  if(!value)return "—";
+  const date=new Date(value);
+  return Number.isNaN(date.getTime())?String(value):date.toLocaleString();
+}
+function normalizeStatus(value){
+  const s=String(value||"pending").toLowerCase();
+  if(s.includes("approv")||s==="paid"||s==="verified")return "approved";
+  if(s.includes("reject")||s==="failed"||s==="cancelled")return "rejected";
+  if(["pending","submitted","under_review"].includes(s))return "pending";
+  return s;
+}
+function statusBadge(value){
+  const s=normalizeStatus(value);
+  return `<span class="status status-${escapeHtml(s)}">${escapeHtml(s.charAt(0).toUpperCase()+s.slice(1))}</span>`;
+}
+async function apiRequest(path,options={}){
+  if(!adminToken)throw new Error("Enter your admin access token in Admin API Settings first.");
+  const headers={
+    Accept:"application/json",
+    ...(options.body?{"Content-Type":"application/json"}:{}),
+    Authorization:"Bearer "+adminToken,
+    ...(options.headers||{})
+  };
+  const response=await fetch(apiBase()+path,{...options,headers});
+  const raw=await response.text();
+  let data={};
+  try{data=raw?JSON.parse(raw):{}}catch{data={message:raw}}
+  if(!response.ok)throw new Error(data.message||data.error||`Request failed (${response.status}). Check backend route and admin permission.`);
+  return data;
+}
+function extractArray(data,keys){
+  if(Array.isArray(data))return data;
+  for(const key of keys){
+    if(Array.isArray(data?.[key]))return data[key];
+    if(Array.isArray(data?.data?.[key]))return data.data[key];
+  }
+  return Array.isArray(data?.data)?data.data:[];
+}
+const methodId=m=>m.id??m.method_id??m.payment_method_id??"";
+const paymentId=p=>p.id??p.payment_id??p.submission_id??"";
+function paymentUser(p){return p.username||p.user?.username||p.full_name||p.user?.full_name||p.user_id||"Unknown user"}
+function paymentMethod(p){return p.payment_method_name||p.method_name||p.method||p.payment_method||"—"}
+function reference(p){return p.transaction_reference||p.transaction_id||p.reference||p.trx_id||"—"}
+function amount(p){
+  const a=p.amount??p.price??p.payment_amount;
+  return a===undefined||a===null?"—":`${p.currency||""} ${a}`.trim();
+}
+function isEnabled(m){return m.enabled===true||m.is_enabled===true||m.active===true}
+
+function renderStats(){
+  $("pendingCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="pending").length;
+  $("approvedCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="approved").length;
+  $("rejectedCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="rejected").length;
+  $("methodsCount").textContent=methods.filter(isEnabled).length;
+}
+function renderMethods(){
+  $("methodListLabel").textContent=`${methods.length} method${methods.length===1?"":"s"}`;
+  if(!methods.length){
+    $("methodsList").innerHTML='<div class="empty">No payment methods found. Add a method or check the backend API.</div>';
+    renderStats();return;
+  }
+  $("methodsList").innerHTML=methods.map(m=>{
+    const id=methodId(m),name=m.name||m.method_name||"Unnamed method";
+    const region=m.region||m.country||"—";
+    const recipient=m.account_details||m.account_number||m.recipient||m.wallet_address||m.upi_id||"Not provided";
+    const enabled=isEnabled(m);
+    return `<article class="payment-method">
+      <div class="method-top"><div>
+        <div class="method-name">${escapeHtml(name)}</div>
+        <div class="method-meta">Region: ${escapeHtml(region)}<br>Recipient: ${escapeHtml(recipient)}<br>ID: ${escapeHtml(id||"Not supplied")}</div>
+      </div>${enabled?'<span class="status status-active">Enabled</span>':'<span class="status status-disabled">Disabled</span>'}</div>
+      <div class="method-actions">
+        <button class="btn btn-small" data-edit-method="${escapeHtml(id)}" type="button">Edit</button>
+        <button class="btn btn-small ${enabled?"btn-danger":"btn-success"}" data-toggle-method="${escapeHtml(id)}" data-enabled="${enabled}" type="button">${enabled?"Disable":"Enable"}</button>
+        <button class="btn btn-small btn-danger" data-delete-method="${escapeHtml(id)}" type="button">Delete</button>
+      </div></article>`;
+  }).join("");
+  renderStats();
+}
+function renderPayments(){
+  const query=$("paymentSearch").value.trim().toLowerCase();
+  const filter=$("paymentStatusFilter").value;
+  const filtered=payments.filter(p=>{
+    const s=normalizeStatus(p.status);
+    const searchable=[paymentUser(p),paymentMethod(p),reference(p),paymentId(p),p.user_id,p.transaction_reference].join(" ").toLowerCase();
+    return (!query||searchable.includes(query))&&(filter==="all"||s===filter);
+  });
+  if(!filtered.length){
+    $("paymentsTable").innerHTML='<tr><td colspan="5" class="empty">No matching payment submissions found.</td></tr>';
+    renderStats();return;
+  }
+  $("paymentsTable").innerHTML=filtered.map(p=>{
+    const id=paymentId(p),s=normalizeStatus(p.status);
+    const duration=p.duration_months||p.months||p.duration||"—";
+    const submitted=p.created_at||p.submitted_at||p.createdAt;
+    const actions=s==="pending"?`
+      <button class="btn btn-success btn-small" data-payment-action="approve" data-payment-id="${escapeHtml(id)}" type="button">Approve</button>
+      <button class="btn btn-danger btn-small" data-payment-action="reject" data-payment-id="${escapeHtml(id)}" type="button">Reject</button>`:'<span class="muted">No actions</span>';
+    return `<tr>
+      <td><strong>${escapeHtml(paymentUser(p))}</strong><br><span class="muted">ID: ${escapeHtml(id||"—")}</span><br><span class="muted">${escapeHtml(formatDate(submitted))}</span></td>
+      <td>${escapeHtml(paymentMethod(p))}<br><strong>${escapeHtml(amount(p))}</strong><br><span class="muted">${escapeHtml(duration)} month(s)</span></td>
+      <td><code>${escapeHtml(reference(p))}</code></td><td>${statusBadge(s)}</td><td>${actions}</td>
+    </tr>`;
+  }).join("");
+  renderStats();
+}
+async function loadMethods(){
+  $("methodsList").innerHTML='<div class="empty">Loading payment methods…</div>';
+  try{
+    const data=await apiRequest("/payments/methods");
+    methods=extractArray(data,["methods","payment_methods","items"]);
+    renderMethods();clearMessage("methodMessage");
+  }catch(e){
+    methods=[];renderMethods();
+    showMessage("methodMessage","Could not load payment methods: "+e.message,"error");
+  }
+}
+async function loadPayments(){
+  $("paymentsTable").innerHTML='<tr><td colspan="5" class="empty">Loading submissions…</td></tr>';
+  try{
+    const data=await apiRequest("/admin/payments");
+    payments=extractArray(data,["payments","submissions","items"]);
+    renderPayments();clearMessage("paymentsMessage");
+  }catch(e){
+    payments=[];renderPayments();
+    showMessage("paymentsMessage","Could not load submissions: "+e.message,"error");
+  }
+}
+async function loadPricing(){
+  try{
+    const data=await apiRequest("/admin/payment-pricing");
+    pricing=data.pricing||data.data||data;
+    const currency=pricing.currency||"BDT";
+    if([...$("priceCurrency").options].some(o=>o.value===currency))$("priceCurrency").value=currency;
+    $("price1").value=pricing.month_1??pricing["1_month"]??pricing.price_1_month??"";
+    $("price3").value=pricing.month_3??pricing["3_months"]??pricing.price_3_months??"";
+    $("price6").value=pricing.month_6??pricing["6_months"]??pricing.price_6_months??"";
+    $("price12").value=pricing.month_12??pricing["12_months"]??pricing.price_12_months??"";
+    clearMessage("priceMessage");
+  }catch(e){
+    showMessage("priceMessage","Could not load pricing. Check whether GET /admin/payment-pricing is supported. "+e.message,"info");
+  }
+}
+function resetMethodForm(){
+  $("methodForm").reset();$("methodId").value="";
+  $("methodEnabled").checked=true;
+  $("methodFormHeading").textContent="Add Payment Method";
+  $("saveMethodBtn").textContent="Save Payment Method";
+  clearMessage("methodMessage");
+}
+function editMethod(id){
+  const m=methods.find(x=>String(methodId(x))===String(id));
+  if(!m){showMessage("methodMessage","Payment method not found.","error");return}
+  $("methodId").value=methodId(m);
+  $("methodName").value=m.name||m.method_name||"";
+  $("methodRegion").value=m.region||m.country||"Other";
+  $("methodAccount").value=m.account_details||m.account_number||m.recipient||m.wallet_address||m.upi_id||"";
+  $("methodInstructions").value=m.instructions||m.description||"";
+  $("methodQr").value=m.qr_url||m.qr_image_url||"";
+  $("methodEnabled").checked=isEnabled(m);
+  $("methodFormHeading").textContent="Edit Payment Method";
+  $("saveMethodBtn").textContent="Update Payment Method";
+  $("methodFormHeading").scrollIntoView({behavior:"smooth",block:"center"});
+}
+async function saveMethod(event){
+  event.preventDefault();clearMessage("methodMessage");
+  const id=$("methodId").value.trim();
+  const name=$("methodName").value.trim(),account=$("methodAccount").value.trim();
+  const enabled=$("methodEnabled").checked;
+  const payload={
+    name,method_name:name,region:$("methodRegion").value,
+    account_details:account,recipient:account,
+    instructions:$("methodInstructions").value.trim(),
+    qr_url:$("methodQr").value.trim()||null,
+    enabled,is_enabled:enabled
+  };
+  const btn=$("saveMethodBtn");btn.disabled=true;btn.textContent="Saving…";
+  try{
+    const result=id
+      ?await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify(payload)})
+      :await apiRequest("/admin/payment-methods",{method:"POST",body:JSON.stringify(payload)});
+    showMessage("methodMessage",result.message||(id?"Update request completed.":"Creation request completed."),"success");
+    resetMethodForm();await loadMethods();
+  }catch(e){
+    showMessage("methodMessage","Could not save method: "+e.message+" Check backend payment-method routes and field names.","error");
+  }finally{
+    btn.disabled=false;btn.textContent=$("methodId").value?"Update Payment Method":"Save Payment Method";
+  }
+}
+async function toggleMethod(id,currentlyEnabled){
+  if(!id){showMessage("methodMessage","Payment method ID is missing.","error");return}
+  const action=currentlyEnabled?"disable":"enable";
+  if(!confirm(`Are you sure you want to ${action} this payment method?`))return;
+  try{
+    await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{
+      method:"PATCH",body:JSON.stringify({enabled:!currentlyEnabled,is_enabled:!currentlyEnabled})
+    });
+    showMessage("methodMessage",`Payment method ${action} request completed.`,"success");
+    await loadMethods();
+  }catch(e){showMessage("methodMessage","Could not update method: "+e.message,"error")}
+}
+async function deleteMethod(id){
+  if(!id){showMessage("methodMessage","Payment method ID is missing.","error");return}
+  if(!confirm("Delete this payment method? This cannot be undone."))return;
+  try{
+    const result=await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{method:"DELETE"});
+    showMessage("methodMessage",result.message||"Delete request completed.","success");
+    await loadMethods();
+  }catch(e){showMessage("methodMessage","Could not delete method: "+e.message,"error")}
+}
+async function reviewPayment(id,action){
+  if(!id){showMessage("paymentsMessage","Payment submission ID is missing.","error");return}
+  const approve=action==="approve";
+  const warning=approve
+    ?"Approve this payment? Only continue after verifying the transaction with the payment provider."
+    :"Reject this payment submission?";
+  if(!confirm(warning))return;
+  const reason=approve?"":(prompt("Optional rejection reason:")||"");
+  try{
+    const result=await apiRequest("/admin/payments/"+encodeURIComponent(id),{
+      method:"PATCH",
+      body:JSON.stringify({status:approve?"approved":"rejected",action:approve?"approve":"reject",rejection_reason:reason})
+    });
+    showMessage("paymentsMessage",result.message||(approve?"Approval request completed.":"Rejection request completed."),"success");
+    await loadPayments();
+  }catch(e){
+    showMessage("paymentsMessage","Could not review payment: "+e.message+" Check PATCH /admin/payments/:id and its expected payload.","error");
+  }
+}
+async function savePricing(event){
+  event.preventDefault();clearMessage("priceMessage");
+  const values=[$("price1").value,$("price3").value,$("price6").value,$("price12").value].map(Number);
+  if(values.some(v=>!Number.isFinite(v)||v<0)){
+    showMessage("priceMessage","Enter valid non-negative prices.","error");return;
+  }
+  const payload={currency:$("priceCurrency").value,month_1:values[0],month_3:values[1],month_6:values[2],month_12:values[3]};
+  try{
+    const result=await apiRequest("/admin/payment-pricing",{method:"PATCH",body:JSON.stringify(payload)});
+    showMessage("priceMessage",result.message||"Pricing update request completed.","success");
+  }catch(e){
+    showMessage("priceMessage","Could not save pricing: "+e.message+" Check whether PATCH /admin/payment-pricing exists on the backend.","error");
+  }
+}
+async function refreshAll(){
+  if(!adminToken){
+    showMessage("globalMessage","Open Admin API Settings and enter your admin access token first.","info");return;
+  }
+  clearMessage("globalMessage");
+  await Promise.allSettled([loadMethods(),loadPayments(),loadPricing()]);
+}
+
+$("dashboardBtn").addEventListener("click",()=>{window.location.href="admin.html"});
+$("refreshBtn").addEventListener("click",refreshAll);
+$("loadPaymentsBtn").addEventListener("click",loadPayments);
+$("resetMethodBtn").addEventListener("click",resetMethodForm);
+$("methodForm").addEventListener("submit",saveMethod);
+$("priceForm").addEventListener("submit",savePricing);
+$("paymentSearch").addEventListener("input",renderPayments);
+$("paymentStatusFilter").addEventListener("change",renderPayments);
+
+$("saveSettingsBtn").addEventListener("click",async()=>{
+  const token=$("adminToken").value.trim(),base=apiBase();
+  if(!base){showMessage("globalMessage","Enter the API Base URL.","error");return}
+  if(!token){showMessage("globalMessage","Enter your admin access token.","error");return}
+  adminToken=token;
+  showMessage("globalMessage","Connecting and loading admin data…","info");
+  await refreshAll();
+});
+
+$("methodsList").addEventListener("click",async event=>{
+  const edit=event.target.closest("[data-edit-method]");
+  const toggle=event.target.closest("[data-toggle-method]");
+  const del=event.target.closest("[data-delete-method]");
+  if(edit){editMethod(edit.dataset.editMethod);return}
+  if(toggle){await toggleMethod(toggle.dataset.toggleMethod,toggle.dataset.enabled==="true");return}
+  if(del)await deleteMethod(del.dataset.deleteMethod);
+});
+$("paymentsTable").addEventListener("click",async event=>{
+  const btn=event.target.closest("[data-payment-action]");
+  if(!btn)return;
+  btn.disabled=true;
+  try{await reviewPayment(btn.dataset.paymentId,btn.dataset.paymentAction)}
+  finally{btn.disabled=false}
+});
+
+$("apiBase").value=DEFAULT_API;
+renderStats();renderPayments();renderMethods();
+})();
+</script>
 </body>
 </html>
