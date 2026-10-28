@@ -4,21 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#251d2d">
-<title>FreeTube — Stories</title>
+<title>Boys vs Girls — Stories</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
 :root{--green:#00f59b;--red:#ff626b;--glass:rgba(25,27,33,.78);--border:rgba(255,255,255,.16);--muted:#c9d0d0}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
 body{min-height:100vh;min-height:100dvh;background:linear-gradient(140deg,#8b1538,#43263f 48%,#087a49);background-attachment:fixed;color:#fff;font-family:Arial,Helvetica,sans-serif}
-button,input,textarea{font:inherit}button{color:inherit;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
-.app{max-width:650px;min-height:100dvh;margin:auto;padding-bottom:30px;background:rgba(16,20,24,.18)}
-.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:13px;padding:13px 16px;background:rgba(30,24,35,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(20px)}
+button,input,textarea{font:inherit}
+button{color:inherit;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.app{max-width:650px;min-height:100dvh;margin:auto;padding-bottom:95px;background:rgba(16,20,24,.18)}
+.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:13px;padding:13px 16px;background:rgba(30,24,35,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .icon-btn{width:42px;height:42px;border:1px solid var(--border);border-radius:50%;background:#ffffff12;display:grid;place-items:center}
 .brand{font-size:23px;font-weight:900;flex:1;letter-spacing:-1px}.brand i{color:var(--red)}.brand span{color:var(--green)}
 .top-label{font-size:12px;color:var(--green);font-weight:700}
 .heading{padding:22px 17px 6px;font-size:26px;font-weight:900}
 .subheading{padding:0 17px 17px;font-size:13px;line-height:1.6;color:var(--muted)}
-.panel{margin:0 12px 16px;padding:15px;border:1px solid var(--border);border-radius:20px;background:var(--glass);backdrop-filter:blur(18px);box-shadow:0 12px 35px #0002}
+.panel{margin:0 12px 16px;padding:15px;border:1px solid var(--border);border-radius:20px;background:var(--glass);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 35px #0002}
 .panel-title{font-size:15px;font-weight:800;margin-bottom:13px}
 .picker{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .pick{min-height:80px;border:1px solid var(--border);border-radius:15px;background:#ffffff09;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:13px}
@@ -44,37 +48,40 @@ textarea::placeholder{color:#b6bfc0}
 .story-list{display:flex;gap:13px;overflow-x:auto;padding:2px 1px 10px;scrollbar-width:thin}
 .story-card{position:relative;flex:0 0 105px;height:155px;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#ffffff0b;display:flex;align-items:center;justify-content:center}
 .story-card img,.story-card video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.story-card::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#000c)}
+.story-card::after{content:"";position:absolute;inset:45% 0 0;background:linear-gradient(transparent,#000c);pointer-events:none}
 .story-avatar{position:absolute;top:8px;left:8px;width:31px;height:31px;border:2px solid var(--green);border-radius:50%;background:#292a32;display:grid;place-items:center;z-index:2;overflow:hidden}
 .story-avatar img{width:100%;height:100%;object-fit:cover}
 .story-name{position:absolute;z-index:2;left:7px;right:7px;bottom:8px;font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .story-time{position:absolute;z-index:2;top:11px;right:6px;font-size:9px;background:#0009;border-radius:7px;padding:4px}
 .empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
-.bottom-nav{position:fixed;z-index:10;left:50%;bottom:0;transform:translateX(-50%);width:min(650px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 5px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:#191a20eF;backdrop-filter:blur(20px)}
+.bottom-nav{position:fixed;z-index:10;left:50%;bottom:0;transform:translateX(-50%);width:min(650px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 5px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:#191a20ef;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
 .nav-item{text-decoration:none;color:#c5c8ca;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px}
 .nav-item i{font-size:19px}.nav-item.active{color:var(--green)}
 .viewer{position:fixed;inset:0;z-index:30;background:#050507;display:flex;align-items:center;justify-content:center}
 .viewer-content{position:relative;width:min(100%,520px);height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#08080b}
 .viewer-media{width:100%;height:100%;object-fit:contain}
-.viewer-top{position:absolute;top:0;left:0;right:0;padding:22px 14px 12px;padding-top:calc(14px + env(safe-area-inset-top));z-index:2;background:linear-gradient(#000b,transparent)}
+.viewer-top{position:absolute;top:0;left:0;right:0;padding:22px 14px 12px;padding-top:calc(14px + env(safe-area-inset-top));z-index:2;background:linear-gradient(#000b,transparent);pointer-events:none}
 .viewer-progress{height:3px;background:#ffffff55;border-radius:5px;overflow:hidden;margin-bottom:13px}
 .viewer-progress>div{height:100%;width:0;background:white}
 .viewer-user{display:flex;align-items:center;gap:10px}
 .viewer-avatar{width:38px;height:38px;border-radius:50%;background:#333;object-fit:cover}
 .viewer-username{font-weight:800;font-size:13px}.viewer-expiry{font-size:11px;color:#ddd;margin-top:4px}
-.viewer-caption{position:absolute;bottom:35px;left:17px;right:17px;z-index:2;text-align:center;font-size:15px;line-height:1.5;text-shadow:0 2px 8px #000}
+.viewer-caption{position:absolute;bottom:35px;left:17px;right:17px;z-index:2;text-align:center;font-size:15px;line-height:1.5;text-shadow:0 2px 8px #000;overflow-wrap:anywhere;pointer-events:none}
 .viewer-close{position:absolute;top:calc(17px + env(safe-area-inset-top));right:14px;z-index:4;width:39px;height:39px;border:0;border-radius:50%;background:#0009}
 .viewer-prev,.viewer-next{position:absolute;top:22%;bottom:15%;width:35%;border:0;background:transparent;z-index:1}
 .viewer-prev{left:0}.viewer-next{right:0}
 .toast{position:fixed;z-index:50;bottom:85px;left:50%;transform:translateX(-50%);max-width:90%;padding:12px 17px;background:#20232a;border:1px solid var(--border);border-radius:13px;box-shadow:0 5px 20px #0005;font-size:13px}
-@media(min-width:600px){.app{border-left:1px solid #ffffff15;border-right:1px solid #ffffff15}.editor{margin:0 17px}.heading{padding-top:27px}}
+@media(min-width:600px){.app{border-left:1px solid #ffffff15;border-right:1px solid #ffffff15}.heading{padding-top:27px}}
 </style>
 </head>
+
 <body>
 <div class="app">
   <header class="topbar">
-    <button class="icon-btn" id="backBtn" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
-    <div class="brand"><i class="fa-solid fa-play"></i> Free<span>Tube</span></div>
+    <button class="icon-btn" id="backBtn" type="button" aria-label="Go back">
+      <i class="fa-solid fa-arrow-left"></i>
+    </button>
+    <div class="brand"><i class="fa-solid fa-play"></i> Boys <span>vs Girls</span></div>
     <div class="top-label"><i class="fa-regular fa-clock"></i> 24 HOURS</div>
   </header>
 
@@ -83,9 +90,10 @@ textarea::placeholder{color:#b6bfc0}
 
   <section class="panel">
     <h2 class="panel-title"><i class="fa-solid fa-photo-film" style="color:var(--green)"></i> Choose your media</h2>
+
     <div class="picker">
-      <button class="pick" id="chooseImage"><i class="fa-regular fa-image"></i><span>Choose photo</span></button>
-      <button class="pick" id="chooseVideo"><i class="fa-solid fa-film"></i><span>Choose video</span></button>
+      <button class="pick" id="chooseImage" type="button"><i class="fa-regular fa-image"></i><span>Choose photo</span></button>
+      <button class="pick" id="chooseVideo" type="button"><i class="fa-solid fa-film"></i><span>Choose video</span></button>
     </div>
 
     <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
@@ -99,8 +107,8 @@ textarea::placeholder{color:#b6bfc0}
       </div>
       <img id="previewMedia" alt="Story image preview">
       <div class="preview-tools" id="previewTools" hidden>
-        <button class="small-btn" id="mutePreview" aria-label="Toggle preview sound" hidden><i class="fa-solid fa-volume-high"></i></button>
-        <button class="small-btn" id="removeMedia" aria-label="Remove media"><i class="fa-solid fa-xmark"></i></button>
+        <button class="small-btn" id="mutePreview" type="button" aria-label="Toggle preview sound" hidden><i class="fa-solid fa-volume-high"></i></button>
+        <button class="small-btn" id="removeMedia" type="button" aria-label="Remove media"><i class="fa-solid fa-xmark"></i></button>
       </div>
     </div>
 
@@ -108,9 +116,9 @@ textarea::placeholder{color:#b6bfc0}
     <textarea id="caption" maxlength="500" placeholder="Write something about your Story..."></textarea>
     <div class="meta"><span>Keep it short and interesting</span><span id="captionCount">0/500</span></div>
 
-    <div class="notice"><i class="fa-solid fa-clock"></i> Your Story will expire 24 hours after publishing. It will not be added to the regular post feed.</div>
+    <div class="notice"><i class="fa-solid fa-clock"></i> Your Story will expire 24 hours after publishing. Stories may require Admin approval before becoming visible.</div>
 
-    <button class="primary" id="publishBtn"><i class="fa-solid fa-paper-plane"></i> Publish Story</button>
+    <button class="primary" id="publishBtn" type="button"><i class="fa-solid fa-paper-plane"></i> Publish Story</button>
     <div class="progress" id="progress" hidden><div id="progressBar"></div></div>
     <div class="status" id="status" role="status" aria-live="polite"></div>
   </section>
@@ -120,7 +128,8 @@ textarea::placeholder{color:#b6bfc0}
     <div class="story-list" id="storyList">
       <div class="empty" style="width:100%">Loading active Stories...</div>
     </div>
-    <div class="status" id="listStatus"></div>
+    <div class="status" id="listStatus" role="status"></div>
+    <button class="secondary" id="refreshStories" type="button"><i class="fa-solid fa-rotate"></i> Refresh Stories</button>
   </section>
 </div>
 
@@ -143,424 +152,573 @@ textarea::placeholder{color:#b6bfc0}
         </div>
       </div>
     </div>
-    <button class="viewer-close" id="closeViewer" aria-label="Close Story"><i class="fa-solid fa-xmark"></i></button>
-    <button class="viewer-prev" id="viewerPrev" aria-label="Previous Story"></button>
-    <button class="viewer-next" id="viewerNext" aria-label="Next Story"></button>
+    <button class="viewer-close" id="closeViewer" type="button" aria-label="Close Story"><i class="fa-solid fa-xmark"></i></button>
+    <button class="viewer-prev" id="viewerPrev" type="button" aria-label="Previous Story"></button>
+    <button class="viewer-next" id="viewerNext" type="button" aria-label="Next Story"></button>
     <img class="viewer-media" id="viewerImage" alt="Story" hidden>
     <video class="viewer-media" id="viewerVideo" playsinline autoplay controls hidden></video>
     <div class="viewer-caption" id="viewerCaption"></div>
   </div>
 </div>
-<div class="toast" id="toast" hidden></div>
+
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
 
 <script>
-(() => {
 "use strict";
 
-const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
+(() => {
+  const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+  const TOKEN_KEY = "freetube_access_token";
+  const $ = id => document.getElementById(id);
 
-const $ = id => document.getElementById(id);
-const state = {
-  file: null,
-  previewUrl: null,
-  mediaType: null,
-  stories: [],
-  viewingIndex: -1,
-  timer: null,
-  progressTimer: null,
-  uploadBusy: false
-};
+  const state = {
+    file: null,
+    previewUrl: null,
+    mediaType: null,
+    stories: [],
+    viewingIndex: -1,
+    timer: null,
+    progressTimer: null,
+    uploadBusy: false
+  };
 
-function token() {
-  try { return localStorage.getItem(TOKEN_KEY) || ""; }
-  catch (_) { return ""; }
-}
-
-function authHeaders(json = false) {
-  const headers = {};
-  if (token()) headers.Authorization = "Bearer " + token();
-  if (json) headers["Content-Type"] = "application/json";
-  return headers;
-}
-
-async function api(path, options = {}) {
-  const response = await fetch(API_BASE + path, {
-    ...options,
-    headers: { ...authHeaders(), ...(options.headers || {}) }
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) {
-    throw new Error(data.error || data.message || "Request failed (" + response.status + ").");
-  }
-  return data;
-}
-
-function setStatus(message, kind = "") {
-  $("status").textContent = message;
-  $("status").className = "status " + kind;
-}
-
-function showToast(message) {
-  const el = $("toast");
-  el.textContent = message;
-  el.hidden = false;
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => el.hidden = true, 3000);
-}
-
-function safeDate(value) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function timeLeft(expiry) {
-  const date = safeDate(expiry);
-  if (!date) return "24h";
-  const ms = date.getTime() - Date.now();
-  if (ms <= 0) return "Expired";
-  const hours = Math.floor(ms / 3600000);
-  const minutes = Math.floor((ms % 3600000) / 60000);
-  return hours > 0 ? hours + "h " + minutes + "m left" : minutes + "m left";
-}
-
-function formatAge(value) {
-  const date = safeDate(value);
-  if (!date) return "Recently";
-  const mins = Math.max(0, Math.floor((Date.now() - date.getTime()) / 60000));
-  if (mins < 1) return "Just now";
-  if (mins < 60) return mins + "m ago";
-  if (mins < 1440) return Math.floor(mins / 60) + "h ago";
-  return "Expired";
-}
-
-function resetPreview() {
-  if (state.previewUrl) URL.revokeObjectURL(state.previewUrl);
-  state.previewUrl = null;
-  state.file = null;
-  state.mediaType = null;
-
-  const oldVideo = document.getElementById("previewVideo");
-  if (oldVideo) oldVideo.remove();
-
-  $("previewMedia").removeAttribute("src");
-  $("previewMedia").style.display = "none";
-  $("placeholder").hidden = false;
-  $("previewTools").hidden = true;
-  $("mutePreview").hidden = true;
-  $("imageInput").value = "";
-  $("videoInput").value = "";
-}
-
-function setPreview(file, type) {
-  if (!file) return;
-  if (!token()) {
-    showToast("Please log in before creating a Story.");
-    return;
-  }
-  const maxBytes = 50 * 1024 * 1024;
-  if (file.size > maxBytes) {
-    showToast("Maximum file size is 50 MB.");
-    return;
+  function token() {
+    try {
+      return localStorage.getItem(TOKEN_KEY) || "";
+    } catch (_) {
+      return "";
+    }
   }
 
-  const isImage = type === "image" && file.type.startsWith("image/");
-  const isVideo = type === "video" && file.type.startsWith("video/");
-  if (!isImage && !isVideo) {
-    showToast("Please select a supported photo or video.");
-    return;
+  function authHeaders() {
+    const headers = {};
+    if (token()) headers.Authorization = "Bearer " + token();
+    return headers;
   }
 
-  resetPreview();
-  state.file = file;
-  state.mediaType = type;
-  state.previewUrl = URL.createObjectURL(file);
-  $("placeholder").hidden = true;
-  $("previewTools").hidden = false;
+  async function api(path, options = {}) {
+    let response;
 
-  if (type === "image") {
-    $("previewMedia").src = state.previewUrl;
-    $("previewMedia").style.display = "block";
-  } else {
-    const video = document.createElement("video");
-    video.id = "previewVideo";
-    video.src = state.previewUrl;
-    video.controls = true;
-    video.playsInline = true;
-    video.autoplay = true;
-    video.loop = true;
-    video.muted = true;
-    video.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090b";
-    $("preview").insertBefore(video, $("previewTools"));
-    $("mutePreview").hidden = false;
-    $("mutePreview").innerHTML = '<i class="fa-solid fa-volume-xmark"></i>';
-  }
-  setStatus("");
-}
+    try {
+      response = await fetch(API_BASE + path, {
+        ...options,
+        headers: {
+          ...authHeaders(),
+          ...(options.headers || {})
+        },
+        cache: "no-store"
+      });
+    } catch (_) {
+      throw new Error("Could not connect to the server. Check your internet connection.");
+    }
 
-async function uploadMedia(file) {
-  const form = new FormData();
-  form.append("file", file);
-  const result = await api("/media/upload", { method: "POST", body: form });
-  if (!result.media || !result.media.url) {
-    throw new Error("The media server did not return a media URL.");
-  }
-  return result.media;
-}
+    const raw = await response.text();
+    let data = {};
 
-async function publishStory() {
-  if (state.uploadBusy) return;
-  if (!token()) {
-    setStatus("Please log in first.", "error");
-    return;
-  }
-  if (!state.file || !state.mediaType) {
-    setStatus("Choose a photo or video first.", "error");
-    return;
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch (_) {
+      data = { message: raw };
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Request failed (" + response.status + ")."
+      );
+    }
+
+    return data;
   }
 
-  state.uploadBusy = true;
-  $("publishBtn").disabled = true;
-  $("chooseImage").disabled = true;
-  $("chooseVideo").disabled = true;
-  $("progress").hidden = false;
-  $("progressBar").style.width = "8%";
-  setStatus("Uploading your media...");
+  function setStatus(message, kind = "") {
+    $("status").textContent = message;
+    $("status").className = "status " + kind;
+  }
 
-  try {
-    const media = await uploadMedia(state.file);
-    $("progressBar").style.width = "70%";
-    setStatus("Publishing your Story...");
+  function showToast(message) {
+    const el = $("toast");
+    el.textContent = message;
+    el.hidden = false;
 
-    const payload = {
-      content: $("caption").value.trim(),
-      media_url: media.url,
-      media_type: state.mediaType,
-      media_public_id: media.public_id
-    };
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => {
+      el.hidden = true;
+    }, 3000);
+  }
 
-    // This endpoint must be implemented on the backend.
-    const result = await api("/stories", {
+  function safeDate(value) {
+    if (!value) return null;
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function timeLeft(expiry) {
+    const date = safeDate(expiry);
+    if (!date) return "24h";
+
+    const ms = date.getTime() - Date.now();
+    if (ms <= 0) return "Expired";
+
+    const hours = Math.floor(ms / 3600000);
+    const minutes = Math.floor((ms % 3600000) / 60000);
+
+    return hours > 0
+      ? hours + "h " + minutes + "m left"
+      : Math.max(1, minutes) + "m left";
+  }
+
+  function resetPreview() {
+    if (state.previewUrl) {
+      URL.revokeObjectURL(state.previewUrl);
+    }
+
+    state.previewUrl = null;
+    state.file = null;
+    state.mediaType = null;
+
+    const oldVideo = $("previewVideo");
+    if (oldVideo) {
+      oldVideo.pause();
+      oldVideo.removeAttribute("src");
+      oldVideo.load();
+      oldVideo.remove();
+    }
+
+    $("previewMedia").removeAttribute("src");
+    $("previewMedia").style.display = "none";
+    $("placeholder").hidden = false;
+    $("previewTools").hidden = true;
+    $("mutePreview").hidden = true;
+    $("imageInput").value = "";
+    $("videoInput").value = "";
+  }
+
+  function setPreview(file, type) {
+    if (!file) return;
+
+    if (!token()) {
+      showToast("Please log in before creating a Story.");
+      return;
+    }
+
+    const maxBytes = 50 * 1024 * 1024;
+
+    if (file.size > maxBytes) {
+      showToast("Maximum file size is 50 MB.");
+      return;
+    }
+
+    const isImage = type === "image" &&
+      ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(file.type);
+
+    const isVideo = type === "video" &&
+      ["video/mp4", "video/webm", "video/quicktime"].includes(file.type);
+
+    if (!isImage && !isVideo) {
+      showToast("Please select a supported photo or video.");
+      return;
+    }
+
+    resetPreview();
+
+    state.file = file;
+    state.mediaType = type;
+    state.previewUrl = URL.createObjectURL(file);
+
+    $("placeholder").hidden = true;
+    $("previewTools").hidden = false;
+
+    if (type === "image") {
+      $("previewMedia").src = state.previewUrl;
+      $("previewMedia").style.display = "block";
+    } else {
+      const video = document.createElement("video");
+      video.id = "previewVideo";
+      video.src = state.previewUrl;
+      video.controls = true;
+      video.playsInline = true;
+      video.autoplay = true;
+      video.loop = true;
+      video.muted = true;
+      video.style.cssText =
+        "position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#09090b";
+
+      $("preview").insertBefore(video, $("previewTools"));
+
+      $("mutePreview").hidden = false;
+      $("mutePreview").innerHTML =
+        '<i class="fa-solid fa-volume-xmark"></i>';
+    }
+
+    setStatus("");
+  }
+
+  async function uploadMedia(file) {
+    const form = new FormData();
+    form.append("file", file);
+
+    const result = await api("/media/upload", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: form
     });
 
-    $("progressBar").style.width = "100%";
-    setStatus(result.message || "Story published successfully.", "success");
-    $("caption").value = "";
-    $("captionCount").textContent = "0/500";
-    resetPreview();
-    await loadStories();
-    showToast("Your Story has been published!");
-  } catch (error) {
-    setStatus(error.message + (error.message.includes("Route not found")
-      ? " The Story API has not been added to the backend yet."
-      : ""), "error");
-  } finally {
-    state.uploadBusy = false;
-    $("publishBtn").disabled = false;
-    $("chooseImage").disabled = false;
-    $("chooseVideo").disabled = false;
-    setTimeout(() => $("progress").hidden = true, 900);
-  }
-}
+    if (!result.media || !result.media.url) {
+      throw new Error("The media server did not return a media URL.");
+    }
 
-function getStoryMedia(story) {
-  return story.media_url || story.mediaUrl || story.url || "";
-}
-
-function getStoryExpiry(story) {
-  return story.expires_at || story.expiresAt || "";
-}
-
-function isActiveStory(story) {
-  const expiry = safeDate(getStoryExpiry(story));
-  return expiry ? expiry.getTime() > Date.now() : false;
-}
-
-function renderStories() {
-  const list = $("storyList");
-  list.replaceChildren();
-
-  const active = state.stories.filter(isActiveStory);
-  if (!active.length) {
-    const empty = document.createElement("div");
-    empty.className = "empty";
-    empty.style.width = "100%";
-    empty.textContent = "No active Stories yet. Publish your first photo or video Story!";
-    list.appendChild(empty);
-    return;
+    return result.media;
   }
 
-  active.forEach((story, index) => {
-    const card = document.createElement("button");
-    card.className = "story-card";
-    card.type = "button";
-    card.setAttribute("aria-label", "View Story by " + (story.username || "user"));
+  async function publishStory() {
+    if (state.uploadBusy) return;
+
+    if (!token()) {
+      setStatus("Please log in first.", "error");
+      return;
+    }
+
+    if (!state.file || !state.mediaType) {
+      setStatus("Choose a photo or video first.", "error");
+      return;
+    }
+
+    state.uploadBusy = true;
+    $("publishBtn").disabled = true;
+    $("chooseImage").disabled = true;
+    $("chooseVideo").disabled = true;
+    $("progress").hidden = false;
+    $("progressBar").style.width = "8%";
+    setStatus("Uploading your media...");
+
+    try {
+      const media = await uploadMedia(state.file);
+
+      $("progressBar").style.width = "70%";
+      setStatus("Publishing your Story...");
+
+      // The API expects the caption field.
+      const payload = {
+        caption: $("caption").value.trim(),
+        media_url: media.url,
+        media_type: state.mediaType,
+        media_public_id: media.public_id || ""
+      };
+
+      const result = await api("/stories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      $("progressBar").style.width = "100%";
+      $("caption").value = "";
+      $("captionCount").textContent = "0/500";
+      resetPreview();
+
+      const message = result.message || "Story submitted successfully.";
+      setStatus(message, "success");
+      showToast(message);
+
+      await loadStories();
+    } catch (error) {
+      console.error("Story publishing failed:", error);
+      setStatus("Story publishing failed: " + error.message, "error");
+    } finally {
+      state.uploadBusy = false;
+      $("publishBtn").disabled = false;
+      $("chooseImage").disabled = false;
+      $("chooseVideo").disabled = false;
+
+      setTimeout(() => {
+        $("progress").hidden = true;
+      }, 900);
+    }
+  }
+
+  function getStoryMedia(story) {
+    return story.media_url || story.mediaUrl || story.url || "";
+  }
+
+  function getStoryExpiry(story) {
+    return story.expires_at || story.expiresAt || "";
+  }
+
+  function isActiveStory(story) {
+    const expiry = safeDate(getStoryExpiry(story));
+    return Boolean(expiry && expiry.getTime() > Date.now());
+  }
+
+  function renderStories() {
+    const list = $("storyList");
+    list.replaceChildren();
+
+    const active = state.stories.filter(isActiveStory);
+
+    if (!active.length) {
+      const empty = document.createElement("div");
+      empty.className = "empty";
+      empty.style.width = "100%";
+      empty.textContent =
+        "No approved active Stories yet. Publish a Story or check again after Admin approval.";
+      list.appendChild(empty);
+      return;
+    }
+
+    active.forEach((story, index) => {
+      const card = document.createElement("button");
+      card.className = "story-card";
+      card.type = "button";
+
+      const username =
+        story.display_name || story.username || "User";
+
+      card.setAttribute("aria-label", "View Story by " + username);
+
+      const url = getStoryMedia(story);
+
+      if (String(story.media_type).toLowerCase() === "video") {
+        const video = document.createElement("video");
+        video.src = url;
+        video.muted = true;
+        video.preload = "metadata";
+        card.appendChild(video);
+      } else {
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "";
+        img.loading = "lazy";
+        card.appendChild(img);
+      }
+
+      const avatar = document.createElement("div");
+      avatar.className = "story-avatar";
+
+      if (story.avatar_url) {
+        const img = document.createElement("img");
+        img.src = story.avatar_url;
+        img.alt = "";
+        avatar.appendChild(img);
+      } else {
+        avatar.innerHTML = '<i class="fa-regular fa-user"></i>';
+      }
+
+      const name = document.createElement("div");
+      name.className = "story-name";
+      name.textContent = username;
+
+      const time = document.createElement("div");
+      time.className = "story-time";
+      time.textContent = timeLeft(getStoryExpiry(story));
+
+      card.append(avatar, name, time);
+      card.addEventListener("click", () => openStory(index));
+
+      list.appendChild(card);
+    });
+  }
+
+  async function loadStories() {
+    $("listStatus").textContent = "";
+
+    if (!token()) {
+      $("storyList").innerHTML =
+        '<div class="empty">Log in to load Stories.</div>';
+      $("listStatus").textContent =
+        "You can sign in and refresh this page to view available Stories.";
+      $("listStatus").className = "status error";
+      return;
+    }
+
+    $("storyList").innerHTML =
+      '<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i> Loading Stories...</div>';
+
+    try {
+      const result = await api("/stories");
+
+      const stories = Array.isArray(result)
+        ? result
+        : Array.isArray(result.stories)
+          ? result.stories
+          : Array.isArray(result.data?.stories)
+            ? result.data.stories
+            : [];
+
+      state.stories = stories.filter(isActiveStory);
+      renderStories();
+    } catch (error) {
+      console.error("Loading Stories failed:", error);
+
+      $("storyList").innerHTML =
+        '<div class="empty">Could not load Stories. Please try again.</div>';
+
+      $("listStatus").textContent = error.message;
+      $("listStatus").className = "status error";
+    }
+  }
+
+  function closeStory() {
+    clearTimeout(state.timer);
+    clearInterval(state.progressTimer);
+
+    state.timer = null;
+    state.progressTimer = null;
+
+    $("viewerVideo").pause();
+    $("viewerVideo").removeAttribute("src");
+    $("viewerVideo").load();
+
+    $("viewerImage").removeAttribute("src");
+    $("viewer").hidden = true;
+    state.viewingIndex = -1;
+  }
+
+  function openStory(index) {
+    const active = state.stories.filter(isActiveStory);
+    const story = active[index];
+
+    if (!story) return;
+
+    clearTimeout(state.timer);
+    clearInterval(state.progressTimer);
+
+    state.viewingIndex = index;
+    $("viewer").hidden = false;
+
+    $("viewerUsername").textContent =
+      story.display_name || story.username || "User";
+
+    $("viewerExpiry").textContent = timeLeft(getStoryExpiry(story));
+
+    // API data may use caption or content.
+    $("viewerCaption").textContent =
+      story.caption || story.content || "";
+
+    $("viewerAvatar").src = story.avatar_url || "";
+    $("viewerProgress").style.width = "0%";
 
     const url = getStoryMedia(story);
-    if (story.media_type === "video") {
-      const video = document.createElement("video");
-      video.src = url;
-      video.muted = true;
-      video.preload = "metadata";
-      card.appendChild(video);
+    const isVideo = String(story.media_type || "").toLowerCase() === "video";
+
+    if (isVideo) {
+      $("viewerImage").hidden = true;
+      $("viewerVideo").hidden = false;
+      $("viewerVideo").src = url;
+      $("viewerVideo").currentTime = 0;
+      $("viewerVideo").play().catch(() => {});
     } else {
-      const img = document.createElement("img");
-      img.src = url;
-      img.alt = "";
-      img.loading = "lazy";
-      card.appendChild(img);
+      $("viewerVideo").pause();
+      $("viewerVideo").hidden = true;
+      $("viewerImage").hidden = false;
+      $("viewerImage").src = url;
     }
 
-    const avatar = document.createElement("div");
-    avatar.className = "story-avatar";
-    if (story.avatar_url) {
-      const img = document.createElement("img");
-      img.src = story.avatar_url;
-      img.alt = "";
-      avatar.appendChild(img);
+    const duration = isVideo ? 15000 : 7000;
+    const started = Date.now();
+
+    state.progressTimer = setInterval(() => {
+      const progress = Math.min(
+        100,
+        ((Date.now() - started) / duration) * 100
+      );
+      $("viewerProgress").style.width = progress + "%";
+    }, 80);
+
+    state.timer = setTimeout(nextStory, duration);
+  }
+
+  function nextStory() {
+    const active = state.stories.filter(isActiveStory);
+
+    if (state.viewingIndex + 1 < active.length) {
+      openStory(state.viewingIndex + 1);
     } else {
-      avatar.innerHTML = '<i class="fa-regular fa-user"></i>';
+      closeStory();
     }
+  }
 
-    const name = document.createElement("div");
-    name.className = "story-name";
-    name.textContent = story.display_name || story.username || "FreeTube user";
+  function previousStory() {
+    if (state.viewingIndex > 0) {
+      openStory(state.viewingIndex - 1);
+    }
+  }
 
-    const time = document.createElement("div");
-    time.className = "story-time";
-    time.textContent = timeLeft(getStoryExpiry(story));
-
-    card.append(avatar, name, time);
-    card.addEventListener("click", () => openStory(index));
-    list.appendChild(card);
+  $("chooseImage").addEventListener("click", () => {
+    $("imageInput").click();
   });
-}
 
-async function loadStories() {
-  $("listStatus").textContent = "";
-  try {
-    // The backend must return active stories only, with expires_at.
-    const result = await api("/stories");
-    state.stories = Array.isArray(result.stories) ? result.stories : [];
+  $("chooseVideo").addEventListener("click", () => {
+    $("videoInput").click();
+  });
+
+  $("imageInput").addEventListener("change", event => {
+    setPreview(event.target.files[0], "image");
+  });
+
+  $("videoInput").addEventListener("change", event => {
+    setPreview(event.target.files[0], "video");
+  });
+
+  $("removeMedia").addEventListener("click", resetPreview);
+  $("publishBtn").addEventListener("click", publishStory);
+  $("refreshStories").addEventListener("click", loadStories);
+
+  $("caption").addEventListener("input", () => {
+    $("captionCount").textContent =
+      $("caption").value.length + "/500";
+  });
+
+  $("mutePreview").addEventListener("click", () => {
+    const video = $("previewVideo");
+    if (!video) return;
+
+    video.muted = !video.muted;
+
+    $("mutePreview").innerHTML = video.muted
+      ? '<i class="fa-solid fa-volume-xmark"></i>'
+      : '<i class="fa-solid fa-volume-high"></i>';
+  });
+
+  $("closeViewer").addEventListener("click", closeStory);
+  $("viewerNext").addEventListener("click", nextStory);
+  $("viewerPrev").addEventListener("click", previousStory);
+
+  $("backBtn").addEventListener("click", () => {
+    if (history.length > 1) history.back();
+    else location.href = "home.html";
+  });
+
+  $("viewer").addEventListener("click", event => {
+    if (event.target === $("viewer")) closeStory();
+  });
+
+  document.addEventListener("keydown", event => {
+    if ($("viewer").hidden) return;
+
+    if (event.key === "Escape") closeStory();
+    if (event.key === "ArrowRight") nextStory();
+    if (event.key === "ArrowLeft") previousStory();
+  });
+
+  if (!token()) {
+    setStatus("Log in to publish Stories. If you are already logged in, sign in again.", "error");
+  }
+
+  loadStories();
+
+  setInterval(() => {
+    state.stories = state.stories.filter(isActiveStory);
+
+    if (
+      !$("viewer").hidden &&
+      state.viewingIndex >= state.stories.length
+    ) {
+      closeStory();
+    }
+
     renderStories();
-  } catch (error) {
-    $("storyList").innerHTML = '<div class="empty">Story service is not available yet.</div>';
-    $("listStatus").textContent = error.message + " Add the Story endpoints to server.js to enable shared Stories.";
-    $("listStatus").className = "status error";
-  }
-}
-
-function closeStory() {
-  clearTimeout(state.timer);
-  clearInterval(state.progressTimer);
-  state.timer = null;
-  state.progressTimer = null;
-  $("viewerVideo").pause();
-  $("viewerVideo").removeAttribute("src");
-  $("viewerVideo").load();
-  $("viewer").hidden = true;
-  state.viewingIndex = -1;
-}
-
-function openStory(index) {
-  const active = state.stories.filter(isActiveStory);
-  if (!active.length) return;
-  const story = active[index];
-  if (!story) return;
-
-  clearTimeout(state.timer);
-  clearInterval(state.progressTimer);
-  state.viewingIndex = index;
-
-  $("viewer").hidden = false;
-  $("viewerUsername").textContent = story.display_name || story.username || "FreeTube user";
-  $("viewerExpiry").textContent = timeLeft(getStoryExpiry(story));
-  $("viewerCaption").textContent = story.content || "";
-  $("viewerAvatar").src = story.avatar_url || "";
-  $("viewerProgress").style.width = "0%";
-
-  const url = getStoryMedia(story);
-  if (story.media_type === "video") {
-    $("viewerImage").hidden = true;
-    $("viewerVideo").hidden = false;
-    $("viewerVideo").src = url;
-    $("viewerVideo").currentTime = 0;
-    $("viewerVideo").play().catch(() => {});
-  } else {
-    $("viewerVideo").pause();
-    $("viewerVideo").hidden = true;
-    $("viewerImage").hidden = false;
-    $("viewerImage").src = url;
-  }
-
-  const duration = story.media_type === "video" ? 15000 : 7000;
-  const started = Date.now();
-  state.progressTimer = setInterval(() => {
-    const progress = Math.min(100, ((Date.now() - started) / duration) * 100);
-    $("viewerProgress").style.width = progress + "%";
-  }, 80);
-  state.timer = setTimeout(nextStory, duration);
-}
-
-function nextStory() {
-  const active = state.stories.filter(isActiveStory);
-  if (state.viewingIndex + 1 < active.length) {
-    openStory(state.viewingIndex + 1);
-  } else {
-    closeStory();
-  }
-}
-
-function previousStory() {
-  if (state.viewingIndex > 0) openStory(state.viewingIndex - 1);
-}
-
-$("chooseImage").addEventListener("click", () => $("imageInput").click());
-$("chooseVideo").addEventListener("click", () => $("videoInput").click());
-$("imageInput").addEventListener("change", event => setPreview(event.target.files[0], "image"));
-$("videoInput").addEventListener("change", event => setPreview(event.target.files[0], "video"));
-$("removeMedia").addEventListener("click", resetPreview);
-$("publishBtn").addEventListener("click", publishStory);
-$("caption").addEventListener("input", () => {
-  $("captionCount").textContent = $("caption").value.length + "/500";
-});
-$("mutePreview").addEventListener("click", () => {
-  const video = $("previewVideo");
-  if (!video) return;
-  video.muted = !video.muted;
-  $("mutePreview").innerHTML = video.muted
-    ? '<i class="fa-solid fa-volume-xmark"></i>'
-    : '<i class="fa-solid fa-volume-high"></i>';
-});
-$("closeViewer").addEventListener("click", closeStory);
-$("viewerNext").addEventListener("click", nextStory);
-$("viewerPrev").addEventListener("click", previousStory);
-$("backBtn").addEventListener("click", () => {
-  if (history.length > 1) history.back();
-  else location.href = "home.html";
-});
-$("viewer").addEventListener("click", event => {
-  if (event.target === $("viewer")) closeStory();
-});
-document.addEventListener("keydown", event => {
-  if ($("viewer").hidden) return;
-  if (event.key === "Escape") closeStory();
-  if (event.key === "ArrowRight") nextStory();
-  if (event.key === "ArrowLeft") previousStory();
-});
-
-if (!token()) {
-  setStatus("Log in to publish Stories. If you are already logged in, please sign in again.", "error");
-}
-loadStories();
-setInterval(() => {
-  state.stories = state.stories.filter(isActiveStory);
-  if (!$("viewer").hidden && state.viewingIndex >= state.stories.length) closeStory();
-  renderStories();
-}, 30000);
+  }, 30000);
 })();
 </script>
 </body>
