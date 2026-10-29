@@ -826,6 +826,10 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
     const result = await pool.query(
       `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,
               p.created_at,u.username,pr.display_name,pr.avatar_url,
+              CASE WHEN pr.blue_badge_status='verified'
+                     AND pr.blue_badge_expires_at IS NOT NULL
+                     AND pr.blue_badge_expires_at > NOW()
+                   THEN 'verified' ELSE 'none' END AS blue_badge_status,
               (SELECT COUNT(*) FROM ft_post_reactions r WHERE r.post_id=p.id) AS reaction_count,
               (SELECT COALESCE(jsonb_object_agg(rc.reaction,rc.cnt),'{}'::jsonb)
                  FROM (SELECT reaction,COUNT(*)::int AS cnt FROM ft_post_reactions
@@ -1022,7 +1026,11 @@ app.get("/api/posts/:id/comments", async (req, res, next) => {
 
     const result = await pool.query(
       `SELECT c.id,c.post_id,c.user_id,c.content,c.created_at,
-              u.username,p.avatar_url
+              u.username,p.display_name,p.avatar_url,
+              CASE WHEN p.blue_badge_status='verified'
+                     AND p.blue_badge_expires_at IS NOT NULL
+                     AND p.blue_badge_expires_at > NOW()
+                   THEN 'verified' ELSE 'none' END AS blue_badge_status
        FROM ft_comments c JOIN users u ON u.id::text=c.user_id
        LEFT JOIN ft_profiles p ON p.user_id=c.user_id
        WHERE c.post_id=$1 ORDER BY c.id ASC LIMIT 100`,
