@@ -26,8 +26,7 @@ button:focus-visible,a:focus-visible{outline:2px solid #35c7ff;outline-offset:2p
 .app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:100px;background:#17132922;box-shadow:0 0 40px #0005}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
 .brand{font-size:22px;font-weight:900;letter-spacing:-.6px;white-space:nowrap}
-.brand i{color:var(--pink);margin-right:4px}
-.brand span{color:var(--red)}
+.brand-hearts{display:inline;color:#f22e9b!important;background:none;-webkit-text-fill-color:#f22e9b;font-size:24px;letter-spacing:-3px;margin-left:3px}
 .top-actions{display:flex;gap:10px}
 .icon-btn{position:relative;width:42px;height:42px;flex-shrink:0;border-radius:50%;background:linear-gradient(145deg,#ffffff12,#a33cff20);border:1px solid #ffffff2a;display:grid;place-items:center;font-size:18px}
 .heart-btn{color:#f22e9b}
@@ -139,8 +138,8 @@ textarea.field{min-height:100px;resize:vertical}
 <div class="app">
 <header class="topbar">
   <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px">
-    <i class="fa-solid fa-people-group" style="color:#a33cff"></i>Boys
-    <span style="color:#f22e9b">vs Girls</span> 💙💗
+    Boys <span style="color:#f22e9b">vs Girls</span>
+    <span class="brand-hearts" aria-label="Love">♥ ♥</span>
   </div>
   <div class="top-actions">
     <button class="icon-btn" onclick="openAdminOrSecurity()" aria-label="Security and admin"><i class="fa-solid fa-shield-halved"></i></button>
@@ -154,7 +153,7 @@ textarea.field{min-height:100px;resize:vertical}
 </div>
 
 <div class="stories">
-  <button class="story create" onclick="openUpload()"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
+  <button class="story create" onclick="openUpload"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=360" alt="Community story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt=""></span><span>Community</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=360" alt="Travel story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100" alt=""></span><span>Travel</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=360" alt="Friends story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100" alt=""></span><span>Friends</span></button>
