@@ -13,7 +13,7 @@ body{background:linear-gradient(135deg,#11172e,#251536,#40163b,#111329);backgrou
 button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:90px;background:#17132922;box-shadow:0 0 40px #0005}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
-.brand{font-size:22px;font-weight:900;letter-spacing:-.6px}.brand i{color:var(--pink);margin-right:4px}.brand span{color:var(--red)}
+.brand{font-size:22px;font-weight:900;letter-spacing:-.6px}.brand i{color:var(--pink);margin-right:4px}.brand span{color:var(--red)}.brand .brand-heart{color:var(--pink);background:none;-webkit-text-fill-color:initial;margin-left:3px}.ad-banner{margin:10px 0 14px;padding:14px 15px;min-height:96px;background:linear-gradient(125deg,#22203b,#302047);border-top:1px solid #ffffff20;border-bottom:1px solid #ffffff20;display:flex;align-items:center;gap:12px}.ad-mark{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,#278bff,#f22e9b);font-size:20px;flex-shrink:0}.ad-copy{flex:1;min-width:0}.ad-copy strong{font-size:13px;display:block}.ad-copy p{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}.ad-label{font-size:9px;color:#d2cce5;border:1px solid #ffffff30;border-radius:5px;padding:3px 5px;align-self:flex-start}
 .top-actions{display:flex;gap:10px}.icon-btn{position:relative;width:48px;height:48px;border-radius:50%;background:linear-gradient(145deg,#ffffff12,#a33cff20);border:1px solid #ffffff2a;display:grid;place-items:center;font-size:20px}.heart-btn{color:#f22e9b}
 .badge{position:absolute;top:-3px;right:-3px;background:var(--red);font-size:9px;font-weight:bold;padding:2px 5px;border-radius:12px;border:1px solid #171329}
 .composer{display:flex;align-items:center;gap:11px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
@@ -62,10 +62,10 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px"><i class="fa-solid fa-people-group" style="color:#a33cff"></i>Boys <span style="color:#f22e9b">vs Girls</span> 💙💗</div>
+  <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px">Bᴏʏs♡Gɪʀʟs <span class="brand-heart">💗</span></div>
   <div class="top-actions">
     <button class="icon-btn" onclick="openAdminOrSecurity()" aria-label="Security and admin"><i class="fa-solid fa-shield-halved"></i></button>
-    <button class="icon-btn heart-btn" onclick="openFavorites()" aria-label="Favorites"><i class="fa-solid fa-heart"></i></button>
+    <button class="icon-btn heart-btn" onclick="openInbox()" aria-label="Messenger" title="Messenger"><i class="fa-brands fa-facebook-messenger"></i></button>
   </div>
 </header>
 
@@ -149,11 +149,11 @@ function requireLogin(){if(!token()){location.href="auth.html?mode=login";return
 function closeModal(id){document.getElementById(id).classList.remove("open")}
 function openProfile(){if(requireLogin())location.href="profile.html"}
 function openInbox(){if(requireLogin())location.href="inbox.html"}
-function openPulse(){location.href="pulse.html"}
+function openPulse(){location.href="discovery.html"}
 function openFavorites(){if(requireLogin())location.href="favorites.html"}
 function openAdminOrSecurity(){if(!requireLogin())return;location.href=(currentUser&&String(currentUser.role||"").toLowerCase()==="admin")?"admin.html":"settings.html"}
 function openNotifications(){if(requireLogin())location.href="notifications.html"}
-function openUpload(){if(!requireLogin())return;document.getElementById("postText").value="";document.getElementById("postFile").value="";document.getElementById("uploadModal").classList.add("open")}
+function openUpload(){if(!requireLogin())return;location.href="create.html"}
 function home(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navHome").classList.add("active");render(videos)}
 function openDiscover(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navDiscover").classList.add("active");document.getElementById("discoverModal").classList.add("open");document.getElementById("searchInput").focus()}
 function openUserProfile(username,userId){
@@ -207,13 +207,13 @@ function reactionButtonHTML(v){
 function render(list=videos){
   const feed=document.getElementById("feed");
   if(!list.length){feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';return}
-  feed.innerHTML=list.map(v=>{
+  feed.innerHTML=list.map((v,index)=>{
     let media="";
     if(v.type==="video"&&v.src)media='<div class="post-media-container"><video class="post-video" src="'+esc(v.src)+'" controls muted loop playsinline preload="metadata"></video><button type="button" class="sound-toggle" aria-label="Turn sound on" title="Sound Off"><i class="fa-solid fa-volume-xmark"></i></button></div><div class="video-error-message" hidden>This video could not be played. The media URL or format may be unsupported.</div>';
     else if(v.type==="photo"&&v.src)media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
     const c=v.counts,total=count(c.love)+count(c.angry)+count(c.sad)+count(c.haha);
     const summary=(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.haha?'<span class="reaction-emoji">😂</span>':"")+'<span>'+total+'</span>';
-    return '<article class="post-card" data-id="'+esc(v.id)+'">'+
+    const postHTML = '<article class="post-card" data-id="'+esc(v.id)+'">'+
       '<div class="post-header"><div class="post-user-info">'+
       '<img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(v.avatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'">'+
       '<div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div>'+
@@ -221,6 +221,8 @@ function render(list=videos){
       (v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':"")+media+
       '<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div>'+
       '<div class="post-actions-bar">'+reactionButtonHTML(v)+'<button class="post-action-btn" onclick="comments(\''+esc(v.id)+'\')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost(\''+esc(v.id)+'\')"><i class="fa-solid fa-share"></i> Share</button></div></article>';
+    const adHTML = ((index + 1) % 3 === 0) ? '<aside class="ad-banner" aria-label="Advertisement"><div class="ad-mark"><i class="fa-solid fa-bullhorn"></i></div><div class="ad-copy"><strong>Advertisement</strong><p>Sponsored content will appear here.</p></div><span class="ad-label">AD</span></aside>' : "";
+    return postHTML + adHTML;
   }).join("");
   setupVideoAutoplay();setupPostViewObserver();
 }
