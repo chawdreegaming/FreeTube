@@ -57,6 +57,16 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .toast{position:fixed;z-index:100;left:50%;bottom:78px;transform:translateX(-50%);display:none;background:#211b38;border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;text-align:center;max-width:90%}.toast.show{display:block}
 .empty-state,.loading{padding:32px 18px;text-align:center;color:var(--muted);font-size:13px}
 @media(max-width:350px){.nav-item{min-width:39px}.post-stats{font-size:9px;gap:4px;padding:8px 7px}.post-action-btn{font-size:11px;padding:9px 3px}.reaction-choice{width:36px;flex-basis:36px}}
+
+/* Final Boys vs Girls navigation */
+.top-actions{display:flex;align-items:center;gap:10px}
+.messenger-btn{width:48px;height:48px;font-size:22px;color:#f02d9b;background:linear-gradient(135deg,#302044,#3b1740);border:1px solid #ffffff35}
+.bottom-nav{display:flex;justify-content:space-around;align-items:center;gap:0;min-height:72px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(105deg,rgba(22,23,49,.98),rgba(54,22,57,.98));}
+.bottom-nav .nav-item{flex:1;min-width:0;gap:4px;font-size:11px}
+.bottom-nav .nav-item i{font-size:23px}
+.bottom-nav .nav-item.active{color:#f02d9b}
+.post-action-btn.reaction-haha{color:#ffd166}
+
 </style>
 </head>
 <body>
@@ -64,8 +74,10 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <header class="topbar">
   <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px"><i class="fa-solid fa-people-group" style="color:#a33cff"></i>Boys <span style="color:#f22e9b">vs Girls</span> 💙💗</div>
   <div class="top-actions">
-    <button class="icon-btn" onclick="openAdminOrSecurity()" aria-label="Security and admin"><i class="fa-solid fa-shield-halved"></i></button>
-    <button class="icon-btn heart-btn" onclick="openFriends()" aria-label="Friends"><i class="fa-solid fa-heart"></i></button>
+    <button class="icon-btn messenger-btn" onclick="openInbox()" aria-label="Messenger" title="Messenger">
+      <i class="fa-brands fa-facebook-messenger"></i>
+      <span id="messageBadge" class="badge" hidden>0</span>
+    </button>
   </div>
 </header>
 
@@ -83,12 +95,19 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 
 <main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
 
-<nav class="bottom-nav">
-  <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button id="navInbox" class="nav-item" onclick="openInbox()"><i class="fa-solid fa-inbox"></i><span>Inbox</span></button>
-  <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Notifications</span></button>
-  <button id="navExplore" class="nav-item" onclick="openDiscover()"><i class="fa-solid fa-compass"></i><span>Explore</span></button>
-  <button id="navFriends" class="nav-item" onclick="openFriends()"><i class="fa-solid fa-user-group"></i><span>Friends</span></button>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button id="navHome" class="nav-item active" onclick="home()" aria-label="Home">
+    <i class="fa-solid fa-house"></i><span>Home</span>
+  </button>
+  <button id="navPulse" class="nav-item" onclick="openPulse()" aria-label="Pulse">
+    <i class="fa-solid fa-compass"></i><span>Pulse</span>
+  </button>
+  <button id="navNotifications" class="nav-item" onclick="openNotifications()" aria-label="Notifications">
+    <i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Notifications</span>
+  </button>
+  <button id="navProfile" class="nav-item" onclick="openProfile()" aria-label="Profile">
+    <i class="fa-regular fa-user"></i><span>Profile</span>
+  </button>
 </nav>
 </div>
 
@@ -150,6 +169,7 @@ function requireLogin(){if(!token()){location.href="auth.html?mode=login";return
 function closeModal(id){document.getElementById(id).classList.remove("open")}
 function openProfile(){if(requireLogin())location.href="profile.html"}
 function openInbox(){if(requireLogin())location.href="inbox.html"}
+function openPulse(){location.href="discover.html"}
 function openDiscover(){location.href="discover.html"}
 function openFriends(){if(requireLogin())location.href="friends.html"}
 function openStories(){location.href="story.html"}
