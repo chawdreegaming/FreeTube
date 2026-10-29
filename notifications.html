@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,273 +7,496 @@
 <meta name="theme-color" content="#17132f">
 <title>Notifications — Boys vs Girls</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
 :root{
-  --bg:#100f24;--panel:#191832;--panel2:#211d42;
-  --blue:#4295ff;--purple:#9565ff;--pink:#ff5ebc;
-  --text:#f8f7ff;--muted:#aaa8c6;--border:rgba(255,255,255,.11);
+  --bg:#100f24;
+  --panel:#191832;
+  --panel2:#211d42;
+  --blue:#4295ff;
+  --purple:#9565ff;
+  --pink:#ff5ebc;
+  --text:#f8f7ff;
+  --muted:#aaa8c6;
+  --border:rgba(255,255,255,.11);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{min-height:100%;background:var(--bg)}
 body{
-  font-family:Arial,Helvetica,sans-serif;color:var(--text);
-  background:radial-gradient(ellipse at 0% 0%,rgba(71,91,255,.25),transparent 42%),
-  radial-gradient(ellipse at 100% 30%,rgba(255,69,177,.18),transparent 42%),
-  linear-gradient(145deg,#111126,#19132f 55%,#11152b);
+  font-family:Arial,Helvetica,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(ellipse at 0% 0%,rgba(71,91,255,.25),transparent 42%),
+    radial-gradient(ellipse at 100% 30%,rgba(255,69,177,.18),transparent 42%),
+    linear-gradient(145deg,#111126,#19132f 55%,#11152b);
   background-attachment:fixed;
 }
-button,a{font:inherit}button{cursor:pointer;color:inherit}
-.app{max-width:650px;min-height:100dvh;margin:auto;padding-bottom:94px}
+button,a{font:inherit}
+button{cursor:pointer;color:inherit}
+.app{
+  max-width:650px;
+  min-height:100dvh;
+  margin:auto;
+  padding-bottom:94px;
+}
 .topbar{
-  position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:12px;
   padding:calc(12px + env(safe-area-inset-top)) 15px 14px;
-  background:rgba(20,18,43,.84);backdrop-filter:blur(22px);
-  -webkit-backdrop-filter:blur(22px);border-bottom:1px solid var(--border);
+  background:rgba(20,18,43,.84);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
 }
 .menu-btn,.search-btn{
-  flex-shrink:0;width:40px;height:42px;display:grid;place-items:center;
-  background:transparent;border:0;border-radius:13px;font-size:20px;
+  flex-shrink:0;width:40px;height:42px;
+  display:grid;place-items:center;
+  background:transparent;border:0;
+  border-radius:13px;font-size:20px;
 }
 .menu-btn:active,.search-btn:active{background:rgba(255,255,255,.1)}
 .topbar h1{
-  flex:1;min-width:0;font-size:clamp(22px,5.8vw,30px);font-weight:900;
-  letter-spacing:-.7px;background:linear-gradient(100deg,#fff 8%,#b8caff 48%,#ff91d1 100%);
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  flex:1;min-width:0;
+  font-size:clamp(22px,5.8vw,30px);
+  font-weight:900;letter-spacing:-.7px;
+  background:linear-gradient(100deg,#fff 8%,#b8caff 48%,#ff91d1 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
-.search-panel{display:none;padding:12px 15px;background:rgba(25,24,50,.92);border-bottom:1px solid var(--border)}
+.search-panel{
+  display:none;padding:12px 15px;
+  background:rgba(25,24,50,.92);
+  border-bottom:1px solid var(--border);
+}
 .search-panel.open{display:block}
 .search-box{
-  display:flex;align-items:center;gap:10px;padding:0 13px;
-  border:1px solid rgba(151,115,255,.4);border-radius:15px;background:rgba(10,10,29,.58);
+  display:flex;align-items:center;gap:10px;
+  padding:0 13px;
+  border:1px solid rgba(151,115,255,.4);
+  border-radius:15px;
+  background:rgba(10,10,29,.58);
 }
 .search-box i{color:#b29aff}
-.search-box input{width:100%;min-width:0;padding:14px 0;background:transparent;border:0;outline:0;color:#fff}
+.search-box input{
+  width:100%;min-width:0;padding:14px 0;
+  background:transparent;border:0;outline:0;color:#fff;
+}
 .search-box input::placeholder{color:var(--muted)}
-.section-title{display:flex;align-items:center;gap:9px;padding:17px 16px 12px;font-size:19px;font-weight:850}
-.section-title i{color:#b39aff;font-size:17px}
+.section-title{
+  display:flex;align-items:center;gap:9px;
+  padding:17px 16px 12px;
+  font-size:19px;font-weight:850;
+}
+.section-title i{
+  color:#b39aff;
+  font-size:17px;
+}
 .section-count{
-  display:inline-grid;place-items:center;min-width:23px;height:23px;padding:0 6px;
-  border-radius:20px;background:linear-gradient(120deg,var(--blue),var(--purple));color:white;font-size:12px;
+  display:inline-grid;place-items:center;
+  min-width:23px;height:23px;padding:0 6px;
+  border-radius:20px;
+  background:linear-gradient(120deg,var(--blue),var(--purple));
+  color:white;font-size:12px;
 }
 .notification-list{padding:0 10px}
 .notification{
-  display:flex;align-items:flex-start;gap:12px;margin:0 0 9px;padding:15px 12px;
-  border:1px solid rgba(255,255,255,.075);border-radius:18px;
+  display:flex;align-items:flex-start;gap:12px;
+  margin:0 0 9px;padding:15px 12px;
+  border:1px solid rgba(255,255,255,.075);
+  border-radius:18px;
   background:linear-gradient(120deg,rgba(37,34,70,.94),rgba(31,27,57,.94));
-  box-shadow:0 5px 18px rgba(0,0,0,.12);transition:background .2s,border-color .2s;
+  box-shadow:0 5px 18px rgba(0,0,0,.12);
+  transition:background .2s,border-color .2s;
 }
-.notification.unread{background:linear-gradient(115deg,rgba(40,49,95,.98),rgba(65,36,83,.96));border-color:rgba(139,121,255,.28)}
-.notification-main{display:flex;align-items:flex-start;gap:12px;flex:1;min-width:0;cursor:pointer}
-.notification-main:focus-visible{outline:2px solid var(--purple);outline-offset:3px;border-radius:10px}
+.notification.unread{
+  background:linear-gradient(115deg,rgba(40,49,95,.98),rgba(65,36,83,.96));
+  border-color:rgba(139,121,255,.28);
+}
 .avatar-wrap{position:relative;flex-shrink:0;width:54px;height:54px}
-.avatar,.avatar-fallback{
-  display:block;width:54px;height:54px;object-fit:cover;border-radius:50%;
-  background:#29264d;border:2px solid rgba(184,166,255,.45);
+.avatar{
+  display:block;width:54px;height:54px;
+  object-fit:cover;border-radius:50%;
+  background:#29264d;
+  border:2px solid rgba(184,166,255,.45);
 }
 .avatar-fallback{
-  display:grid;place-items:center;background:linear-gradient(140deg,#477eff,#955cff 60%,#f35db7);
+  display:grid;place-items:center;
+  width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(140deg,#477eff,#955cff 60%,#f35db7);
   color:#fff;font-size:22px;
 }
 .action-badge{
-  position:absolute;right:-4px;bottom:-3px;width:25px;height:25px;display:grid;place-items:center;
-  border:2px solid #211d42;border-radius:50%;background:#4696ff;color:#fff;font-size:11px;
+  position:absolute;right:-4px;bottom:-3px;
+  width:25px;height:25px;
+  display:grid;place-items:center;
+  border:2px solid #211d42;border-radius:50%;
+  background:#4696ff;color:#fff;font-size:11px;
 }
-.action-badge.like{background:#398cff}.action-badge.love{background:#f34eac}
-.action-badge.comment{background:#9565ff}.action-badge.follow{background:#4b9dff}
-.action-badge.message{background:#438bff}.action-badge.story{background:#a25dff}
-.action-badge.friend_request,.action-badge.friend{background:#4b9dff}
+.action-badge.like{background:#398cff}
+.action-badge.love{background:#f34eac}
+.action-badge.comment{background:#9565ff}
+.action-badge.follow{background:#4b9dff}
+.action-badge.message{background:#438bff}
+.action-badge.story{background:#a25dff}
 .action-badge.other{background:#777991}
 .notification-body{flex:1;min-width:0;padding-top:1px}
-.message{font-size:15px;line-height:1.55;overflow-wrap:anywhere;color:#efedff}
+.message{
+  font-size:15px;line-height:1.55;
+  overflow-wrap:anywhere;color:#efedff;
+}
 .user-name,.action-name{font-weight:850;color:#fff}
 .time{margin-top:7px;color:#aaa8c6;font-size:12px}
-.notification-actions{flex-shrink:0;display:flex;align-items:center;gap:3px}
+.notification-actions{
+  flex-shrink:0;display:flex;align-items:center;gap:3px;
+}
 .more-btn,.read-btn{
-  width:29px;height:29px;display:grid;place-items:center;border:0;border-radius:50%;
+  width:29px;height:29px;
+  display:grid;place-items:center;
+  border:0;border-radius:50%;
   background:transparent;color:#d6d3ed;
 }
-.more-btn{font-size:16px}.read-btn{color:#85b7ff;font-size:14px}
+.more-btn{font-size:16px}
+.read-btn{color:#85b7ff;font-size:14px}
 .more-btn:active,.read-btn:active{background:rgba(255,255,255,.12)}
 .empty-state,.loading-state{
-  margin:8px 5px;padding:36px 18px;text-align:center;color:var(--muted);
-  line-height:1.8;border:1px solid var(--border);border-radius:18px;background:rgba(30,27,58,.65);
+  margin:8px 5px;padding:36px 18px;
+  text-align:center;color:var(--muted);
+  line-height:1.8;
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(30,27,58,.65);
 }
-.empty-state>i,.loading-state>i{display:inline-block;color:#b49aff;font-size:34px;margin-bottom:12px}
-.empty-state h2{color:#fff;font-size:18px;margin-bottom:7px}.empty-state p{font-size:14px}
-.primary-btn,.secondary-btn{margin-top:14px;padding:11px 17px;border:1px solid var(--border);border-radius:12px;font-weight:800}
-.primary-btn{background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));border:0;color:#fff}
+.empty-state>i,.loading-state>i{
+  display:inline-block;
+  color:#b49aff;font-size:34px;margin-bottom:12px;
+}
+.empty-state h2{color:#fff;font-size:18px;margin-bottom:7px}
+.empty-state p{font-size:14px}
+.primary-btn,.secondary-btn{
+  margin-top:14px;padding:11px 17px;
+  border:1px solid var(--border);border-radius:12px;
+  font-weight:800;
+}
+.primary-btn{
+  background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));
+  border:0;color:#fff;
+}
 .secondary-btn{background:#282447}
 .bottom-nav{
-  position:fixed;left:50%;bottom:0;transform:translateX(-50%);z-index:30;width:100%;max-width:650px;
-  display:flex;align-items:center;justify-content:space-around;padding:9px 3px calc(9px + env(safe-area-inset-bottom));
-  background:rgba(20,18,43,.88);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  position:fixed;left:50%;bottom:0;transform:translateX(-50%);
+  z-index:30;width:100%;max-width:650px;
+  display:flex;align-items:center;justify-content:space-around;
+  padding:9px 3px calc(9px + env(safe-area-inset-bottom));
+  background:rgba(20,18,43,.88);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
   border-top:1px solid rgba(255,255,255,.12);
 }
 .nav-item{
-  flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:5px;color:#9996b8;text-decoration:none;font-size:11px;
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:5px;
+  color:#9996b8;text-decoration:none;font-size:11px;
 }
-.nav-item i{font-size:21px}.nav-item.active{color:#b59aff}
-.nav-item.active i{filter:drop-shadow(0 0 7px rgba(164,120,255,.45))}
+.nav-item i{font-size:21px}
+.nav-item.active{color:#b59aff}
+.nav-item.active i{
+  filter:drop-shadow(0 0 7px rgba(164,120,255,.45));
+}
 .toast{
-  position:fixed;left:50%;bottom:95px;transform:translateX(-50%);z-index:60;display:none;max-width:90%;
-  padding:12px 16px;border:1px solid rgba(165,136,255,.3);border-radius:13px;
-  background:rgba(30,26,60,.98);box-shadow:0 8px 30px rgba(0,0,0,.3);font-size:13px;text-align:center;
+  position:fixed;left:50%;bottom:95px;transform:translateX(-50%);
+  z-index:60;display:none;max-width:90%;
+  padding:12px 16px;border:1px solid rgba(165,136,255,.3);
+  border-radius:13px;background:rgba(30,26,60,.98);
+  box-shadow:0 8px 30px rgba(0,0,0,.3);
+  font-size:13px;text-align:center;
 }
 .toast.show{display:block}
+
+/* Adsterra banner: one banner after each group of three notifications */
+.adsterra-notification-slot{
+  width:100%;
+  min-height:60px;
+  margin:10px 0 14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:12px;
+  background:rgba(16,15,36,.35);
+}
+.adsterra-notification-slot iframe{
+  display:block;
+  width:320px;
+  max-width:100%;
+  height:50px;
+  border:0;
+  overflow:hidden;
+  background:transparent;
+}
 @media(max-width:380px){
-  .topbar{gap:7px;padding-left:10px;padding-right:10px}.topbar h1{font-size:22px}
-  .notification{padding:12px 9px;gap:8px}.notification-main{gap:9px}
-  .notification-list{padding:0 7px}.avatar-wrap,.avatar,.avatar-fallback{width:46px;height:46px}
-  .action-badge{width:23px;height:23px;font-size:10px}.message{font-size:14px}
-  .section-title{font-size:18px}.notification-actions{gap:0}.more-btn,.read-btn{width:25px;height:28px}
+  .topbar{gap:7px;padding-left:10px;padding-right:10px}
+  .topbar h1{font-size:22px}
+  .notification{padding:12px 9px;gap:9px}
+  .notification-list{padding:0 7px}
+  .avatar-wrap,.avatar,.avatar-fallback{width:46px;height:46px}
+  .action-badge{width:23px;height:23px;font-size:10px}
+  .message{font-size:14px}
+  .section-title{font-size:18px}
+  .notification-actions{gap:0}
+  .more-btn,.read-btn{width:25px;height:28px}
 }
 </style>
 </head>
+
 <body>
 <div class="app">
+
 <header class="topbar">
-  <button class="menu-btn" id="menuButton" aria-label="Open settings" type="button"><i class="fa-solid fa-bars"></i></button>
+  <button class="menu-btn" id="menuButton" aria-label="Open settings">
+    <i class="fa-solid fa-bars"></i>
+  </button>
   <h1>Notifications</h1>
-  <button class="search-btn" id="searchToggle" aria-label="Search notifications" type="button"><i class="fa-solid fa-magnifying-glass"></i></button>
+  <button class="search-btn" id="searchToggle" aria-label="Search notifications">
+    <i class="fa-solid fa-magnifying-glass"></i>
+  </button>
 </header>
 
 <section class="search-panel" id="searchPanel">
-  <label class="search-box"><i class="fa-solid fa-magnifying-glass"></i>
+  <label class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
     <input id="searchInput" type="search" placeholder="Search notifications..." autocomplete="off">
   </label>
 </section>
 
 <section>
-  <h2 class="section-title"><i class="fa-solid fa-sparkles"></i> New <span class="section-count" id="newCount">0</span></h2>
-  <div id="newList" class="notification-list"><div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading notifications...</div></div>
+  <h2 class="section-title">
+    <i class="fa-solid fa-sparkles"></i>
+    New
+    <span class="section-count" id="newCount">0</span>
+  </h2>
+  <div id="newList" class="notification-list">
+    <div class="loading-state">
+      <i class="fa-solid fa-spinner fa-spin"></i><br>
+      Loading notifications...
+    </div>
+  </div>
 </section>
 
 <section>
-  <h2 class="section-title"><i class="fa-regular fa-clock"></i> Earlier <span class="section-count" id="earlierCount">0</span></h2>
+  <h2 class="section-title">
+    <i class="fa-regular fa-clock"></i>
+    Earlier
+    <span class="section-count" id="earlierCount">0</span>
+  </h2>
   <div id="earlierList" class="notification-list"></div>
 </section>
 
 <nav class="bottom-nav" aria-label="Main navigation">
-  <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
-  <a class="nav-item active" href="notifications.html" aria-current="page"><i class="fa-solid fa-bell"></i><span>Notifications</span></a>
-  <a class="nav-item" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+  <a class="nav-item" href="home.html">
+    <i class="fa-solid fa-house"></i><span>Home</span>
+  </a>
+  <a class="nav-item" href="discover.html">
+    <i class="fa-solid fa-compass"></i><span>Pulse</span>
+  </a>
+  <a class="nav-item" href="friends.html"><i class="fa-solid fa-user-group"></i><span>Friends</span></a>
+  <a class="nav-item active" href="notifications.html" aria-current="page">
+    <i class="fa-solid fa-bell"></i><span>Notifications</span>
+  </a>
+  <a class="nav-item" href="profile.html">
+    <i class="fa-regular fa-user"></i><span>Profile</span>
+  </a>
 </nav>
 </div>
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div id="toast" class="toast" role="status"></div>
 
 <script>
 "use strict";
 
 const API_BASE="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
-const $=id=>document.getElementById(id);
 
-const newList=$("newList"),earlierList=$("earlierList");
-const searchPanel=$("searchPanel"),searchInput=$("searchInput"),toast=$("toast");
-const newCount=$("newCount"),earlierCount=$("earlierCount");
+const newList=document.getElementById("newList");
+const earlierList=document.getElementById("earlierList");
+const searchPanel=document.getElementById("searchPanel");
+const searchInput=document.getElementById("searchInput");
+const toast=document.getElementById("toast");
+const newCount=document.getElementById("newCount");
+const earlierCount=document.getElementById("earlierCount");
 
-let notifications=[],loading=false,toastTimer=null;
+let notifications=[];
+let loading=false;
+let toastTimer=null;
 
 function getToken(){
-  try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}
+  try{return localStorage.getItem(TOKEN_KEY)||""}
+  catch(_){return ""}
 }
+
 function escapeHTML(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
 }
+
 function showToast(message){
   toast.textContent=String(message||"Something went wrong.");
   toast.classList.add("show");
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>toast.classList.remove("show"),2800);
 }
-function getActorObject(item){return item.actor||item.sender||item.user||{}}
+
 function getActor(item){
-  const actor=getActorObject(item);
-  return String(item.actor_display_name||item.actor_username||item.username||item.display_name||
-    item.sender_name||actor.display_name||actor.username||"").trim();
+  const actor=item.actor||item.sender||item.user||{};
+  return String(
+    item.actor_display_name||
+    item.actor_username||
+    item.username||
+    item.display_name||
+    item.sender_name||
+    actor.display_name||
+    actor.username||
+    ""
+  ).trim();
 }
-function getType(item){
-  return String(item.type||item.notification_type||"notification").toLowerCase().replace(/[\s-]+/g,"_");
-}
+
 function getAction(item){
-  const type=getType(item),message=String(item.message||item.body||"").toLowerCase();
+  const type=String(item.type||item.notification_type||"").toLowerCase();
+  const message=String(item.message||item.body||"").toLowerCase();
   const combined=type+" "+message;
 
-  if(type.includes("friend_request")||type==="friendrequest"||combined.includes("sent you a friend request"))return "friend_request";
-  if(type==="friend"||type.includes("friend_accepted")||combined.includes("accepted your friend request"))return "friend";
-  if(/\blove\b|\bloved\b|\bhearts?\b/.test(combined)&&/(react|reaction|love|heart)/.test(combined))return "love";
-  if(type.includes("comment")||type.includes("mention")||/\bcommented\b|\bcomment\b|\bmentioned you\b/.test(message))return "comment";
+  if(/\blove\b|\bloved\b|\bhearts?\b/.test(combined)&&
+     /(react|reaction|love|heart)/.test(combined))return "love";
+
+  if(type.includes("comment")||type.includes("mention")||
+     /\bcommented\b|\bcomment\b|\bmentioned you\b/.test(message))return "comment";
+
   if(type.includes("like")||/\bliked your post\b/.test(message))return "like";
+
   if(type.includes("follow")||/\bstarted following\b|\bfollowed you\b/.test(message))return "follow";
+
   if(type.includes("message")||/\bnew message\b|\bsent you a message\b/.test(message))return "message";
+
   if(type.includes("story")||message.includes("story"))return "story";
+
   return "other";
 }
+
 function actionIcon(action){
-  return ({
-    comment:"fa-comment",like:"fa-thumbs-up",love:"fa-heart",follow:"fa-user-plus",
-    message:"fa-comment-dots",story:"fa-book-open",friend_request:"fa-user-plus",
-    friend:"fa-user-check",other:"fa-bell"
-  })[action]||"fa-bell";
+  const icons={
+    comment:"fa-comment",
+    like:"fa-thumbs-up",
+    love:"fa-heart",
+    follow:"fa-user-plus",
+    message:"fa-comment-dots",
+    story:"fa-book-open",
+    other:"fa-bell"
+  };
+  return icons[action]||icons.other;
 }
+
 function actionLabel(action){
-  return ({
-    comment:"Comment",like:"Like",love:"Love",follow:"Follow",message:"Message",
-    story:"Story",friend_request:"Friend request",friend:"Friend",other:"Notification"
-  })[action]||"Notification";
+  const labels={
+    comment:"Comment",
+    like:"Like",
+    love:"Love",
+    follow:"Follow",
+    message:"Message",
+    story:"Story",
+    other:"Notification"
+  };
+  return labels[action]||labels.other;
 }
+
 function timeAgo(value){
   if(!value)return "Recently";
   const date=new Date(value);
   if(Number.isNaN(date.getTime()))return String(value);
+
   const minutes=Math.max(0,Math.floor((Date.now()-date.getTime())/60000));
   if(minutes<1)return "Just now";
   if(minutes<60)return minutes+"m";
+
   const hours=Math.floor(minutes/60);
   if(hours<24)return hours+"h";
+
   const days=Math.floor(hours/24);
   if(days<7)return days+"d";
+
   return date.toLocaleDateString();
 }
+
 function buildMessage(item){
-  const actor=getActor(item),action=getAction(item),raw=String(item.message||item.body||"");
+  const actor=getActor(item);
+  const action=getAction(item);
+  const raw=String(item.message||item.body||"");
+
   if(!raw){
     const phrases={
-      comment:"commented on your post.",like:"liked your post.",love:"reacted love to your post.",
-      follow:"started following you.",message:"sent you a message.",story:"added to their story.",
-      friend_request:"sent you a friend request.",friend:"became your friend.",other:"sent you a notification."
+      comment:"commented on your post.",
+      like:"liked your post.",
+      love:"reacted love to your post.",
+      follow:"started following you.",
+      message:"sent you a message.",
+      story:"added to their story.",
+      other:"sent you a notification."
     };
-    return (actor?'<strong class="user-name">'+escapeHTML(actor)+'</strong> ':"")+
-      '<strong class="action-name">'+escapeHTML(phrases[action]||phrases.other)+'</strong>';
+    return (actor
+      ?'<strong class="user-name">'+escapeHTML(actor)+'</strong> '
+      :"")+
+      '<strong class="action-name">'+escapeHTML(phrases[action])+'</strong>';
   }
+
   let output=escapeHTML(raw);
+
   if(actor){
     const escaped=escapeHTML(actor).replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
-    output=output.replace(new RegExp(escaped,"ig"),match=>'<strong class="user-name">'+match+"</strong>");
+    output=output.replace(new RegExp(escaped,"ig"),match=>
+      '<strong class="user-name">'+match+"</strong>"
+    );
   }
+
   const phrases=[
-    /\bsent you a friend request\b/gi,/\baccepted your friend request\b/gi,
-    /\bstarted following\b/gi,/\breacted love\b/gi,/\breacted like\b/gi,
-    /\bsent you a message\b/gi,/\bcommented\b/gi,/\bmentioned\b/gi,
-    /\bliked\b/gi,/\bfollowing\b/gi,/\bfollowed\b/gi,/\bshared\b/gi,/\breplied\b/gi
+    /\bstarted following\b/gi,
+    /\breacted love\b/gi,
+    /\breacted like\b/gi,
+    /\bsent you a message\b/gi,
+    /\breacted\b/gi,
+    /\bcommented\b/gi,
+    /\bcomment\b/gi,
+    /\bmentioned\b/gi,
+    /\bliked\b/gi,
+    /\bfollowing\b/gi,
+    /\bfollowed\b/gi,
+    /\blove\b/gi,
+    /\bshared\b/gi,
+    /\breplied\b/gi
   ];
+
   for(const regex of phrases){
-    output=output.replace(regex,match=>'<strong class="action-name">'+match+"</strong>");
+    output=output.replace(regex,match=>
+      '<strong class="action-name">'+match+"</strong>"
+    );
   }
   return output;
 }
+
 function normalize(item,index){
-  const actor=getActorObject(item);
+  const actorObject=item.actor||item.sender||item.user||{};
   return {
     id:String(item.id??item.notification_id??index),
-    type:getType(item),
-    actorId:String(item.actor_id??item.sender_id??item.user_id??actor.id??actor.user_id??""),
-    actorName:getActor(item)||String(actor.display_name||actor.username||""),
-    actorUsername:String(item.actor_username||item.username||actor.username||"").replace(/^@/,""),
-    avatar:item.actor_avatar_url||item.actor_avatar||item.avatar_url||item.avatar||item.profile_picture||actor.avatar_url||actor.avatar||"",
-    postId:String(item.post_id??item.postId??item.post?.id??item.post?.post_id??""),
+    type:String(item.type||item.notification_type||"notification").toLowerCase(),
+    actorName:getActor(item)||String(actorObject.display_name||actorObject.username||""),
+    avatar:
+      item.actor_avatar_url||
+      item.actor_avatar||
+      item.avatar_url||
+      item.avatar||
+      item.profile_picture||
+      actorObject.avatar_url||
+      actorObject.avatar||
+      "",
     message:item.message||item.body||"",
     created:item.created_at||item.createdAt||item.time||"",
     read:Boolean(item.read_at||item.is_read===true||item.read===true),
@@ -280,67 +504,8 @@ function normalize(item,index){
   };
 }
 
-/* Determine the destination using IDs actually returned by the backend. */
-function notificationDestination(item){
-  const original=item.original||{};
-  const action=getAction(original);
-  const actorId=String(item.actorId||"").trim();
-  const username=String(item.actorUsername||"").trim();
-  const postId=String(item.postId||"").trim();
-
-  if(action==="friend_request"){
-    // The friend requests page is the correct place to accept/decline this request.
-    return "friends.html?tab=requests";
-  }
-  if(action==="friend"){
-    if(username||actorId){
-      const p=new URLSearchParams();
-      if(username)p.set("username",username);
-      if(actorId)p.set("userId",actorId);
-      return "profile.html?"+p.toString();
-    }
-    return "friends.html";
-  }
-  if(action==="message"){
-    const p=new URLSearchParams();
-    if(actorId)p.set("user_id",actorId);
-    if(username)p.set("username",username);
-    return "inbox.html"+(p.toString()?"?"+p.toString():"");
-  }
-  if(action==="like"||action==="comment"||action==="love"){
-    if(postId)return "home.html?postId="+encodeURIComponent(postId);
-    return "home.html";
-  }
-  if(action==="follow"){
-    if(username||actorId){
-      const p=new URLSearchParams();
-      if(username)p.set("username",username);
-      if(actorId)p.set("userId",actorId);
-      return "profile.html?"+p.toString();
-    }
-    return "profile.html";
-  }
-  if(action==="story"){
-    if(username||actorId){
-      const p=new URLSearchParams();
-      if(username)p.set("username",username);
-      if(actorId)p.set("userId",actorId);
-      return "profile.html?"+p.toString();
-    }
-    return "discover.html";
-  }
-  if(original.post_id)return "home.html?postId="+encodeURIComponent(String(original.post_id));
-  if(actorId||username){
-    const p=new URLSearchParams();
-    if(username)p.set("username",username);
-    if(actorId)p.set("userId",actorId);
-    return "profile.html?"+p.toString();
-  }
-  return "";
-}
-
 function renderItem(item){
-  const action=getAction(item.original);
+  const action=getAction(item);
   const icon=actionIcon(action);
   const avatarHTML=item.avatar
     ?'<img class="avatar" src="'+escapeHTML(item.avatar)+'" alt="" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false">'+
@@ -349,73 +514,113 @@ function renderItem(item){
 
   return `
     <article class="notification ${item.read?"":"unread"}" data-id="${escapeHTML(item.id)}">
-      <div class="notification-main" role="link" tabindex="0" data-open="${escapeHTML(item.id)}" aria-label="Open notification">
-        <div class="avatar-wrap">
-          ${avatarHTML}
-          <span class="action-badge ${escapeHTML(action)}" title="${escapeHTML(actionLabel(action))}">
-            <i class="fa-solid ${icon}"></i>
-          </span>
-        </div>
-        <div class="notification-body">
-          <div class="message">${buildMessage(item.original)}</div>
-          <div class="time">${escapeHTML(timeAgo(item.created))}</div>
-        </div>
+      <div class="avatar-wrap">
+        ${avatarHTML}
+        <span class="action-badge ${action}" title="${escapeHTML(actionLabel(action))}">
+          <i class="fa-solid ${icon}"></i>
+        </span>
       </div>
+
+      <div class="notification-body">
+        <div class="message">${buildMessage(item.original)}</div>
+        <div class="time">${escapeHTML(timeAgo(item.created))}</div>
+      </div>
+
       <div class="notification-actions">
-        <button class="more-btn" type="button" data-more="${escapeHTML(item.id)}" aria-label="Notification options">
+        <button class="more-btn" type="button"
+          data-more="${escapeHTML(item.id)}" aria-label="Notification options">
           <i class="fa-solid fa-ellipsis"></i>
         </button>
         ${item.read?"":`
-          <button class="read-btn" type="button" data-read="${escapeHTML(item.id)}" aria-label="Mark as read">
+          <button class="read-btn" type="button"
+            data-read="${escapeHTML(item.id)}" aria-label="Mark as read">
             <i class="fa-solid fa-check"></i>
-          </button>`}
+          </button>
+        `}
       </div>
-    </article>`;
+    </article>
+  `;
+}
+
+
+/* Render one Adsterra banner after every three notifications in each list. */
+function renderNotificationsWithAds(items, sectionName){
+  let output="";
+  items.forEach((item,index)=>{
+    output+=renderItem(item);
+    const number=index+1;
+    if(number%3===0){
+      output+=`<div class="adsterra-notification-slot" id="adsterra-${sectionName}-${number}" aria-label="Advertisement"></div>`;
+    }
+  });
+  return output;
+}
+
+/* Isolate each Adsterra unit in its own iframe so repeated atOptions variables
+   do not overwrite one another when several banners appear on the page. */
+function mountAdsterraBanners(){
+  document.querySelectorAll(".adsterra-notification-slot").forEach(slot=>{
+    if(slot.dataset.mounted==="true")return;
+    slot.dataset.mounted="true";
+    const frame=document.createElement("iframe");
+    frame.title="Advertisement";
+    frame.width="320";
+    frame.height="50";
+    frame.loading="lazy";
+    frame.referrerPolicy="no-referrer-when-downgrade";
+    frame.setAttribute("sandbox","allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox");
+    frame.srcdoc='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;width:320px;height:50px;overflow:hidden;background:transparent"><script>var atOptions={\'key\':\'ab837cf0ea9c26ae43b7bc4e05a0b5de\',\'format\':\'iframe\',\'height\':50,\'width\':320,\'params\':{}};<\/script><script src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de"></scr'+'ipt></body></html>';
+    slot.appendChild(frame);
+  });
 }
 
 function render(){
   const query=searchInput.value.trim().toLowerCase();
+
   const filtered=notifications.filter(item=>{
-    const text=[item.actorName,item.message,item.type,getAction(item.original)].join(" ").toLowerCase();
+    const text=[item.actorName,item.message,item.type,getAction(item.original)]
+      .join(" ").toLowerCase();
     return !query||text.includes(query);
   });
+
   const newItems=filtered.filter(item=>!item.read);
   const earlierItems=filtered.filter(item=>item.read);
 
   newCount.textContent=String(newItems.length);
   earlierCount.textContent=String(earlierItems.length);
-  newList.innerHTML=newItems.length?newItems.map(renderItem).join("")
+
+  newList.innerHTML=newItems.length
+    ?renderNotificationsWithAds(newItems,"new")
     :'<div class="empty-state"><i class="fa-solid fa-bell-slash"></i><br><h2>No new notifications</h2><p>You are all caught up.</p></div>';
-  earlierList.innerHTML=earlierItems.length?earlierItems.map(renderItem).join("")
+
+  earlierList.innerHTML=earlierItems.length
+    ?renderNotificationsWithAds(earlierItems,"earlier")
     :'<div class="empty-state"><i class="fa-regular fa-clock"></i><br><p>No earlier notifications.</p></div>';
 
+  mountAdsterraBanners();
+
   document.querySelectorAll("[data-read]").forEach(button=>{
-    button.addEventListener("click",event=>{
-      event.stopPropagation();
-      markOneAsRead(button.dataset.read);
-    });
+    button.addEventListener("click",()=>markOneAsRead(button.dataset.read));
   });
+
   document.querySelectorAll("[data-more]").forEach(button=>{
-    button.addEventListener("click",event=>{
-      event.stopPropagation();
+    button.addEventListener("click",()=>{
       const item=notifications.find(n=>n.id===button.dataset.more);
       if(!item)return;
       if(!item.read)markOneAsRead(item.id);
       else showToast("This notification is already read.");
     });
   });
-  document.querySelectorAll("[data-open]").forEach(element=>{
-    const open=()=>openNotification(element.dataset.open);
-    element.addEventListener("click",open);
-    element.addEventListener("keydown",event=>{
-      if(event.key==="Enter"||event.key===" "){event.preventDefault();open();}
-    });
-  });
 }
 
 async function apiRequest(path,options={}){
   const token=getToken();
-  if(!token){const error=new Error("LOGIN_REQUIRED");error.status=401;throw error;}
+  if(!token){
+    const error=new Error("LOGIN_REQUIRED");
+    error.status=401;
+    throw error;
+  }
+
   let response;
   try{
     response=await fetch(API_BASE+path,{
@@ -427,37 +632,59 @@ async function apiRequest(path,options={}){
       },
       cache:"no-store"
     });
-  }catch(_){throw new Error("Cannot connect to the server. Check your internet connection.");}
+  }catch(_){
+    throw new Error("Backend-এ সংযোগ হচ্ছে না। ইন্টারনেট পরীক্ষা করো।");
+  }
+
   const raw=await response.text();
   let data={};
-  try{data=raw?JSON.parse(raw):{};}catch(_){data={message:raw};}
+  try{data=raw?JSON.parse(raw):{}}
+  catch(_){data={message:raw}}
+
   if(!response.ok){
     const error=new Error(data.message||data.error||("API error "+response.status));
-    error.status=response.status;throw error;
+    error.status=response.status;
+    throw error;
   }
   return data;
 }
 
 function showError(title,description,login=false){
-  newList.innerHTML=`<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i>
-    <h2>${escapeHTML(title)}</h2><p>${escapeHTML(description)}</p>
-    <button class="primary-btn" id="retryBtn">${login?"Login":"Try again"}</button></div>`;
-  earlierList.innerHTML="";newCount.textContent="0";earlierCount.textContent="0";
-  $("retryBtn").addEventListener("click",()=>login?location.href="login.html":loadNotifications());
+  newList.innerHTML=`
+    <div class="empty-state">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h2>${escapeHTML(title)}</h2>
+      <p>${escapeHTML(description)}</p>
+      <button class="primary-btn" id="retryBtn">${login?"Login":"Try again"}</button>
+    </div>`;
+  earlierList.innerHTML="";
+  newCount.textContent="0";
+  earlierCount.textContent="0";
+
+  document.getElementById("retryBtn").addEventListener("click",()=>{
+    if(login)location.href="auth.html?mode=login";
+    else loadNotifications();
+  });
 }
 
 async function loadNotifications(){
   if(loading)return;
   loading=true;
+
   newList.innerHTML='<div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading notifications...</div>';
   earlierList.innerHTML="";
+
   try{
     if(!getToken()){
       showError("Please log in","Log in to view your notifications.",true);
       return;
     }
+
     const data=await apiRequest("/notifications");
-    const items=Array.isArray(data)?data:(data.notifications||data.data||data.items||[]);
+    const items=Array.isArray(data)
+      ?data
+      :(data.notifications||data.data||data.items||[]);
+
     notifications=Array.isArray(items)?items.map(normalize):[];
     render();
   }catch(error){
@@ -467,65 +694,57 @@ async function loadNotifications(){
     }else{
       showError("Could not load notifications",error.message||"Please try again.");
     }
-  }finally{loading=false;}
+  }finally{
+    loading=false;
+  }
 }
 
 async function markOneAsRead(id){
   if(!id)return;
   const item=notifications.find(n=>n.id===String(id));
   if(!item||item.read)return;
+
   try{
     await apiRequest("/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});
     item.read=true;
     item.original.read_at=new Date().toISOString();
-    item.original.is_read=true;
     render();
-  }catch(error){showToast("Could not mark as read: "+error.message);}
-}
-
-/* Clicking the notification opens its destination. Mark-as-read is attempted first. */
-async function openNotification(id){
-  const item=notifications.find(n=>n.id===String(id));
-  if(!item)return;
-  const destination=notificationDestination(item);
-  if(!destination){
-    showToast("This notification does not have a destination yet.");
-    return;
+  }catch(error){
+    showToast("Could not mark as read: "+error.message);
   }
-  if(!item.read){
-    try{
-      await apiRequest("/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});
-      item.read=true;
-      item.original.read_at=new Date().toISOString();
-      item.original.is_read=true;
-    }catch(error){
-      // Do not block navigation if marking as read fails.
-      console.warn("Could not mark notification as read:",error);
-    }
-  }
-  location.href=destination;
 }
 
 async function markAllAsRead(){
   if(loading||!notifications.some(item=>!item.read))return;
+
   try{
     await apiRequest("/notifications/read-all",{method:"PATCH"});
     const now=new Date().toISOString();
     notifications.forEach(item=>{
       item.read=true;
       item.original.read_at=item.original.read_at||now;
-      item.original.is_read=true;
     });
-    render();showToast("All notifications marked as read.");
-  }catch(error){showToast("Could not mark notifications as read: "+error.message);}
+    render();
+    showToast("All notifications marked as read.");
+  }catch(error){
+    showToast("Could not mark notifications as read: "+error.message);
+  }
 }
 
-$("menuButton").addEventListener("click",()=>{location.href="settings.html";});
-$("searchToggle").addEventListener("click",()=>{
-  searchPanel.classList.toggle("open");
-  if(searchPanel.classList.contains("open"))searchInput.focus();
-  else{searchInput.value="";render();}
+document.getElementById("menuButton").addEventListener("click",()=>{
+  location.href="settings.html";
 });
+
+document.getElementById("searchToggle").addEventListener("click",()=>{
+  searchPanel.classList.toggle("open");
+  if(searchPanel.classList.contains("open")){
+    searchInput.focus();
+  }else{
+    searchInput.value="";
+    render();
+  }
+});
+
 searchInput.addEventListener("input",render);
 loadNotifications();
 </script>
