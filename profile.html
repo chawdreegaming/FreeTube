@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,47 +16,37 @@ button,input,textarea,select{font:inherit}
 button{color:inherit;cursor:pointer}
 button:disabled{opacity:.5;cursor:wait}
 a{color:inherit;text-decoration:none}
-.app{max-width:600px;margin:auto;min-height:100dvh;padding-bottom:95px}
-.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 15px;background:#100f20e8;border-bottom:1px solid var(--border);backdrop-filter:blur(20px)}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand-logo{width:39px;height:39px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:var(--gradient);color:#17142e;font-size:18px}
+.app{max-width:600px;margin:auto;min-height:100dvh;padding-bottom:82px}
+
+/* App name and settings are over the cover; no top bar or messenger icon */
+.cover{height:225px;position:relative;overflow:hidden;background:linear-gradient(125deg,#233d70,#49346f,#77344f)}
+.cover>img{width:100%;height:100%;object-fit:cover}
+.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#100f20bb,transparent 40%,#100f2070);pointer-events:none}
+.cover-top{position:absolute;z-index:3;top:0;left:0;right:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px}
+.brand{display:flex;align-items:center;gap:8px;min-width:0;text-shadow:0 2px 8px #0009}
+.brand-logo{width:37px;height:37px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:var(--gradient);color:#17142e;font-size:17px}
 .brand-title{font-size:17px;font-weight:900;white-space:nowrap}
-.boys{color:var(--blue)}
-.girls{color:var(--pink)}
-.brand-subtitle{display:block;font-size:10px;color:var(--muted);margin-top:3px}
-.top-actions{display:flex;gap:8px}
-.icon-button{width:39px;height:39px;display:grid;place-items:center;border:1px solid var(--border);border-radius:12px;background:var(--panel2)}
-.cover{height:190px;position:relative;overflow:hidden;background:linear-gradient(125deg,#233d70,#49346f,#77344f)}
-.cover img{width:100%;height:100%;object-fit:cover}
-.upload-cover{position:absolute;right:12px;bottom:12px;background:#100f20c9;border:1px solid var(--border);padding:9px 11px;border-radius:10px;font-size:11px;font-weight:bold}
+.boys{color:#60a5fa}.girls{color:#fb7185}
+.brand-hearts{font-size:15px}
+.settings-button{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;border:1px solid #ffffff45;border-radius:12px;background:#17142eaa;backdrop-filter:blur(12px);font-size:19px}
+.upload-cover{position:absolute;z-index:4;right:12px;bottom:12px;background:#100f20c9;border:1px solid var(--border);padding:9px 11px;border-radius:10px;font-size:11px;font-weight:bold}
 input[type=file]{display:none}
 .profile-head{text-align:center;padding:0 16px 17px;border-bottom:1px solid var(--border);background:linear-gradient(#19182e88,transparent)}
-.avatar-wrap{width:100px;height:100px;margin:-48px auto 10px;position:relative;z-index:2}
+.avatar-wrap{width:100px;height:100px;margin:-48px auto 10px;position:relative;z-index:5}
 .avatar{width:100%;height:100%;object-fit:cover;border-radius:50%;border:4px solid var(--bg);box-shadow:0 0 0 2px #a78bfa99;background:var(--panel2)}
 .upload-avatar{position:absolute;right:0;bottom:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--gradient);color:#17142e;border:3px solid var(--bg)}
 .name{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;font-size:24px;font-weight:900;overflow-wrap:anywhere}
 .admin-badge{font-size:9px;padding:5px 8px;border-radius:8px;background:#a78bfa22;border:1px solid #a78bfa55;color:#d0baff}
-
-/* Blue Badge */
-.blue-verified-badge{
- display:inline-flex;align-items:center;justify-content:center;
- width:23px;height:23px;flex:0 0 23px;border-radius:50%;
- color:#fff;background:#168cff;font-size:12px;
- box-shadow:0 0 0 2px #168cff25;
- vertical-align:middle;
-}
+.blue-verified-badge{display:inline-flex;align-items:center;justify-content:center;width:23px;height:23px;flex:0 0 23px;border-radius:50%;color:#fff;background:#168cff;font-size:12px;box-shadow:0 0 0 2px #168cff25;vertical-align:middle}
 .blue-verified-badge i{font-size:12px}
 .handle{font-size:13px;color:var(--muted);margin-top:6px}
-.stats{font-size:13px;font-weight:bold;margin:11px 0}
-.stats span{color:var(--blue)}
+.stats{font-size:13px;font-weight:bold;margin:11px 0}.stats span{color:var(--blue)}
 .bio{font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;max-width:450px;margin:8px auto}
 .actions{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:13px}
 .btn{flex:1;min-width:0;padding:10px 7px;border:1px solid var(--border);border-radius:11px;background:#ffffff0a;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:6px}
-.primary{background:var(--gradient);color:#17142e;border:0}
-.admin-btn{background:#a78bfa22}
+.primary{background:var(--gradient);color:#17142e;border:0}.admin-btn{background:#a78bfa22}
 .status{font-size:11px;color:var(--muted);line-height:1.6;margin-top:9px;overflow-wrap:anywhere}
-.status.error{color:#ffacba}
-.status.success{color:var(--green)}
+.status.error{color:#ffacba}.status.success{color:var(--green)}
 .panel{background:linear-gradient(145deg,#22203bf0,#18172df0);border:1px solid var(--border);border-radius:15px;padding:12px 13px;margin:10px 10px 0;box-shadow:0 7px 22px #0002}
 .panel-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:14px;font-weight:850;margin-bottom:10px}
 .panel-title i{color:var(--purple);margin-right:7px}
@@ -67,8 +58,7 @@ input[type=file]{display:none}
 .detail-copy span{display:block;margin-bottom:3px}
 .detail-copy strong{display:block;color:#f2efff;font-size:12px;overflow-wrap:anywhere}
 .friends-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
-.friends-head h2{font-size:14px}
-.friends-head h2 i{color:var(--purple);margin-right:5px}
+.friends-head h2{font-size:14px}.friends-head h2 i{color:var(--purple);margin-right:5px}
 .see-more{border:0;background:none;color:#8ebaff;font-size:11px;font-weight:bold;padding:5px}
 .friends-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
 .friend-card{min-width:0;text-align:center;background:#ffffff06;border:1px solid #ffffff0d;border-radius:10px;padding:7px 3px;cursor:pointer}
@@ -77,139 +67,142 @@ input[type=file]{display:none}
 .friend-handle{font-size:9px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .muted{font-size:10px;color:var(--muted);line-height:1.6}
 .posts-count{padding:4px 7px;border-radius:7px;background:#60a5fa20;color:#9ac8ff;font-size:10px}
+.refresh-button{border:1px solid var(--border);border-radius:8px;background:#ffffff0b;color:#d4c5ff;padding:7px 9px;font-size:11px;font-weight:bold}
+.refresh-button i{margin-right:4px}
+.refresh-button.spinning i{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .post{padding:12px 0;border-bottom:1px solid var(--border);overflow-wrap:anywhere}
 .post:last-child{border-bottom:0}
-.post-author{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer}
-.post-author img{width:34px;height:34px;border-radius:50%;object-fit:cover}
-.post-author strong{font-size:12px}
+.post-author{display:flex;align-items:center;gap:8px;margin-bottom:8px;cursor:pointer;min-width:0}
+.post-author img{width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0}
+.post-author-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.post-author strong{font-size:12px;overflow-wrap:anywhere}
+.post-time{font-size:10px;color:var(--muted);font-weight:normal}
 .post-content{font-size:13px;line-height:1.65;white-space:pre-wrap;margin:7px 0}
 .post-media{display:block;width:100%;max-height:420px;object-fit:contain;margin-top:8px;border-radius:10px;background:#090815}
 .post-meta{display:flex;gap:13px;margin-top:9px}
-.empty{text-align:center;padding:18px 8px;color:var(--muted);font-size:11px;line-height:1.7}
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;min-height:64px;padding:9px 4px calc(9px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:#100f20e8;border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:25}
-.nav{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px;font-weight:bold}
-.nav i{font-size:19px}
-.nav.active{color:var(--purple)}
+.ad-banner-slot{width:100%;min-height:50px;margin:9px 0;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#100f2088;border-top:1px solid #ffffff12;border-bottom:1px solid #ffffff12}
+.ad-banner-slot iframe{max-width:100%;border:0}
+.ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:600px;min-height:60px;padding:7px 4px calc(7px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;background:#100f20ed;border-top:1px solid var(--border);backdrop-filter:blur(20px);z-index:25}
+.nav{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:bold}
+.nav i{font-size:19px}.nav.active{color:var(--purple)}
 .modal{display:none;position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;padding-bottom:25px}
 .modal.open{display:block}
 .modal-head{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border);position:sticky;top:0;background:#100f20f5}
-.modal-head h2{font-size:16px}
-.modal-head button{border:0;background:none;font-size:22px}
+.modal-head h2{font-size:16px}.modal-head button{border:0;background:none;font-size:22px}
 .modal-content{max-width:500px;margin:auto;padding:17px}
 .field{display:block;margin:13px 0;font-size:12px;font-weight:bold;color:#d9d5f1}
 .field input,.field textarea,.field select{display:block;width:100%;margin-top:7px;border:1px solid var(--border);background:#211f39;border-radius:10px;padding:12px;color:white;outline:none}
-.field input[type=date]{color-scheme:dark}
-.field textarea{min-height:85px;resize:vertical}
+.field input[type=date]{color-scheme:dark}.field textarea{min-height:85px;resize:vertical}
 .save{width:100%;padding:13px;border:0;border-radius:10px;background:var(--gradient);color:#17142e;font-weight:900}
-.toast{display:none;position:fixed;z-index:200;bottom:80px;left:50%;transform:translateX(-50%);background:#292546;border:1px solid var(--border);padding:11px 15px;border-radius:12px;font-size:12px;max-width:90%;text-align:center}
+.toast{display:none;position:fixed;z-index:200;bottom:75px;left:50%;transform:translateX(-50%);background:#292546;border:1px solid var(--border);padding:11px 15px;border-radius:12px;font-size:12px;max-width:90%;text-align:center}
 @media(max-width:380px){
-.brand-title{font-size:14px}
-.brand-logo{width:35px;height:35px}
-.cover{height:170px}
-.name{font-size:21px}
-.panel{margin-left:8px;margin-right:8px;padding:10px}
-.details-grid{column-gap:10px;row-gap:8px}
-.detail-icon{width:27px;height:27px}
-.detail-copy strong{font-size:11px}
-.friend-card img,.friend-fallback{width:40px;height:40px}
-.friend-name{font-size:9px}
-.btn{font-size:10px;padding:9px 4px}
+ .brand-title{font-size:14px}.brand-logo{width:32px;height:32px}
+ .cover{height:195px}.name{font-size:21px}
+ .panel{margin-left:8px;margin-right:8px;padding:10px}
+ .details-grid{column-gap:10px;row-gap:8px}.detail-icon{width:27px;height:27px}
+ .detail-copy strong{font-size:11px}
+ .friend-card img,.friend-fallback{width:40px;height:40px}
+ .friend-name{font-size:9px}.btn{font-size:10px;padding:9px 4px}
 }
 </style>
 </head>
 <body>
 <div class="app">
-<header class="topbar">
-<a class="brand" href="home.html">
-<span class="brand-logo"><i class="fa-solid fa-users"></i></span>
-<span><span class="brand-title"><span class="boys">Boys</span> vs <span class="girls">Girls 💙💗</span></span><span class="brand-subtitle">Your profile, your story</span></span>
-</a>
-<div class="top-actions">
-<button class="icon-button" id="messagesButton" aria-label="Messages"><i class="fa-regular fa-paper-plane"></i></button>
-<button class="icon-button" id="menuToggle" aria-label="Settings"><i class="fa-solid fa-bars"></i></button>
-</div>
-</header>
 
 <section class="cover">
-<img id="coverPhoto" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
-<label class="upload-cover" id="coverUploadLabel" for="coverInput"><i class="fa-solid fa-camera"></i> Edit cover</label>
-<input id="coverInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+  <img id="coverPhoto" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
+  <div class="cover-top">
+    <a class="brand" href="home.html" aria-label="Boys vs Girls home">
+      <span class="brand-logo"><i class="fa-solid fa-users"></i></span>
+      <span>
+        <span class="brand-title"><span class="boys">Boys</span> vs <span class="girls">Girls</span> <span class="brand-hearts">💙💗</span></span>
+      </span>
+    </a>
+    <button class="settings-button" id="menuToggle" aria-label="Settings"><i class="fa-solid fa-bars"></i></button>
+  </div>
+  <label class="upload-cover" id="coverUploadLabel" for="coverInput"><i class="fa-solid fa-camera"></i> Edit cover</label>
+  <input id="coverInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
 </section>
 
 <section class="profile-head">
-<div class="avatar-wrap">
-<img id="profileAvatar" class="avatar" src="https://placehold.co/120x120/302c50/ffffff?text=BG" alt="Profile photo">
-<label class="upload-avatar" id="avatarUploadLabel" for="avatarInput" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
-<input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
-</div>
-<div class="name">
-  <span id="username">User</span>
-  <span id="blueBadge" class="blue-verified-badge hidden" title="Verified Blue Badge" aria-label="Verified Blue Badge"><i class="fa-solid fa-check"></i></span>
-  <span id="adminBadge" class="admin-badge hidden"><i class="fa-solid fa-shield-halved"></i> ADMIN</span>
-</div>
-<div id="handle" class="handle">@username</div>
-<div class="stats"><span id="followersCount">0</span> followers · <span id="followingCount">0</span> following</div>
-<p class="bio" id="bioText">Welcome to Boys vs Girls 💙💗!</p>
-<div class="actions" id="ownActions">
-<button class="btn admin-btn hidden" id="dashboardButton"><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</button>
-<button class="btn" id="homeButton"><i class="fa-solid fa-house"></i> Home</button>
-<button class="btn" id="editButton"><i class="fa-solid fa-pen"></i> Edit profile</button>
-</div>
-<div class="actions hidden" id="otherActions">
-<button class="btn primary" id="friendButton"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
-<button class="btn" id="followButton"><i class="fa-solid fa-user-plus"></i> Follow</button>
-<button class="btn" id="messageButton"><i class="fa-regular fa-paper-plane"></i> Message</button>
-<button class="btn hidden" id="declineFriendButton"><i class="fa-solid fa-xmark"></i> Decline</button>
-</div>
-<p class="status" id="sessionStatus" role="status">Loading profile...</p>
-<button class="btn" id="retrySessionButton" style="display:none;width:100%;margin-top:8px"><i class="fa-solid fa-rotate"></i> Retry connection</button>
+  <div class="avatar-wrap">
+    <img id="profileAvatar" class="avatar" src="https://placehold.co/120x120/302c50/ffffff?text=BG" alt="Profile photo">
+    <label class="upload-avatar" id="avatarUploadLabel" for="avatarInput" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
+    <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+  </div>
+  <div class="name">
+    <span id="username">User</span>
+    <span id="blueBadge" class="blue-verified-badge hidden" title="Verified Blue Badge" aria-label="Verified Blue Badge"><i class="fa-solid fa-check"></i></span>
+    <span id="adminBadge" class="admin-badge hidden"><i class="fa-solid fa-shield-halved"></i> ADMIN</span>
+  </div>
+  <div id="handle" class="handle">@username</div>
+  <div class="stats"><span id="followersCount">0</span> followers · <span id="followingCount">0</span> following</div>
+  <p class="bio" id="bioText">Welcome to Boys vs Girls 💙💗!</p>
+  <div class="actions" id="ownActions">
+    <button class="btn admin-btn hidden" id="dashboardButton"><i class="fa-solid fa-shield-halved"></i> Admin Dashboard</button>
+    <button class="btn" id="homeButton"><i class="fa-solid fa-house"></i> Home</button>
+    <button class="btn" id="editButton"><i class="fa-solid fa-pen"></i> Edit profile</button>
+  </div>
+  <div class="actions hidden" id="otherActions">
+    <button class="btn primary" id="friendButton"><i class="fa-solid fa-user-plus"></i> Add Friend</button>
+    <button class="btn" id="followButton"><i class="fa-solid fa-user-plus"></i> Follow</button>
+    <button class="btn" id="messageButton"><i class="fa-regular fa-paper-plane"></i> Message</button>
+    <button class="btn hidden" id="declineFriendButton"><i class="fa-solid fa-xmark"></i> Decline</button>
+  </div>
+  <p class="status" id="sessionStatus" role="status">Loading profile...</p>
+  <button class="btn" id="retrySessionButton" style="display:none;width:100%;margin-top:8px"><i class="fa-solid fa-rotate"></i> Retry connection</button>
 </section>
 
 <section class="panel">
-<div class="panel-title"><span><i class="fa-regular fa-id-card"></i> Personal details</span><button class="edit-icon own-edit" data-edit aria-label="Edit personal details"><i class="fa-solid fa-pen"></i></button></div>
-<div class="details-grid">
-<div class="detail"><span class="detail-icon"><i class="fa-solid fa-location-dot"></i></span><span class="detail-copy"><span>Lives in</span><strong id="cityText">Not added</strong></span></div>
-<div class="detail"><span class="detail-icon"><i class="fa-solid fa-cake-candles"></i></span><span class="detail-copy"><span>Birthday</span><strong id="birthdayText">Not added</strong></span></div>
-<div class="detail"><span class="detail-icon"><i class="fa-solid fa-venus-mars"></i></span><span class="detail-copy"><span>Gender</span><strong id="genderText">Not added</strong></span></div>
-<div class="detail"><span class="detail-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="detail-copy"><span>Education</span><strong id="educationText">Not added</strong></span></div>
-</div>
+  <div class="panel-title"><span><i class="fa-regular fa-id-card"></i> Personal details</span><button class="edit-icon own-edit" data-edit aria-label="Edit personal details"><i class="fa-solid fa-pen"></i></button></div>
+  <div class="details-grid">
+    <div class="detail"><span class="detail-icon"><i class="fa-solid fa-location-dot"></i></span><span class="detail-copy"><span>Lives in</span><strong id="cityText">Not added</strong></span></div>
+    <div class="detail"><span class="detail-icon"><i class="fa-solid fa-cake-candles"></i></span><span class="detail-copy"><span>Birthday</span><strong id="birthdayText">Not added</strong></span></div>
+    <div class="detail"><span class="detail-icon"><i class="fa-solid fa-venus-mars"></i></span><span class="detail-copy"><span>Gender</span><strong id="genderText">Not added</strong></span></div>
+    <div class="detail"><span class="detail-icon"><i class="fa-solid fa-graduation-cap"></i></span><span class="detail-copy"><span>Education</span><strong id="educationText">Not added</strong></span></div>
+  </div>
 </section>
 
 <section class="panel">
-<div class="friends-head">
-<h2><i class="fa-solid fa-user-group"></i> Friends <span class="posts-count" id="friendsCount">0</span></h2>
-<button class="see-more" id="seeMoreFriends" hidden>See more <i class="fa-solid fa-chevron-down"></i></button>
-</div>
-<div class="friends-grid" id="friendsGrid"><div class="muted">Loading friends...</div></div>
+  <div class="friends-head">
+    <h2><i class="fa-solid fa-user-group"></i> Friends <span class="posts-count" id="friendsCount">0</span></h2>
+    <button class="see-more" id="seeMoreFriends" hidden>See more <i class="fa-solid fa-chevron-down"></i></button>
+  </div>
+  <div class="friends-grid" id="friendsGrid"><div class="muted">Loading friends...</div></div>
 </section>
 
 <section class="panel">
-<div class="panel-title"><span><i class="fa-solid fa-images"></i> Posts</span><span class="posts-count" id="postCount">0 posts</span></div>
-<div id="myPosts"><div class="empty">Loading posts...</div></div>
+  <div class="panel-title">
+    <span><i class="fa-solid fa-images"></i> Posts <span class="posts-count" id="postCount">0 posts</span></span>
+    <button class="refresh-button" id="refreshPostsButton" type="button"><i class="fa-solid fa-rotate"></i> Refresh</button>
+  </div>
+  <div id="myPosts"><div class="empty">Loading posts...</div></div>
 </section>
 </div>
 
-<nav class="bottom-nav">
-<a class="nav" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-<a class="nav" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
-<a class="nav" href="notifications.html"><i class="fa-regular fa-bell"></i><span>Notifications</span></a>
-<a class="nav active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <a class="nav" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
+  <a class="nav" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
+  <a class="nav" href="notifications.html"><i class="fa-regular fa-bell"></i><span>Notifications</span></a>
+  <a class="nav active" id="profileNavLink" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
 </nav>
 
 <div class="modal" id="editModal">
-<header class="modal-head"><button id="closeEdit" aria-label="Close"><i class="fa-solid fa-xmark"></i></button><h2>Edit profile</h2><span></span></header>
-<div class="modal-content">
-<form id="editForm">
-<label class="field">Full name<input id="editName" maxlength="80" required></label>
-<label class="field">Bio<textarea id="editBio" maxlength="500" placeholder="Tell people about yourself"></textarea></label>
-<label class="field">Lives in<input id="editCity" maxlength="120"></label>
-<label class="field">Birthday<input id="editBirthday" type="date" max="9999-12-31"></label>
-<label class="field">Gender<select id="editGender"><option value="">Select gender</option><option value="Male">Male</option><option value="Female">Female</option></select></label>
-<label class="field">Education<input id="editEducation" maxlength="200"></label>
-<button class="save" id="saveProfileButton" type="submit">Save profile</button>
-<p class="status" id="editStatus"></p>
-</form>
-</div>
+  <header class="modal-head"><button id="closeEdit" aria-label="Close"><i class="fa-solid fa-xmark"></i></button><h2>Edit profile</h2><span></span></header>
+  <div class="modal-content">
+    <form id="editForm">
+      <label class="field">Full name<input id="editName" maxlength="80" required></label>
+      <label class="field">Bio<textarea id="editBio" maxlength="500" placeholder="Tell people about yourself"></textarea></label>
+      <label class="field">Lives in<input id="editCity" maxlength="120"></label>
+      <label class="field">Birthday<input id="editBirthday" type="date" max="9999-12-31"></label>
+      <label class="field">Gender<select id="editGender"><option value="">Select gender</option><option value="Male">Male</option><option value="Female">Female</option></select></label>
+      <label class="field">Education<input id="editEducation" maxlength="200"></label>
+      <button class="save" id="saveProfileButton" type="submit">Save profile</button>
+      <p class="status" id="editStatus"></p>
+    </form>
+  </div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -220,11 +213,11 @@ const TOKEN="freetube_access_token";
 const CACHE="freetube_profile_data";
 const FALLBACK_AVATAR="https://placehold.co/120x120/302c50/ffffff?text=BG";
 const FALLBACK_COVER="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800";
-
 const $=id=>document.getElementById(id);
 let toastTimer=null,currentUser=null,viewedUser=null,serverProfile={},serverStats={};
 let isOwn=true,isAdmin=false,following=false,friendState="none",incomingRequestId="";
-let friends=[],showAllFriends=false,loading=false;
+let friends=[],showAllFriends=false,loading=false,postsLoading=false;
+
 const qp=new URLSearchParams(location.search);
 const targetName=String(qp.get("username")||"").replace(/^@/,"").trim();
 const targetId=String(qp.get("userId")||"").trim();
@@ -249,11 +242,10 @@ async function api(path,opt={}){
 }
 function profileFrom(d){return d?.profile||d?.data?.profile||d?.user||d?.data||d||{}}
 function normalize(u={},p={},s={},l={}){
- const badgeStatus=String(first(p.blue_badge_status,u.blue_badge_status,l.blue_badge_status,"none")).toLowerCase();
+ const badgeStatus=String(first(p.blue_badge_status,p.blueBadgeStatus,u.blue_badge_status,u.blueBadgeStatus,l.blue_badge_status,"none")).toLowerCase();
  const badgeExpiry=first(p.blue_badge_expires_at,p.blueBadgeExpiresAt,u.blue_badge_expires_at,u.blueBadgeExpiresAt,l.blue_badge_expires_at,"");
  const badgeExpiryTime=badgeExpiry?new Date(badgeExpiry).getTime():0;
- const badgeActive=badgeStatus==="verified"&&Number.isFinite(badgeExpiryTime)&&badgeExpiryTime>Date.now();
-
+ const badgeActive=badgeStatus==="verified"&&(!badgeExpiry||Number.isFinite(badgeExpiryTime)&&badgeExpiryTime>Date.now());
  return {
   id:String(first(p.user_id,p.userId,p.id,u.user_id,u.userId,u.id)||""),
   name:String(first(p.display_name,p.full_name,p.fullName,u.display_name,u.full_name,u.fullName,u.name,p.username,u.username,l.name)||"User"),
@@ -291,14 +283,9 @@ function render(p){
  $("followingCount").textContent=p.following;
  setImg($("profileAvatar"),p.avatar,FALLBACK_AVATAR);
  setImg($("coverPhoto"),p.cover,FALLBACK_COVER);
-
- /* Show a Blue Badge only when the backend says verified
-    and the expiration date is still in the future. */
  const badge=$("blueBadge");
  badge.classList.toggle("hidden",!p.blueBadgeActive);
- badge.title=p.blueBadgeActive
-   ? "Verified Blue Badge"+(p.blueBadgeDurationMonths?" · "+p.blueBadgeDurationMonths+" month(s)":"")
-   : "No active Blue Badge";
+ badge.title=p.blueBadgeActive?"Verified Blue Badge"+(p.blueBadgeDurationMonths?" · "+p.blueBadgeDurationMonths+" month(s)":""):"No active Blue Badge";
 }
 function ownUI(own){
  isOwn=own;
@@ -308,7 +295,7 @@ function ownUI(own){
  $("avatarUploadLabel").classList.toggle("hidden",!own);
  $("coverUploadLabel").classList.toggle("hidden",!own);
  $("adminBadge").classList.toggle("hidden",!(own&&isAdmin));
- $("dashboardButton").classList.toggle("hidden",!(own&&isAdmin))
+ $("dashboardButton").classList.toggle("hidden",!(own&&isAdmin));
 }
 function updateFollow(){$("followButton").innerHTML=following?'<i class="fa-solid fa-user-check"></i> Following':'<i class="fa-solid fa-user-plus"></i> Follow'}
 function updateFriend(){
@@ -402,9 +389,9 @@ async function loadFriends(){
  try{const d=await api("/friends");friends=arrayFrom(d,"friends");renderFriends()}
  catch(e){$("friendsGrid").innerHTML='<div class="muted">Could not load friends. Please try again later.</div>';console.warn(e)}
 }
-
 async function loadProfile(){
- if(loading)return;loading=true;$("retrySessionButton").style.display="none";status("Connecting to Boys vs Girls...");
+ if(loading)return;
+ loading=true;$("retrySessionButton").style.display="none";status("Connecting to Boys vs Girls...");
  try{
   if(!token()){location.replace("login.html");return}
   const me=await api("/auth/me");
@@ -424,25 +411,14 @@ async function loadProfile(){
     serverProfile=profileFrom(d);
     serverStats=d.stats||d.data?.stats||{};
    }
-
-   viewedUser={
-    ...currentUser,
-    ...serverProfile,
-    id:String(serverProfile.user_id??serverProfile.userId??serverProfile.id??currentUser.id??currentUser.user_id??""),
-    username:serverProfile.username||myName
-   };
-
-   /* The public profile endpoint includes Blue Badge status and expiry.
-      Fetch it for the signed-in user's profile as well. */
+   viewedUser={...currentUser,...serverProfile,id:String(serverProfile.user_id??serverProfile.userId??serverProfile.id??currentUser.id??currentUser.user_id??""),username:serverProfile.username||myName};
    try{
     const badgeData=await api("/profile/"+encodeURIComponent(myName||viewedUser.username));
     const badgeProfile=profileFrom(badgeData);
     serverProfile={...serverProfile,...badgeProfile};
     serverStats=badgeData.stats||badgeData.data?.stats||serverStats;
     viewedUser={...viewedUser,...badgeProfile};
-   }catch(badgeError){
-    console.warn("Could not refresh Blue Badge information:",badgeError);
-   }
+   }catch(badgeError){console.warn("Could not refresh Blue Badge information:",badgeError)}
   }else{
    if(!targetName&&!targetId)throw Error("This profile link is missing a username or user ID.");
    const d=targetName?await api("/profile/"+encodeURIComponent(targetName)):await api("/profile/id/"+encodeURIComponent(targetId));
@@ -454,7 +430,6 @@ async function loadProfile(){
    viewedUser={...serverProfile,id,username:un};
    isOwn=Boolean(id===myId||un.toLowerCase()===myName.toLowerCase())
   }
-
   const local=isOwn?localProfile():{};
   const p=normalize(viewedUser,serverProfile,serverStats,local);
   viewedUser={...viewedUser,...p};
@@ -501,7 +476,6 @@ function openEdit(){
 }
 function closeEdit(){$("editModal").classList.remove("open")}
 $("menuToggle").onclick=()=>location.href="settings.html";
-$("messagesButton").onclick=()=>location.href="inbox.html";
 $("homeButton").onclick=()=>location.href="home.html";
 $("editButton").onclick=openEdit;
 document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=openEdit);
@@ -513,6 +487,13 @@ $("followButton").onclick=toggleFollow;
 $("messageButton").onclick=openMessage;
 $("dashboardButton").onclick=()=>{if(isOwn&&isAdmin)location.href="admin.html";else toast("Admin access is not enabled for this account.")};
 $("seeMoreFriends").onclick=()=>{showAllFriends=!showAllFriends;renderFriends()};
+$("refreshPostsButton").onclick=async()=>{
+ const b=$("refreshPostsButton");
+ if(postsLoading)return;
+ b.classList.add("spinning");b.disabled=true;
+ try{await loadPosts(true);toast("Posts refreshed.")}
+ finally{b.classList.remove("spinning");b.disabled=false}
+};
 document.addEventListener("keydown",e=>{if(e.key==="Escape")closeEdit()});
 
 $("editForm").addEventListener("submit",async e=>{
@@ -559,32 +540,105 @@ $("coverInput").addEventListener("change",function(){const f=this.files[0];this.
 function authorOf(p){return p.user||p.author||p.owner||{}}
 function postName(p){const a=authorOf(p);return first(p.username,p.author_username,p.user_username,a.username,a.handle)}
 function postId(p){const a=authorOf(p);return p.user_id??p.author_id??p.owner_id??a.id??a.user_id??null}
-async function loadPosts(){
- const box=$("myPosts"),count=$("postCount");box.innerHTML='<div class="empty">Loading posts...</div>';count.textContent="Loading...";
+function relativeTime(value){
+ const time=new Date(value).getTime();
+ if(!Number.isFinite(time))return"";
+ const seconds=Math.max(0,Math.floor((Date.now()-time)/1000));
+ if(seconds<60)return Math.max(1,seconds)+"s ago";
+ const minutes=Math.floor(seconds/60);
+ if(minutes<60)return minutes+"m ago";
+ const hours=Math.floor(minutes/60);
+ if(hours<24)return hours+"H ago";
+ const days=Math.floor(hours/24);
+ if(days<7)return days+"D ago";
+ const weeks=Math.floor(days/7);
+ if(days<30)return weeks+"w ago";
+ const months=Math.floor(days/30);
+ if(days<365)return months+"mo ago";
+ return Math.floor(days/365)+"y ago";
+}
+function mountAdBanner(slot){
+ if(slot.dataset.loaded==="1")return;
+ slot.dataset.loaded="1";
+ const options=document.createElement("script");
+ options.type="text/javascript";
+ options.text="atOptions = {'key':'ab837cf0ea9c26ae43b7bc4e05a0b5de','format':'iframe','height':50,'width':320,'params':{}};";
+ slot.appendChild(options);
+ const adScript=document.createElement("script");
+ adScript.type="text/javascript";
+ adScript.src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";
+ adScript.async=true;
+ slot.appendChild(adScript);
+}
+async function loadPosts(force=false){
+ if(postsLoading&&!force)return;
+ postsLoading=true;
+ const box=$("myPosts"),count=$("postCount");
+ box.innerHTML='<div class="empty">Loading posts...</div>';count.textContent="Loading...";
  try{
   const d=await api("/posts?limit=50");
   const posts=Array.isArray(d)?d:Array.isArray(d.posts)?d.posts:Array.isArray(d.data?.posts)?d.data.posts:[];
   const id=String(viewedUser?.id||""),un=String(viewedUser?.username||targetName||"").toLowerCase();
   const filtered=posts.filter(p=>(id&&String(postId(p)||"")===id)||(un&&String(postName(p)||"").replace(/^@/,"").toLowerCase()===un));
-  count.textContent=filtered.length+(filtered.length===1?" post":" posts");box.replaceChildren();
+  count.textContent=filtered.length+(filtered.length===1?" post":" posts");
+  box.replaceChildren();
   if(!filtered.length){box.innerHTML='<div class="empty">No posts found for this user.</div>';return}
-  filtered.forEach(p=>{
-   const card=document.createElement("article");card.className="post";const a=authorOf(p),name=String(postName(p)||un||"User").replace(/^@/,"");
-   const row=document.createElement("div");row.className="post-author";const im=document.createElement("img");im.alt="Profile picture";setImg(im,a.avatar_url||a.avatar||p.avatar_url,FALLBACK_AVATAR);
-   const strong=document.createElement("strong");strong.textContent=first(p.display_name,a.display_name,a.name,name);row.append(im,strong);
-   row.onclick=()=>{const q=new URLSearchParams({username:name});if(postId(p))q.set("userId",postId(p));location.href="profile.html?"+q};card.append(row);
-   const content=String(first(p.content,p.text,p.caption));if(content){const t=document.createElement("p");t.className="post-content";t.textContent=content;card.append(t)}
+
+  filtered.forEach((p,index)=>{
+   const card=document.createElement("article");card.className="post";
+   const a=authorOf(p),name=String(postName(p)||un||"User").replace(/^@/,"");
+   const row=document.createElement("div");row.className="post-author";
+   const im=document.createElement("img");im.alt="Profile picture";
+   setImg(im,a.avatar_url||a.avatar||p.avatar_url,FALLBACK_AVATAR);
+   const authorCopy=document.createElement("div");authorCopy.className="post-author-copy";
+   const strong=document.createElement("strong");strong.textContent=first(p.display_name,a.display_name,a.name,name);
+   authorCopy.append(strong);
+   const timeValue=first(p.created_at,p.createdAt,p.created_at_timestamp);
+   if(timeValue){
+    const time=document.createElement("span");time.className="post-time";time.textContent=relativeTime(timeValue);authorCopy.append(time);
+   }
+   row.append(im,authorCopy);
+   row.onclick=()=>{const q=new URLSearchParams({username:name});if(postId(p))q.set("userId",postId(p));location.href="profile.html?"+q};
+   card.append(row);
+
+   const content=String(first(p.content,p.text,p.caption));
+   if(content){const t=document.createElement("p");t.className="post-content";t.textContent=content;card.append(t)}
+
    const url=String(first(p.media_url,p.image_url,p.video_url)),type=String(p.media_type||p.type||"").toLowerCase();
-   if(url){const video=type.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url),m=document.createElement(video?"video":"img");m.className="post-media";m.src=url;m.alt=video?"Post video":"Post image";if(video){m.controls=true;m.playsInline=true}else m.loading="lazy";card.append(m)}
+   if(url){
+    const video=type.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url);
+    const m=document.createElement(video?"video":"img");
+    m.className="post-media";m.src=url;m.alt=video?"Post video":"Post image";
+    if(video){m.controls=true;m.playsInline=true}else m.loading="lazy";
+    card.append(m)
+   }
    const meta=document.createElement("div");meta.className="post-meta muted";
-   [["fa-regular fa-heart",p.like_count],["fa-regular fa-comment",p.comment_count],["fa-regular fa-eye",p.view_count]].forEach(([icon,n])=>{const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s)});
+   [["fa-regular fa-heart",p.like_count],["fa-regular fa-comment",p.comment_count],["fa-regular fa-eye",p.view_count]].forEach(([icon,n])=>{
+    const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s)
+   });
    card.append(meta);
-   if(p.created_at){const date=document.createElement("p");date.className="muted";date.style.marginTop="6px";date.textContent=new Date(p.created_at).toLocaleString();card.append(date)}
-   box.append(card)
-  })
- }catch(e){count.textContent="Posts unavailable";box.textContent="Could not load posts: "+e.message}
+
+   /* Full post date/time is intentionally not displayed. */
+   box.append(card);
+
+   /* Show an ad banner after every three posts. */
+   if((index+1)%3===0&&index!==filtered.length-1){
+    const slot=document.createElement("div");
+    slot.className="ad-banner-slot";
+    slot.innerHTML='<span class="ad-banner-label">Advertisement</span>';
+    box.append(slot);
+    mountAdBanner(slot);
+   }
+  });
+ }catch(e){
+  count.textContent="Posts unavailable";
+  box.textContent="Could not load posts: "+e.message
+ }finally{postsLoading=false}
 }
-window.addEventListener("DOMContentLoaded",()=>{if(targetName)document.title="Boys vs Girls 💙💗 - @"+targetName;loadProfile()});
+window.addEventListener("DOMContentLoaded",()=>{
+ if(targetName)document.title="Boys vs Girls 💙💗 - @"+targetName;
+ loadProfile()
+});
 </script>
 </body>
 </html>
