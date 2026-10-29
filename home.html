@@ -75,7 +75,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 </div>
 
 <div class="stories">
-  <button class="story create" onclick="openUpload()"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
+  <button class="story create" onclick="openStoryCreator()"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=360" alt="Community story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt=""></span><span>Community</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=360" alt="Travel story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100" alt=""></span><span>Travel</span></button>
   <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=360" alt="Friends story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100" alt=""></span><span>Friends</span></button>
@@ -150,6 +150,7 @@ function closeModal(id){document.getElementById(id).classList.remove("open")}
 function openProfile(){if(requireLogin())location.href="profile.html"}
 function openInbox(){if(requireLogin())location.href="inbox.html"}
 function openPulse(){location.href="discovery.html"}
+function openStoryCreator(){if(requireLogin())location.href="story.html"}
 function openFavorites(){if(requireLogin())location.href="favorites.html"}
 function openAdminOrSecurity(){if(!requireLogin())return;location.href=(currentUser&&String(currentUser.role||"").toLowerCase()==="admin")?"admin.html":"settings.html"}
 function openNotifications(){if(requireLogin())location.href="notifications.html"}
@@ -170,6 +171,18 @@ function findAvatar(source){
   return "";
 }
 function setAvatar(el,url){if(!el)return;el.onerror=function(){this.onerror=null;this.src=FALLBACK_AVATAR};el.src=url||FALLBACK_AVATAR}
+function loadCachedProfileAvatar(){
+  try{
+    const raw=localStorage.getItem("freetube_profile_data");
+    if(!raw)return;
+    const cached=JSON.parse(raw);
+    const avatar=findAvatar(cached)||findAvatar(cached.profile)||findAvatar(cached.user);
+    if(avatar){setAvatar(document.getElementById("composerAvatar"),avatar);setAvatar(document.getElementById("modalAvatar"),avatar)}
+    const user=cached.user||cached.profile||cached.data?.user||cached;
+    const name=user.display_name||user.full_name||user.name||user.username;
+    if(name)document.getElementById("modalUsername").textContent=name;
+  }catch(_){/* Ignore invalid cached profile data. */}
+}
 function count(value){const n=Number(value);return Number.isFinite(n)&&n>=0?n:0}
 function relativeTime(date){const t=new Date(date).getTime();if(!Number.isFinite(t))return "Just now";const m=Math.max(0,Math.floor((Date.now()-t)/60000));if(m<1)return "Just now";if(m<60)return m+"m ago";if(m<1440)return Math.floor(m/60)+"h ago";return Math.floor(m/1440)+"d ago"}
 function normalizePost(post){
@@ -183,10 +196,13 @@ function normalizePost(post){
   const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:(REACTIONS[post.reaction]?post.reaction:null);
   return {...post,id:String(post.id),username:displayName,profileUsername,authorId:post.user_id??post.author_id??author.id??post.userId??"",avatar:findAvatar(post)||findAvatar(author)||FALLBACK_AVATAR,content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,comments:count(post.comment_count??post.comments_count),views:count(post.view_count??post.views),time:relativeTime(post.created_at)};
 }
+function findAvatarFromCache(){
+  try{const raw=localStorage.getItem("freetube_profile_data");if(!raw)return "";const cached=JSON.parse(raw);return findAvatar(cached)||findAvatar(cached.profile)||findAvatar(cached.user)||""}catch(_){return ""}
+}
 async function loadMe(){
   const data=await api("/auth/me");currentUser=data.user||data.profile||data.data?.user||data.data||data;
   const display=currentUser.display_name||currentUser.full_name||currentUser.name||currentUser.username||"Boys vs Girls User";
-  const avatar=findAvatar(data)||findAvatar(currentUser);
+  const avatar=findAvatar(data)||findAvatar(currentUser)||findAvatarFromCache();
   document.getElementById("modalUsername").textContent=display;
   setAvatar(document.getElementById("modalAvatar"),avatar);setAvatar(document.getElementById("composerAvatar"),avatar);
 }
@@ -361,6 +377,7 @@ function clearSearch(){document.getElementById("searchInput").value="";render(vi
 async function loadNotificationCount(){try{const data=await api("/notifications");const n=count(data.unread_count);const el=document.getElementById("notificationBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}}
 async function loadMessageCount(){try{const data=await api("/messages");const n=(data.conversations||[]).reduce((s,item)=>s+count(item.unread_count),0);const el=document.getElementById("messageBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}}
 async function initialize(){
+  loadCachedProfileAvatar();
   if(!token()){location.replace("auth.html?mode=login");return}
   try{await loadMe()}catch(error){toast(error.message);return}
   await loadFeed();await Promise.all([loadNotificationCount(),loadMessageCount()]);
