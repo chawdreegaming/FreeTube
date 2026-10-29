@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d3b22">
-<title>FreeTube - Home Feed</title>
+<meta name="theme-color" content="#171329">
+<title>Boys vs Girls - Home</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--green:#00ff88;--red:#ff5e62;--panel:rgba(19,45,31,.94);--border:rgba(255,255,255,.16);--muted:rgba(255,255,255,.65)}
+:root{--green:#35c7ff;--red:#f22e9b;--panel:rgba(25,23,48,.96);--border:rgba(255,255,255,.14);--muted:rgba(224,220,245,.76);--blue:#278bff;--pink:#f22e9b}
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
-body{background:linear-gradient(135deg,#0d3b22,#1b4d3e,#4a0e17,#7a1c24);background-attachment:fixed;color:#fff;min-height:100vh}
+body{background:linear-gradient(135deg,#11172e,#251536,#40163b,#111329);background-attachment:fixed;color:#fff;min-height:100vh}
 button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
-.app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:80px;background:#0d3b222b;box-shadow:0 0 40px #0005}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#0d3b22f5;backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
-.brand{font-size:23px;font-weight:900;letter-spacing:-.5px}.brand i{color:var(--green);margin-right:4px}.brand span{color:var(--red)}
+.app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:80px;background:#17132922;box-shadow:0 0 40px #0005}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
+.brand{font-size:23px;font-weight:900;letter-spacing:-.5px}.brand i{color:var(--pink);margin-right:4px}.brand span{color:var(--red)}
 .top-actions{display:flex;gap:8px}.icon-btn{position:relative;width:38px;height:38px;border-radius:50%;background:#ffffff12;border:1px solid var(--border);display:grid;place-items:center}
-.badge{position:absolute;top:-3px;right:-3px;background:var(--red);font-size:9px;font-weight:bold;padding:2px 5px;border-radius:12px;border:1px solid #0d3b22}
+.badge{position:absolute;top:-3px;right:-3px;background:var(--red);font-size:9px;font-weight:bold;padding:2px 5px;border-radius:12px;border:1px solid #171329}
 .composer{display:flex;align-items:center;gap:11px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
 .avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
-.fake-input{flex:1;padding:11px 15px;border:1px solid var(--border);border-radius:24px;background:#ffffff0b;color:var(--muted);font-size:14px}.fake-input i{float:right;color:var(--green);font-size:18px}
-.stories{display:flex;gap:8px;padding:12px 15px;overflow-x:auto;background:#0d3b2277;scrollbar-width:none;border-bottom:1px solid var(--border)}.stories::-webkit-scrollbar{display:none}
+.fake-input{flex:1;padding:11px 15px;border:1px solid var(--border);border-radius:24px;background:#ffffff0b;color:var(--muted);font-size:14px}.fake-input i{float:right;color:var(--pink);font-size:18px}
+.stories{display:flex;gap:8px;padding:12px 15px;overflow-x:auto;background:rgba(30,26,55,.72);scrollbar-width:none;border-bottom:1px solid var(--border)}.stories::-webkit-scrollbar{display:none}
 .story{position:relative;flex:0 0 100px;height:155px;border-radius:14px;overflow:hidden;background:#244b37;border:1px solid var(--border);display:flex;align-items:flex-end;padding:8px}
 .story>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.story:after{content:"";position:absolute;inset:40% 0 0;background:linear-gradient(transparent,#000b)}.story span{position:relative;z-index:1;font-size:11px;font-weight:700;text-shadow:0 1px 4px #000}
-.story.create{justify-content:center;align-items:center;flex-direction:column;gap:9px;text-align:center;background:#ffffff0a;cursor:pointer}.story.create:after{display:none}.story.create i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#07351f;font-size:18px}
+.story.create{justify-content:center;align-items:center;flex-direction:column;gap:9px;text-align:center;background:#ffffff0a;cursor:pointer}.story.create:after{display:none}.story.create i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#278bff,#9b35ff,#f22e9b);color:#fff;font-size:18px}
 .feed{padding-top:8px}.post-card{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
 .post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
 .post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
@@ -39,22 +39,22 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .reaction-summary{display:flex;align-items:center;gap:3px;min-width:0}.reaction-emoji{font-size:13px}
 .post-actions-bar{display:flex;align-items:center;justify-content:space-around;padding:4px 3px}
 .post-action-btn{background:none;color:#ffffffd9;font-size:12px;font-weight:600;padding:10px 5px;display:flex;align-items:center;justify-content:center;gap:6px;border-radius:7px;min-width:0;flex:1;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-.post-action-btn:active{background:#ffffff10}.post-action-btn.selected{color:#54a8ff}.post-action-btn.reaction-love{color:#ff687e}.post-action-btn.reaction-sad{color:#ffd166}.post-action-btn.reaction-angry{color:#ff785c}
+.post-action-btn:active{background:#ffffff10}.post-action-btn.selected{color:#54a8ff}.post-action-btn.reaction-love{color:#ff687e}.post-action-btn.reaction-sad{color:#ffd166}.post-action-btn.reaction-angry{color:#ff785c}.post-action-btn.reaction-haha{color:#ffd166}
 .reaction-wrap{position:relative;display:flex;flex:1;min-width:0}.reaction-wrap>.post-action-btn{width:100%}
-.reaction-picker{display:none;position:absolute;bottom:calc(100% + 6px);left:0;z-index:35;background:#14251d;border:1px solid var(--border);border-radius:28px;padding:6px;gap:3px;box-shadow:0 5px 20px #0009;max-width:calc(100vw - 25px)}
+.reaction-picker{display:none;position:absolute;bottom:calc(100% + 6px);left:0;z-index:35;background:#211b38;border:1px solid var(--border);border-radius:28px;padding:6px;gap:3px;box-shadow:0 5px 20px #0009;max-width:calc(100vw - 25px)}
 .reaction-wrap.open .reaction-picker{display:flex}
 .reaction-choice{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;touch-action:manipulation}
 .reaction-choice:active{background:#ffffff20;transform:scale(1.06)}.reaction-choice .emoji{font-size:23px;line-height:25px}.reaction-choice small{font-size:8px;color:#fff}
-.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:58px;padding:7px 4px calc(7px + env(safe-area-inset-bottom));background:#0d3b22f7;backdrop-filter:blur(16px);border-top:1px solid var(--border)}
-.nav-item{background:none;color:#ffffff9c;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;min-width:45px;position:relative}.nav-item i{font-size:18px}.nav-item.active{color:var(--green)}
+.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:58px;padding:7px 4px calc(7px + env(safe-area-inset-bottom));background:rgba(20,18,39,.97);backdrop-filter:blur(16px);border-top:1px solid var(--border)}
+.nav-item{background:none;color:#ffffff9c;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;min-width:45px;position:relative}.nav-item i{font-size:18px}.nav-item.active{color:var(--pink)}
 .modal{display:none;position:fixed;z-index:60;inset:0;background:#0009;backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;padding:10px}.modal.open{display:flex}
-.modal-content{width:100%;max-width:460px;max-height:88dvh;overflow:auto;background:#142d1f;border:1px solid var(--border);border-radius:18px;padding:17px}
+.modal-content{width:100%;max-width:460px;max-height:88dvh;overflow:auto;background:#19172f;border:1px solid var(--border);border-radius:18px;padding:17px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.close{width:34px;height:34px;border-radius:50%;background:#ffffff12;border:1px solid var(--border)}
 .field{display:block;width:100%;padding:11px 12px;background:#ffffff0a;border:1px solid var(--border);border-radius:10px;color:#fff;margin:8px 0;outline:none;font-size:13px}.field::placeholder{color:#ffffff75}textarea.field{min-height:100px;resize:vertical}
-.secondary{padding:10px 13px;border-radius:10px;background:#ffffff12;border:1px solid var(--border);color:#fff;font-size:13px}.primary{padding:11px 15px;border-radius:10px;background:var(--green);color:#06351f;font-weight:700}
+.secondary{padding:10px 13px;border-radius:10px;background:#ffffff12;border:1px solid var(--border);color:#fff;font-size:13px}.primary{padding:11px 15px;border-radius:10px;background:linear-gradient(135deg,#278bff,#9b35ff,#f22e9b);color:#fff;font-weight:700}
 .row{display:flex;gap:8px;align-items:center}.row .field{flex:1;min-width:0}
 .comment{padding:10px 0;border-bottom:1px solid #ffffff12;font-size:12px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
-.toast{position:fixed;z-index:100;left:50%;bottom:78px;transform:translateX(-50%);display:none;background:#18241d;border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;text-align:center;max-width:90%}.toast.show{display:block}
+.toast{position:fixed;z-index:100;left:50%;bottom:78px;transform:translateX(-50%);display:none;background:#211b38;border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;text-align:center;max-width:90%}.toast.show{display:block}
 .empty-state,.loading{padding:32px 18px;text-align:center;color:var(--muted);font-size:13px}
 @media(max-width:350px){.nav-item{min-width:39px}.post-stats{font-size:9px;gap:4px;padding:8px 7px}.post-action-btn{font-size:11px;padding:9px 3px}.reaction-choice{width:36px;flex-basis:36px}}
 </style>
@@ -62,7 +62,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <body>
 <div class="app">
 <header class="topbar">
-  <div class="brand"><i class="fa-solid fa-play"></i>Free<span>Tube</span></div>
+  <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px"><i class="fa-solid fa-people-group" style="color:#a33cff"></i>Boys <span style="color:#f22e9b">vs Girls</span> 💙💗</div>
   <div class="top-actions">
     <button class="icon-btn" onclick="openInbox()" aria-label="Messenger"><i class="fa-brands fa-facebook-messenger"></i><span id="messageBadge" class="badge" hidden>0</span></button>
   </div>
@@ -85,7 +85,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <nav class="bottom-nav">
   <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
   <button id="navDiscover" class="nav-item" onclick="openDiscover()"><i class="fa-solid fa-compass"></i><span>Discover</span></button>
-  <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="color:var(--green)"></i><span>Create</span></button>
+  <button class="nav-item" onclick="openUpload()"><i class="fa-solid fa-square-plus" style="color:var(--pink)"></i><span>Create</span></button>
   <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Notifications</span></button>
   <button id="navProfile" class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
 </nav>
@@ -94,7 +94,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 <div class="modal" id="uploadModal">
   <div class="modal-content">
     <div class="modal-head"><h3>Create post</h3><button class="close" onclick="closeModal('uploadModal')" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img id="modalAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt=""><strong id="modalUsername">FreeTube User</strong></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><img id="modalAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt=""><strong id="modalUsername">Boys vs Girls User</strong></div>
     <textarea id="postText" class="field" maxlength="5000" placeholder="What's on your mind?"></textarea>
     <input id="postFile" class="field" type="file" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime">
     <p style="font-size:11px;color:var(--muted);margin:5px 0 12px">Photos or videos · Maximum 50 MB</p>
@@ -112,7 +112,7 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 
 <div class="modal" id="discoverModal">
   <div class="modal-content">
-    <div class="modal-head"><h3>Discover FreeTube</h3><button class="close" onclick="closeModal('discoverModal')"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="modal-head"><h3>Discover Boys vs Girls</h3><button class="close" onclick="closeModal('discoverModal')"><i class="fa-solid fa-xmark"></i></button></div>
     <input id="searchInput" class="field" placeholder="Search posts or people..." oninput="filterPosts(this.value)">
     <button class="secondary" onclick="clearSearch()">Show all posts</button>
   </div>
@@ -125,10 +125,10 @@ const API_BASE="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 const FALLBACK_AVATAR="https://placehold.co/120x120/244b37/ffffff?text=FT";
 const REACTIONS={
-  like:{label:"Like",emoji:"👍",className:"selected"},
   love:{label:"Love",emoji:"❤️",className:"reaction-love"},
+  angry:{label:"Angry",emoji:"😡",className:"reaction-angry"},
   sad:{label:"Sad",emoji:"😢",className:"reaction-sad"},
-  angry:{label:"Angry",emoji:"😡",className:"reaction-angry"}
+  haha:{label:"Haha",emoji:"😂",className:"reaction-haha"}
 };
 let videos=[],currentUser=null,activeCommentId=null,selectedFile=null,toastTimer=null,loading=false;
 const pendingReactions=new Set(),viewRequestsInSession=new Set();
@@ -139,7 +139,7 @@ function toast(message){const el=document.getElementById("toast");el.textContent
 async function api(path,options={}){
   const headers={...(options.headers||{})};const t=token();if(t)headers.Authorization="Bearer "+t;
   if(options.body&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
-  let response;try{response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"})}catch(_){throw new Error("Cannot connect to FreeTube server. Check your internet connection.")}
+  let response;try{response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"})}catch(_){throw new Error("Cannot connect to Boys vs Girls server. Check your internet connection.")}
   const data=await response.json().catch(()=>({}));
   if(response.status===401){localStorage.removeItem(TOKEN_KEY);location.replace("auth.html?mode=login");throw new Error("Session expired. Please log in again.")}
   if(!response.ok)throw new Error(data.error||data.message||"Request failed.");
@@ -172,18 +172,17 @@ function relativeTime(date){const t=new Date(date).getTime();if(!Number.isFinite
 function normalizePost(post){
   const author=post.user||post.author||post.profile||{};
   const profileUsername=String(post.author_username||post.user_username||post.username||author.username||author.handle||"").trim().replace(/^@/,"");
-  const displayName=String(post.display_name||post.full_name||post.fullName||author.display_name||author.displayName||author.full_name||author.fullName||author.name||author.username||post.username||"FreeTube User").trim();
+  const displayName=String(post.display_name||post.full_name||post.fullName||author.display_name||author.displayName||author.full_name||author.fullName||author.name||author.username||post.username||"Boys vs Girls User").trim();
   const rawType=String(post.media_type||post.type||"").toLowerCase();
   const type=["video","mp4","webm","quicktime"].includes(rawType)?"video":(["image","photo","png","jpg","jpeg","webp","gif"].includes(rawType)?"photo":"");
   const raw=post.reaction_counts||post.reactions_count||{};
-  const counts={like:count(raw.like??raw.likes??post.like_count??post.likes),love:count(raw.love??raw.loves??post.love_count),sad:count(raw.sad??raw.sads??post.sad_count),angry:count(raw.angry??raw.angries??post.angry_count)};
-  const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:((post.liked_by_me===true||post.liked===true)?"like":null);
-  const blueBadge=String(post.blue_badge_status||author.blue_badge_status||"").toLowerCase()==="verified";
-  return {...post,id:String(post.id),username:displayName,profileUsername,authorId:post.user_id??post.author_id??author.id??post.userId??"",avatar:findAvatar(post)||findAvatar(author)||FALLBACK_AVATAR,blueBadge,content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,comments:count(post.comment_count??post.comments_count),views:count(post.view_count??post.views),time:relativeTime(post.created_at)};
+  const counts={love:count(raw.love??raw.loves??post.love_count),angry:count(raw.angry??raw.angries??post.angry_count),sad:count(raw.sad??raw.sads??post.sad_count),haha:count(raw.haha??raw.hahas??post.haha_count)};
+  const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:(REACTIONS[post.reaction]?post.reaction:null);
+  return {...post,id:String(post.id),username:displayName,profileUsername,authorId:post.user_id??post.author_id??author.id??post.userId??"",avatar:findAvatar(post)||findAvatar(author)||FALLBACK_AVATAR,content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,comments:count(post.comment_count??post.comments_count),views:count(post.view_count??post.views),time:relativeTime(post.created_at)};
 }
 async function loadMe(){
   const data=await api("/auth/me");currentUser=data.user||data.profile||data.data?.user||data.data||data;
-  const display=currentUser.display_name||currentUser.full_name||currentUser.name||currentUser.username||"FreeTube User";
+  const display=currentUser.display_name||currentUser.full_name||currentUser.name||currentUser.username||"Boys vs Girls User";
   const avatar=findAvatar(data)||findAvatar(currentUser);
   document.getElementById("modalUsername").textContent=display;
   setAvatar(document.getElementById("modalAvatar"),avatar);setAvatar(document.getElementById("composerAvatar"),avatar);
@@ -196,10 +195,10 @@ async function loadFeed(){
 }
 function reactionButtonHTML(v){
   const key=v.myReaction&&REACTIONS[v.myReaction]?v.myReaction:null;
-  const label=key?REACTIONS[key].label:"Like",emoji=key?REACTIONS[key].emoji:"👍",cls=key?" "+REACTIONS[key].className:"";
+  const label=key?REACTIONS[key].label:"React",emoji=key?REACTIONS[key].emoji:"❤️",cls=key?" "+REACTIONS[key].className:"";
   const picker=Object.entries(REACTIONS).map(([name,item])=>'<button type="button" class="reaction-choice" aria-label="'+item.label+'" title="'+item.label+'" onclick="chooseReaction(event,\''+esc(v.id)+'\',\''+name+'\')"><span class="emoji">'+item.emoji+'</span><small>'+item.label+'</small></button>').join("");
   return '<div class="reaction-wrap" data-reaction-wrap="'+esc(v.id)+'">'+
-    '<button type="button" class="post-action-btn'+cls+'" data-like-button="'+esc(v.id)+'" aria-label="Like; hold for reactions"><span>'+emoji+'</span> '+label+'</button>'+
+    '<button type="button" class="post-action-btn'+cls+'" data-like-button="'+esc(v.id)+'" aria-label="React; hold for reactions"><span>'+emoji+'</span> '+label+'</button>'+
     '<div class="reaction-picker">'+picker+'</div></div>';
 }
 function render(list=videos){
@@ -209,12 +208,12 @@ function render(list=videos){
     let media="";
     if(v.type==="video"&&v.src)media='<div class="post-media-container"><video class="post-video" src="'+esc(v.src)+'" controls muted loop playsinline preload="metadata"></video><button type="button" class="sound-toggle" aria-label="Turn sound on" title="Sound Off"><i class="fa-solid fa-volume-xmark"></i></button></div><div class="video-error-message" hidden>This video could not be played. The media URL or format may be unsupported.</div>';
     else if(v.type==="photo"&&v.src)media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
-    const c=v.counts,total=count(c.like)+count(c.love)+count(c.sad)+count(c.angry);
-    const summary=(c.like?'<span class="reaction-emoji">👍</span>':"")+(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+'<span>'+total+'</span>';
+    const c=v.counts,total=count(c.love)+count(c.angry)+count(c.sad)+count(c.haha);
+    const summary=(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.haha?'<span class="reaction-emoji">😂</span>':"")+'<span>'+total+'</span>';
     return '<article class="post-card" data-id="'+esc(v.id)+'">'+
       '<div class="post-header"><div class="post-user-info">'+
       '<img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(v.avatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'">'+
-      '<div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+(v.blueBadge?' <span class="blue-badge" title="Verified profile" aria-label="Verified profile" style="display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:4px;border-radius:50%;background:#1877f2;color:#fff;font-size:10px;font-weight:700;vertical-align:middle">✓</span>':'')+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div>'+
+      '<div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div>'+
       '<button class="post-options" onclick="postOptions(\''+esc(v.id)+'\')" aria-label="Post options"><i class="fa-solid fa-ellipsis"></i></button></div>'+
       (v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':"")+media+
       '<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div>'+
@@ -223,14 +222,15 @@ function render(list=videos){
   setupVideoAutoplay();setupPostViewObserver();
 }
 function updateOnePost(post){
+  // Only update the affected post; do not rebuild the whole feed (prevents flicker).
   const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===String(post.id));
   if(!card)return;
   const old=card.querySelector(".post-actions-bar .reaction-wrap");
   if(old){const temp=document.createElement("div");temp.innerHTML=reactionButtonHTML(post);old.replaceWith(temp.firstElementChild)}
-  const c=post.counts,total=count(c.like)+count(c.love)+count(c.sad)+count(c.angry);
+  const c=post.counts,total=count(c.love)+count(c.angry)+count(c.sad)+count(c.haha);
   const summary=card.querySelector(".reaction-summary");
   if(summary){
-    summary.innerHTML=total?((c.like?'<span class="reaction-emoji">👍</span>':"")+(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+'<span>'+total+'</span>'):'<span>0 reactions</span>';
+    summary.innerHTML=total?((c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.haha?'<span class="reaction-emoji">😂</span>':"")+'<span>'+total+'</span>'):'<span>0 reactions</span>';
   }
 }
 function closePickers(except=null){document.querySelectorAll(".reaction-wrap.open").forEach(el=>{if(el!==except)el.classList.remove("open")})}
@@ -283,10 +283,10 @@ async function reactToPost(id,reaction){
   else{if(oldReaction&&REACTIONS[oldReaction])post.counts[oldReaction]=Math.max(0,post.counts[oldReaction]-1);post.myReaction=reaction;post.counts[reaction]=count(post.counts[reaction])+1}
   updateOnePost(post);
   try{
-    const data=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{method:"PUT",body:JSON.stringify({reaction})});
-    if(data.my_reaction!==undefined)post.myReaction=REACTIONS[data.my_reaction]?data.my_reaction:null;
+    const data=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{method:"POST",body:JSON.stringify({reaction})});
+    if(data.reaction!==undefined)post.myReaction=REACTIONS[data.reaction]?data.reaction:null;
     if(data.reaction_counts){for(const key of Object.keys(REACTIONS)){post.counts[key]=count(data.reaction_counts[key]??data.reaction_counts[key+"s"]??post.counts[key])}}
-    else if(data.like_count!==undefined)post.counts.like=count(data.like_count);
+    
     updateOnePost(post);
   }catch(error){post.myReaction=oldReaction;post.counts=oldCounts;updateOnePost(post);toast(error.message)}
   finally{pendingReactions.delete(post.id)}
@@ -322,7 +322,7 @@ function setupPostViewObserver(){
 }
 async function comments(id){
   if(!requireLogin())return;activeCommentId=String(id);document.getElementById("commentModal").classList.add("open");document.getElementById("commentList").innerHTML='<div class="loading">Loading comments...</div>';
-  try{const data=await api("/posts/"+encodeURIComponent(id)+"/comments");document.getElementById("commentList").innerHTML=(data.comments||[]).map(c=>'<div class="comment"><strong>'+esc(c.display_name||c.username||"User")+(String(c.blue_badge_status||"").toLowerCase()==="verified"?' <span class="blue-badge" title="Verified profile" aria-label="Verified profile" style="display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;margin-left:4px;border-radius:50%;background:#1877f2;color:#fff;font-size:10px;font-weight:700;vertical-align:middle">✓</span>':'')+'</strong><br>'+esc(c.content)+'</div>').join("")||'<div class="empty-state">No comments yet.</div>'}
+  try{const data=await api("/posts/"+encodeURIComponent(id)+"/comments");document.getElementById("commentList").innerHTML=(data.comments||[]).map(c=>'<div class="comment"><strong>'+esc(c.display_name||c.username||"User")+'</strong><br>'+esc(c.content)+'</div>').join("")||'<div class="empty-state">No comments yet.</div>'}
   catch(error){document.getElementById("commentList").innerHTML='<div class="empty-state">'+esc(error.message)+'</div>'}
 }
 document.getElementById("commentForm").addEventListener("submit",async event=>{
