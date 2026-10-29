@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,146 +6,251 @@
 <meta name="theme-color" content="#101827">
 <title>Blue Badge Management | Boys vs Girls</title>
 <style>
-:root{
-  --bg:#0b1120;--panel:#131d30;--panel2:#18253b;
-  --border:#293851;--text:#edf4ff;--muted:#9aabc4;
-  --blue:#3985ff;--green:#23c783;--red:#ff5b70;--yellow:#ffc857
+:root {
+  --bg:#0b1120;
+  --panel:#131d30;
+  --panel2:#18253b;
+  --border:#293851;
+  --text:#edf4ff;
+  --muted:#9aabc4;
+  --blue:#3985ff;
+  --green:#23c783;
+  --red:#ff5b70;
 }
-*{box-sizing:border-box}
-html{width:100%;overflow-x:hidden}
-body{
-  margin:0;width:100%;overflow-x:hidden;
-  background:radial-gradient(circle at top left,#142b50,transparent 35%),var(--bg);
-  color:var(--text);font:14px Arial,Helvetica,sans-serif;line-height:1.45
+* { box-sizing:border-box; }
+html,body {
+  margin:0;
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
 }
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.55;cursor:wait}
-.container{width:min(760px,100%);margin:auto;padding:10px 10px 25px}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.brand{display:flex;align-items:center;gap:9px;min-width:0}
-.brand-icon{
-  width:37px;height:37px;flex-shrink:0;border-radius:11px;display:grid;
-  place-items:center;font-size:21px;background:linear-gradient(135deg,#2676ff,#44d8ff)
+body {
+  background:radial-gradient(circle at top left,#142b50,transparent 38%),var(--bg);
+  color:var(--text);
+  font:15px Arial,Helvetica,sans-serif;
+  line-height:1.5;
 }
-h1{font-size:clamp(17px,5vw,23px);line-height:1.2;margin:0}
-.subtitle{color:var(--muted);font-size:11px;margin-top:3px}
-.top-actions{display:flex;gap:6px;width:100%}
-.btn{
-  border:1px solid var(--border);background:var(--panel2);color:var(--text);
-  border-radius:8px;padding:8px 10px;font-size:12px;font-weight:700
+button,input,select,textarea { font:inherit; }
+button { cursor:pointer; }
+button:disabled { opacity:.55; cursor:wait; }
+.container {
+  width:100%;
+  max-width:650px;
+  margin:0 auto;
+  padding:12px 10px 28px;
 }
-.top-actions .btn{flex:1}
-.btn-primary{background:linear-gradient(135deg,#2875ff,#27bfff);border:0;color:#fff}
-.btn-success{background:#123c31;color:#6df0bd;border-color:#236b54}
-.btn-danger{background:#421e2b;color:#ff9aa7;border-color:#773243}
-.btn-small{padding:6px 8px;font-size:11px}
-.notice{
-  padding:9px 10px;border:1px solid #315b8e;background:#132a46;
-  border-radius:9px;color:#c9e3ff;font-size:12px;line-height:1.5;margin-bottom:10px
+.brand {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+  min-width:0;
 }
-.notice strong{color:#fff}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:10px}
-.stat{
-  position:relative;min-width:0;background:linear-gradient(145deg,var(--panel),#111a2b);
-  border:1px solid var(--border);border-radius:10px;padding:9px 10px
+.brand-icon {
+  flex-shrink:0;
+  width:46px;
+  height:46px;
+  display:grid;
+  place-items:center;
+  border-radius:13px;
+  background:linear-gradient(135deg,#2676ff,#44d8ff);
+  font-size:27px;
 }
-.stat-label{color:var(--muted);font-size:11px;padding-right:20px;line-height:1.35}
-.stat-number{font-size:22px;font-weight:800;margin-top:4px}
-.stat-icon{position:absolute;right:9px;top:9px;font-size:16px}
-.panel{
+h1 { margin:0; font-size:clamp(19px,5vw,25px); line-height:1.2; }
+.subtitle { color:var(--muted); font-size:13px; margin-top:4px; }
+.top-actions { display:flex; gap:8px; margin-bottom:12px; }
+.btn {
+  border:1px solid var(--border);
+  background:var(--panel2);
+  color:var(--text);
+  border-radius:9px;
+  padding:10px 12px;
+  font-weight:700;
+}
+.top-actions .btn { flex:1; }
+.btn-primary { background:linear-gradient(135deg,#2875ff,#27bfff); border:0; color:white; }
+.btn-success { background:#123c31; color:#78f0bd; border-color:#236b54; }
+.btn-danger { background:#421e2b; color:#ff9aa7; border-color:#773243; }
+.btn-small { padding:7px 10px; font-size:12px; }
+.full-btn { width:100%; }
+.notice {
+  padding:12px;
+  border:1px solid #315b8e;
+  background:#132a46;
+  border-radius:10px;
+  color:#c9e3ff;
+  margin-bottom:12px;
+  overflow-wrap:anywhere;
+}
+.notice strong { color:white; }
+.message {
+  display:none;
+  padding:10px 12px;
+  margin:0 0 10px;
+  border-radius:9px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.message.success { display:block; color:#8af0c7; background:#123b30; border:1px solid #28664f; }
+.message.error { display:block; color:#ffb0b9; background:#421e2b; border:1px solid #773243; }
+.message.info { display:block; color:#c4e0ff; background:#142d4b; border:1px solid #315b8e; }
+.stats {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  gap:8px;
+  margin-bottom:12px;
+}
+.stat {
+  min-width:0;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:linear-gradient(145deg,var(--panel),#111a2b);
+}
+.stat-label { color:var(--muted); font-size:12px; }
+.stat-number { font-size:25px; font-weight:800; margin-top:3px; }
+.panel {
+  min-width:0;
+  margin-bottom:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
   background:linear-gradient(145deg,#141f33,#101827);
-  border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:10px;min-width:0
 }
-.panel-header{
-  padding:10px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;gap:8px
+.panel-header {
+  padding:13px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
 }
-.panel-header h2{margin:0;font-size:14px}
-.panel-body{padding:10px}
-.field{margin-bottom:9px;min-width:0}
-label{display:block;color:#c8d5e9;font-size:12px;font-weight:700;margin-bottom:4px}
-input,select,textarea{
-  display:block;width:100%;min-width:0;max-width:100%;background:#0b1424;
-  color:var(--text);border:1px solid #30415d;border-radius:8px;padding:9px 10px;outline:none
+.panel-header h2 { font-size:16px; margin:0; }
+.panel-body { padding:12px; min-width:0; }
+.field { margin-bottom:12px; min-width:0; }
+label {
+  display:block;
+  margin-bottom:5px;
+  color:#c8d5e9;
+  font-size:13px;
+  font-weight:700;
 }
-input,select{min-height:38px}
-input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 2px #3985ff20}
-textarea{resize:vertical;min-height:58px}
-.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.checkbox-row{display:flex;align-items:center;gap:8px;margin:8px 0 11px;color:#d7e4f7;font-size:12px}
-.checkbox-row input{width:16px;height:16px;min-height:0;accent-color:var(--blue)}
-.checkbox-row label{margin:0}
-.full-btn{width:100%}
-.payment-method,.payment-card{
-  border:1px solid var(--border);background:#101a2b;
-  padding:10px;border-radius:9px;margin-bottom:8px;min-width:0
+input,select,textarea {
+  display:block;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  color:var(--text);
+  background:#0b1424;
+  border:1px solid #30415d;
+  border-radius:9px;
+  padding:11px;
+  outline:none;
 }
-.method-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.method-name{font-weight:800;overflow-wrap:anywhere}
-.method-meta{color:var(--muted);font-size:11px;margin-top:4px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word}
-.method-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
-.status{display:inline-block;padding:4px 7px;border-radius:20px;font-size:10px;font-weight:800}
-.status-pending{color:#ffdc86;background:#4b3817}
-.status-approved{color:#78f0bd;background:#123c31}
-.status-rejected{color:#ff9eaa;background:#48212d}
-.status-active{color:#7fecc1;background:#123c31}
-.status-disabled{color:#c0cbe0;background:#293449}
-.toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.55fr);gap:7px;margin-bottom:9px}
-.message{display:none;padding:9px 10px;margin-bottom:9px;border-radius:8px;font-size:12px;line-height:1.5;overflow-wrap:anywhere;word-break:break-word}
-.message.success{display:block;color:#8af0c7;background:#123b30;border:1px solid #28664f}
-.message.error{display:block;color:#ffb0b9;background:#421e2b;border:1px solid #773243}
-.message.info{display:block;color:#c4e0ff;background:#142d4b;border:1px solid #315b8e}
-details.collapsible>summary{cursor:pointer;list-style:none}
-details.collapsible>summary::-webkit-details-marker{display:none}
-details.collapsible>summary:after{content:"＋";float:right;color:var(--muted)}
-details.collapsible[open]>summary:after{content:"−"}
-.checklist{font-size:12px;line-height:1.65;color:#cbd9ed}
-.checklist p{margin:5px 0}
-.muted{color:var(--muted)}
-.empty{text-align:center;color:var(--muted);padding:18px 8px;font-size:12px}
-.card-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
-.card-title{font-size:13px;font-weight:700;overflow-wrap:anywhere}
-.card-meta{font-size:11px;color:var(--muted);margin-top:4px;overflow-wrap:anywhere;word-break:break-word}
-.card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-.token-note{font-size:11px;color:var(--muted);margin:0;line-height:1.5}
-.footer-note{text-align:center;color:#71829c;font-size:11px;margin-top:12px;line-height:1.6}
-@media(max-width:380px){
-  .container{padding:8px 7px 20px}
-  .grid2{grid-template-columns:1fr;gap:0}
-  .top-actions .btn{padding:8px 6px}
-  .panel-body{padding:8px}
+input,select { min-height:43px; }
+textarea { min-height:76px; resize:vertical; }
+input:focus,select:focus,textarea:focus {
+  border-color:var(--blue);
+  box-shadow:0 0 0 2px #3985ff20;
+}
+.checkbox-row {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin:12px 0;
+}
+.checkbox-row input { width:18px; height:18px; min-height:0; }
+.checkbox-row label { margin:0; }
+.item {
+  min-width:0;
+  padding:12px;
+  margin-bottom:9px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#101a2b;
+}
+.item:last-child { margin-bottom:0; }
+.item-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+}
+.item-title { font-weight:800; overflow-wrap:anywhere; }
+.item-meta {
+  color:var(--muted);
+  font-size:12px;
+  margin-top:6px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.actions { display:flex; flex-wrap:wrap; gap:7px; margin-top:11px; }
+.status {
+  display:inline-block;
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:800;
+  flex-shrink:0;
+}
+.status-pending { color:#ffdc86; background:#4b3817; }
+.status-approved { color:#78f0bd; background:#123c31; }
+.status-rejected { color:#ff9eaa; background:#48212d; }
+.status-active { color:#78f0bd; background:#123c31; }
+.status-disabled { color:#c0cbe0; background:#293449; }
+.toolbar { margin-bottom:10px; }
+.toolbar > * { margin-bottom:8px; }
+.empty { text-align:center; color:var(--muted); padding:18px 8px; font-size:13px; }
+.muted { color:var(--muted); font-size:12px; }
+.footer-note { text-align:center; color:#71829c; font-size:12px; padding:8px; }
+@media(max-width:360px) {
+  .container { padding:8px 7px 20px; }
+  .panel-body { padding:9px; }
+  .btn { padding:9px; }
 }
 </style>
 </head>
 <body>
 <main class="container">
-<header class="topbar">
-  <div class="brand">
-    <div class="brand-icon">✓</div>
-    <div>
-      <h1>Blue Badge Management</h1>
-      <div class="subtitle">Boys vs Girls 💙💗 · Main Admin</div>
-    </div>
-  </div>
-  <div class="top-actions">
-    <button class="btn" id="dashboardBtn" type="button">← Dashboard</button>
-    <button class="btn" id="refreshBtn" type="button">↻ Refresh</button>
+
+<header class="brand">
+  <div class="brand-icon">✓</div>
+  <div>
+    <h1>Blue Badge Management</h1>
+    <div class="subtitle">Boys vs Girls 💙💗 · Main Admin</div>
   </div>
 </header>
+
+<div class="top-actions">
+  <button class="btn" id="dashboardBtn" type="button">← Dashboard</button>
+  <button class="btn" id="refreshBtn" type="button">↻ Refresh</button>
+</div>
 
 <div id="globalMessage" class="message" role="status" aria-live="polite"></div>
 
 <div class="notice">
-  <strong>Manual verification:</strong> Verify each payment before approving a Blue Badge.
-  Never request a card number, CVV, PIN, OTP, password, or crypto recovery phrase.
+  <strong>Manual verification:</strong>
+  Verify every payment with the payment provider before approving a Blue Badge.
+  Never request a card number, CVV, PIN, OTP, password or crypto recovery phrase.
 </div>
 
 <section class="stats">
-  <div class="stat"><span class="stat-icon">⌛</span><div class="stat-label">Pending Payments</div><div class="stat-number" id="pendingCount">—</div></div>
-  <div class="stat"><span class="stat-icon">✓</span><div class="stat-label">Approved Payments</div><div class="stat-number" id="approvedCount">—</div></div>
-  <div class="stat"><span class="stat-icon">✕</span><div class="stat-label">Rejected Payments</div><div class="stat-number" id="rejectedCount">—</div></div>
-  <div class="stat"><span class="stat-icon">₿</span><div class="stat-label">Enabled Methods</div><div class="stat-number" id="methodsCount">—</div></div>
+  <div class="stat">
+    <div class="stat-label">Pending Payments</div>
+    <div class="stat-number" id="pendingCount">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Approved Payments</div>
+    <div class="stat-number" id="approvedCount">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Rejected Payments</div>
+    <div class="stat-number" id="rejectedCount">—</div>
+  </div>
+  <div class="stat">
+    <div class="stat-label">Enabled Methods</div>
+    <div class="stat-number" id="methodsCount">—</div>
+  </div>
 </section>
 
 <section class="panel">
@@ -156,43 +260,97 @@ details.collapsible[open]>summary:after{content:"−"}
   </div>
   <div class="panel-body">
     <div id="methodMessage" class="message" role="status"></div>
+
     <form id="methodForm">
       <input type="hidden" id="methodId">
-      <div class="grid2">
-        <div class="field">
-          <label for="methodName">Payment Method Name *</label>
-          <input id="methodName" required maxlength="80" placeholder="e.g. bKash, UPI, Binance Pay">
-        </div>
-        <div class="field">
-          <label for="methodRegion">Region *</label>
-          <select id="methodRegion" required>
-            <option value="Bangladesh">Bangladesh</option>
-            <option value="India">India</option>
-            <option value="International">International</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
-      </div>
+
       <div class="field">
-        <label for="methodAccount">Recipient Number / Wallet / UPI ID *</label>
-        <input id="methodAccount" required maxlength="200" placeholder="Enter recipient details">
+        <label for="methodName">Payment Method Name *</label>
+        <input id="methodName" required maxlength="80"
+          placeholder="e.g. bKash, Nagad, Binance Pay">
       </div>
+
+      <div class="field">
+        <label for="methodRegion">Region *</label>
+        <select id="methodRegion" required>
+          <option value="bangladesh">Bangladesh</option>
+          <option value="india">India</option>
+          <option value="global">International</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="methodCurrency">Currency *</label>
+        <select id="methodCurrency" required>
+          <option value="BDT">BDT — Bangladeshi Taka</option>
+          <option value="INR">INR — Indian Rupee</option>
+          <option value="USDT">USDT — Tether</option>
+          <option value="USD">USD — US Dollar</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="methodAccountName">Recipient Name</label>
+        <input id="methodAccountName" maxlength="160"
+          placeholder="Account or wallet owner name">
+      </div>
+
+      <div class="field">
+        <label for="methodAccount">Recipient Number / Wallet Address / UPI ID *</label>
+        <input id="methodAccount" required maxlength="500"
+          placeholder="Enter recipient details">
+      </div>
+
+      <div class="field">
+        <label for="methodPrice">Default Price *</label>
+        <input id="methodPrice" type="number" min="0.01" step="0.01"
+          required placeholder="Enter price">
+      </div>
+
+      <div class="field">
+        <label for="price1">Blue Badge — 1 Month Price</label>
+        <input id="price1" type="number" min="0" step="0.01" value="0">
+      </div>
+
+      <div class="field">
+        <label for="price3">Blue Badge — 3 Months Price</label>
+        <input id="price3" type="number" min="0" step="0.01" value="0">
+      </div>
+
+      <div class="field">
+        <label for="price6">Blue Badge — 6 Months Price</label>
+        <input id="price6" type="number" min="0" step="0.01" value="0">
+      </div>
+
+      <div class="field">
+        <label for="price12">Blue Badge — 12 Months Price</label>
+        <input id="price12" type="number" min="0" step="0.01" value="0">
+      </div>
+
       <div class="field">
         <label for="methodInstructions">Payment Instructions</label>
-        <textarea id="methodInstructions" maxlength="1500" placeholder="Explain how users should pay and submit their transaction reference."></textarea>
+        <textarea id="methodInstructions" maxlength="1500"
+          placeholder="Explain how users should pay and submit their transaction reference."></textarea>
       </div>
+
       <div class="field">
-        <label for="methodQr">QR Image URL (optional)</label>
-        <input id="methodQr" type="url" maxlength="1000" placeholder="https://example.com/payment-qr.png">
+        <label for="methodQr">QR Image URL (optional, HTTPS only)</label>
+        <input id="methodQr" type="url" maxlength="2000"
+          placeholder="https://example.com/payment-qr.png">
       </div>
+
       <div class="checkbox-row">
         <input id="methodEnabled" type="checkbox" checked>
         <label for="methodEnabled">Enable this payment method</label>
       </div>
-      <button class="btn btn-primary full-btn" id="saveMethodBtn" type="submit">Save Payment Method</button>
+
+      <button class="btn btn-primary full-btn" id="saveMethodBtn" type="submit">
+        Save Payment Method
+      </button>
     </form>
-    <p class="token-note" id="authHint" style="margin-top:9px">
-      Admin access is checked using your existing app login.
+
+    <p class="muted">
+      Authentication uses your existing app login. No manual token entry is required.
     </p>
   </div>
 </section>
@@ -214,7 +372,7 @@ details.collapsible[open]>summary:after{content:"−"}
   </div>
   <div class="panel-body">
     <div class="toolbar">
-      <input id="paymentSearch" type="search" placeholder="Search user or reference">
+      <input id="paymentSearch" type="search" placeholder="Search username or transaction reference">
       <select id="paymentStatusFilter">
         <option value="all">All statuses</option>
         <option value="pending">Pending</option>
@@ -227,47 +385,6 @@ details.collapsible[open]>summary:after{content:"−"}
   </div>
 </section>
 
-<section class="panel">
-  <details class="collapsible">
-    <summary class="panel-header"><h2>Blue Badge Pricing</h2></summary>
-    <div class="panel-body">
-      <div class="notice">Pricing changes require matching backend support.</div>
-      <div id="priceMessage" class="message" role="status"></div>
-      <form id="priceForm">
-        <div class="field">
-          <label for="priceCurrency">Currency</label>
-          <select id="priceCurrency">
-            <option value="BDT">BDT — Bangladeshi Taka</option>
-            <option value="INR">INR — Indian Rupee</option>
-            <option value="USD">USD — US Dollar</option>
-          </select>
-        </div>
-        <div class="grid2">
-          <div class="field"><label for="price1">1 Month Price</label><input id="price1" type="number" min="0" step="0.01" required placeholder="0.00"></div>
-          <div class="field"><label for="price3">3 Months Price</label><input id="price3" type="number" min="0" step="0.01" required placeholder="0.00"></div>
-          <div class="field"><label for="price6">6 Months Price</label><input id="price6" type="number" min="0" step="0.01" required placeholder="0.00"></div>
-          <div class="field"><label for="price12">12 Months Price</label><input id="price12" type="number" min="0" step="0.01" required placeholder="0.00"></div>
-        </div>
-        <button class="btn btn-primary full-btn" type="submit">Save Pricing</button>
-      </form>
-    </div>
-  </details>
-</section>
-
-<section class="panel">
-  <details class="collapsible">
-    <summary class="panel-header"><h2>Verification Checklist</h2></summary>
-    <div class="panel-body checklist">
-      <p>1. Check the transaction reference.</p>
-      <p>2. Verify amount, recipient, currency, and payment status with the provider.</p>
-      <p>3. Approve only a genuine, confirmed payment.</p>
-      <p>4. Reject duplicate, invalid, or unconfirmed submissions.</p>
-      <p>5. The backend must enforce admin authorization, badge activation, and subscription expiry.</p>
-      <p style="color:#ffc857">This page cannot independently confirm a payment.</p>
-    </div>
-  </details>
-</section>
-
 <div class="footer-note">Boys vs Girls 💙💗 · Main Admin Panel</div>
 </main>
 
@@ -275,311 +392,542 @@ details.collapsible[open]>summary:after{content:"−"}
 (() => {
 "use strict";
 
-const API="https://freetube-backend-a222.onrender.com/api";
-let methods=[],payments=[];
-const $=id=>document.getElementById(id);
+const API = "https://freetube-backend-a222.onrender.com/api";
+let methods = [];
+let payments = [];
+
+const $ = id => document.getElementById(id);
 
 /*
-  Reuse the token already created by the app login.
-  No token input is shown on this page.
-*/
-function getExistingToken(){
-  try{
-    return localStorage.getItem("freetube_access_token")||"";
-  }catch{
-    return "";
-  }
+ * Use the app's existing login token.
+ * This page intentionally has no manual token field.
+ */
+function getExistingToken() {
+  const keys = [
+    "freetube_access_token",
+    "boys_vs_girls_access_token",
+    "access_token",
+    "authToken",
+    "token"
+  ];
+
+  try {
+    for (const key of keys) {
+      const value = localStorage.getItem(key);
+      if (value && value.trim()) return value.trim();
+    }
+    for (const key of keys) {
+      const value = sessionStorage.getItem(key);
+      if (value && value.trim()) return value.trim();
+    }
+  } catch (_) {}
+  return "";
 }
 
-function showMessage(id,message,type="info"){
-  const el=$(id);el.textContent=message;el.className="message "+type;
+function showMessage(id, message, type = "info") {
+  const el = $(id);
+  el.textContent = message;
+  el.className = "message " + type;
 }
-function clearMessage(id){const el=$(id);el.textContent="";el.className="message"}
-function escapeHtml(value){
-  return String(value??"").replace(/[&<>"']/g,c=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+function clearMessage(id) {
+  const el = $(id);
+  el.textContent = "";
+  el.className = "message";
+}
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   }[c]));
 }
-function normalizeStatus(value){
-  const s=String(value||"pending").toLowerCase();
-  if(s.includes("approv")||s==="paid"||s==="verified")return "approved";
-  if(s.includes("reject")||s==="failed"||s==="cancelled")return "rejected";
-  if(["pending","submitted","under_review"].includes(s))return "pending";
-  return s;
+function normalizeStatus(value) {
+  const s = String(value || "pending").toLowerCase();
+  if (["approved","paid","verified"].includes(s)) return "approved";
+  if (["rejected","failed","cancelled"].includes(s)) return "rejected";
+  return "pending";
 }
-function statusBadge(value){
-  const s=normalizeStatus(value);
-  return `<span class="status status-${escapeHtml(s)}">${escapeHtml(s.charAt(0).toUpperCase()+s.slice(1))}</span>`;
+function statusBadge(value) {
+  const s = normalizeStatus(value);
+  return `<span class="status status-${s}">${escapeHtml(s[0].toUpperCase() + s.slice(1))}</span>`;
 }
-async function apiRequest(path,options={}){
-  const token=getExistingToken();
-  if(!token){
-    throw new Error("No existing app login token was found. Log in to Boys vs Girls with your Main Admin account first. If login uses a different token key, the backend/login code must be connected.");
+function extractArray(data, keys) {
+  if (Array.isArray(data)) return data;
+  for (const key of keys) {
+    if (Array.isArray(data?.[key])) return data[key];
+    if (Array.isArray(data?.data?.[key])) return data.data[key];
   }
-  const headers={
-    Accept:"application/json",
-    Authorization:"Bearer "+token,
-    ...(options.body?{"Content-Type":"application/json"}:{}),
-    ...(options.headers||{})
+  return Array.isArray(data?.data) ? data.data : [];
+}
+function methodId(m) {
+  return m.id ?? m.method_id ?? m.payment_method_id ?? "";
+}
+function paymentId(p) {
+  return p.id ?? p.payment_id ?? p.submission_id ?? "";
+}
+function isEnabled(m) {
+  return m.enabled === true || m.enabled === "true";
+}
+function paymentUser(p) {
+  return p.display_name || p.username || p.email || p.user_id || "Unknown user";
+}
+function paymentMethod(p) {
+  return p.method || p.payment_method_name || p.method_name || "—";
+}
+function reference(p) {
+  return p.transaction_ref || p.transaction_reference || p.transaction_id || "—";
+}
+function formatDate(value) {
+  if (!value) return "—";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? String(value) : d.toLocaleString();
+}
+function amount(p) {
+  return `${p.currency || ""} ${p.amount ?? "—"}`.trim();
+}
+
+async function apiRequest(path, options = {}) {
+  const token = getExistingToken();
+
+  if (!token) {
+    throw new Error(
+      "No existing login was found in this browser. Open Boys vs Girls, log in with your Main Admin account, then reopen this page."
+    );
+  }
+
+  const headers = {
+    Accept: "application/json",
+    Authorization: "Bearer " + token,
+    ...(options.body ? {"Content-Type":"application/json"} : {}),
+    ...(options.headers || {})
   };
-  const response=await fetch(API+path,{...options,headers});
-  const raw=await response.text();
-  let data={};
-  try{data=raw?JSON.parse(raw):{}}catch{data={message:raw}}
-  if(!response.ok){
-    if(response.status===401||response.status===403){
-      throw new Error("Your current login is not authorized for this admin action. Log in with your Main Admin account and check backend admin permissions.");
+
+  const response = await fetch(API + path, {
+    ...options,
+    headers
+  });
+
+  const raw = await response.text();
+  let data = {};
+  try { data = raw ? JSON.parse(raw) : {}; }
+  catch (_) { data = {message:raw}; }
+
+  if (!response.ok) {
+    if (response.status === 401) {
+      throw new Error("Your login has expired or is invalid. Log in again with your Main Admin account.");
     }
-    throw new Error(data.message||data.error||`Request failed (${response.status}).`);
+    if (response.status === 403) {
+      throw new Error("Admin permission denied. Confirm that ADMIN_EMAIL matches your registered account and that you have logged in again.");
+    }
+    throw new Error(data.error || data.message || `Request failed (${response.status}).`);
   }
   return data;
 }
-function extractArray(data,keys){
-  if(Array.isArray(data))return data;
-  for(const key of keys){
-    if(Array.isArray(data?.[key]))return data[key];
-    if(Array.isArray(data?.data?.[key]))return data.data[key];
+
+function renderStats() {
+  $("pendingCount").textContent =
+    payments.filter(p => normalizeStatus(p.status) === "pending").length;
+  $("approvedCount").textContent =
+    payments.filter(p => normalizeStatus(p.status) === "approved").length;
+  $("rejectedCount").textContent =
+    payments.filter(p => normalizeStatus(p.status) === "rejected").length;
+  $("methodsCount").textContent = methods.filter(isEnabled).length;
+}
+
+function renderMethods() {
+  $("methodListLabel").textContent =
+    `${methods.length} method${methods.length === 1 ? "" : "s"}`;
+
+  if (!methods.length) {
+    $("methodsList").innerHTML =
+      '<div class="empty">No payment methods found.</div>';
+    renderStats();
+    return;
   }
-  return Array.isArray(data?.data)?data.data:[];
-}
-const methodId=m=>m.id??m.method_id??m.payment_method_id??"";
-const paymentId=p=>p.id??p.payment_id??p.submission_id??"";
-const isEnabled=m=>m.enabled===true||m.is_enabled===true||m.active===true;
-const paymentUser=p=>p.username||p.user?.username||p.full_name||p.user?.full_name||p.user_id||"Unknown user";
-const paymentMethod=p=>p.payment_method_name||p.method_name||p.method||p.payment_method||"—";
-const reference=p=>p.transaction_reference||p.transaction_id||p.reference||p.trx_id||"—";
-function amount(p){
-  const a=p.amount??p.price??p.payment_amount;
-  return a===undefined||a===null?"—":`${p.currency||""} ${a}`.trim();
-}
-function formatDate(value){
-  if(!value)return "—";
-  const d=new Date(value);
-  return Number.isNaN(d.getTime())?String(value):d.toLocaleString();
-}
-function renderStats(){
-  $("pendingCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="pending").length;
-  $("approvedCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="approved").length;
-  $("rejectedCount").textContent=payments.filter(p=>normalizeStatus(p.status)==="rejected").length;
-  $("methodsCount").textContent=methods.filter(isEnabled).length;
-}
-function renderMethods(){
-  $("methodListLabel").textContent=`${methods.length} method${methods.length===1?"":"s"}`;
-  if(!methods.length){
-    $("methodsList").innerHTML='<div class="empty">No payment methods found.</div>';
-    renderStats();return;
-  }
-  $("methodsList").innerHTML=methods.map(m=>{
-    const id=methodId(m),enabled=isEnabled(m);
-    const name=m.name||m.method_name||"Unnamed method";
-    const region=m.region||m.country||"—";
-    const recipient=m.account_details||m.account_number||m.recipient||m.wallet_address||m.upi_id||"Not provided";
-    return `<article class="payment-method">
-      <div class="method-top"><div>
-        <div class="method-name">${escapeHtml(name)}</div>
-        <div class="method-meta">Region: ${escapeHtml(region)}<br>Recipient: ${escapeHtml(recipient)}</div>
-      </div>${enabled?'<span class="status status-active">Enabled</span>':'<span class="status status-disabled">Disabled</span>'}</div>
-      <div class="method-actions">
+
+  $("methodsList").innerHTML = methods.map(m => {
+    const id = methodId(m);
+    const enabled = isEnabled(m);
+    const region = {
+      bangladesh:"Bangladesh",
+      india:"India",
+      global:"International"
+    }[String(m.region || "").toLowerCase()] || m.region || "—";
+
+    return `<article class="item">
+      <div class="item-top">
+        <div>
+          <div class="item-title">${escapeHtml(m.name || "Unnamed method")}</div>
+          <div class="item-meta">
+            Region: ${escapeHtml(region)}<br>
+            Currency: ${escapeHtml(m.currency || "—")}<br>
+            Recipient: ${escapeHtml(m.account_details || "Not provided")}<br>
+            Default price: ${escapeHtml(m.currency || "")} ${escapeHtml(m.price_amount ?? "0")}<br>
+            1 month: ${escapeHtml(m.price_1_month ?? "0")} ·
+            3 months: ${escapeHtml(m.price_3_months ?? "0")}<br>
+            6 months: ${escapeHtml(m.price_6_months ?? "0")} ·
+            12 months: ${escapeHtml(m.price_12_months ?? "0")}
+          </div>
+        </div>
+        <span class="status ${enabled ? "status-active" : "status-disabled"}">
+          ${enabled ? "Enabled" : "Disabled"}
+        </span>
+      </div>
+      <div class="actions">
         <button class="btn btn-small" data-edit="${escapeHtml(id)}" type="button">Edit</button>
-        <button class="btn btn-small ${enabled?"btn-danger":"btn-success"}" data-toggle="${escapeHtml(id)}" data-enabled="${enabled}" type="button">${enabled?"Disable":"Enable"}</button>
-        <button class="btn btn-small btn-danger" data-delete="${escapeHtml(id)}" type="button">Delete</button>
+        <button class="btn btn-small ${enabled ? "btn-danger" : "btn-success"}"
+          data-toggle="${escapeHtml(id)}" data-enabled="${enabled}" type="button">
+          ${enabled ? "Disable" : "Enable"}
+        </button>
+        <button class="btn btn-small btn-danger" data-delete="${escapeHtml(id)}" type="button">
+          Disable
+        </button>
       </div>
     </article>`;
   }).join("");
+
   renderStats();
 }
-function renderPayments(){
-  const q=$("paymentSearch").value.trim().toLowerCase();
-  const filter=$("paymentStatusFilter").value;
-  const list=payments.filter(p=>{
-    const status=normalizeStatus(p.status);
-    const hay=[paymentUser(p),paymentMethod(p),reference(p),paymentId(p),p.user_id].join(" ").toLowerCase();
-    return (!q||hay.includes(q))&&(filter==="all"||filter===status);
+
+function renderPayments() {
+  const q = $("paymentSearch").value.trim().toLowerCase();
+  const filter = $("paymentStatusFilter").value;
+
+  const list = payments.filter(p => {
+    const status = normalizeStatus(p.status);
+    const hay = [
+      paymentUser(p), paymentMethod(p), reference(p),
+      paymentId(p), p.user_id, p.email
+    ].join(" ").toLowerCase();
+    return (!q || hay.includes(q)) && (filter === "all" || filter === status);
   });
-  if(!list.length){
-    $("paymentsList").innerHTML='<div class="empty">No matching payment submissions found.</div>';
-    renderStats();return;
-  }
-  $("paymentsList").innerHTML=list.map(p=>{
-    const id=paymentId(p),status=normalizeStatus(p.status);
-    const duration=p.duration_months||p.months||p.duration||"—";
-    const date=p.created_at||p.submitted_at||p.createdAt;
-    const actions=status==="pending"?`
-      <button class="btn btn-success btn-small" data-review="approve" data-id="${escapeHtml(id)}" type="button">Approve</button>
-      <button class="btn btn-danger btn-small" data-review="reject" data-id="${escapeHtml(id)}" type="button">Reject</button>`:
-      '<span class="muted">No actions</span>';
-    return `<article class="payment-card">
-      <div class="card-heading"><div class="card-title">${escapeHtml(paymentUser(p))}</div>${statusBadge(status)}</div>
-      <div class="card-meta">Payment: ${escapeHtml(paymentMethod(p))}<br>
-      Amount: ${escapeHtml(amount(p))}<br>
-      Duration: ${escapeHtml(duration)} month(s)<br>
-      Reference: ${escapeHtml(reference(p))}<br>
-      Submitted: ${escapeHtml(formatDate(date))}<br>
-      Submission ID: ${escapeHtml(id||"—")}</div>
-      <div class="card-actions">${actions}</div>
-    </article>`;
-  }).join("");
-  renderStats();
-}
-async function loadMethods(){
-  $("methodsList").innerHTML='<div class="empty">Loading methods…</div>';
-  try{
-    const data=await apiRequest("/payments/methods");
-    methods=extractArray(data,["methods","payment_methods","items"]);
-    renderMethods();clearMessage("methodMessage");
-  }catch(e){
-    methods=[];renderMethods();
-    showMessage("methodMessage",e.message,"error");
-  }
-}
-async function loadPayments(){
-  $("paymentsList").innerHTML='<div class="empty">Loading submissions…</div>';
-  try{
-    const data=await apiRequest("/admin/payments");
-    payments=extractArray(data,["payments","submissions","items"]);
-    renderPayments();clearMessage("paymentsMessage");
-  }catch(e){
-    payments=[];renderPayments();
-    showMessage("paymentsMessage",e.message,"error");
-  }
-}
-async function loadPricing(){
-  try{
-    const data=await apiRequest("/admin/payment-pricing");
-    const p=data.pricing||data.data||data;
-    const currency=p.currency||"BDT";
-    if([...$("priceCurrency").options].some(o=>o.value===currency))$("priceCurrency").value=currency;
-    $("price1").value=p.month_1??p["1_month"]??p.price_1_month??"";
-    $("price3").value=p.month_3??p["3_months"]??p.price_3_months??"";
-    $("price6").value=p.month_6??p["6_months"]??p.price_6_months??"";
-    $("price12").value=p.month_12??p["12_months"]??p.price_12_months??"";
-    clearMessage("priceMessage");
-  }catch(e){
-    showMessage("priceMessage","Could not load pricing: "+e.message,"info");
-  }
-}
-async function refreshAll(){
-  if(!getExistingToken()){
-    showMessage("globalMessage","Please log in with your Main Admin account first. This page looks for the existing freetube_access_token login value.","error");
-    $("authHint").textContent="Main Admin login is required. No token input is used on this page.";
+
+  if (!list.length) {
+    $("paymentsList").innerHTML =
+      '<div class="empty">No matching payment submissions found.</div>';
+    renderStats();
     return;
   }
-  clearMessage("globalMessage");
-  await Promise.allSettled([loadMethods(),loadPayments(),loadPricing()]);
+
+  $("paymentsList").innerHTML = list.map(p => {
+    const id = paymentId(p);
+    const status = normalizeStatus(p.status);
+    const duration = p.duration_months || 1;
+    const actions = status === "pending" ? `
+      <button class="btn btn-success btn-small" data-review="approve"
+        data-id="${escapeHtml(id)}" type="button">Approve</button>
+      <button class="btn btn-danger btn-small" data-review="reject"
+        data-id="${escapeHtml(id)}" type="button">Reject</button>
+    ` : '<span class="muted">Already reviewed</span>';
+
+    return `<article class="item">
+      <div class="item-top">
+        <div class="item-title">${escapeHtml(paymentUser(p))}</div>
+        ${statusBadge(status)}
+      </div>
+      <div class="item-meta">
+        Email: ${escapeHtml(p.email || "—")}<br>
+        Purpose: ${escapeHtml(p.purpose || "—")}<br>
+        Payment method: ${escapeHtml(paymentMethod(p))}<br>
+        Amount: ${escapeHtml(amount(p))}<br>
+        Duration: ${escapeHtml(duration)} month(s)<br>
+        Transaction reference: ${escapeHtml(reference(p))}<br>
+        Payer account: ${escapeHtml(p.payer_account || "—")}<br>
+        Submitted: ${escapeHtml(formatDate(p.created_at))}<br>
+        Submission ID: ${escapeHtml(id || "—")}
+      </div>
+      <div class="actions">${actions}</div>
+    </article>`;
+  }).join("");
+
+  renderStats();
 }
-function resetForm(){
-  $("methodForm").reset();$("methodId").value="";
-  $("methodEnabled").checked=true;
-  $("methodFormHeading").textContent="Add Payment Method";
-  $("saveMethodBtn").textContent="Save Payment Method";
+
+async function loadMethods() {
+  $("methodsList").innerHTML = '<div class="empty">Loading methods…</div>';
+
+  try {
+    const data = await apiRequest("/admin/payment-methods");
+    methods = extractArray(data, ["methods"]);
+    renderMethods();
+    clearMessage("methodMessage");
+  } catch (e) {
+    methods = [];
+    renderMethods();
+    showMessage("methodMessage", e.message, "error");
+  }
+}
+
+async function loadPayments() {
+  $("paymentsList").innerHTML = '<div class="empty">Loading submissions…</div>';
+
+  try {
+    const data = await apiRequest("/admin/payments?status=all");
+    payments = extractArray(data, ["payments"]);
+    renderPayments();
+    clearMessage("paymentsMessage");
+  } catch (e) {
+    payments = [];
+    renderPayments();
+    showMessage("paymentsMessage", e.message, "error");
+  }
+}
+
+async function refreshAll() {
+  if (!getExistingToken()) {
+    showMessage(
+      "globalMessage",
+      "Log in to Boys vs Girls with your Main Admin account first. This page does not require manual token entry.",
+      "error"
+    );
+    return;
+  }
+
+  clearMessage("globalMessage");
+  await Promise.allSettled([loadMethods(), loadPayments()]);
+}
+
+function resetForm() {
+  $("methodForm").reset();
+  $("methodId").value = "";
+  $("methodEnabled").checked = true;
+  $("methodFormHeading").textContent = "Add Payment Method";
+  $("saveMethodBtn").textContent = "Save Payment Method";
+  $("methodCurrency").value = "BDT";
+  $("methodRegion").value = "bangladesh";
+  $("price1").value = "0";
+  $("price3").value = "0";
+  $("price6").value = "0";
+  $("price12").value = "0";
   clearMessage("methodMessage");
 }
-function editMethod(id){
-  const m=methods.find(x=>String(methodId(x))===String(id));
-  if(!m){showMessage("methodMessage","Payment method not found.","error");return}
-  $("methodId").value=methodId(m);
-  $("methodName").value=m.name||m.method_name||"";
-  $("methodRegion").value=m.region||m.country||"Other";
-  $("methodAccount").value=m.account_details||m.account_number||m.recipient||m.wallet_address||m.upi_id||"";
-  $("methodInstructions").value=m.instructions||m.description||"";
-  $("methodQr").value=m.qr_url||m.qr_image_url||"";
-  $("methodEnabled").checked=isEnabled(m);
-  $("methodFormHeading").textContent="Edit Payment Method";
-  $("saveMethodBtn").textContent="Update Payment Method";
-  $("methodFormHeading").scrollIntoView({behavior:"smooth",block:"center"});
-}
-async function saveMethod(event){
-  event.preventDefault();clearMessage("methodMessage");
-  const id=$("methodId").value.trim();
-  const name=$("methodName").value.trim(),account=$("methodAccount").value.trim();
-  const enabled=$("methodEnabled").checked;
-  const payload={
-    name,method_name:name,region:$("methodRegion").value,
-    account_details:account,recipient:account,
-    instructions:$("methodInstructions").value.trim(),
-    qr_url:$("methodQr").value.trim()||null,
-    enabled,is_enabled:enabled
-  };
-  const btn=$("saveMethodBtn");btn.disabled=true;btn.textContent="Saving…";
-  try{
-    const result=id
-      ?await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify(payload)})
-      :await apiRequest("/admin/payment-methods",{method:"POST",body:JSON.stringify(payload)});
-    showMessage("methodMessage",result.message||(id?"Update request completed.":"Payment method added."),"success");
-    resetForm();await loadMethods();
-  }catch(e){showMessage("methodMessage","Could not save method: "+e.message,"error")}
-  finally{btn.disabled=false;btn.textContent=$("methodId").value?"Update Payment Method":"Save Payment Method"}
-}
-async function toggleMethod(id,enabled){
-  if(!id){showMessage("methodMessage","Payment method ID is missing.","error");return}
-  if(!confirm(`Are you sure you want to ${enabled?"disable":"enable"} this payment method?`))return;
-  try{
-    await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{
-      method:"PATCH",body:JSON.stringify({enabled:!enabled,is_enabled:!enabled})
-    });
-    showMessage("methodMessage","Payment method update completed.","success");await loadMethods();
-  }catch(e){showMessage("methodMessage",e.message,"error")}
-}
-async function deleteMethod(id){
-  if(!id){showMessage("methodMessage","Payment method ID is missing.","error");return}
-  if(!confirm("Delete this payment method?"))return;
-  try{
-    const result=await apiRequest("/admin/payment-methods/"+encodeURIComponent(id),{method:"DELETE"});
-    showMessage("methodMessage",result.message||"Payment method deleted.","success");await loadMethods();
-  }catch(e){showMessage("methodMessage",e.message,"error")}
-}
-async function reviewPayment(id,action){
-  if(!id){showMessage("paymentsMessage","Payment submission ID is missing.","error");return}
-  const approve=action==="approve";
-  if(!confirm(approve?"Approve only after confirming the payment with the provider. Continue?":"Reject this payment submission?"))return;
-  const reason=approve?"":(prompt("Optional rejection reason:")||"");
-  try{
-    const result=await apiRequest("/admin/payments/"+encodeURIComponent(id),{
-      method:"PATCH",
-      body:JSON.stringify({status:approve?"approved":"rejected",action:approve?"approve":"reject",rejection_reason:reason})
-    });
-    showMessage("paymentsMessage",result.message||(approve?"Payment approval submitted.":"Payment rejection submitted."),"success");
-    await loadPayments();
-  }catch(e){showMessage("paymentsMessage","Could not review payment: "+e.message,"error")}
-}
-async function savePricing(event){
-  event.preventDefault();clearMessage("priceMessage");
-  const values=[$("price1").value,$("price3").value,$("price6").value,$("price12").value].map(Number);
-  if(values.some(v=>!Number.isFinite(v)||v<0)){
-    showMessage("priceMessage","Enter valid non-negative prices.","error");return;
+
+function editMethod(id) {
+  const m = methods.find(x => String(methodId(x)) === String(id));
+  if (!m) {
+    showMessage("methodMessage", "Payment method not found.", "error");
+    return;
   }
-  try{
-    const result=await apiRequest("/admin/payment-pricing",{
-      method:"PATCH",
-      body:JSON.stringify({currency:$("priceCurrency").value,month_1:values[0],month_3:values[1],month_6:values[2],month_12:values[3]})
-    });
-    showMessage("priceMessage",result.message||"Pricing update submitted.","success");
-  }catch(e){showMessage("priceMessage","Could not save pricing: "+e.message,"error")}
+
+  $("methodId").value = methodId(m);
+  $("methodName").value = m.name || "";
+  $("methodRegion").value = String(m.region || "bangladesh").toLowerCase();
+  $("methodCurrency").value = m.currency || "BDT";
+  $("methodAccountName").value = m.account_name || "";
+  $("methodAccount").value = m.account_details || "";
+  $("methodPrice").value = m.price_amount ?? "0";
+  $("price1").value = m.price_1_month ?? "0";
+  $("price3").value = m.price_3_months ?? "0";
+  $("price6").value = m.price_6_months ?? "0";
+  $("price12").value = m.price_12_months ?? "0";
+  $("methodInstructions").value = m.instructions || "";
+  $("methodQr").value = m.qr_image_url || "";
+  $("methodEnabled").checked = isEnabled(m);
+  $("methodFormHeading").textContent = "Edit Payment Method";
+  $("saveMethodBtn").textContent = "Update Payment Method";
+  $("methodFormHeading").scrollIntoView({behavior:"smooth", block:"start"});
 }
 
-$("dashboardBtn").addEventListener("click",()=>location.href="admin.html");
-$("refreshBtn").addEventListener("click",refreshAll);
-$("loadPaymentsBtn").addEventListener("click",loadPayments);
-$("resetMethodBtn").addEventListener("click",resetForm);
-$("methodForm").addEventListener("submit",saveMethod);
-$("priceForm").addEventListener("submit",savePricing);
-$("paymentSearch").addEventListener("input",renderPayments);
-$("paymentStatusFilter").addEventListener("change",renderPayments);
+async function saveMethod(event) {
+  event.preventDefault();
+  clearMessage("methodMessage");
 
-$("methodsList").addEventListener("click",async e=>{
-  const edit=e.target.closest("[data-edit]");
-  const toggle=e.target.closest("[data-toggle]");
-  const del=e.target.closest("[data-delete]");
-  if(edit){editMethod(edit.dataset.edit);return}
-  if(toggle){await toggleMethod(toggle.dataset.toggle,toggle.dataset.enabled==="true");return}
-  if(del)await deleteMethod(del.dataset.delete);
+  const id = $("methodId").value.trim();
+  const name = $("methodName").value.trim();
+  const account = $("methodAccount").value.trim();
+  const price = Number($("methodPrice").value);
+  const price1 = Number($("price1").value || 0);
+  const price3 = Number($("price3").value || 0);
+  const price6 = Number($("price6").value || 0);
+  const price12 = Number($("price12").value || 0);
+  const currency = $("methodCurrency").value;
+  const region = $("methodRegion").value;
+  const qr = $("methodQr").value.trim();
+
+  if (!name || !account || !Number.isFinite(price) || price < 0 ||
+      ![price1,price3,price6,price12].every(n => Number.isFinite(n) && n >= 0)) {
+    showMessage("methodMessage", "Enter a method name, recipient and valid non-negative prices.", "error");
+    return;
+  }
+
+  if (qr && !/^https:\/\//i.test(qr)) {
+    showMessage("methodMessage", "The QR image URL must start with https://.", "error");
+    return;
+  }
+
+  const code = name.toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 50);
+
+  const payload = {
+    code,
+    name,
+    region,
+    currency,
+    price_amount:price,
+    price_1_month:price1,
+    price_3_months:price3,
+    price_6_months:price6,
+    price_12_months:price12,
+    account_name:$("methodAccountName").value.trim(),
+    account_details:account,
+    instructions:$("methodInstructions").value.trim(),
+    qr_image_url:qr,
+    enabled:$("methodEnabled").checked
+  };
+
+  const btn = $("saveMethodBtn");
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+
+  try {
+    const result = id
+      ? await apiRequest("/admin/payment-methods/" + encodeURIComponent(id), {
+          method:"PATCH",
+          body:JSON.stringify(payload)
+        })
+      : await apiRequest("/admin/payment-methods", {
+          method:"POST",
+          body:JSON.stringify(payload)
+        });
+
+    showMessage(
+      "methodMessage",
+      result.message || (id ? "Payment method updated." : "Payment method saved."),
+      "success"
+    );
+    resetForm();
+    await loadMethods();
+  } catch (e) {
+    showMessage("methodMessage", "Could not save method: " + e.message, "error");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = $("methodId").value ? "Update Payment Method" : "Save Payment Method";
+  }
+}
+
+async function toggleMethod(id, enabled) {
+  if (!id) {
+    showMessage("methodMessage", "Payment method ID is missing.", "error");
+    return;
+  }
+
+  const nextEnabled = !enabled;
+  if (!confirm(`Are you sure you want to ${nextEnabled ? "enable" : "disable"} this payment method?`)) return;
+
+  try {
+    const m = methods.find(x => String(methodId(x)) === String(id));
+    if (!m) throw new Error("Payment method not found.");
+
+    const payload = {enabled:nextEnabled};
+    const result = await apiRequest("/admin/payment-methods/" + encodeURIComponent(id), {
+      method:"PATCH",
+      body:JSON.stringify(payload)
+    });
+
+    showMessage(
+      "methodMessage",
+      result.message || "Payment method updated.",
+      "success"
+    );
+    await loadMethods();
+  } catch (e) {
+    showMessage("methodMessage", e.message, "error");
+  }
+}
+
+async function disableMethod(id) {
+  if (!id) {
+    showMessage("methodMessage", "Payment method ID is missing.", "error");
+    return;
+  }
+  if (!confirm("Disable this payment method? It will not be deleted permanently.")) return;
+
+  try {
+    const result = await apiRequest("/admin/payment-methods/" + encodeURIComponent(id), {
+      method:"DELETE"
+    });
+    showMessage("methodMessage", result.message || "Payment method disabled.", "success");
+    await loadMethods();
+  } catch (e) {
+    showMessage("methodMessage", e.message, "error");
+  }
+}
+
+async function reviewPayment(id, action) {
+  if (!id) {
+    showMessage("paymentsMessage", "Payment submission ID is missing.", "error");
+    return;
+  }
+
+  const approve = action === "approve";
+  if (!confirm(
+    approve
+      ? "Approve this payment only after verifying it with the provider. Continue?"
+      : "Reject this payment submission?"
+  )) return;
+
+  const reason = approve ? "" : (prompt("Optional rejection reason:") || "");
+
+  try {
+    const result = await apiRequest("/admin/payments/" + encodeURIComponent(id), {
+      method:"PATCH",
+      body:JSON.stringify({
+        action:approve ? "approve" : "reject",
+        admin_note:reason
+      })
+    });
+
+    showMessage(
+      "paymentsMessage",
+      result.message || (approve ? "Payment approved." : "Payment rejected."),
+      "success"
+    );
+    await loadPayments();
+  } catch (e) {
+    showMessage("paymentsMessage", "Could not review payment: " + e.message, "error");
+  }
+}
+
+$("dashboardBtn").addEventListener("click", () => {
+  location.href = "admin.html";
 });
-$("paymentsList").addEventListener("click",async e=>{
-  const btn=e.target.closest("[data-review]");
-  if(!btn)return;
-  btn.disabled=true;
-  try{await reviewPayment(btn.dataset.id,btn.dataset.review)}
-  finally{btn.disabled=false}
+$("refreshBtn").addEventListener("click", refreshAll);
+$("loadPaymentsBtn").addEventListener("click", loadPayments);
+$("resetMethodBtn").addEventListener("click", resetForm);
+$("methodForm").addEventListener("submit", saveMethod);
+$("paymentSearch").addEventListener("input", renderPayments);
+$("paymentStatusFilter").addEventListener("change", renderPayments);
+
+$("methodRegion").addEventListener("change", () => {
+  const region = $("methodRegion").value;
+  $("methodCurrency").value =
+    region === "bangladesh" ? "BDT" :
+    region === "india" ? "INR" : "USDT";
+});
+
+$("methodsList").addEventListener("click", async event => {
+  const edit = event.target.closest("[data-edit]");
+  const toggle = event.target.closest("[data-toggle]");
+  const del = event.target.closest("[data-delete]");
+
+  if (edit) return editMethod(edit.dataset.edit);
+  if (toggle) {
+    return toggleMethod(toggle.dataset.toggle, toggle.dataset.enabled === "true");
+  }
+  if (del) return disableMethod(del.dataset.delete);
+});
+
+$("paymentsList").addEventListener("click", async event => {
+  const btn = event.target.closest("[data-review]");
+  if (!btn) return;
+
+  btn.disabled = true;
+  try {
+    await reviewPayment(btn.dataset.id, btn.dataset.review);
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 refreshAll();
