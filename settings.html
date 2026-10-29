@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,15 +34,17 @@ a{color:inherit;text-decoration:none}
   padding:12px 14px;background:linear-gradient(110deg,#102c54f5,#3a1a48f5,#641d4bf5);
   backdrop-filter:blur(20px);border-bottom:1px solid var(--border)
 }
-.back-btn,.icon-btn{
+.back-btn{
   width:39px;height:39px;flex-shrink:0;display:grid;place-items:center;
   border-radius:50%;background:#ffffff12;border:1px solid #ffffff26
 }
 .page-heading{flex:1;min-width:0}
 .page-heading h1{font-size:20px;font-weight:900}
 .page-heading p{font-size:11px;color:var(--muted);margin-top:4px}
-.brand-mark{background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
-.love-icon{color:var(--pink);font-size:18px}
+.brand-mark{
+  background:var(--gradient);-webkit-background-clip:text;background-clip:text;
+  color:transparent
+}
 
 /* Compact setting cards */
 .section-title{
@@ -120,6 +121,40 @@ a{color:inherit;text-decoration:none}
 .availability.checking{color:#d5d6f0}
 .availability.neutral{color:var(--muted)}
 
+/* Policy list */
+.policy-intro{margin-bottom:12px}
+.policy-list{display:flex;flex-direction:column;gap:8px}
+.policy-card{
+  border:1px solid #ffffff18;border-radius:12px;overflow:hidden;
+  background:#ffffff06
+}
+.policy-toggle{
+  width:100%;display:flex;align-items:center;gap:10px;text-align:left;
+  padding:12px;background:transparent;border:0;color:#fff
+}
+.policy-icon{
+  flex:0 0 35px;width:35px;height:35px;display:grid;place-items:center;
+  border:1px solid #ffffff18;border-radius:10px;
+  background:linear-gradient(145deg,#168cff25,#862dff22,#ff248c18);
+  color:#9bcaff;font-size:14px
+}
+.policy-heading{flex:1;min-width:0}
+.policy-heading strong{display:block;font-size:12.5px;line-height:1.45}
+.policy-heading small{display:block;color:var(--muted);font-size:10px;line-height:1.5;margin-top:3px}
+.policy-arrow{color:#aaaed0;font-size:11px;transition:transform .2s}
+.policy-card.open .policy-arrow{transform:rotate(90deg)}
+.policy-details{
+  display:none;padding:0 13px 13px 57px;
+  color:var(--muted);font-size:11.5px;line-height:1.75;
+  white-space:pre-line
+}
+.policy-card.open .policy-details{display:block}
+.policy-notice{
+  margin-top:12px;padding:11px;border:1px solid #37d7ff30;
+  border-radius:10px;background:#168cff0c;color:#c8dfff;
+  font-size:10.5px;line-height:1.65
+}
+
 /* Bottom navigation */
 .bottom-nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:100%;max-width:650px;
@@ -157,7 +192,26 @@ a{color:inherit;text-decoration:none}
   text-align:center;box-shadow:0 8px 25px #0004
 }
 .toast.show{display:block}
-.footer-note{margin:16px 13px;padding:12px;border:1px solid var(--border);border-radius:12px;background:#162344bb;text-align:center}
+
+/* Made by branding */
+.footer-note{
+  margin:16px 13px;padding:15px 10px;border:1px solid var(--border);
+  border-radius:12px;background:#162344bb;text-align:center
+}
+.footer-brand{
+  display:inline-flex;flex-wrap:wrap;align-items:center;justify-content:center;
+  gap:5px;font-weight:900;line-height:1.7
+}
+.footer-app-name{
+  font-size:17px;letter-spacing:.2px;
+  background:var(--gradient);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent
+}
+.footer-made-by{
+  font-size:11px;letter-spacing:.8px;font-weight:900;
+  background:var(--gradient);-webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent
+}
 @media(max-width:380px){
   .page-heading h1{font-size:18px}
   .item{min-height:53px;padding:8px 9px;gap:8px}
@@ -165,6 +219,9 @@ a{color:inherit;text-decoration:none}
   .desc{font-size:10px}
   .nav-item{font-size:10px}
   .nav-item i{font-size:18px}
+  .footer-app-name{font-size:15px}
+  .footer-made-by{font-size:10px}
+  .policy-details{padding-left:14px}
 }
 @media(min-width:651px){.app{border-inline:1px solid var(--border)}}
 </style>
@@ -172,17 +229,15 @@ a{color:inherit;text-decoration:none}
 <body>
 <div class="app">
 <header class="topbar">
-  <button class="back-btn" id="backButton" type="button" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+  <button class="back-btn" id="backButton" type="button" aria-label="Back">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
   <div class="page-heading">
     <h1 id="pageTitle">Settings <span class="brand-mark">⚙</span></h1>
     <p>Boys vs Girls 💙💗 · Account center</p>
   </div>
-  <button class="icon-btn" id="messengerButton" type="button" aria-label="Love Messenger">
-    <i class="fa-solid fa-heart love-icon"></i>
-  </button>
 </header>
 
-<!-- Main settings: the old profile-name card has been removed -->
 <div id="mainView" class="view active">
   <div class="section-title"><i class="fa-solid fa-user-gear"></i> Account</div>
   <div class="group">
@@ -274,7 +329,13 @@ a{color:inherit;text-decoration:none}
       <i class="fa-solid fa-chevron-right arrow"></i>
     </button>
   </div>
-  <div class="footer-note"><p class="muted">Made with <i class="fa-solid fa-heart pink"></i> for Boys vs Girls 💙💗</p></div>
+
+  <div class="footer-note">
+    <div class="footer-brand" aria-label="Boys Girls made by Chawdree">
+      <span class="footer-app-name">Bᴏʏs♡Gɪʀʟs</span>
+      <span class="footer-made-by">MADE BY CHAWDREE.</span>
+    </div>
+  </div>
 </div>
 
 <!-- Change username -->
@@ -341,13 +402,16 @@ a{color:inherit;text-decoration:none}
 </div>
 
 <div id="privacyView" class="view">
-  <div class="panel"><h2><i class="fa-solid fa-lock blue"></i> Privacy Center</h2>
+  <div class="panel">
+    <h2><i class="fa-solid fa-lock blue"></i> Privacy Center</h2>
     <p class="muted">Keep your password, verification codes and login token private. Avoid signing in on devices you do not trust.</p>
   </div>
-  <div class="panel"><h2>Public profile</h2>
+  <div class="panel">
+    <h2>Public profile</h2>
     <p class="muted">Your name, bio, profile photo and posts may be visible to other users depending on the backend privacy rules. This page does not independently change server-side privacy settings.</p>
   </div>
-  <div class="panel"><h2>Account data</h2>
+  <div class="panel">
+    <h2>Account data</h2>
     <p class="muted">Logging out removes the local session token from this browser.</p>
   </div>
 </div>
@@ -357,7 +421,10 @@ a{color:inherit;text-decoration:none}
     <h2><i class="fa-solid fa-globe pink"></i> Language</h2>
     <p class="muted">Choose a language preference for this device.</p>
     <label class="field">Preferred language
-      <select id="languageSelect"><option value="en">English</option><option value="bn">বাংলা (Bangla)</option></select>
+      <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="bn">বাংলা (Bangla)</option>
+      </select>
     </label>
     <button class="primary" id="saveLanguage" type="button">Save language</button>
     <p class="status" id="languageStatus" role="status"></p>
@@ -375,20 +442,36 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
-<div id="devicesView" class="view"><div class="panel"><h2>Device requests</h2><p class="muted">Device requests are not connected in this version.</p></div></div>
-<div id="adsView" class="view"><div class="panel"><h2>Your Ad Activity</h2><p class="muted">Ad activity history is not available in this version.</p></div></div>
-<div id="paymentsView" class="view"><div class="panel"><h2>Orders and payments</h2><p class="muted">Payment and order services are not connected in this version.</p></div></div>
-<div id="linksView" class="view"><div class="panel"><h2>Link history</h2><p class="muted">This version does not record link history.</p></div></div>
+<div id="devicesView" class="view">
+  <div class="panel"><h2>Device requests</h2><p class="muted">Device requests are not connected in this version.</p></div>
+</div>
+<div id="adsView" class="view">
+  <div class="panel"><h2>Your Ad Activity</h2><p class="muted">Ad activity history is not available in this version.</p></div>
+</div>
+<div id="paymentsView" class="view">
+  <div class="panel">
+    <h2>Orders and payments</h2>
+    <p class="muted">Use only the payment methods displayed by Boys vs Girls. Never provide your card number, CVV, PIN or OTP. Payment verification must be handled through the app's approved process.</p>
+  </div>
+</div>
+<div id="linksView" class="view">
+  <div class="panel"><h2>Link history</h2><p class="muted">This version does not record link history.</p></div>
+</div>
 
 <div id="scamView" class="view">
-  <div class="panel"><h2><i class="fa-solid fa-shield-heart pink"></i> Scam Protection Center</h2>
+  <div class="panel">
+    <h2><i class="fa-solid fa-shield-heart pink"></i> Scam Protection Center</h2>
     <p class="muted">Never share your password, access token or verification codes. Be cautious of links asking you to log in again.</p>
   </div>
-  <div class="panel"><h2>Safety tips</h2><p class="muted">Use a strong password, verify suspicious messages and report abusive or misleading content.</p></div>
+  <div class="panel">
+    <h2>Safety tips</h2>
+    <p class="muted">Use a strong password, verify suspicious messages and report abusive or misleading content.</p>
+  </div>
 </div>
 
 <div id="supportView" class="view">
-  <div class="panel"><h2><i class="fa-solid fa-life-ring blue"></i> Help and support</h2>
+  <div class="panel">
+    <h2><i class="fa-solid fa-life-ring blue"></i> Help and support</h2>
     <p class="muted">If a feature fails, note what you were doing and the error message.</p>
     <button class="primary" style="margin-top:12px" id="supportReportButton" type="button">Report a problem</button>
   </div>
@@ -409,18 +492,32 @@ a{color:inherit;text-decoration:none}
   </div>
 </div>
 
+<!-- Terms and Policies: policy cards are populated automatically by JavaScript -->
 <div id="termsView" class="view">
-  <div class="panel"><h2><i class="fa-solid fa-book-open blue"></i> Terms and Policies</h2>
-    <p class="muted">Use Boys vs Girls respectfully. Do not post unlawful, harmful, deceptive or abusive content. Respect other users' privacy and intellectual property.</p>
-    <p class="muted" style="margin-top:10px">These are basic in-app guidelines, not a replacement for official legal terms.</p>
+  <div class="panel">
+    <h2><i class="fa-solid fa-book-open blue"></i> Terms and Policies</h2>
+    <p class="muted policy-intro">Review the community rules and important account policies for Boys vs Girls. Tap a policy to read its summary.</p>
+    <div id="policyList" class="policy-list"></div>
+    <div class="policy-notice">
+      <i class="fa-solid fa-circle-info"></i>
+      These policy summaries are in-app guidance, not legal advice. Before launching publicly, review and adapt them to the laws and requirements that apply to your service.
+    </div>
   </div>
 </div>
 
 <nav class="bottom-nav" aria-label="Main navigation">
-  <button class="nav-item" type="button" data-page="home.html"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button class="nav-item" type="button" data-page="discover.html"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span></button>
-  <button class="nav-item" type="button" data-page="notifications.html"><i class="fa-solid fa-bell"></i><span>Notifications</span></button>
-  <button class="nav-item active" type="button" data-page="profile.html" aria-current="page"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+  <button class="nav-item" type="button" data-page="home.html">
+    <i class="fa-solid fa-house"></i><span>Home</span>
+  </button>
+  <button class="nav-item" type="button" data-page="discover.html">
+    <i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span>
+  </button>
+  <button class="nav-item" type="button" data-page="notifications.html">
+    <i class="fa-solid fa-bell"></i><span>Notifications</span>
+  </button>
+  <button class="nav-item active" type="button" data-page="profile.html" aria-current="page">
+    <i class="fa-regular fa-user"></i><span>Profile</span>
+  </button>
 </nav>
 </div>
 
@@ -531,6 +628,7 @@ function fillProfile(user={},profile={}){
   $("education").value=value(profile.education,user.education,local.education);
   resetUsernameChecker();
 }
+
 async function loadSettings(){
   const local=getCachedProfile();
   fillProfile(local,local);
@@ -571,11 +669,174 @@ function showView(key){
   document.querySelectorAll(".view").forEach(el=>el.classList.remove("active"));
   view.classList.add("active");
   $("pageTitle").textContent=viewTitles[key]||"Settings";
+  if(key==="terms")renderPolicies();
   window.scrollTo({top:0,behavior:"auto"});
   try{history.replaceState(null,"",key==="main"?"settings.html":"settings.html?page="+encodeURIComponent(key))}
   catch(_){}
 }
 window.showView=showView;
+
+/* Policy library: automatically creates the Terms and Policies list. */
+const POLICY_DATA=[
+  {
+    title:"Terms of Service",
+    subtitle:"Basic rules for using the app",
+    icon:"fa-file-contract",
+    body:"By using Boys vs Girls, you agree to use the service lawfully and respectfully. You are responsible for the content you post and for keeping your account secure. Do not use the service to threaten people, deceive users, distribute unlawful material or interfere with the service. Features may change as the app develops. These in-app terms are a summary and should be reviewed before public launch."
+  },
+  {
+    title:"Community Guidelines",
+    subtitle:"Respectful behaviour and content",
+    icon:"fa-people-group",
+    body:"Treat other users with respect. Do not publish threats, targeted harassment, hateful abuse, bullying, or content intended to intimidate others. Do not impersonate another person or mislead people about who you are. Report content that appears abusive or dangerous. Moderation decisions should be handled fairly and consistently."
+  },
+  {
+    title:"Privacy Policy",
+    subtitle:"Personal information and account data",
+    icon:"fa-user-shield",
+    body:"Only provide personal information you are comfortable sharing with the service. Profile details, posts, photos and other information may be processed by the app and its service providers to operate the features you use. The actual collection, storage, retention, deletion and sharing practices must be documented accurately by the service owner. Do not claim that data is deleted or private unless the backend actually enforces that behaviour."
+  },
+  {
+    title:"Account Security Rules",
+    subtitle:"Protect your login and account",
+    icon:"fa-lock",
+    body:"Use a strong, unique password and keep your login token private. Never share your password, one-time verification code or account recovery information with another person. Log out on devices you do not trust. If you believe your account has been compromised, use the supported account recovery process and report the issue."
+  },
+  {
+    title:"Safety and Anti-Scam Policy",
+    subtitle:"Avoid fraud and suspicious requests",
+    icon:"fa-shield-heart",
+    body:"Do not use Boys vs Girls to scam, defraud, threaten or deceive users. Be cautious of messages promising prizes, asking for urgent payments, or requesting passwords and verification codes. Do not send money based only on an unverified message. Report suspicious accounts, links or payment requests."
+  },
+  {
+    title:"Content and Posting Policy",
+    subtitle:"Rules for posts, photos and videos",
+    icon:"fa-photo-film",
+    body:"Only upload content you are allowed to share. Do not post unlawful content, threats, private information about others without permission, or content that violates the app's community rules. You remain responsible for the material you submit. Content moderation and removal should follow the service's published rules and applicable law."
+  },
+  {
+    title:"Copyright and Intellectual Property",
+    subtitle:"Respect ownership of creative work",
+    icon:"fa-copyright",
+    body:"Share photos, videos, music and other creative work only when you own it or have permission or another valid legal basis to share it. Do not impersonate creators or falsely claim ownership. A final public policy should explain how copyright complaints are submitted, reviewed and resolved."
+  },
+  {
+    title:"Messaging Policy",
+    subtitle:"Private messages and user safety",
+    icon:"fa-comments",
+    body:"Use messages respectfully. Do not send threats, harassment, scams, malicious links or unwanted abusive content. Avoid sending passwords, verification codes or sensitive financial information through messages. Block or report accounts when supported features are available. Message retention and deletion must match the actual server implementation and published privacy policy."
+  },
+  {
+    title:"Stories and Temporary Content",
+    subtitle:"Rules for temporary posts",
+    icon:"fa-circle-play",
+    body:"Only share stories and temporary content you are permitted to publish. Temporary display does not guarantee that other users cannot capture or copy content. Any promise that stories are automatically deleted from servers after a set period must be implemented and verified by the service before being advertised as a guarantee."
+  },
+  {
+    title:"Blue Badge Verification Policy",
+    subtitle:"Verification and badge eligibility",
+    icon:"fa-circle-check",
+    body:"A Blue Badge should be granted only after the service's verification requirements are met. Payment alone should not be represented as proof of identity unless the verification process actually establishes identity. Badge status, duration, expiry, renewal and removal should be clearly communicated. Users should not claim to be verified before the badge is approved."
+  },
+  {
+    title:"Payments and Refunds Policy",
+    subtitle:"Payment safety and manual review",
+    icon:"fa-wallet",
+    body:"Use only payment methods officially displayed by Boys vs Girls. Where manual verification is used, submit the transaction reference through the approved process and wait for an administrator's decision. Never submit card numbers, CVV, PIN or one-time passwords. Payment confirmation, badge activation, refunds, disputes and processing times must follow the service's actual payment procedures. Do not send funds to an account that has not been confirmed by the app administrator."
+  },
+  {
+    title:"Advertising Policy",
+    subtitle:"Advertising and sponsored content",
+    icon:"fa-rectangle-ad",
+    body:"Advertising may appear in supported parts of the app. Do not use advertisements to mislead users or disguise fraudulent requests. Users should exercise caution before opening external advertising links. Advertising placement, tracking and consent practices must be described accurately in the service's privacy documentation."
+  },
+  {
+    title:"Reporting and Moderation Policy",
+    subtitle:"How to report a problem",
+    icon:"fa-flag",
+    body:"When reporting a problem, include a clear description and relevant details without exposing another person's sensitive information. Reports should be reviewed through the service's available moderation process. A report form that only prepares text locally does not send a report to the server; the interface must state this clearly until a working submission endpoint is implemented."
+  },
+  {
+    title:"Impersonation and Identity Policy",
+    subtitle:"Authentic names and representation",
+    icon:"fa-id-card",
+    body:"Do not impersonate another user, public figure, organization or administrator in a way that misleads people. Do not use another person's photos or identifying details to deceive others. Verification badges must not be copied or presented as official approval when they have not been granted."
+  },
+  {
+    title:"Prohibited Activities",
+    subtitle:"Misuse of the platform",
+    icon:"fa-ban",
+    body:"Do not attempt to break into accounts, bypass access controls, manipulate engagement counts, interfere with the service, distribute malicious software, or misuse other users' information. Do not use automated activity to deceive people or artificially inflate likes, reactions, views or follows."
+  },
+  {
+    title:"Children and Age Safety",
+    subtitle:"Age-appropriate use and protection",
+    icon:"fa-child-reaching",
+    body:"Use the service only if you meet its applicable age requirements. Do not exploit, endanger or target children. The service owner should publish an age policy and reporting process that comply with applicable laws before opening the app to the public."
+  },
+  {
+    title:"Data Retention and Deletion",
+    subtitle:"Account, story and message retention",
+    icon:"fa-database",
+    body:"Data retention depends on the service's actual database, media storage and deletion jobs. Removing content from the interface does not necessarily remove every server copy or backup. Any specific promise about automatic deletion of stories, messages or account data must be supported by working server-side deletion and documented retention practices."
+  },
+  {
+    title:"Policy Updates",
+    subtitle:"Changes to these rules",
+    icon:"fa-arrows-rotate",
+    body:"Policies may need to change as Boys vs Girls adds features or meets new legal requirements. When material changes are made, the service should communicate them clearly and identify the effective date. This settings page currently provides policy summaries; it does not automatically notify users of legal changes."
+  }
+];
+
+function renderPolicies(){
+  const container=$("policyList");
+  if(!container||container.dataset.rendered==="1")return;
+  container.dataset.rendered="1";
+  container.replaceChildren();
+
+  POLICY_DATA.forEach((policy,index)=>{
+    const card=document.createElement("section");
+    card.className="policy-card";
+
+    const toggle=document.createElement("button");
+    toggle.type="button";
+    toggle.className="policy-toggle";
+    toggle.setAttribute("aria-expanded","false");
+    toggle.setAttribute("aria-controls","policy-details-"+index);
+
+    const icon=document.createElement("span");
+    icon.className="policy-icon";
+    const iconElement=document.createElement("i");
+    iconElement.className="fa-solid "+policy.icon;
+    icon.appendChild(iconElement);
+
+    const heading=document.createElement("span");
+    heading.className="policy-heading";
+    const title=document.createElement("strong");
+    title.textContent=policy.title;
+    const subtitle=document.createElement("small");
+    subtitle.textContent=policy.subtitle;
+    heading.append(title,subtitle);
+
+    const arrow=document.createElement("i");
+    arrow.className="fa-solid fa-chevron-right policy-arrow";
+    toggle.append(icon,heading,arrow);
+
+    const details=document.createElement("div");
+    details.className="policy-details";
+    details.id="policy-details-"+index;
+    details.textContent=policy.body;
+
+    toggle.addEventListener("click",()=>{
+      const opening=!card.classList.contains("open");
+      card.classList.toggle("open",opening);
+      toggle.setAttribute("aria-expanded",String(opening));
+    });
+
+    card.append(toggle,details);
+    container.appendChild(card);
+  });
+}
 
 document.querySelectorAll("[data-view]").forEach(button=>{
   button.addEventListener("click",()=>showView(button.dataset.view));
@@ -583,7 +844,6 @@ document.querySelectorAll("[data-view]").forEach(button=>{
 document.querySelectorAll("[data-page]").forEach(button=>{
   button.addEventListener("click",()=>go(button.dataset.page));
 });
-$("messengerButton").addEventListener("click",()=>go("inbox.html"));
 $("blueBadgeLink").addEventListener("click",()=>go("blue-badge.html"));
 $("supportReportButton").addEventListener("click",()=>showView("report"));
 
@@ -879,6 +1139,7 @@ document.addEventListener("keydown",event=>{
 
 document.addEventListener("DOMContentLoaded",()=>{
   loadSettings();
+  renderPolicies();
   const page=new URLSearchParams(location.search).get("page");
   if(page&&$(page+"View"))showView(page);
 });
