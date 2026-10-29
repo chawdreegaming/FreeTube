@@ -22,11 +22,8 @@
 }
 *{box-sizing:border-box}
 body{
-  margin:0;
-  min-height:100vh;
-  background:
-    radial-gradient(circle at top left,#17365d,transparent 38%),
-    var(--bg);
+  margin:0;min-height:100vh;
+  background:radial-gradient(circle at top left,#17365d,transparent 38%),var(--bg);
   color:var(--text);
   font:15px/1.55 system-ui,-apple-system,sans-serif;
 }
@@ -47,15 +44,15 @@ h2{font-size:20px;margin:0 0 14px}
 h3{font-size:16px;margin:0 0 8px}
 .muted{color:var(--muted)}
 .small{font-size:12px}
-button,input,select,textarea{font:inherit}
-button{
+button{font:inherit}
+button,.button{
+  display:inline-flex;justify-content:center;align-items:center;
   border:0;border-radius:10px;padding:11px 14px;
-  background:var(--blue);color:#fff;font-weight:750;cursor:pointer
+  background:var(--blue);color:#fff;font-weight:750;cursor:pointer;
+  text-decoration:none
 }
-button.secondary{background:#263a56;border:1px solid #3b5272}
-button.danger{background:#a82d48}
+button.secondary,.button.secondary{background:#263a56;border:1px solid #3b5272}
 button:disabled{opacity:.5;cursor:not-allowed}
-a{text-decoration:none;color:inherit}
 .card{
   padding:17px;margin:14px 0;border:1px solid var(--line);
   border-radius:18px;background:linear-gradient(155deg,#13243a,#0d192b)
@@ -63,18 +60,19 @@ a{text-decoration:none;color:inherit}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .field{margin:12px 0}
 label{display:block;margin-bottom:6px;font-size:13px;color:#cbd7e8}
-input,select,textarea{
+input,textarea{
   width:100%;padding:11px 12px;border:1px solid #30435e;
-  border-radius:10px;background:#081426;color:var(--text);outline:none
+  border-radius:10px;background:#081426;color:var(--text);outline:none;
+  font:inherit
 }
 textarea{resize:vertical;min-height:120px}
-input:focus,select:focus,textarea:focus{border-color:var(--blue)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+input:focus,textarea:focus{border-color:var(--blue)}
 .notice{
   display:none;padding:12px 14px;margin:12px 0;
   border-radius:11px;background:#42232c;color:#ffd5dc;overflow-wrap:anywhere
 }
 .notice.success{background:#103c32;color:#b4ffe2}
+.notice.info{background:#182f4b;color:#d8e8ff}
 .pill{display:inline-block;padding:4px 9px;border-radius:999px;background:#263952;font-size:12px}
 .list{display:grid;gap:10px}
 .item{padding:14px;border:1px solid var(--line);border-radius:13px;background:#0a1729;overflow-wrap:anywhere}
@@ -87,7 +85,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--blue)}
 .preview-title{font-weight:800;font-size:17px}
 .preview-body{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px}
 footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
-@media(max-width:650px){.grid{grid-template-columns:1fr}.container{padding:16px 11px 35px}}
+@media(max-width:650px){
+  .container{padding:16px 11px 35px}
+  header .row{width:100%}
+  header .row>*{flex:1}
+}
 </style>
 </head>
 
@@ -100,101 +102,60 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
     <div>
       <div class="eyebrow">BOYS VS GIRLS / ADMIN</div>
       <h1>Notification Management</h1>
-      <div class="muted small">Compose and manage app notifications</div>
+      <div class="muted small">Compose and manage app notices</div>
     </div>
   </div>
 
   <div class="row">
-    <a href="admin.html">
-      <button type="button" class="secondary">← Dashboard</button>
-    </a>
+    <a class="button secondary" href="admin.html">← Dashboard</a>
     <button type="button" class="secondary" id="refreshBtn">Refresh</button>
   </div>
 </header>
 
-<div id="notice" class="notice" role="status"></div>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
 
 <section class="card">
   <div class="item-top">
     <div>
       <h2>Admin Access</h2>
       <p class="muted small">
-        Uses the existing freetube_access_token saved in this browser.
-        Only an authorized admin should send notifications.
+        This page uses the token saved automatically when you log in to
+        the main app. Only an authorized admin can manage notices.
       </p>
     </div>
-    <button type="button" class="secondary" id="tokenBtn">Set Token</button>
+    <span class="pill" id="adminBadge">Checking...</span>
   </div>
-  <div id="connection" class="muted small">Checking token...</div>
+  <div id="connection" class="muted small">Verifying your account...</div>
 </section>
 
 <section class="card">
-  <h2>Compose Notification</h2>
+  <h2>Compose Notice</h2>
+
+  <p class="muted small">
+    Sending a notice broadcasts it to all active users. Review your message
+    carefully before sending.
+  </p>
 
   <form id="notificationForm">
     <div class="field">
-      <label for="recipient">Recipient</label>
-      <select id="recipient" name="recipient" required>
-        <option value="all">All users</option>
-        <option value="user">A specific user</option>
-      </select>
-    </div>
-
-    <div class="field" id="userField" hidden>
-      <label for="userId">User ID or username</label>
-      <input
-        id="userId"
-        name="userId"
-        maxlength="160"
-        placeholder="Enter the target user ID"
-      >
-      <p class="muted small">
-        Enter a user ID only if your backend's notification endpoint
-        accepts this recipient format.
-      </p>
-    </div>
-
-    <div class="grid">
-      <div class="field">
-        <label for="type">Notification Type</label>
-        <select id="type" name="type" required>
-          <option value="announcement">Announcement</option>
-          <option value="system">System</option>
-          <option value="account">Account</option>
-          <option value="blue_badge">Blue Badge</option>
-          <option value="security">Security</option>
-          <option value="update">App Update</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="priority">Priority</label>
-        <select id="priority" name="priority">
-          <option value="normal">Normal</option>
-          <option value="important">Important</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="field">
-      <label for="title">Notification Title</label>
+      <label for="title">Notice Title</label>
       <input
         id="title"
         name="title"
         maxlength="160"
         required
-        placeholder="Enter notification title"
+        placeholder="Enter notice title"
       >
     </div>
 
     <div class="field">
-      <label for="body">Notification Message</label>
+      <label for="body">Notice Message</label>
       <textarea
         id="body"
         name="body"
         maxlength="3000"
         required
-        placeholder="Write your notification message..."
+        placeholder="Write your notice message..."
       ></textarea>
       <div class="muted small">
         <span id="charCount">0</span>/3000 characters
@@ -203,20 +164,20 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 
     <div class="preview">
       <div class="muted small">LIVE PREVIEW</div>
-      <div class="preview-title" id="previewTitle">Notification title</div>
-      <div class="preview-body" id="previewBody">Your notification message will appear here.</div>
+      <div class="preview-title" id="previewTitle">Notice title</div>
+      <div class="preview-body" id="previewBody">Your notice message will appear here.</div>
       <div style="margin-top:10px">
-        <span class="pill" id="previewType">Announcement</span>
+        <span class="pill">Admin Notice · All Active Users</span>
       </div>
     </div>
 
     <p class="muted small">
-      Sending a notification may immediately reach users. Check the
-      recipient and message before submitting.
+      The server sends this notice to all active users. Do not include
+      passwords, access tokens, private information, or payment secrets.
     </p>
 
     <div class="row">
-      <button id="sendBtn" type="submit">Send Notification</button>
+      <button id="sendBtn" type="submit" disabled>Send Notice to All Users</button>
       <button id="clearBtn" class="secondary" type="button">Clear Form</button>
     </div>
   </form>
@@ -225,22 +186,24 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 <section class="card">
   <div class="item-top">
     <div>
-      <h2>Notification History</h2>
+      <h2>Notice History</h2>
       <p class="muted small">
-        Loads history only if the backend provides a compatible admin endpoint.
+        Displays the latest notices returned by the server.
       </p>
     </div>
-    <button type="button" id="historyBtn">Load History</button>
+    <button type="button" id="historyBtn" class="secondary" disabled>
+      Load History
+    </button>
   </div>
 
   <div id="history" class="list">
-    <div class="empty">Click Load History to view available records.</div>
+    <div class="empty">Verifying admin access...</div>
   </div>
 </section>
 
 <footer>
   Boys vs Girls 💙💗 — Notification Management<br>
-  This page requires server-side admin authorization. Never share your access token.
+  Admin access is verified by the backend. Never share your access token.
 </footer>
 
 </main>
@@ -251,127 +214,233 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 
 const API = "https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY = "freetube_access_token";
+
 const $ = id => document.getElementById(id);
 
-function token(){
+let adminVerified = false;
+let latestRequest = 0;
+let historyLoaded = false;
+
+function getToken(){
   return localStorage.getItem(TOKEN_KEY) || "";
 }
 
-function esc(value){
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#39;"
-  }[char]));
-}
-
-function showNotice(message, success){
+function showNotice(message, type){
   const el = $("notice");
   el.textContent = message;
-  el.className = "notice" + (success ? " success" : "");
+  el.className = "notice" + (type ? " " + type : "");
   el.style.display = "block";
-  el.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
-function updateConnection(){
-  $("connection").textContent = token()
-    ? "An access token is saved in this browser."
-    : "No access token is saved.";
+function setAccess(allowed, message){
+  adminVerified = allowed;
+
+  $("sendBtn").disabled = !allowed;
+  $("historyBtn").disabled = !allowed;
+  $("adminBadge").textContent = allowed ? "Admin Verified" : "Not Verified";
+  $("connection").textContent = message;
 }
 
 async function api(path, options){
   options = options || {};
-  const headers = Object.assign({}, options.headers || {});
+  const headers = Object.assign(
+    {"Accept":"application/json"},
+    options.headers || {}
+  );
 
-  if(token()){
-    headers.Authorization = "Bearer " + token();
+  const currentToken = getToken();
+
+  if(currentToken){
+    headers.Authorization = "Bearer " + currentToken;
   }
 
-  if(options.body && !headers["Content-Type"]){
+  if(options.body){
     headers["Content-Type"] = "application/json";
   }
 
   const response = await fetch(API + path, {
     ...options,
-    headers
+    headers,
+    cache: "no-store"
   });
 
   const data = await response.json().catch(() => ({}));
 
   if(!response.ok){
-    throw new Error(
-      data.error || data.message || ("Request failed: " + response.status)
+    const error = new Error(
+      data.error || data.message || ("HTTP " + response.status)
     );
+    error.status = response.status;
+    throw error;
   }
 
   return data;
 }
 
+async function verifyAdmin(){
+  const requestId = ++latestRequest;
+
+  setAccess(false, "Checking login and administrator permissions...");
+  $("history").innerHTML =
+    '<div class="empty">Verifying your admin account...</div>';
+
+  const currentToken = getToken();
+
+  if(!currentToken){
+    setAccess(
+      false,
+      "No saved login found. Log in to the main app with your admin account, then return here."
+    );
+    $("history").innerHTML =
+      '<div class="empty">Please log in to the main app first.</div>';
+    return false;
+  }
+
+  try{
+    await api("/auth/me");
+
+    if(requestId !== latestRequest) return false;
+
+    await api("/admin/dashboard");
+
+    if(requestId !== latestRequest) return false;
+
+    setAccess(true, "Login and administrator permissions verified by the server.");
+    return true;
+
+  }catch(error){
+    if(requestId !== latestRequest) return false;
+
+    if(error.status === 401){
+      setAccess(
+        false,
+        "Your login session is invalid or expired. Log in again to the main app."
+      );
+    }else if(error.status === 403){
+      setAccess(
+        false,
+        "This account does not have administrator permission. Check the server's ADMIN_EMAIL and account role."
+      );
+    }else{
+      setAccess(
+        false,
+        "Could not verify admin access. Check your internet connection and the backend service."
+      );
+    }
+
+    $("history").innerHTML =
+      '<div class="empty">Admin verification is required before notices can be managed.</div>';
+
+    return false;
+  }
+}
+
 function updatePreview(){
   $("previewTitle").textContent =
-    $("title").value.trim() || "Notification title";
+    $("title").value.trim() || "Notice title";
 
   $("previewBody").textContent =
-    $("body").value.trim() || "Your notification message will appear here.";
-
-  $("previewType").textContent =
-    $("type").options[$("type").selectedIndex].text;
+    $("body").value.trim() || "Your notice message will appear here.";
 
   $("charCount").textContent = $("body").value.length;
 }
 
-$("recipient").addEventListener("change", function(){
-  const specific = this.value === "user";
-  $("userField").hidden = !specific;
-  $("userId").required = specific;
-});
-
 $("title").addEventListener("input", updatePreview);
 $("body").addEventListener("input", updatePreview);
-$("type").addEventListener("change", updatePreview);
-
-$("tokenBtn").addEventListener("click", function(){
-  const value = prompt(
-    "Paste your existing access token. Keep it private.",
-    token()
-  );
-
-  if(value === null) return;
-
-  if(value.trim()){
-    localStorage.setItem(TOKEN_KEY, value.trim());
-  }else{
-    localStorage.removeItem(TOKEN_KEY);
-  }
-
-  updateConnection();
-  showNotice("Local token setting updated.", true);
-});
 
 $("clearBtn").addEventListener("click", function(){
-  if(!confirm("Clear the notification form?")) return;
-
   $("notificationForm").reset();
-  $("userField").hidden = true;
-  $("userId").required = false;
   updatePreview();
+  showNotice("Form cleared.", "info");
 });
+
+async function loadHistory(){
+  if(!adminVerified){
+    showNotice("Verify admin access before loading notice history.", "");
+    return;
+  }
+
+  $("history").innerHTML =
+    '<div class="empty">Loading notice history...</div>';
+
+  $("historyBtn").disabled = true;
+
+  try{
+    const data = await api("/admin/notices");
+    const items = Array.isArray(data.notices) ? data.notices : [];
+    const root = $("history");
+
+    root.replaceChildren();
+
+    if(!items.length){
+      root.innerHTML =
+        '<div class="empty">No notices have been returned by the server.</div>';
+      historyLoaded = true;
+      return;
+    }
+
+    items.forEach(function(item){
+      const card = document.createElement("article");
+      card.className = "item";
+
+      const top = document.createElement("div");
+      top.className = "item-top";
+
+      const title = document.createElement("h3");
+      title.textContent = item.title || "Admin Notice";
+
+      const badge = document.createElement("span");
+      badge.className = "pill";
+      badge.textContent = "Admin Notice";
+
+      top.append(title, badge);
+
+      const body = document.createElement("p");
+      body.style.whiteSpace = "pre-wrap";
+      body.textContent = item.body || "";
+
+      const date = document.createElement("div");
+      date.className = "muted small";
+
+      const rawDate = item.created_at;
+      let dateText = "Date not provided";
+
+      if(rawDate){
+        const parsedDate = new Date(rawDate);
+        if(!Number.isNaN(parsedDate.getTime())){
+          dateText = parsedDate.toLocaleString();
+        }
+      }
+
+      date.textContent = "Created: " + dateText;
+
+      card.append(top, body, date);
+      root.appendChild(card);
+    });
+
+    historyLoaded = true;
+
+  }catch(error){
+    $("history").innerHTML = "";
+
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent =
+      error.status === 401 || error.status === 403
+        ? "Access denied. Refresh and verify your admin account."
+        : "Could not load notice history: " + error.message;
+
+    $("history").appendChild(empty);
+  }finally{
+    $("historyBtn").disabled = !adminVerified;
+  }
+}
 
 $("notificationForm").addEventListener("submit", async function(event){
   event.preventDefault();
 
-  if(!token()){
-    showNotice("Please set your existing admin access token first.", false);
-    return;
-  }
-
-  const recipient = $("recipient").value;
-  const userId = $("userId").value.trim();
-
-  if(recipient === "user" && !userId){
-    showNotice("Enter a user ID for a specific recipient.", false);
+  if(!adminVerified){
+    showNotice("Admin verification is required before sending a notice.", "");
     return;
   }
 
@@ -379,32 +448,15 @@ $("notificationForm").addEventListener("submit", async function(event){
   const body = $("body").value.trim();
 
   if(!title || !body){
-    showNotice("Enter both a title and a message.", false);
+    showNotice("Enter both the notice title and message.", "");
     return;
   }
 
-  const payload = {
-    title: title,
-    message: body,
-    type: $("type").value,
-    priority: $("priority").value
-  };
+  const confirmed = confirm(
+    "Send this notice to ALL active users? This action may notify users immediately."
+  );
 
-  if(recipient === "all"){
-    payload.recipient = "all";
-    payload.broadcast = true;
-  }else{
-    payload.recipient = "user";
-    payload.user_id = userId;
-  }
-
-  if(!confirm(
-    recipient === "all"
-      ? "Send this notification to ALL users?"
-      : "Send this notification to the selected user?"
-  )){
-    return;
-  }
+  if(!confirmed) return;
 
   const button = $("sendBtn");
   button.disabled = true;
@@ -412,87 +464,83 @@ $("notificationForm").addEventListener("submit", async function(event){
 
   try{
     /*
-      This endpoint and payload must match your backend.
-      The route is intentionally not guessed: a failed request
-      will show the server response instead of claiming success.
+      Backend-confirmed route:
+      POST /api/admin/notices
+      Body: { title, body }
+
+      The server broadcasts this notice to active users.
     */
-    const result = await api("/admin/notifications", {
+    const result = await api("/admin/notices", {
       method: "POST",
-      body: JSON.stringify(payload)
+      body: JSON.stringify({title, body})
     });
 
-    showNotice(
-      result.message || "The server accepted the notification request.",
-      true
-    );
+    if(result.notified !== true){
+      showNotice(
+        "The server accepted the request, but did not confirm that users were notified. Check the server response.",
+        ""
+      );
+    }else{
+      showNotice(
+        "Notice created successfully. The server confirmed that notifications were sent to active users.",
+        "success"
+      );
 
-    await loadHistory();
-
-  }catch(error){
-    showNotice(
-      "Notification was not confirmed. Check whether your backend supports POST /api/admin/notifications and the expected payload. Server response: " + error.message,
-      false
-    );
-  }finally{
-    button.disabled = false;
-    button.textContent = "Send Notification";
-  }
-});
-
-async function loadHistory(){
-  $("history").innerHTML =
-    '<div class="empty">Loading notification history...</div>';
-
-  try{
-    const data = await api("/admin/notifications");
-    const items = Array.isArray(data)
-      ? data
-      : (data.notifications || data.items || data.results || []);
-
-    const root = $("history");
-    root.innerHTML = "";
-
-    if(!items.length){
-      root.innerHTML =
-        '<div class="empty">No notification history was returned.</div>';
-      return;
+      $("notificationForm").reset();
+      updatePreview();
+      await loadHistory();
     }
 
-    items.forEach(item => {
-      const card = document.createElement("article");
-      card.className = "item";
-
-      card.innerHTML = `
-        <div class="item-top">
-          <h3>${esc(item.title || "Notification")}</h3>
-          <span class="pill">${esc(item.type || "general")}</span>
-        </div>
-        <p style="white-space:pre-wrap">${esc(item.message || item.body || "")}</p>
-        <div class="muted small">
-          Recipient: ${esc(item.recipient || item.user_id || "not provided")}
-          · Status: ${esc(item.status || "not provided")}
-          · Date: ${esc(item.created_at || item.createdAt || "not provided")}
-        </div>
-      `;
-
-      root.appendChild(card);
-    });
-
   }catch(error){
-    $("history").innerHTML =
-      '<div class="empty">Could not load history. Check whether your backend supports GET /api/admin/notifications. ' +
-      esc(error.message) + '</div>';
-  }
-}
+    if(error.status === 401 || error.status === 403){
+      setAccess(
+        false,
+        "The server denied this request. Please verify your login and admin permissions."
+      );
+    }
 
-$("historyBtn").addEventListener("click", loadHistory);
-$("refreshBtn").addEventListener("click", function(){
-  updateConnection();
-  loadHistory();
+    showNotice(
+      "Notice sending failed: " + error.message,
+      ""
+    );
+
+  }finally{
+    button.textContent = "Send Notice to All Users";
+    button.disabled = !adminVerified;
+  }
 });
 
-updateConnection();
+$("historyBtn").addEventListener("click", loadHistory);
+
+$("refreshBtn").addEventListener("click", async function(){
+  $("refreshBtn").disabled = true;
+  $("refreshBtn").textContent = "Checking...";
+
+  try{
+    const valid = await verifyAdmin();
+
+    if(valid){
+      await loadHistory();
+      showNotice("Admin access refreshed.", "success");
+    }else{
+      showNotice(
+        "Admin access could not be verified. See the access status above.",
+        ""
+      );
+    }
+  }finally{
+    $("refreshBtn").disabled = false;
+    $("refreshBtn").textContent = "Refresh";
+  }
+});
+
 updatePreview();
+
+verifyAdmin().then(function(valid){
+  if(valid){
+    loadHistory();
+  }
+});
 
 })();
 </script>
