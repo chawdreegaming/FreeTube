@@ -1,374 +1,594 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="bn">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#07111f">
-<title>Admin Dashboard — Boys vs Girls</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10111b">
+  <title>Admin Dashboard - Boys vs Girls</title>
 
-<style>
-:root {
-  color-scheme: dark;
-  --bg: #07111f;
-  --card: #101e32;
-  --line: #293d59;
-  --text: #f3f7ff;
-  --muted: #9fb0c8;
-  --blue: #4b8dff;
-  --green: #30c997;
-  --purple: #a78bfa;
-  --orange: #ffad66;
-}
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #10111b;
+      --card: #1a1c2b;
+      --border: #303247;
+      --text: #f4f5ff;
+      --muted: #a4a8c0;
+      --primary: #7865ff;
+      --primary-hover: #6550ed;
+      --success: #39d98a;
+      --danger: #ff647c;
+      --warning: #ffc857;
+    }
 
-* { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
-body {
-  margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, #17365d, transparent 40%),
-    radial-gradient(circle at bottom right, #24204b, transparent 35%),
-    var(--bg);
-  color: var(--text);
-  font: 15px/1.55 system-ui, sans-serif;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top right, #242044 0, transparent 35%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, "Noto Sans Bengali", sans-serif;
+    }
 
-.wrap {
-  max-width: 1400px;
-  margin: auto;
-  padding: 24px 18px 35px;
-}
+    button,
+    a {
+      font: inherit;
+    }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 18px;
-  flex-wrap: wrap;
-  margin-bottom: 22px;
-}
+    .container {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 24px 18px 40px;
+    }
 
-.brand { display: flex; align-items: center; gap: 14px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
 
-.logo {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #4b8dff, #a78bfa);
-  font-size: 20px;
-  font-weight: 900;
-  box-shadow: 0 8px 25px #4b8dff30;
-}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
 
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: 2px;
-  color: var(--muted);
-  font-weight: 800;
-}
+    .logo {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #7865ff, #e64b98);
+      font-size: 25px;
+      font-weight: bold;
+    }
 
-h1 {
-  margin: 3px 0;
-  font-size: clamp(25px, 4vw, 35px);
-  line-height: 1.2;
-}
+    h1 {
+      margin: 0;
+      font-size: clamp(22px, 4vw, 30px);
+    }
 
-.subtitle { margin: 5px 0 0; color: var(--muted); }
+    .subtitle {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 6px;
+    }
 
-.header-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-button {
-  padding: 10px 14px;
-  border: 1px solid #3b5272;
-  border-radius: 11px;
-  background: #263a56;
-  color: white;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
+    .btn {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
 
-button:hover, .card-link:hover { filter: brightness(1.12); }
+    .btn:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+    }
 
-.status {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
-  color: var(--muted);
-  font-size: 13px;
-}
+    .btn:disabled {
+      opacity: .6;
+      cursor: wait;
+      transform: none;
+    }
 
-.dot { width: 9px; height: 9px; border-radius: 50%; background: #ff7185; }
+    .status-panel {
+      padding: 18px;
+      margin-bottom: 26px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(26, 28, 43, .94);
+    }
 
-.cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
-}
+    .status-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 9px;
+      font-size: 17px;
+      font-weight: 700;
+    }
 
-.card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 300px;
-  padding: 21px;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 22px;
-  background: linear-gradient(155deg, #142740, #0d192b);
-  box-shadow: 0 16px 40px #0002;
-}
+    .status-dot {
+      width: 11px;
+      height: 11px;
+      flex: 0 0 11px;
+      border-radius: 50%;
+      background: var(--warning);
+    }
 
-.card::after {
-  content: "";
-  position: absolute;
-  top: -65px;
-  right: -65px;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: .12;
-  pointer-events: none;
-}
+    .status-dot.success {
+      background: var(--success);
+      box-shadow: 0 0 10px #39d98a55;
+    }
 
-.app { --accent: var(--blue); --icon-bg: #1c3c68; }
-.badge { --accent: var(--green); --icon-bg: #164a46; }
-.notifications { --accent: var(--purple); --icon-bg: #3c2c63; }
-.moderators { --accent: var(--orange); --icon-bg: #593a28; }
+    .status-dot.error {
+      background: var(--danger);
+    }
 
-.icon {
-  display: grid;
-  place-items: center;
-  width: 54px;
-  height: 54px;
-  flex: 0 0 auto;
-  margin-bottom: 16px;
-  border-radius: 17px;
-  background: var(--icon-bg);
-  color: var(--accent);
-}
+    #statusMessage {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      overflow-wrap: anywhere;
+    }
 
-.icon svg {
-  width: 28px;
-  height: 28px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+    .status-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
 
-.card h2 { margin: 0 0 9px; font-size: 19px; line-height: 1.3; }
+    .pill {
+      display: inline-flex;
+      padding: 6px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+    }
 
-.card p { flex: 1; margin: 0 0 20px; color: var(--muted); }
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 20px;
+    }
 
-.card-link {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7px;
-  padding: 11px 12px;
-  border-radius: 12px;
-  background: var(--accent);
-  color: #07111f;
-  font-weight: 850;
-  text-decoration: none;
-  text-align: center;
-  font-size: 13px;
-}
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
 
-.message {
-  display: none;
-  padding: 12px;
-  margin-bottom: 16px;
-  border: 1px solid #395477;
-  border-radius: 12px;
-  background: #122640;
-  overflow-wrap: anywhere;
-}
+    .card {
+      display: flex;
+      flex-direction: column;
+      min-height: 215px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      background: linear-gradient(145deg, #1c1e2e, #171927);
+      transition: border-color .2s, transform .2s;
+    }
 
-.footer {
-  margin-top: 22px;
-  padding-top: 14px;
-  border-top: 1px solid #263a53;
-  color: var(--muted);
-  font-size: 12px;
-}
+    .card:hover {
+      border-color: #7865ff99;
+      transform: translateY(-3px);
+    }
 
-.footer p { margin: 4px 0; }
+    .card-icon {
+      width: 49px;
+      height: 49px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      background: #7865ff22;
+      font-size: 25px;
+      margin-bottom: 15px;
+    }
 
-a:focus-visible, button:focus-visible {
-  outline: 3px solid white;
-  outline-offset: 3px;
-}
+    .card h3 {
+      margin: 0 0 9px;
+      font-size: 18px;
+    }
 
-/* Four cards on one row on wide screens */
-@media (max-width: 1050px) {
-  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .card { min-height: 260px; }
-}
+    .card p {
+      margin: 0 0 20px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
 
-/* Keep a compact two-column grid on phones */
-@media (max-width: 520px) {
-  .wrap { padding: 16px 12px 26px; }
-  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-  .card { min-height: 270px; padding: 14px; border-radius: 17px; }
-  .card h2 { font-size: 16px; }
-  .card p { font-size: 13px; }
-  .card-link { font-size: 12px; padding: 10px 8px; }
-  .logo { width: 48px; height: 48px; border-radius: 15px; }
-  .brand { gap: 10px; }
-  .header-actions button { padding: 9px 10px; font-size: 13px; }
-}
-</style>
+    .card .btn {
+      margin-top: auto;
+      align-self: flex-start;
+    }
+
+    .card .btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 650px) {
+      .container {
+        padding: 18px 13px 30px;
+      }
+
+      header {
+        align-items: flex-start;
+      }
+
+      .header-actions {
+        width: 100%;
+      }
+
+      .header-actions .btn {
+        flex: 1;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 13px;
+      }
+
+      .card {
+        min-height: 195px;
+      }
+    }
+  </style>
 </head>
 
 <body>
-<main class="wrap">
-  <header class="header">
-    <div class="brand">
-      <div class="logo">BvG</div>
-      <div>
-        <div class="eyebrow">BOYS VS GIRLS</div>
-        <h1>Admin Dashboard</h1>
-        <p class="subtitle">Select a management section below.</p>
+  <main class="container">
+
+    <header>
+      <div class="brand">
+        <div class="logo">B♡G</div>
+        <div>
+          <h1>Admin Dashboard</h1>
+          <div class="subtitle">Boys vs Girls · Administration Panel</div>
+        </div>
       </div>
-    </div>
 
-    <div class="header-actions">
-      <button type="button" id="tokenButton">Set Admin Token</button>
-      <button type="button" id="refreshButton">Refresh</button>
-    </div>
-  </header>
-
-  <div class="message" id="message" role="status"></div>
-
-  <div class="status">
-    <span class="dot" id="statusDot"></span>
-    <span id="statusText">Checking access token...</span>
-  </div>
-
-  <section class="cards">
-    <!-- CARD 1: APP MANAGEMENT -->
-    <article class="card app">
-      <div class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
-          <rect x="14" y="14" width="7" height="7" rx="1.5"/>
-        </svg>
+      <div class="header-actions">
+        <button id="refreshButton" class="btn" type="button">
+          ↻ Refresh
+        </button>
       </div>
-      <h2>App Management</h2>
-      <p>Manage users, posts, reports and the main administration features of your app.</p>
-      <a class="card-link" href="admin-app.html">Open App Management <span>→</span></a>
-    </article>
+    </header>
 
-    <!-- CARD 2: BLUE BADGE MANAGEMENT -->
-    <article class="card badge">
-      <div class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 3l2.5 1.7 3-.1.9 2.9 2.2 2-1.2 2.8.4 3-2.6 1.5-1.4 2.7-3-.5-2.8 1.1-2.2-2-3-.7-.3-3-1.9-2.3 1.4-2.7.1-3 2.8-1.2L9 3.8z"/>
-          <path d="m8.5 12 2.2 2.2 4.8-5"/>
-        </svg>
+    <section class="status-panel" aria-live="polite">
+      <div class="status-heading">
+        <span id="statusDot" class="status-dot"></span>
+        <span id="statusTitle">অ্যাকাউন্ট যাচাই হচ্ছে...</span>
       </div>
-      <h2>Blue Badge Management</h2>
-      <p>Configure payment methods and prices, review payment references, and approve or reject Blue Badge applications.</p>
-      <a class="card-link" href="admin-payments.html">Open Blue Badge <span>→</span></a>
-    </article>
 
-    <!-- CARD 3: NOTIFICATION MANAGEMENT -->
-    <article class="card notifications">
-      <div class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
-          <path d="M10 21h4"/>
-        </svg>
+      <div id="statusMessage">
+        আপনার লগইন ও অ্যাডমিন অনুমতি যাচাই করা হচ্ছে। অপেক্ষা করুন।
       </div>
-      <h2>Notification Management</h2>
-      <p>Send notifications to users, compose messages, choose recipients and review notification history.</p>
-      <a class="card-link" href="admin-notifications.html">Open Notifications <span>→</span></a>
-    </article>
 
-    <!-- CARD 4: MODERATOR MANAGEMENT -->
-    <article class="card moderators">
-      <div class="icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"/>
-          <circle cx="9.5" cy="7" r="4"/>
-          <path d="m16 11 2 2 4-4"/>
-          <path d="M16 3.5a4 4 0 0 1 0 7.5"/>
-        </svg>
+      <div class="status-meta">
+        <span class="pill" id="loginStatus">Login: Checking</span>
+        <span class="pill" id="adminStatus">Admin: Checking</span>
       </div>
-      <h2>Moderator Management</h2>
-      <p>Manage moderators, assign moderation permissions and review their access to community safety tools.</p>
-      <a class="card-link" href="admin-moderator.html">Open Moderators <span>→</span></a>
-    </article>
-  </section>
+    </section>
 
-  <footer class="footer">
-    <p>Admin Dashboard · Boys vs Girls 💙💗</p>
-    <p>Keep your access token private. The backend must verify admin permissions for protected actions.</p>
-  </footer>
-</main>
+    <h2 class="section-title">Management Center</h2>
 
-<script>
-(function () {
-  "use strict";
+    <section class="grid">
 
-  const TOKEN_KEY = "freetube_access_token";
+      <article class="card">
+        <div class="card-icon">⚙️</div>
+        <h3>App Management</h3>
+        <p>
+          অ্যাপের ব্যবহারকারী, পোস্ট এবং অন্যান্য প্রশাসনিক কাজ পরিচালনা করুন।
+        </p>
+        <a class="btn admin-link" href="admin-app.html">
+          Manage App →
+        </a>
+      </article>
 
-  const $ = function (id) {
-    return document.getElementById(id);
-  };
+      <article class="card">
+        <div class="card-icon">💙</div>
+        <h3>Blue Badge Management</h3>
+        <p>
+          Blue Badge আবেদন, পেমেন্ট রেফারেন্স এবং ম্যানুয়াল ভেরিফিকেশন পরিচালনা করুন।
+        </p>
+        <a class="btn admin-link" href="admin-payments.html">
+          Manage Payments →
+        </a>
+      </article>
 
-  function showMessage(text) {
-    const box = $("message");
-    box.textContent = text;
-    box.style.display = "block";
-  }
+      <article class="card">
+        <div class="card-icon">🔔</div>
+        <h3>Notification Management</h3>
+        <p>
+          ব্যবহারকারীদের জন্য অ্যাডমিন নোটিশ তৈরি ও প্রকাশ করুন।
+        </p>
+        <a class="btn admin-link" href="admin-notifications.html">
+          Manage Notices →
+        </a>
+      </article>
 
-  function refreshStatus() {
-    const savedToken = localStorage.getItem(TOKEN_KEY) || "";
+      <article class="card">
+        <div class="card-icon">🛡️</div>
+        <h3>Moderator Management</h3>
+        <p>
+          মডারেশন, রিপোর্ট এবং অনুমোদনের জন্য নির্ধারিত কাজ পরিচালনা করুন।
+        </p>
+        <a class="btn admin-link" href="admin-moderator.html">
+          Manage Moderation →
+        </a>
+      </article>
 
-    $("statusText").textContent = savedToken
-      ? "An access token is saved in this browser."
-      : "No access token is saved in this browser.";
+    </section>
 
-    $("statusDot").style.background = savedToken ? "#30c997" : "#ff7185";
-    $("message").style.display = "none";
-  }
+    <footer class="footer">
+      <div><strong>Boys vs Girls 💙💗</strong></div>
+      <div>Secure Admin Dashboard</div>
+      <div>শুধুমাত্র অনুমোদিত অ্যাডমিন অ্যাকাউন্ট ব্যবহার করতে পারবে।</div>
+    </footer>
 
-  $("tokenButton").addEventListener("click", function () {
-    const currentToken = localStorage.getItem(TOKEN_KEY) || "";
-    const value = prompt(
-      "Paste your existing access token. Do not share it with anyone.",
-      currentToken
-    );
+  </main>
 
-    if (value === null) return;
+  <script>
+    "use strict";
 
-    if (!value.trim()) {
-      localStorage.removeItem(TOKEN_KEY);
-      refreshStatus();
-      showMessage("The local access token was cleared.");
-      return;
+    const API_BASE = "https://freetube-backend-a222.onrender.com/api";
+
+    const TOKEN_KEY = "freetube_access_token";
+
+    const refreshButton = document.getElementById("refreshButton");
+    const statusDot = document.getElementById("statusDot");
+    const statusTitle = document.getElementById("statusTitle");
+    const statusMessage = document.getElementById("statusMessage");
+    const loginStatus = document.getElementById("loginStatus");
+    const adminStatus = document.getElementById("adminStatus");
+    const adminLinks = document.querySelectorAll(".admin-link");
+
+    let requestNumber = 0;
+
+    function setStatus(type, title, message) {
+      statusDot.className = "status-dot";
+
+      if (type === "success") {
+        statusDot.classList.add("success");
+      } else if (type === "error") {
+        statusDot.classList.add("error");
+      }
+
+      statusTitle.textContent = title;
+      statusMessage.textContent = message;
     }
 
-    localStorage.setItem(TOKEN_KEY, value.trim());
-    refreshStatus();
-    showMessage("Token saved in this browser. Your backend must still verify admin access.");
-  });
+    function setLoginStatus(value) {
+      loginStatus.textContent = "Login: " + value;
+    }
 
-  $("refreshButton").addEventListener("click", refreshStatus);
-  refreshStatus();
-})();
-</script>
+    function setAdminStatus(value) {
+      adminStatus.textContent = "Admin: " + value;
+    }
+
+    function setAdminLinksEnabled(enabled) {
+      adminLinks.forEach(function (link) {
+        if (enabled) {
+          link.removeAttribute("aria-disabled");
+          link.style.pointerEvents = "";
+          link.style.opacity = "";
+          link.removeAttribute("tabindex");
+        } else {
+          link.setAttribute("aria-disabled", "true");
+          link.style.pointerEvents = "none";
+          link.style.opacity = "0.45";
+          link.setAttribute("tabindex", "-1");
+        }
+      });
+    }
+
+    async function apiRequest(path, token) {
+      const response = await fetch(API_BASE + path, {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Accept": "application/json"
+        },
+        cache: "no-store"
+      });
+
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch (error) {
+        data = {};
+      }
+
+      return {
+        ok: response.ok,
+        status: response.status,
+        data: data
+      };
+    }
+
+    async function refreshStatus() {
+      const currentRequest = ++requestNumber;
+
+      refreshButton.disabled = true;
+      refreshButton.textContent = "⏳ Checking...";
+      setAdminLinksEnabled(false);
+
+      try {
+        const token = localStorage.getItem(TOKEN_KEY);
+
+        if (!token) {
+          setLoginStatus("Not logged in");
+          setAdminStatus("Not verified");
+
+          setStatus(
+            "error",
+            "লগইন প্রয়োজন",
+            "প্রথমে মূল Boys vs Girls অ্যাপে আপনার অ্যাডমিন অ্যাকাউন্ট দিয়ে লগইন করুন। লগইন সফল হলে এই পেজে ফিরে Refresh চাপুন।"
+          );
+
+          return;
+        }
+
+        setStatus(
+          "loading",
+          "অ্যাকাউন্ট যাচাই হচ্ছে...",
+          "আপনার লগইন এবং অ্যাডমিন অনুমতি সার্ভার থেকে যাচাই করা হচ্ছে।"
+        );
+
+        setLoginStatus("Checking");
+        setAdminStatus("Checking");
+
+        const meResult = await apiRequest("/auth/me", token);
+
+        if (currentRequest !== requestNumber) return;
+
+        if (!meResult.ok) {
+          if (meResult.status === 401) {
+            setLoginStatus("Expired or invalid");
+            setAdminStatus("Not verified");
+
+            setStatus(
+              "error",
+              "লগইন মেয়াদ শেষ বা অবৈধ",
+              "আপনার লগইন টোকেন আর গ্রহণযোগ্য নয়। মূল অ্যাপে আবার লগইন করে এই পেজে ফিরে Refresh চাপুন।"
+            );
+          } else if (meResult.status === 403) {
+            setLoginStatus("Restricted");
+            setAdminStatus("Not verified");
+
+            setStatus(
+              "error",
+              "অ্যাকাউন্টে প্রবেশাধিকার নেই",
+              "সার্ভার আপনার অ্যাকাউন্টের অনুরোধ প্রত্যাখ্যান করেছে। অ্যাকাউন্টের অবস্থা যাচাই করুন।"
+            );
+          } else {
+            setLoginStatus("Could not verify");
+            setAdminStatus("Not verified");
+
+            setStatus(
+              "error",
+              "লগইন যাচাই করা যায়নি",
+              "সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি। কিছুক্ষণ পরে Refresh চাপুন।"
+            );
+          }
+
+          return;
+        }
+
+        setLoginStatus("Verified");
+
+        const dashboardResult = await apiRequest(
+          "/admin/dashboard",
+          token
+        );
+
+        if (currentRequest !== requestNumber) return;
+
+        if (!dashboardResult.ok) {
+          if (dashboardResult.status === 403) {
+            setAdminStatus("Not authorized");
+
+            setStatus(
+              "error",
+              "অ্যাডমিন অনুমতি নেই",
+              "আপনি লগইন করেছেন, কিন্তু এই অ্যাকাউন্টের অ্যাডমিন অনুমতি নেই। সার্ভারের ADMIN_EMAIL সেটিং ও ডাটাবেসে অ্যাকাউন্টের role যাচাই করুন।"
+            );
+          } else if (dashboardResult.status === 401) {
+            setLoginStatus("Expired or invalid");
+            setAdminStatus("Not verified");
+
+            setStatus(
+              "error",
+              "লগইন যাচাই ব্যর্থ",
+              "সার্ভার টোকেন গ্রহণ করেনি। মূল অ্যাপে আবার লগইন করে চেষ্টা করুন।"
+            );
+          } else {
+            setAdminStatus("Could not verify");
+
+            setStatus(
+              "error",
+              "অ্যাডমিন ড্যাশবোর্ড যাচাই করা যায়নি",
+              "সার্ভার অনুরোধ সম্পন্ন করতে পারেনি। API ঠিকানা, Render সার্ভারের অবস্থা এবং সার্ভারের লগ পরীক্ষা করুন।"
+            );
+          }
+
+          return;
+        }
+
+        setAdminStatus("Verified");
+        setAdminLinksEnabled(true);
+
+        setStatus(
+          "success",
+          "অ্যাডমিন অ্যাক্সেস নিশ্চিত",
+          "আপনার লগইন এবং অ্যাডমিন অনুমতি সার্ভার যাচাই করেছে। এখন নিচের ম্যানেজমেন্ট পেজগুলো খুলতে পারবেন।"
+        );
+
+      } catch (error) {
+        if (currentRequest !== requestNumber) return;
+
+        setLoginStatus("Connection error");
+        setAdminStatus("Not verified");
+
+        setStatus(
+          "error",
+          "সার্ভারের সঙ্গে সংযোগ হচ্ছে না",
+          "ইন্টারনেট সংযোগ পরীক্ষা করুন। Render ব্যাকএন্ড চালু আছে কি না দেখুন। প্রয়োজন হলে কিছুক্ষণ পরে আবার Refresh চাপুন।"
+        );
+
+      } finally {
+        if (currentRequest === requestNumber) {
+          refreshButton.disabled = false;
+          refreshButton.textContent = "↻ Refresh";
+        }
+      }
+    }
+
+    refreshButton.addEventListener("click", refreshStatus);
+
+    setAdminLinksEnabled(false);
+    refreshStatus();
+  </script>
 </body>
 </html>
