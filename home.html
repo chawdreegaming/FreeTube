@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,35 +15,9 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .app{max-width:480px;margin:auto;min-height:100dvh;padding-bottom:90px;background:#17132922;box-shadow:0 0 40px #0005}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
 .brand{font-size:22px;font-weight:900;letter-spacing:-.6px;white-space:nowrap}
-.brand-boys,.brand-girls{
-  background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.brand-vs{
-  display:inline-block;
-  margin:0 3px;
-  font-size:.62em;
-  font-weight:900;
-  background:linear-gradient(90deg,#ff2d2d,#35c759);
-  -webkit-background-clip:text;
-  background-clip:text;
-  -webkit-text-fill-color:transparent;
-  transform:rotate(-45deg);
-  transform-origin:center;
-  position:relative;
-  top:-2px;
-}
-.brand-hearts{
-  display:inline;
-  color:#f22e9b!important;
-  background:none;
-  -webkit-text-fill-color:#f22e9b;
-  font-size:24px;
-  letter-spacing:-3px;
-  margin-left:3px;
-}
+.brand-boys,.brand-girls{background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-vs{display:inline-block;margin:0 3px;font-size:.62em;font-weight:900;background:linear-gradient(90deg,#ff2d2d,#35c759);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;transform:rotate(-45deg);transform-origin:center;position:relative;top:-2px}
+.brand-hearts{display:inline;color:#f22e9b!important;background:none;-webkit-text-fill-color:#f22e9b;font-size:24px;letter-spacing:-3px;margin-left:3px}
 .top-actions{display:flex;gap:10px}.icon-btn{position:relative;width:48px;height:48px;border-radius:50%;background:linear-gradient(145deg,#ffffff12,#a33cff20);border:1px solid #ffffff2a;display:grid;place-items:center;font-size:20px}.heart-btn{color:#f22e9b}
 .badge{position:absolute;top:-3px;right:-3px;background:var(--red);font-size:9px;font-weight:bold;padding:2px 5px;border-radius:12px;border:1px solid #171329}
 .composer{display:flex;align-items:center;gap:11px;padding:12px 16px;background:var(--panel);border-bottom:1px solid var(--border);cursor:pointer}
@@ -56,7 +31,6 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .ad-banner-slot{width:100%;min-height:50px;margin:6px 0 10px;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#171329aa;border-top:1px solid #ffffff0b;border-bottom:1px solid #ffffff0b}
 .ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .ad-banner-slot iframe{max-width:100%;border:0}
-
 .post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
 .post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 .post-author{font-size:14px;font-weight:700;overflow-wrap:anywhere}.blue-badge{display:inline-flex;align-items:center;justify-content:center;color:#278bff;font-size:13px;margin-left:4px;vertical-align:middle;filter:drop-shadow(0 0 3px #278bff35)}.comment-author{font-weight:700}.post-time{font-size:11px;color:var(--muted);margin-top:4px}
@@ -78,8 +52,45 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .reaction-wrap.open .reaction-picker{display:flex}
 .reaction-choice{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;touch-action:manipulation}
 .reaction-choice:active{background:#ffffff20;transform:scale(1.06)}.reaction-choice .emoji{font-size:23px;line-height:25px}.reaction-choice small{font-size:8px;color:#fff}
-.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;display:flex;justify-content:space-around;align-items:center;min-height:70px;padding:8px 4px calc(8px + env(safe-area-inset-bottom));background:linear-gradient(110deg,rgba(22,20,48,.98),rgba(55,20,57,.98));backdrop-filter:blur(16px);border-top:1px solid var(--border)}
-.nav-item{background:none;color:#c3bfd2;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:12px;min-width:58px;position:relative}.nav-item i{font-size:24px}.nav-item.active{color:var(--pink)}
+
+/* Corrected four-item bottom navigation */
+.bottom-nav{
+  position:fixed;
+  z-index:25;
+  bottom:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:650px;
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  min-height:70px;
+  padding:8px 4px calc(8px + env(safe-area-inset-bottom));
+  background:linear-gradient(110deg,rgba(22,20,48,.98),rgba(55,20,57,.98));
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--border);
+}
+.nav-item{
+  background:none;
+  color:#c3bfd2;
+  display:flex;
+  flex:1;
+  min-width:0;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:5px;
+  font-size:12px;
+  position:relative;
+  padding:2px 0;
+  white-space:nowrap;
+}
+.nav-item i{font-size:24px}
+.nav-item.active{color:var(--pink)}
+.nav-item.active i{filter:drop-shadow(0 0 7px #f22e9b55)}
+.nav-item .badge{top:-2px;right:calc(50% - 25px)}
 .modal{display:none;position:fixed;z-index:60;inset:0;background:#0009;backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;padding:10px}.modal.open{display:flex}
 .modal-content{width:100%;max-width:460px;max-height:88dvh;overflow:auto;background:#19172f;border:1px solid var(--border);border-radius:18px;padding:17px}
 .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.close{width:34px;height:34px;border-radius:50%;background:#ffffff12;border:1px solid var(--border)}
@@ -89,7 +100,13 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .comment{padding:10px 0;border-bottom:1px solid #ffffff12;font-size:12px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
 .toast{position:fixed;z-index:100;left:50%;bottom:78px;transform:translateX(-50%);display:none;background:#211b38;border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:12px;text-align:center;max-width:90%}.toast.show{display:block}
 .empty-state,.loading{padding:32px 18px;text-align:center;color:var(--muted);font-size:13px}
-@media(max-width:350px){.nav-item{min-width:39px}.post-stats{font-size:9px;gap:4px;padding:8px 7px}.post-action-btn{font-size:11px;padding:9px 3px}.reaction-choice{width:36px;flex-basis:36px}}
+@media(max-width:350px){
+  .nav-item{font-size:10px}
+  .nav-item i{font-size:20px}
+  .post-stats{font-size:9px;gap:4px;padding:8px 7px}
+  .post-action-btn{font-size:11px;padding:9px 3px}
+  .reaction-choice{width:36px;flex-basis:36px}
+}
 </style>
 </head>
 <body>
@@ -120,11 +137,21 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 
 <main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
 
-<nav class="bottom-nav">
-  <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button id="navPulse" class="nav-item" onclick="openPulse()"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span></button>
-  <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Notifications</span></button>
-  <button id="navProfile" class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+<nav class="bottom-nav" aria-label="Main navigation">
+  <button id="navHome" class="nav-item active" onclick="home()" aria-current="page">
+    <i class="fa-solid fa-house"></i><span>Home</span>
+  </button>
+  <button id="navPulse" class="nav-item" onclick="openPulse()">
+    <i class="fa-solid fa-compass"></i><span>Pulse</span>
+  </button>
+  <button id="navNotifications" class="nav-item" onclick="openNotifications()">
+    <i class="fa-solid fa-bell"></i>
+    <span id="notificationBadge" class="badge" hidden>0</span>
+    <span>Notifications</span>
+  </button>
+  <button id="navProfile" class="nav-item" onclick="openProfile()">
+    <i class="fa-regular fa-user"></i><span>Profile</span>
+  </button>
 </nav>
 </div>
 
@@ -170,7 +197,7 @@ const REACTIONS={
 let videos=[],currentUser=null,activeCommentId=null,selectedFile=null,toastTimer=null,loading=false;
 const pendingReactions=new Set(),viewRequestsInSession=new Set();
 
-function token(){return localStorage.getItem(TOKEN_KEY)||""}
+function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2800)}
 async function api(path,options={}){
@@ -178,21 +205,33 @@ async function api(path,options={}){
   if(options.body&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
   let response;try{response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"})}catch(_){throw new Error("Cannot connect to Boys vs Girls server. Check your internet connection.")}
   const data=await response.json().catch(()=>({}));
-  if(response.status===401){localStorage.removeItem(TOKEN_KEY);location.replace("auth.html?mode=login");throw new Error("Session expired. Please log in again.")}
+  if(response.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}location.replace("auth.html?mode=login");throw new Error("Session expired. Please log in again.")}
   if(!response.ok)throw new Error(data.error||data.message||"Request failed.");
   return data;
 }
 function requireLogin(){if(!token()){location.href="auth.html?mode=login";return false}return true}
 function closeModal(id){document.getElementById(id).classList.remove("open")}
+function setActiveNav(id){
+  document.querySelectorAll(".bottom-nav .nav-item").forEach(item=>{
+    const active=item.id===id;
+    item.classList.toggle("active",active);
+    if(active)item.setAttribute("aria-current","page");
+    else item.removeAttribute("aria-current");
+  });
+}
 function openProfile(){if(requireLogin())location.href="profile.html"}
 function openInbox(){if(requireLogin())location.href="inbox.html"}
-function openPulse(){location.href="pulse.html"}
+function openPulse(){location.href="discover.html"}
 function openFavorites(){if(requireLogin())location.href="favorites.html"}
 function openAdminOrSecurity(){if(!requireLogin())return;location.href=(currentUser&&String(currentUser.role||"").toLowerCase()==="admin")?"admin.html":"settings.html"}
 function openNotifications(){if(requireLogin())location.href="notifications.html"}
 function openUpload(){if(!requireLogin())return;document.getElementById("postText").value="";document.getElementById("postFile").value="";document.getElementById("uploadModal").classList.add("open")}
-function home(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navHome").classList.add("active");render(videos)}
-function openDiscover(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navDiscover").classList.add("active");document.getElementById("discoverModal").classList.add("open");document.getElementById("searchInput").focus()}
+function home(){setActiveNav("navHome");render(videos)}
+function openDiscover(){
+  setActiveNav("navPulse");
+  document.getElementById("discoverModal").classList.add("open");
+  document.getElementById("searchInput").focus();
+}
 function openUserProfile(username,userId){
   username=String(username||"").trim().replace(/^@/,"");userId=String(userId||"").trim();
   if(!username&&!userId){toast("এই ব্যবহারকারীর username পাওয়া যায়নি।");return}
@@ -251,7 +290,6 @@ function reactionButtonHTML(v){
     '<button type="button" class="post-action-btn'+cls+'" data-like-button="'+esc(v.id)+'" aria-label="React; hold for reactions"><span>'+emoji+'</span> '+label+'</button>'+
     '<div class="reaction-picker">'+picker+'</div></div>';
 }
-
 function mountAdBanners(feed){
   feed.querySelectorAll("[data-adsterra-slot]").forEach(slot=>{
     if(slot.dataset.loaded==="1")return;
@@ -267,7 +305,6 @@ function mountAdBanners(feed){
     slot.appendChild(adScript);
   });
 }
-
 function render(list=videos){
   const feed=document.getElementById("feed");
   if(!list.length){feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';return}
@@ -291,7 +328,6 @@ function render(list=videos){
   setupVideoAutoplay();setupPostViewObserver();
 }
 function updateOnePost(post){
-  // Only update the affected post; do not rebuild the whole feed (prevents flicker).
   const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===String(post.id));
   if(!card)return;
   const old=card.querySelector(".post-actions-bar .reaction-wrap");
@@ -355,7 +391,6 @@ async function reactToPost(id,reaction){
     const data=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{method:"POST",body:JSON.stringify({reaction})});
     if(data.reaction!==undefined)post.myReaction=REACTIONS[data.reaction]?data.reaction:null;
     if(data.reaction_counts){for(const key of Object.keys(REACTIONS)){post.counts[key]=count(data.reaction_counts[key]??data.reaction_counts[key+"s"]??post.counts[key])}}
-    
     updateOnePost(post);
   }catch(error){post.myReaction=oldReaction;post.counts=oldCounts;updateOnePost(post);toast(error.message)}
   finally{pendingReactions.delete(post.id)}
@@ -422,12 +457,30 @@ async function sharePost(id){
 function postOptions(id){const p=videos.find(v=>v.id===String(id));if(p&&confirm("Share this post?"))sharePost(id)}
 function filterPosts(query){const q=String(query||"").toLowerCase();render(videos.filter(v=>String(v.content).toLowerCase().includes(q)||String(v.username).toLowerCase().includes(q)||String(v.profileUsername).toLowerCase().includes(q)))}
 function clearSearch(){document.getElementById("searchInput").value="";render(videos)}
-async function loadNotificationCount(){try{const data=await api("/notifications");const n=count(data.unread_count);const el=document.getElementById("notificationBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}}
-async function loadMessageCount(){try{const data=await api("/messages");const n=(data.conversations||[]).reduce((s,item)=>s+count(item.unread_count),0);const el=document.getElementById("messageBadge");el.textContent=n>99?"99+":String(n);el.hidden=n===0}catch(_){}}
+async function loadNotificationCount(){
+  try{
+    const data=await api("/notifications");
+    const n=count(data.unread_count);
+    const el=document.getElementById("notificationBadge");
+    el.textContent=n>99?"99+":String(n);
+    el.hidden=n===0;
+  }catch(_){}
+}
+async function loadMessageCount(){
+  try{
+    const data=await api("/messages");
+    const n=(data.conversations||[]).reduce((s,item)=>s+count(item.unread_count),0);
+    const el=document.getElementById("messageBadge");
+    if(!el)return;
+    el.textContent=n>99?"99+":String(n);
+    el.hidden=n===0;
+  }catch(_){}
+}
 async function initialize(){
   if(!token()){location.replace("auth.html?mode=login");return}
   try{await loadMe()}catch(error){toast(error.message);return}
-  await loadFeed();await Promise.all([loadNotificationCount(),loadMessageCount()]);
+  await loadFeed();
+  await Promise.all([loadNotificationCount(),loadMessageCount()]);
 }
 window.addEventListener("focus",()=>{if(token()){loadFeed();loadNotificationCount();loadMessageCount()}});
 document.addEventListener("visibilitychange",()=>{if(document.hidden)document.querySelectorAll("#feed video").forEach(v=>v.pause())});
