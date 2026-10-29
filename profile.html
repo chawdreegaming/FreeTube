@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -36,6 +35,16 @@ input[type=file]{display:none}
 .upload-avatar{position:absolute;right:0;bottom:0;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:var(--gradient);color:#17142e;border:3px solid var(--bg)}
 .name{display:flex;justify-content:center;align-items:center;gap:7px;flex-wrap:wrap;font-size:24px;font-weight:900;overflow-wrap:anywhere}
 .admin-badge{font-size:9px;padding:5px 8px;border-radius:8px;background:#a78bfa22;border:1px solid #a78bfa55;color:#d0baff}
+
+/* Blue Badge */
+.blue-verified-badge{
+ display:inline-flex;align-items:center;justify-content:center;
+ width:23px;height:23px;flex:0 0 23px;border-radius:50%;
+ color:#fff;background:#168cff;font-size:12px;
+ box-shadow:0 0 0 2px #168cff25;
+ vertical-align:middle;
+}
+.blue-verified-badge i{font-size:12px}
 .handle{font-size:13px;color:var(--muted);margin-top:6px}
 .stats{font-size:13px;font-weight:bold;margin:11px 0}
 .stats span{color:var(--blue)}
@@ -133,7 +142,11 @@ input[type=file]{display:none}
 <label class="upload-avatar" id="avatarUploadLabel" for="avatarInput" aria-label="Change profile photo"><i class="fa-solid fa-camera"></i></label>
 <input id="avatarInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
 </div>
-<div class="name"><span id="username">User</span><span id="adminBadge" class="admin-badge hidden"><i class="fa-solid fa-shield-halved"></i> ADMIN</span></div>
+<div class="name">
+  <span id="username">User</span>
+  <span id="blueBadge" class="blue-verified-badge hidden" title="Verified Blue Badge" aria-label="Verified Blue Badge"><i class="fa-solid fa-check"></i></span>
+  <span id="adminBadge" class="admin-badge hidden"><i class="fa-solid fa-shield-halved"></i> ADMIN</span>
+</div>
 <div id="handle" class="handle">@username</div>
 <div class="stats"><span id="followersCount">0</span> followers · <span id="followingCount">0</span> following</div>
 <p class="bio" id="bioText">Welcome to Boys vs Girls 💙💗!</p>
@@ -236,19 +249,28 @@ async function api(path,opt={}){
 }
 function profileFrom(d){return d?.profile||d?.data?.profile||d?.user||d?.data||d||{}}
 function normalize(u={},p={},s={},l={}){
+ const badgeStatus=String(first(p.blue_badge_status,u.blue_badge_status,l.blue_badge_status,"none")).toLowerCase();
+ const badgeExpiry=first(p.blue_badge_expires_at,p.blueBadgeExpiresAt,u.blue_badge_expires_at,u.blueBadgeExpiresAt,l.blue_badge_expires_at,"");
+ const badgeExpiryTime=badgeExpiry?new Date(badgeExpiry).getTime():0;
+ const badgeActive=badgeStatus==="verified"&&Number.isFinite(badgeExpiryTime)&&badgeExpiryTime>Date.now();
+
  return {
-  id:String(first(p.user_id,p.userId,u.user_id,u.userId,u.id,p.id)||""),
+  id:String(first(p.user_id,p.userId,p.id,u.user_id,u.userId,u.id)||""),
   name:String(first(p.display_name,p.full_name,p.fullName,u.display_name,u.full_name,u.fullName,u.name,p.username,u.username,l.name)||"User"),
   username:String(first(p.username,u.username,targetName)||"").replace(/^@/,""),
   bio:String(first(p.bio,u.bio,l.bio)||""),
-  city:String(first(p.city,u.city,p.location,u.location,l.city)||""),
+  city:String(first(p.city,p.location,u.city,u.location,l.city)||""),
   birthday:String(first(p.birthday,u.birthday,l.birthday)||"").slice(0,10),
   gender:String(first(p.gender,u.gender,l.gender)||""),
   education:String(first(p.education,u.education,l.education)||""),
   followers:Number(first(s.followers,s.followers_count,p.followers_count,p.follower_count,p.followers,u.followers_count,u.followers)||0),
   following:Number(first(s.following,s.following_count,p.following_count,p.following,u.following_count,u.following)||0),
   avatar:first(p.avatar_url,p.avatarUrl,u.avatar_url,u.avatarUrl,l.avatar_url)||"",
-  cover:first(p.cover_url,p.coverUrl,u.cover_url,u.coverUrl,l.cover_url)||""
+  cover:first(p.cover_url,p.coverUrl,u.cover_url,u.coverUrl,l.cover_url)||"",
+  blueBadgeStatus:badgeStatus,
+  blueBadgeExpiresAt:badgeExpiry,
+  blueBadgeDurationMonths:Number(first(p.blue_badge_duration_months,u.blue_badge_duration_months,l.blue_badge_duration_months)||0),
+  blueBadgeActive:badgeActive
  }
 }
 function setImg(el,url,fallback){el.onerror=null;el.src=fallback;if(url){el.onerror=()=>{el.onerror=null;el.src=fallback};el.src=url}}
@@ -268,7 +290,15 @@ function render(p){
  $("followersCount").textContent=p.followers;
  $("followingCount").textContent=p.following;
  setImg($("profileAvatar"),p.avatar,FALLBACK_AVATAR);
- setImg($("coverPhoto"),p.cover,FALLBACK_COVER)
+ setImg($("coverPhoto"),p.cover,FALLBACK_COVER);
+
+ /* Show a Blue Badge only when the backend says verified
+    and the expiration date is still in the future. */
+ const badge=$("blueBadge");
+ badge.classList.toggle("hidden",!p.blueBadgeActive);
+ badge.title=p.blueBadgeActive
+   ? "Verified Blue Badge"+(p.blueBadgeDurationMonths?" · "+p.blueBadgeDurationMonths+" month(s)":"")
+   : "No active Blue Badge";
 }
 function ownUI(own){
  isOwn=own;
@@ -383,26 +413,57 @@ async function loadProfile(){
   const myId=String(currentUser.id??currentUser.user_id??"");
   const myName=String(currentUser.username||"").replace(/^@/,"");
   isOwn=Boolean((!targetName&&!targetId)||(targetId&&targetId===myId)||(!targetId&&targetName.toLowerCase()===myName.toLowerCase()));
+
   if(isOwn){
-   try{const d=await api("/profile");serverProfile=profileFrom(d);serverStats=d.stats||d.data?.stats||{}}
-   catch(e){const d=await api("/profile/"+encodeURIComponent(myName||currentUser.email||""));serverProfile=profileFrom(d);serverStats=d.stats||d.data?.stats||{}}
-   viewedUser={...currentUser,...serverProfile,id:String(serverProfile.user_id??serverProfile.userId??currentUser.id??currentUser.user_id??serverProfile.id??""),username:serverProfile.username||myName}
+   try{
+    const d=await api("/profile");
+    serverProfile=profileFrom(d);
+    serverStats=d.stats||d.data?.stats||{};
+   }catch(e){
+    const d=await api("/profile/"+encodeURIComponent(myName||currentUser.email||""));
+    serverProfile=profileFrom(d);
+    serverStats=d.stats||d.data?.stats||{};
+   }
+
+   viewedUser={
+    ...currentUser,
+    ...serverProfile,
+    id:String(serverProfile.user_id??serverProfile.userId??serverProfile.id??currentUser.id??currentUser.user_id??""),
+    username:serverProfile.username||myName
+   };
+
+   /* The public profile endpoint includes Blue Badge status and expiry.
+      Fetch it for the signed-in user's profile as well. */
+   try{
+    const badgeData=await api("/profile/"+encodeURIComponent(myName||viewedUser.username));
+    const badgeProfile=profileFrom(badgeData);
+    serverProfile={...serverProfile,...badgeProfile};
+    serverStats=badgeData.stats||badgeData.data?.stats||serverStats;
+    viewedUser={...viewedUser,...badgeProfile};
+   }catch(badgeError){
+    console.warn("Could not refresh Blue Badge information:",badgeError);
+   }
   }else{
    if(!targetName&&!targetId)throw Error("This profile link is missing a username or user ID.");
    const d=targetName?await api("/profile/"+encodeURIComponent(targetName)):await api("/profile/id/"+encodeURIComponent(targetId));
-   serverProfile={...(d.user||d.data?.user||{}),...(d.profile||d.data?.profile||{})};serverStats=d.stats||d.data?.stats||{};
+   serverProfile={...(d.user||d.data?.user||{}),...(d.profile||d.data?.profile||{})};
+   serverStats=d.stats||d.data?.stats||{};
    const id=String(serverProfile.user_id??serverProfile.userId??serverProfile.id??"");
    const un=String(serverProfile.username||targetName||"").replace(/^@/,"");
    if(!id)throw Error("The server did not return this user's ID.");
    viewedUser={...serverProfile,id,username:un};
    isOwn=Boolean(id===myId||un.toLowerCase()===myName.toLowerCase())
   }
+
   const local=isOwn?localProfile():{};
   const p=normalize(viewedUser,serverProfile,serverStats,local);
   viewedUser={...viewedUser,...p};
   if(isOwn)saveLocal({...local,...p});
   render(p);ownUI(isOwn);
-  if(!isOwn){following=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);updateFollow();await checkFriend()}
+  if(!isOwn){
+   following=Boolean(serverProfile.is_following??viewedUser.is_following??serverStats.is_following);
+   updateFollow();await checkFriend()
+  }
   status(isOwn?(isAdmin?"Admin account connected.":"Your profile is connected."):"Viewing @"+p.username,"success");
   await Promise.all([loadPosts(),loadFriends()])
  }catch(e){
