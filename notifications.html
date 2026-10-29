@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -104,14 +103,24 @@ button,a{font:inherit}button{cursor:pointer;color:inherit}
 .primary-btn{background:linear-gradient(110deg,var(--blue),var(--purple),var(--pink));border:0;color:#fff}
 .secondary-btn{background:#282447}
 
-/* Ad banner: inserted after every two notifications */
+/* Advertisement banner */
 .ad-banner-slot{
-  display:flex;justify-content:center;align-items:center;
-  width:100%;min-height:50px;margin:12px 0 16px;overflow:hidden;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:50px;
+  margin:12px 0 16px;
+  overflow:hidden;
 }
 .ad-banner-slot iframe{
-  display:block;width:320px;height:50px;max-width:100%;
-  border:0;overflow:hidden;background:transparent;
+  display:block;
+  width:320px;
+  height:50px;
+  max-width:100%;
+  border:0;
+  overflow:hidden;
+  background:transparent;
 }
 
 .bottom-nav{
@@ -384,7 +393,10 @@ function renderItem(item){
     </article>`;
 }
 
-/* Create one isolated Adsterra banner after every two notifications. */
+/*
+ * Adsterra banner. Each banner gets its own iframe so atOptions
+ * from one ad does not overwrite another banner's settings.
+ */
 function renderAdBanner(){
   const adDocument = `<!DOCTYPE html>
 <html lang="en">
@@ -392,7 +404,14 @@ function renderAdBanner(){
 <meta charset="UTF-8">
 <meta name="viewport" content="width=320, initial-scale=1">
 <style>
-html,body{margin:0;padding:0;width:320px;height:50px;overflow:hidden;background:transparent}
+html,body{
+  margin:0;
+  padding:0;
+  width:320px;
+  height:50px;
+  overflow:hidden;
+  background:transparent;
+}
 </style>
 </head>
 <body>
@@ -409,19 +428,27 @@ var atOptions = {
 </body>
 </html>`;
 
-  return '<div class="ad-banner-slot">' +
-    '<iframe title="Advertisement" width="320" height="50" loading="lazy" ' +
-    'scrolling="no" sandbox="allow-scripts" referrerpolicy="no-referrer-when-downgrade" ' +
-    'srcdoc="' + escapeHTML(adDocument) + '"></iframe>' +
-    '</div>';
+  return `
+    <div class="ad-banner-slot">
+      <iframe
+        title="Advertisement"
+        width="320"
+        height="50"
+        loading="lazy"
+        scrolling="no"
+        sandbox="allow-scripts allow-same-origin"
+        referrerpolicy="no-referrer-when-downgrade"
+        srcdoc="${escapeHTML(adDocument)}">
+      </iframe>
+    </div>`;
 }
 
+/* Insert one advertisement after every two notifications. */
 function renderNotificationsWithAds(items){
   let html="";
   items.forEach((item,index)=>{
     html+=renderItem(item);
 
-    // Add an ad after every second notification, if more notifications follow.
     if((index+1)%2===0 && index<items.length-1){
       html+=renderAdBanner();
     }
@@ -455,6 +482,7 @@ function render(){
       markOneAsRead(button.dataset.read);
     });
   });
+
   document.querySelectorAll("[data-more]").forEach(button=>{
     button.addEventListener("click",event=>{
       event.stopPropagation();
@@ -464,18 +492,27 @@ function render(){
       else showToast("This notification is already read.");
     });
   });
+
   document.querySelectorAll("[data-open]").forEach(element=>{
     const open=()=>openNotification(element.dataset.open);
     element.addEventListener("click",open);
     element.addEventListener("keydown",event=>{
-      if(event.key==="Enter"||event.key===" "){event.preventDefault();open();}
+      if(event.key==="Enter"||event.key===" "){
+        event.preventDefault();
+        open();
+      }
     });
   });
 }
 
 async function apiRequest(path,options={}){
   const token=getToken();
-  if(!token){const error=new Error("LOGIN_REQUIRED");error.status=401;throw error;}
+  if(!token){
+    const error=new Error("LOGIN_REQUIRED");
+    error.status=401;
+    throw error;
+  }
+
   let response;
   try{
     response=await fetch(API_BASE+path,{
@@ -487,13 +524,18 @@ async function apiRequest(path,options={}){
       },
       cache:"no-store"
     });
-  }catch(_){throw new Error("Cannot connect to the server. Check your internet connection.");}
+  }catch(_){
+    throw new Error("Cannot connect to the server. Check your internet connection.");
+  }
+
   const raw=await response.text();
   let data={};
   try{data=raw?JSON.parse(raw):{};}catch(_){data={message:raw};}
+
   if(!response.ok){
     const error=new Error(data.message||data.error||("API error "+response.status));
-    error.status=response.status;throw error;
+    error.status=response.status;
+    throw error;
   }
   return data;
 }
@@ -513,47 +555,57 @@ async function loadNotifications(){
   loading=true;
   newList.innerHTML='<div class="loading-state"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading notifications...</div>';
   earlierList.innerHTML="";
+
   try{
     if(!getToken()){
       showError("Please log in","Log in to view your notifications.",true);
       return;
     }
+
     const data=await apiRequest("/notifications");
     const items=Array.isArray(data)?data:(data.notifications||data.data||data.items||[]);
     notifications=Array.isArray(items)?items.map(normalize):[];
     render();
   }catch(error){
     console.error("Notification loading failed:",error);
+
     if(error.status===401||error.message==="LOGIN_REQUIRED"){
       showError("Login required","Your login session may have expired.",true);
     }else{
       showError("Could not load notifications",error.message||"Please try again.");
     }
-  }finally{loading=false;}
+  }finally{
+    loading=false;
+  }
 }
 
 async function markOneAsRead(id){
   if(!id)return;
   const item=notifications.find(n=>n.id===String(id));
   if(!item||item.read)return;
+
   try{
     await apiRequest("/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});
     item.read=true;
     item.original.read_at=new Date().toISOString();
     item.original.is_read=true;
     render();
-  }catch(error){showToast("Could not mark as read: "+error.message);}
+  }catch(error){
+    showToast("Could not mark as read: "+error.message);
+  }
 }
 
-/* Clicking the notification opens its destination. Mark-as-read is attempted first. */
+/* Clicking a notification opens its destination. */
 async function openNotification(id){
   const item=notifications.find(n=>n.id===String(id));
   if(!item)return;
+
   const destination=notificationDestination(item);
   if(!destination){
     showToast("This notification does not have a destination yet.");
     return;
   }
+
   if(!item.read){
     try{
       await apiRequest("/notifications/"+encodeURIComponent(id)+"/read",{method:"PATCH"});
@@ -561,34 +613,48 @@ async function openNotification(id){
       item.original.read_at=new Date().toISOString();
       item.original.is_read=true;
     }catch(error){
-      // Do not block navigation if marking as read fails.
       console.warn("Could not mark notification as read:",error);
     }
   }
+
   location.href=destination;
 }
 
 async function markAllAsRead(){
   if(loading||!notifications.some(item=>!item.read))return;
+
   try{
     await apiRequest("/notifications/read-all",{method:"PATCH"});
     const now=new Date().toISOString();
+
     notifications.forEach(item=>{
       item.read=true;
       item.original.read_at=item.original.read_at||now;
       item.original.is_read=true;
     });
+
     render();
     showToast("All notifications marked as read.");
-  }catch(error){showToast("Could not mark notifications as read: "+error.message);}
+  }catch(error){
+    showToast("Could not mark notifications as read: "+error.message);
+  }
 }
 
-$("menuButton").addEventListener("click",()=>{location.href="settings.html";});
+$("menuButton").addEventListener("click",()=>{
+  location.href="settings.html";
+});
+
 $("searchToggle").addEventListener("click",()=>{
   searchPanel.classList.toggle("open");
-  if(searchPanel.classList.contains("open"))searchInput.focus();
-  else{searchInput.value="";render();}
+
+  if(searchPanel.classList.contains("open")){
+    searchInput.focus();
+  }else{
+    searchInput.value="";
+    render();
+  }
 });
+
 searchInput.addEventListener("input",render);
 loadNotifications();
 </script>
