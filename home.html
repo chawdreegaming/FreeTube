@@ -65,29 +65,30 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
   <div class="brand" style="background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:22px"><i class="fa-solid fa-people-group" style="color:#a33cff"></i>Boys <span style="color:#f22e9b">vs Girls</span> 💙💗</div>
   <div class="top-actions">
     <button class="icon-btn" onclick="openAdminOrSecurity()" aria-label="Security and admin"><i class="fa-solid fa-shield-halved"></i></button>
-    <button class="icon-btn heart-btn" onclick="openFavorites()" aria-label="Favorites"><i class="fa-solid fa-heart"></i></button>
+    <button class="icon-btn heart-btn" onclick="openFriends()" aria-label="Friends"><i class="fa-solid fa-heart"></i></button>
   </div>
 </header>
 
-<div class="composer" onclick="openUpload()">
+<div class="composer" onclick="openCreatePost()">
   <img id="composerAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Avatar">
   <div class="fake-input">What's on your mind? <i class="fa-solid fa-photo-film"></i></div>
 </div>
 
 <div class="stories">
-  <button class="story create" onclick="openUpload()"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
-  <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=360" alt="Community story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt=""></span><span>Community</span></button>
-  <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=360" alt="Travel story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100" alt=""></span><span>Travel</span></button>
-  <button class="story" onclick="openPulse()"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=360" alt="Friends story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100" alt=""></span><span>Friends</span></button>
+  <button class="story create" onclick="openStoryCreator()"><span class="story-plus"><i class="fa-solid fa-plus"></i></span><span>Create story</span></button>
+  <button class="story" onclick="openStories()"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=360" alt="Community story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100" alt=""></span><span>Community</span></button>
+  <button class="story" onclick="openStories()"><img src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=360" alt="Travel story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100" alt=""></span><span>Travel</span></button>
+  <button class="story" onclick="openStories()"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=360" alt="Friends story"><span class="story-avatar"><img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=100" alt=""></span><span>Friends</span></button>
 </div>
 
 <main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
 
 <nav class="bottom-nav">
   <button id="navHome" class="nav-item active" onclick="home()"><i class="fa-solid fa-house"></i><span>Home</span></button>
-  <button id="navPulse" class="nav-item" onclick="openPulse()"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Pulse</span></button>
+  <button id="navInbox" class="nav-item" onclick="openInbox()"><i class="fa-solid fa-inbox"></i><span>Inbox</span></button>
   <button id="navNotifications" class="nav-item" onclick="openNotifications()"><i class="fa-solid fa-bell"></i><span id="notificationBadge" class="badge" hidden>0</span><span>Notifications</span></button>
-  <button id="navProfile" class="nav-item" onclick="openProfile()"><i class="fa-regular fa-user"></i><span>Profile</span></button>
+  <button id="navExplore" class="nav-item" onclick="openDiscover()"><i class="fa-solid fa-compass"></i><span>Explore</span></button>
+  <button id="navFriends" class="nav-item" onclick="openFriends()"><i class="fa-solid fa-user-group"></i><span>Friends</span></button>
 </nav>
 </div>
 
@@ -149,13 +150,16 @@ function requireLogin(){if(!token()){location.href="auth.html?mode=login";return
 function closeModal(id){document.getElementById(id).classList.remove("open")}
 function openProfile(){if(requireLogin())location.href="profile.html"}
 function openInbox(){if(requireLogin())location.href="inbox.html"}
-function openPulse(){location.href="pulse.html"}
-function openFavorites(){if(requireLogin())location.href="favorites.html"}
+function openDiscover(){location.href="discover.html"}
+function openFriends(){if(requireLogin())location.href="friends.html"}
+function openStories(){location.href="story.html"}
+function openStoryCreator(){if(requireLogin())location.href="story.html"}
 function openAdminOrSecurity(){if(!requireLogin())return;location.href=(currentUser&&String(currentUser.role||"").toLowerCase()==="admin")?"admin.html":"settings.html"}
 function openNotifications(){if(requireLogin())location.href="notifications.html"}
+function openCreatePost(){if(requireLogin())location.href="create.html"}
 function openUpload(){if(!requireLogin())return;document.getElementById("postText").value="";document.getElementById("postFile").value="";document.getElementById("uploadModal").classList.add("open")}
-function home(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navHome").classList.add("active");render(videos)}
-function openDiscover(){document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));document.getElementById("navDiscover").classList.add("active");document.getElementById("discoverModal").classList.add("open");document.getElementById("searchInput").focus()}
+function home(){location.href="home.html"}
+function openFeedSearch(){document.getElementById("discoverModal").classList.add("open");document.getElementById("searchInput").focus()}
 function openUserProfile(username,userId){
   username=String(username||"").trim().replace(/^@/,"");userId=String(userId||"").trim();
   if(!username&&!userId){toast("এই ব্যবহারকারীর username পাওয়া যায়নি।");return}
