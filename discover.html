@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -374,6 +373,29 @@ button {
   display:none!important;
 }
 
+
+/* Adsterra 320x50 banner after each video */
+.adsterra-banner-slot {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:60px;
+  margin:0 auto 14px;
+  padding:5px 0;
+  overflow:hidden;
+  background:#10132980;
+}
+.adsterra-banner-frame {
+  display:block;
+  width:320px;
+  max-width:100%;
+  height:50px;
+  border:0;
+  overflow:hidden;
+  background:transparent;
+}
+
 /* Status messages */
 
 .state {
@@ -565,6 +587,11 @@ button {
       aria-current="page">
       <i class="fa-solid fa-compass"></i>
       <span>Pulse</span>
+    </button>
+
+    <button class="nav-item" onclick="go('friends.html')">
+      <i class="fa-solid fa-user-group"></i>
+      <span>Friends</span>
     </button>
 
     <button class="nav-item" onclick="go('notifications.html')">
@@ -854,6 +881,33 @@ function makeAdSlot(index) {
     </section>`;
 }
 
+function makeAdsterraSlot(index) {
+  return `
+    <section class="adsterra-banner-slot" aria-label="Advertisement">
+      <iframe
+        class="adsterra-banner-frame"
+        title="Advertisement"
+        width="320"
+        height="50"
+        loading="lazy"
+        scrolling="no"
+        frameborder="0"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+        data-adsterra-slot="${index}"></iframe>
+    </section>`;
+}
+
+/* Each banner runs in its own iframe so the Adsterra atOptions global
+   does not collide with the next banner's script. */
+function initializeAdsterraBanners() {
+  const slots = document.querySelectorAll("iframe[data-adsterra-slot]");
+  slots.forEach(frame => {
+    if (frame.dataset.loaded === "true") return;
+    frame.dataset.loaded = "true";
+    frame.srcdoc = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;width:320px;height:50px;overflow:hidden;background:transparent"><script>atOptions = { 'key' : 'ab837cf0ea9c26ae43b7bc4e05a0b5de', 'format' : 'iframe', 'height' : 50, 'width' : 320, 'params' : {} };<\/script><script src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de"><\/script></body></html>`;
+  });
+}
+
 function getProfileUrl(video) {
   const params = new URLSearchParams();
 
@@ -1018,6 +1072,11 @@ function render() {
 
     const number = index + 1;
 
+    /* Keep the Android native-ad bridge slots and add an Adsterra
+       320x50 banner after every video card. */
+    html += makeAdsterraSlot(number);
+
+    /* Preserve the existing Android native ad placement. */
     if (number % 2 === 0 && number < filtered.length) {
       html += makeAdSlot(number / 2);
     }
@@ -1025,6 +1084,7 @@ function render() {
 
   root.innerHTML = html;
 
+  initializeAdsterraBanners();
   setupVideoPlayback();
   setupNativeAdSlots();
 }
