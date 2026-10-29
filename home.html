@@ -53,6 +53,10 @@ button,input,textarea{font:inherit}button{cursor:pointer;color:inherit;border:0}
 .story>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.story:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#09071bdc)}.story span{position:relative;z-index:1;font-size:15px;font-weight:800;text-shadow:0 1px 4px #000}.story .story-avatar{position:absolute;top:12px;left:12px;width:42px;height:42px;border-radius:50%;padding:3px;background:#f22e9b;z-index:2}.story .story-avatar img{width:100%;height:100%;border-radius:50%;object-fit:cover}
 .story.create{justify-content:center;align-items:center;flex-direction:column;gap:12px;text-align:center;background:linear-gradient(145deg,#2947c7,#b21a92);cursor:pointer}.story.create:after{display:none}.story.create .story-plus{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#5c2bb4;font-size:25px}.story.create .story-plus i{font-size:25px}
 .feed{padding-top:8px}.post-card{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
+.ad-banner-slot{width:100%;min-height:50px;margin:6px 0 10px;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#171329aa;border-top:1px solid #ffffff0b;border-bottom:1px solid #ffffff0b}
+.ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.ad-banner-slot iframe{max-width:100%;border:0}
+
 .post-header{display:flex;align-items:center;justify-content:space-between;padding:12px 15px 8px}.post-user-info{display:flex;align-items:center;gap:10px;min-width:0}
 .post-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
 .post-author{font-size:14px;font-weight:700;overflow-wrap:anywhere}.blue-badge{display:inline-flex;align-items:center;justify-content:center;color:#278bff;font-size:13px;margin-left:4px;vertical-align:middle;filter:drop-shadow(0 0 3px #278bff35)}.comment-author{font-weight:700}.post-time{font-size:11px;color:var(--muted);margin-top:4px}
@@ -247,16 +251,33 @@ function reactionButtonHTML(v){
     '<button type="button" class="post-action-btn'+cls+'" data-like-button="'+esc(v.id)+'" aria-label="React; hold for reactions"><span>'+emoji+'</span> '+label+'</button>'+
     '<div class="reaction-picker">'+picker+'</div></div>';
 }
+
+function mountAdBanners(feed){
+  feed.querySelectorAll("[data-adsterra-slot]").forEach(slot=>{
+    if(slot.dataset.loaded==="1")return;
+    slot.dataset.loaded="1";
+    const options=document.createElement("script");
+    options.type="text/javascript";
+    options.text="atOptions = {'key':'ab837cf0ea9c26ae43b7bc4e05a0b5de','format':'iframe','height':50,'width':320,'params':{}};";
+    slot.appendChild(options);
+    const adScript=document.createElement("script");
+    adScript.type="text/javascript";
+    adScript.src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";
+    adScript.async=true;
+    slot.appendChild(adScript);
+  });
+}
+
 function render(list=videos){
   const feed=document.getElementById("feed");
   if(!list.length){feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';return}
-  feed.innerHTML=list.map(v=>{
+  feed.innerHTML=list.map((v,index)=>{
     let media="";
     if(v.type==="video"&&v.src)media='<div class="post-media-container"><video class="post-video" src="'+esc(v.src)+'" controls muted loop playsinline preload="metadata"></video><button type="button" class="sound-toggle" aria-label="Turn sound on" title="Sound Off"><i class="fa-solid fa-volume-xmark"></i></button></div><div class="video-error-message" hidden>This video could not be played. The media URL or format may be unsupported.</div>';
     else if(v.type==="photo"&&v.src)media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
     const c=v.counts,total=count(c.love)+count(c.angry)+count(c.sad)+count(c.haha);
     const summary=(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.haha?'<span class="reaction-emoji">😂</span>':"")+'<span>'+total+'</span>';
-    return '<article class="post-card" data-id="'+esc(v.id)+'">'+
+    const postHTML = '<article class="post-card" data-id="'+esc(v.id)+'">'+
       '<div class="post-header"><div class="post-user-info">'+
       '<img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(v.avatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'">'+
       '<div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+(v.blueBadge?blueBadgeHTML({blue_badge_status:"verified"}):"")+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div>'+
@@ -264,7 +285,9 @@ function render(list=videos){
       (v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':"")+media+
       '<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div>'+
       '<div class="post-actions-bar">'+reactionButtonHTML(v)+'<button class="post-action-btn" onclick="comments(\''+esc(v.id)+'\')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost(\''+esc(v.id)+'\')"><i class="fa-solid fa-share"></i> Share</button></div></article>';
+    return postHTML + ((index + 1) % 2 === 0 ? '<div class="ad-banner-slot" data-adsterra-slot><span class="ad-banner-label">Advertisement</span></div>' : '');
   }).join("");
+  mountAdBanners(feed);
   setupVideoAutoplay();setupPostViewObserver();
 }
 function updateOnePost(post){
