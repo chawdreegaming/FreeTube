@@ -363,6 +363,10 @@ async function initializeDatabase() {
     ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS moderation_result JSONB;
     ALTER TABLE ft_posts ADD COLUMN IF NOT EXISTS reaction_counts JSONB NOT NULL DEFAULT '{}'::jsonb;
 
+    -- Photos never require moderation. Convert old pending photo posts to approved.
+    UPDATE ft_posts SET moderation_status='approved'
+      WHERE LOWER(COALESCE(media_type,''))='image' AND moderation_status='pending';
+
     ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_url TEXT;
     ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_type VARCHAR(20);
     ALTER TABLE ft_messages ADD COLUMN IF NOT EXISTS media_public_id TEXT;
@@ -870,9 +874,8 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
       return res.status(400).json({ error: "Invalid media type." });
     }
 
-    // Media posts are not public until moderation is completed. Text-only posts
-    // preserve the existing immediate-publish behavior.
-    const moderationStatus = mediaUrl ? "pending" : "approved";
+    // Only video posts require admin approval. Photos and text-only posts publish immediately.
+    const moderationStatus = mediaUrl && mediaType === "video" ? "pending" : "approved";
     const result = await pool.query(
       `INSERT INTO ft_posts(user_id,content,media_url,media_type,media_public_id,moderation_status)
        VALUES($1,$2,$3,$4,$5,$6) RETURNING *`,
@@ -882,7 +885,7 @@ app.post("/api/posts", requireAuth, async (req, res, next) => {
       await pool.query(
         `INSERT INTO ft_notifications(recipient_id,actor_id,type,post_id,message)
          SELECT id::text,$1,'moderation_pending',$2,$3 FROM users WHERE LOWER(role)='admin'`,
-        [String(req.user.id),result.rows[0].id,`A media post from ${req.user.username} is waiting for moderation.`]
+        [String(req.user.id),result.rows[0].id,`A video post from ${req.user.username} is waiting for moderation.`]
       );
     }
     res.status(201).json({
@@ -929,6 +932,59 @@ app.put("/api/posts/:id", requireAuth, async (req, res, next) => {
   }
 });
 
+// Delete exactly one post, its dependent database rows, and only its own Cloudinary asset.
+// The database transaction commits before Cloudinary cleanup; cleanup failures are reported
+// without risking deletion of any other media asset.
+async function deleteSinglePost(postId) {
+  const client = await pool.connect();
+  let post = null;
+  try {
+    await client.query("BEGIN");
+    const locked = await client.query(
+      `SELECT id,user_id,media_public_id,media_type
+       FROM ft_posts WHERE id=$1 FOR UPDATE`,
+      [postId]
+    );
+    if (!locked.rowCount) {
+      await client.query("ROLLBACK");
+      return { found: false };
+    }
+    post = locked.rows[0];
+
+    // Notifications do not have an ON DELETE CASCADE constraint. Remove only
+    // notifications explicitly linked to this exact post ID.
+    await client.query("DELETE FROM ft_notifications WHERE post_id=$1", [postId]);
+
+    // Likes, reactions, comments, views and reports use ON DELETE CASCADE.
+    await client.query("DELETE FROM ft_posts WHERE id=$1", [postId]);
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK").catch(() => {});
+    throw error;
+  } finally {
+    client.release();
+  }
+
+  let mediaDeleted = true;
+  if (post.media_public_id) {
+    if (!cloudinaryConfigured) {
+      mediaDeleted = false;
+    } else {
+      try {
+        const resourceType = String(post.media_type || "").toLowerCase() === "video" ? "video" : "image";
+        await cloudinary.uploader.destroy(post.media_public_id, {
+          resource_type: resourceType,
+          invalidate: true
+        });
+      } catch (error) {
+        mediaDeleted = false;
+        console.error("Post media cleanup failed for post", String(postId), error.message);
+      }
+    }
+  }
+  return { found: true, mediaDeleted };
+}
+
 app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
@@ -937,23 +993,20 @@ app.delete("/api/posts/:id", requireAuth, async (req, res, next) => {
     }
 
     const admin = String(req.user.role).toLowerCase() === "admin";
-    const result = await pool.query(
-      `DELETE FROM ft_posts
-       WHERE id=$1 AND (user_id=$2 OR $3::boolean=TRUE)
-       RETURNING id`,
-      [id, String(req.user.id), admin]
-    );
-
-    if (!result.rowCount) {
-      const exists = await pool.query("SELECT id FROM ft_posts WHERE id=$1", [id]);
-      return res.status(exists.rowCount ? 403 : 404).json({
-        error: exists.rowCount
-          ? "You can only delete your own posts."
-          : "Post not found."
-      });
+    const owner = await pool.query("SELECT user_id FROM ft_posts WHERE id=$1", [id]);
+    if (!owner.rowCount) return res.status(404).json({ error: "Post not found." });
+    if (!admin && String(owner.rows[0].user_id) !== String(req.user.id)) {
+      return res.status(403).json({ error: "You can only delete your own posts." });
     }
 
-    res.json({ message: "Post deleted.", id });
+    const result = await deleteSinglePost(id);
+    if (!result.found) return res.status(404).json({ error: "Post not found." });
+    res.json({
+      message: "Post deleted.",
+      id: String(id),
+      media_deleted: result.mediaDeleted,
+      warning: result.mediaDeleted ? null : "The post was deleted, but its Cloudinary media could not be confirmed deleted."
+    });
   } catch (e) {
     next(e);
   }
@@ -1458,17 +1511,19 @@ app.patch("/api/admin/users/:id/status", requireAuth, requireAdmin, async (req, 
   }
 });
 
-// ADMIN: view all posts
+// ADMIN: pending video posts only. Photos and already-reviewed posts are excluded.
 app.get("/api/admin/posts", requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(
-      `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.created_at,
+      `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,
+              p.media_public_id,p.moderation_status,p.created_at,
               u.username,pr.display_name,
               (SELECT COUNT(*)::int FROM ft_post_reactions l WHERE l.post_id=p.id) AS like_count,
               (SELECT COUNT(*)::int FROM ft_comments c WHERE c.post_id=p.id) AS comment_count
-       FROM ft_posts p JOIN users u ON u.id::text=p.user_id
+       FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
-       ORDER BY p.id DESC LIMIT 200`
+       WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video'
+       ORDER BY p.created_at ASC LIMIT 200`
     );
     res.json({ posts: result.rows });
   } catch (e) {
@@ -1487,7 +1542,7 @@ app.get("/api/admin/reports", requireAuth, requireAdmin, async (req, res, next) 
     const result = await pool.query(
       `SELECT r.id AS report_id,r.post_id,r.reporter_id,r.reason,r.status,
               r.created_at AS reported_at,p.user_id AS post_owner_id,
-              p.content,p.media_url,p.media_type,
+              p.content,p.media_url,p.media_type,p.media_public_id,
               reporter.username AS reporter_username,
               author.username AS author_username
        FROM ft_post_reports r JOIN ft_posts p ON p.id=r.post_id
@@ -1508,19 +1563,32 @@ app.get("/api/admin/reports", requireAuth, requireAdmin, async (req, res, next) 
 app.patch("/api/admin/reports/:id", requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
-    const map = { approve: "reviewed", dismiss: "dismissed" };
-    const status = map[req.body.action];
-
-    if (!Number.isSafeInteger(id) || id <= 0 || !status) {
-      return res.status(400).json({ error: "Action must be approve or dismiss." });
+    const action = cleanText(req.body.action, 30).toLowerCase();
+    if (!Number.isSafeInteger(id) || id <= 0 || !["approve", "dismiss", "delete_post"].includes(action)) {
+      return res.status(400).json({ error: "Action must be approve, dismiss or delete_post." });
     }
 
+    if (action === "delete_post") {
+      const report = await pool.query(
+        "SELECT post_id FROM ft_post_reports WHERE id=$1 LIMIT 1", [id]
+      );
+      if (!report.rowCount) return res.status(404).json({ error: "Report not found." });
+      const postId = Number(report.rows[0].post_id);
+      const deleted = await deleteSinglePost(postId);
+      if (!deleted.found) return res.status(404).json({ error: "Reported post no longer exists." });
+      return res.json({
+        message: "Reported post and its related database records were deleted.",
+        report_id: id, post_id: String(postId), media_deleted: deleted.mediaDeleted,
+        warning: deleted.mediaDeleted ? null : "The post was deleted, but its Cloudinary media could not be confirmed deleted."
+      });
+    }
+
+    const status = action === "approve" ? "reviewed" : "dismissed";
     const result = await pool.query(
       `UPDATE ft_post_reports SET status=$1 WHERE id=$2
        RETURNING id,post_id,status`,
       [status, id]
     );
-
     if (!result.rowCount) return res.status(404).json({ error: "Report not found." });
     res.json({ message: "Report updated.", report: result.rows[0] });
   } catch (e) {
@@ -1829,8 +1897,28 @@ app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const
 app.post("/api/messages/media", requireAuth, async(req,res,next)=>{try{await purgeExpiredMessages();const recipientId=cleanText(req.body.recipient_id,100),url=cleanText(req.body.media_url,2000),type=cleanText(req.body.media_type,20),publicId=cleanText(req.body.media_public_id,500),content=cleanText(req.body.content,5000);if(!recipientId||recipientId===String(req.user.id)||!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type)||!publicId)return res.status(400).json({error:'Valid recipient, Cloudinary image/video URL and media_public_id are required.'});const recipient=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[recipientId]);if(!recipient.rowCount)return res.status(404).json({error:'Recipient not found.'});const r=await pool.query("INSERT INTO ft_messages(sender_id,recipient_id,content,media_url,media_type,media_public_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,sender_id,recipient_id,content,media_url,media_type,created_at,read_at",[String(req.user.id),recipientId,content,url,type,publicId]);await notifyUser(recipientId,req.user.id,'message',`New message from ${req.user.username}.`);res.status(201).json({item:r.rows[0],expires_at:new Date(Date.now()+72*60*60*1000).toISOString()});}catch(e){next(e);}});
 
 // Fail-closed moderation helper endpoints. No claim of AI protection until provider/add-on is configured.
-app.get("/api/admin/moderation/pending", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
-app.patch("/api/admin/moderation/posts/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_posts SET moderation_status=$1,moderation_result=$2::jsonb WHERE id=$3 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,JSON.stringify({reviewed_by:String(req.user.id),reviewed_at:new Date().toISOString(),method:'manual_admin_review'}),id]);if(!r.rowCount)return res.status(404).json({error:'Pending post not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your post was ${status}.`,id);res.json({post:r.rows[0]});}catch(e){next(e);}});
+app.get("/api/admin/moderation/pending", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
+app.patch("/api/admin/moderation/posts/:id", requireAuth, requireAdmin, async(req,res,next)=>{
+  try {
+    const id=Number.parseInt(req.params.id,10), action=cleanText(req.body.action,20).toLowerCase();
+    if(!Number.isSafeInteger(id)||!["approve","reject"].includes(action)) return res.status(400).json({error:"Action must be approve or reject."});
+    const pending=await pool.query("SELECT id,user_id FROM ft_posts WHERE id=$1 AND moderation_status='pending' AND LOWER(COALESCE(media_type,''))='video'",[id]);
+    if(!pending.rowCount) return res.status(404).json({error:"Pending video post not found."});
+
+    if(action === "reject") {
+      const deleted=await deleteSinglePost(id);
+      if(!deleted.found) return res.status(404).json({error:"Pending video post not found."});
+      // Notify the owner after deletion. This notification intentionally has no post_id.
+      await pool.query("INSERT INTO ft_notifications(recipient_id,actor_id,type,message) VALUES($1,$2,'moderation',$3)",[String(pending.rows[0].user_id),String(req.user.id),"Your video post was rejected and deleted by an administrator."]);
+      return res.json({message:"Video rejected and only that video post was deleted.",post_id:String(id),media_deleted:deleted.mediaDeleted,warning:deleted.mediaDeleted?null:"Post deleted, but Cloudinary media cleanup could not be confirmed."});
+    }
+
+    const r=await pool.query("UPDATE ft_posts SET moderation_status='approved',moderation_result=$1::jsonb WHERE id=$2 AND moderation_status='pending' AND LOWER(COALESCE(media_type,''))='video' RETURNING id::text AS id,user_id,moderation_status",[JSON.stringify({reviewed_by:String(req.user.id),reviewed_at:new Date().toISOString(),method:"manual_admin_review"}),id]);
+    if(!r.rowCount) return res.status(404).json({error:"Pending video post not found."});
+    await notifyUser(r.rows[0].user_id,req.user.id,"moderation","Your video post was approved and is now public.",id);
+    res.json({post:r.rows[0]});
+  } catch(e) { next(e); }
+});
 app.patch("/api/admin/moderation/stories/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_stories SET moderation_status=$1 WHERE id=$2 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,id]);if(!r.rowCount)return res.status(404).json({error:'Pending story not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your story was ${status}.`);res.json({story:r.rows[0]});}catch(e){next(e);}});
 
 app.use((req, res) => {
