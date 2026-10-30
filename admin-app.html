@@ -74,6 +74,7 @@ input,select{
 .empty{padding:20px;border:1px dashed #30435e;border-radius:13px;text-align:center;color:var(--muted);overflow-wrap:anywhere}
 .notice{display:none;padding:12px;margin:12px 0;border-radius:10px;background:#42232c;color:#ffd5dc;overflow-wrap:anywhere}
 .notice.success{background:#103c32;color:#b4ffe2}
+.notice.info{background:#18324e;color:#d7e9ff}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .media{display:block;width:100%;max-width:520px;max-height:420px;object-fit:contain;background:#050b14;border-radius:12px;margin:12px 0}
 a{text-decoration:none}
@@ -89,6 +90,7 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 
 <body>
 <main class="container">
+
 <header>
   <div class="brand">
     <div class="logo">BvG</div>
@@ -110,24 +112,21 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
   <div class="item-top">
     <div>
       <h3>Admin Connection</h3>
-      <div id="connection" class="muted small">Checking access token...</div>
+      <div id="connection" class="muted small">Checking admin access...</div>
     </div>
-    <div class="actions">
-      <button id="tokenButton" class="secondary" type="button">Set Token</button>
-      <button id="clearTokenButton" class="danger" type="button">Clear Token</button>
-    </div>
+    <span class="pill yellow" id="adminBadge">Checking...</span>
   </div>
   <p class="muted small">
-    Uses freetube_access_token from this browser. Administrative permissions
-    are checked by the backend. Never share your token.
+    Uses the login token saved automatically by the main app.
+    Administrator permissions are verified by the backend.
   </p>
 </section>
 
 <section class="stats">
   <div class="stat"><div class="muted">Users Loaded</div><div class="stat-value" id="usersCount">—</div></div>
   <div class="stat"><div class="muted">Posts Loaded</div><div class="stat-value" id="postsCount">—</div></div>
+  <div class="stat"><div class="muted">Pending Posts</div><div class="stat-value" id="pendingCount">—</div></div>
   <div class="stat"><div class="muted">Reports Loaded</div><div class="stat-value" id="reportsCount">—</div></div>
-  <div class="stat"><div class="muted">Access Token</div><div class="stat-value" id="tokenStatus" style="font-size:18px">Unknown</div></div>
 </section>
 
 <nav class="tabs" aria-label="Management sections">
@@ -140,7 +139,7 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 <section id="overview" class="panel active">
   <div class="card">
     <h2>Welcome to App Management</h2>
-    <p class="muted">Load and review users, posts and reports from your backend.</p>
+    <p class="muted">Manage users, review posts and moderate reports from your backend.</p>
     <div class="toolbar">
       <button data-open="users" type="button">Manage Users</button>
       <button data-open="posts" type="button">Manage Posts</button>
@@ -152,6 +151,7 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
       <button id="overviewLoadReports" class="secondary" type="button">Load Reports</button>
     </div>
   </div>
+
   <div class="card">
     <h2>Other Admin Sections</h2>
     <div class="toolbar">
@@ -199,8 +199,20 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
         <label for="postSearch">Search posts</label>
         <input id="postSearch" placeholder="Post text, author or ID">
       </div>
+      <div class="field">
+        <label for="postFilter">Post status</label>
+        <select id="postFilter">
+          <option value="all">All posts</option>
+          <option value="pending">Pending approval</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
     </div>
-    <p class="muted small">Displays post text and media returned by the API. Post deletion is not available in the supplied backend routes.</p>
+    <p class="muted small">
+      Pending posts have Approve and Reject controls. These actions use the
+      backend moderation API. Rejected posts will not be approved automatically.
+    </p>
   </div>
   <div id="postsList" class="list"><div class="empty">Click Load Posts to begin.</div></div>
 </section>
@@ -244,7 +256,10 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
   let users = [];
   let posts = [];
   let reports = [];
-  let busy = false;
+  let pendingPostIds = new Set();
+  let adminVerified = false;
+  let moderationAvailable = false;
+  let moderationWarning = "";
 
   function getToken() {
     return (localStorage.getItem(TOKEN_KEY) || "").trim();
@@ -266,26 +281,20 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
     }
   }
 
-  function showNotice(message, success) {
+  function showNotice(message, type) {
     const box = $("notice");
     box.textContent = message;
-    box.className = "notice" + (success ? " success" : "");
+    box.className = "notice" + (type ? " " + type : "");
     box.style.display = "block";
   }
 
   function updateConnection(message) {
-    const saved = Boolean(getToken());
-    $("connection").textContent = message || (saved
-      ? "Token found. Admin access will be checked by the backend."
-      : "No access token is saved. Set a valid admin token.");
-    $("tokenStatus").textContent = saved ? "Saved" : "Missing";
+    $("connection").textContent = message;
   }
 
   async function api(path, options) {
     const token = getToken();
-    if (!token) {
-      throw new Error("No access token found. Click Set Token and enter your admin access token.");
-    }
+    if (!token) throw new Error("No saved login token. Please log in to the main app first.");
 
     const opts = options || {};
     const headers = Object.assign({}, opts.headers || {}, {
@@ -296,35 +305,30 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
 
     let response;
     try {
-      response = await fetch(API + path, Object.assign({}, opts, { headers }));
+      response = await fetch(API + path, Object.assign({}, opts, {
+        headers,
+        cache: "no-store"
+      }));
     } catch (_) {
-      throw new Error("Could not connect to the backend. Check internet connection and whether the Render service is running.");
+      throw new Error("Could not connect to the backend. Check internet connection and Render service.");
     }
 
     const contentType = response.headers.get("content-type") || "";
     let data;
+
     if (contentType.includes("application/json")) {
       data = await response.json().catch(() => ({}));
     } else {
       const text = await response.text().catch(() => "");
-      data = { error: text.slice(0, 300) || "The server returned a non-JSON response." };
+      data = {error: text.slice(0, 300) || "The server returned a non-JSON response."};
     }
 
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error("401 Unauthorized: token is invalid or expired. Sign in again and set the new token.");
-      }
-      if (response.status === 403) {
-        throw new Error("403 Forbidden: this account does not have admin permission.");
-      }
-      if (response.status === 404) {
-        throw new Error("404 Route not found. Check that the frontend API path matches the deployed backend.");
-      }
-      if (response.status >= 500) {
-        throw new Error("Backend error " + response.status + ": " +
-          (data.error || data.message || "Check Render logs and database tables."));
-      }
-      throw new Error(data.error || data.message || "Request failed: HTTP " + response.status);
+      const error = new Error(
+        data.error || data.message || ("Request failed: HTTP " + response.status)
+      );
+      error.status = response.status;
+      throw error;
     }
 
     return data;
@@ -336,6 +340,47 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
       if (Array.isArray(data && data[key])) return data[key];
     }
     return [];
+  }
+
+  async function verifyAdmin() {
+    adminVerified = false;
+    $("adminBadge").textContent = "Checking...";
+    $("adminBadge").className = "pill yellow";
+
+    if (!getToken()) {
+      updateConnection("No login token found. Log in to the main app first.");
+      $("adminBadge").textContent = "Not logged in";
+      $("adminBadge").className = "pill red";
+      return false;
+    }
+
+    updateConnection("Checking your login and admin permissions...");
+
+    try {
+      await api("/auth/me");
+      await api("/admin/dashboard");
+
+      adminVerified = true;
+      $("adminBadge").textContent = "Admin Verified";
+      $("adminBadge").className = "pill green";
+      updateConnection("Login and administrator permissions verified by the backend.");
+      return true;
+
+    } catch (error) {
+      $("adminBadge").textContent = "Not verified";
+      $("adminBadge").className = "pill red";
+
+      if (error.status === 401) {
+        updateConnection("Login expired or invalid. Log in again to the main app.");
+      } else if (error.status === 403) {
+        updateConnection("This account does not have admin permission. Check ADMIN_EMAIL and account role.");
+      } else {
+        updateConnection("Could not verify admin access: " + error.message);
+      }
+
+      showNotice("Admin verification failed: " + error.message, "");
+      return false;
+    }
   }
 
   function switchTab(name) {
@@ -350,6 +395,7 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
   document.querySelectorAll("[data-tab]").forEach(button => {
     button.addEventListener("click", () => switchTab(button.dataset.tab));
   });
+
   document.querySelectorAll("[data-open]").forEach(button => {
     button.addEventListener("click", () => switchTab(button.dataset.open));
   });
@@ -359,14 +405,19 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
   }
 
   async function loadUsers() {
+    if (!adminVerified) {
+      showNotice("Admin access is not verified.", "");
+      return;
+    }
+
     $("usersList").innerHTML = '<div class="empty">Loading users...</div>';
+
     try {
       const data = await api("/admin/users?status=all");
       users = extractArray(data, ["users", "results"]);
       $("usersCount").textContent = users.length;
       renderUsers();
-      updateConnection("Admin API access succeeded. Users endpoint is responding.");
-      showNotice("Users loaded: " + users.length + ".", true);
+      showNotice("Users loaded: " + users.length + ".", "success");
     } catch (error) {
       $("usersCount").textContent = "—";
       $("usersList").innerHTML = "";
@@ -374,7 +425,7 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
       empty.className = "empty";
       empty.textContent = "Could not load users. " + error.message;
       $("usersList").appendChild(empty);
-      showNotice("Users could not be loaded: " + error.message, false);
+      showNotice("Users could not be loaded: " + error.message, "");
     }
   }
 
@@ -441,95 +492,235 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
         note.textContent = "Admin accounts cannot be banned from this page.";
         item.appendChild(note);
       }
+
       root.appendChild(item);
     });
   }
 
   async function changeUserStatus(id, action, name) {
-    const verb = action === "ban" ? "ban" : "unban";
-    if (!confirm("Are you sure you want to " + verb + " " + name + "?")) return;
+    if (!confirm("Are you sure you want to " + action + " " + name + "?")) return;
+
     try {
       await api("/admin/users/" + encodeURIComponent(id) + "/status", {
         method: "PATCH",
-        body: JSON.stringify({ action })
+        body: JSON.stringify({action})
       });
-      showNotice("User " + name + " updated successfully.", true);
+      showNotice("User " + name + " updated successfully.", "success");
       await loadUsers();
     } catch (error) {
-      showNotice("Could not update user: " + error.message, false);
+      showNotice("Could not update user: " + error.message, "");
     }
   }
 
+  function getPostId(post) {
+    return post.id ?? post.post_id ?? null;
+  }
+
+  function getPostStatus(post) {
+    return String(
+      post.moderation_status ||
+      post.approval_status ||
+      post.status ||
+      "unknown"
+    ).toLowerCase();
+  }
+
   async function loadPosts() {
-    $("postsList").innerHTML = '<div class="empty">Loading posts...</div>';
+    if (!adminVerified) {
+      showNotice("Admin access is not verified.", "");
+      return;
+    }
+
+    $("postsList").innerHTML = '<div class="empty">Loading posts and moderation queue...</div>';
+
     try {
-      const data = await api("/admin/posts");
-      posts = extractArray(data, ["posts", "results"]);
+      const results = await Promise.allSettled([
+        api("/admin/posts"),
+        api("/admin/moderation/pending")
+      ]);
+
+      if (results[0].status === "rejected") {
+        throw results[0].reason;
+      }
+
+      const postData = results[0].value;
+      posts = extractArray(postData, ["posts", "results"]);
+
+      pendingPostIds = new Set();
+      moderationAvailable = results[1].status === "fulfilled";
+      moderationWarning = "";
+
+      if (moderationAvailable) {
+        const pendingData = results[1].value;
+        const pendingPosts = extractArray(pendingData, ["posts"]);
+
+        pendingPosts.forEach(post => {
+          const id = getPostId(post);
+          if (id !== null && id !== undefined) {
+            pendingPostIds.add(String(id));
+          }
+        });
+
+        // Include pending posts even if they were not in the general list.
+        const knownIds = new Set(posts.map(post => String(getPostId(post))));
+        pendingPosts.forEach(post => {
+          const id = getPostId(post);
+          if (id !== null && !knownIds.has(String(id))) {
+            posts.unshift(post);
+            knownIds.add(String(id));
+          }
+        });
+      } else {
+        moderationWarning =
+          "Could not load the moderation queue: " +
+          results[1].reason.message;
+      }
+
       $("postsCount").textContent = posts.length;
+      $("pendingCount").textContent = moderationAvailable
+        ? pendingPostIds.size
+        : "—";
+
       renderPosts();
-      updateConnection("Admin API access succeeded. Posts endpoint is responding.");
-      showNotice("Posts loaded: " + posts.length + ".", true);
+
+      if (moderationAvailable) {
+        showNotice(
+          "Posts loaded: " + posts.length +
+          ". Pending approval: " + pendingPostIds.size + ".",
+          "success"
+        );
+      } else {
+        showNotice(
+          "Posts loaded, but moderation queue could not be checked. " +
+          moderationWarning,
+          ""
+        );
+      }
+
     } catch (error) {
       $("postsCount").textContent = "—";
+      $("pendingCount").textContent = "—";
       $("postsList").innerHTML = "";
+
       const empty = document.createElement("div");
       empty.className = "empty";
-      empty.textContent = "Could not load posts. " + error.message +
-        " If this is HTTP 500, check the Render logs for missing tables or SQL errors in GET /api/admin/posts.";
+      empty.textContent = "Could not load posts. " + error.message;
       $("postsList").appendChild(empty);
-      showNotice("Posts could not be loaded: " + error.message, false);
+
+      showNotice("Posts could not be loaded: " + error.message, "");
     }
   }
 
   function renderPosts() {
     const query = $("postSearch").value.trim().toLowerCase();
-    const filtered = posts.filter(post => [
-      post.id, post.post_id, post.user_id, post.username, post.display_name,
-      post.author, post.author_name, post.content, post.text, post.caption
-    ].join(" ").toLowerCase().includes(query));
+    const filter = $("postFilter").value;
+
+    const filtered = posts.filter(post => {
+      const id = getPostId(post);
+      const status = getPostStatus(post);
+      const pending = pendingPostIds.has(String(id)) || status === "pending";
+
+      const searchable = [
+        id, post.user_id, post.username, post.display_name,
+        post.author, post.author_name, post.content, post.text, post.caption
+      ].join(" ").toLowerCase();
+
+      let statusMatch = true;
+
+      if (filter === "pending") {
+        statusMatch = pending;
+      } else if (filter === "approved") {
+        statusMatch = status === "approved";
+      } else if (filter === "rejected") {
+        statusMatch = status === "rejected";
+      }
+
+      return searchable.includes(query) && statusMatch;
+    });
 
     const root = $("postsList");
     root.innerHTML = "";
 
     if (!filtered.length) {
-      root.innerHTML = '<div class="empty">No matching posts in the loaded results.</div>';
+      root.innerHTML = '<div class="empty">No matching posts found.</div>';
       return;
     }
 
     filtered.forEach(post => {
-      const id = post.id ?? post.post_id ?? "Unknown";
+      const id = getPostId(post);
       const author = post.username || post.display_name || post.author_name || post.author || "Unknown author";
       const content = post.content || post.text || post.caption || "";
       const mediaURL = safeMediaURL(post.media_url);
       const mediaType = String(post.media_type || "").toLowerCase();
+      const status = getPostStatus(post);
+      const isPending = pendingPostIds.has(String(id)) || status === "pending";
 
       const item = document.createElement("article");
       item.className = "item";
-      item.innerHTML =
-        '<div class="item-top"><h3>Post #' + escapeHTML(id) + '</h3>' +
-        '<span class="pill">' + escapeHTML(post.moderation_status || post.status || "Post") + '</span></div>' +
-        '<p style="white-space:pre-wrap">' + escapeHTML(content || "[No text content]") + '</p>' +
-        '<div class="muted small">Author: ' + escapeHTML(author) +
-        ' · User ID: ' + escapeHTML(post.user_id || "Not provided") +
-        ' · Created: ' + escapeHTML(post.created_at || "Not provided") + '</div>' +
-        '<div class="muted small">Reactions: ' + escapeHTML(post.like_count ?? post.reaction_count ?? "—") +
-        ' · Comments: ' + escapeHTML(post.comment_count ?? "—") + '</div>';
 
-      if (mediaURL && (mediaType === "image" || /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(mediaURL))) {
+      const top = document.createElement("div");
+      top.className = "item-top";
+
+      const heading = document.createElement("h3");
+      heading.textContent = "Post #" + (id ?? "Unknown");
+
+      const badge = document.createElement("span");
+      badge.className = "pill " +
+        (isPending ? "yellow" :
+        status === "approved" ? "green" :
+        status === "rejected" ? "red" : "");
+      badge.textContent = isPending ? "Pending Approval" :
+        status === "unknown" ? "Post" : status;
+
+      top.append(heading, badge);
+      item.appendChild(top);
+
+      const text = document.createElement("p");
+      text.style.whiteSpace = "pre-wrap";
+      text.textContent = content || "[No text content]";
+      item.appendChild(text);
+
+      const details = document.createElement("div");
+      details.className = "muted small";
+      details.textContent =
+        "Author: " + author +
+        " · User ID: " + (post.user_id || "Not provided") +
+        " · Created: " + (post.created_at || "Not provided");
+      item.appendChild(details);
+
+      const counts = document.createElement("div");
+      counts.className = "muted small";
+      counts.textContent =
+        "Reactions: " + (post.like_count ?? post.reaction_count ?? "—") +
+        " · Comments: " + (post.comment_count ?? "—");
+      item.appendChild(counts);
+
+      if (mediaURL && (
+        mediaType === "image" ||
+        /\.(png|jpe?g|gif|webp)(\?.*)?$/i.test(mediaURL)
+      )) {
         const image = document.createElement("img");
         image.className = "media";
         image.loading = "lazy";
         image.alt = "Post media";
         image.src = mediaURL;
-        image.onerror = () => { image.alt = "Image could not be loaded"; image.removeAttribute("src"); };
+        image.onerror = () => {
+          image.alt = "Image could not be loaded";
+          image.removeAttribute("src");
+        };
         item.appendChild(image);
-      } else if (mediaURL && (mediaType === "video" || /\.(mp4|webm|mov)(\?.*)?$/i.test(mediaURL))) {
+
+      } else if (mediaURL && (
+        mediaType === "video" ||
+        /\.(mp4|webm|mov)(\?.*)?$/i.test(mediaURL)
+      )) {
         const video = document.createElement("video");
         video.className = "media";
         video.controls = true;
         video.preload = "metadata";
         video.src = mediaURL;
         item.appendChild(video);
+
       } else if (post.media_url) {
         const link = document.createElement("a");
         link.href = mediaURL || "#";
@@ -539,32 +730,123 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
         item.appendChild(link);
       }
 
+      if (isPending && id !== null && id !== undefined) {
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        const approveButton = document.createElement("button");
+        approveButton.className = "success";
+        approveButton.textContent = "✓ Approve";
+        approveButton.addEventListener("click", () => moderatePost(id, "approve"));
+
+        const rejectButton = document.createElement("button");
+        rejectButton.className = "danger";
+        rejectButton.textContent = "✕ Reject";
+        rejectButton.addEventListener("click", () => moderatePost(id, "reject"));
+
+        actions.append(approveButton, rejectButton);
+        item.appendChild(actions);
+
+      } else if (status === "approved" || status === "rejected") {
+        const state = document.createElement("p");
+        state.className = "muted small";
+        state.textContent = status === "approved"
+          ? "This post has been approved."
+          : "This post has been rejected.";
+        item.appendChild(state);
+      }
+
       root.appendChild(item);
     });
+
+    if (!moderationAvailable && moderationWarning) {
+      const warning = document.createElement("div");
+      warning.className = "empty";
+      warning.textContent =
+        "Moderation queue unavailable. " + moderationWarning;
+      root.prepend(warning);
+    }
+  }
+
+  async function moderatePost(id, action) {
+    if (!adminVerified) {
+      showNotice("Admin access is not verified.", "");
+      return;
+    }
+
+    if (!moderationAvailable) {
+      showNotice("The moderation queue is unavailable. Reload posts first.", "");
+      return;
+    }
+
+    const verb = action === "approve" ? "approve" : "reject";
+
+    if (!confirm("Are you sure you want to " + verb + " post #" + id + "?")) {
+      return;
+    }
+
+    const buttons = document.querySelectorAll(".actions button");
+    buttons.forEach(button => button.disabled = true);
+
+    try {
+      await api(
+        "/admin/moderation/posts/" + encodeURIComponent(id),
+        {
+          method: "PATCH",
+          body: JSON.stringify({action})
+        }
+      );
+
+      showNotice(
+        action === "approve"
+          ? "Post #" + id + " approved successfully."
+          : "Post #" + id + " rejected successfully.",
+        "success"
+      );
+
+      await loadPosts();
+
+    } catch (error) {
+      showNotice(
+        "Could not " + verb + " post #" + id + ": " + error.message,
+        ""
+      );
+
+      buttons.forEach(button => button.disabled = false);
+    }
   }
 
   async function loadReports() {
+    if (!adminVerified) {
+      showNotice("Admin access is not verified.", "");
+      return;
+    }
+
     $("reportsList").innerHTML = '<div class="empty">Loading reports...</div>';
+
     try {
       const data = await api("/admin/reports?status=all");
       reports = extractArray(data, ["reports", "results"]);
       $("reportsCount").textContent = reports.length;
       renderReports();
-      updateConnection("Admin API access succeeded. Reports endpoint is responding.");
-      showNotice("Reports loaded: " + reports.length + ".", true);
+      showNotice("Reports loaded: " + reports.length + ".", "success");
+
     } catch (error) {
       $("reportsCount").textContent = "—";
       $("reportsList").innerHTML = "";
+
       const empty = document.createElement("div");
       empty.className = "empty";
       empty.textContent = "Could not load reports. " + error.message;
       $("reportsList").appendChild(empty);
-      showNotice("Reports could not be loaded: " + error.message, false);
+
+      showNotice("Reports could not be loaded: " + error.message, "");
     }
   }
 
   function renderReports() {
     const filter = $("reportFilter").value;
+
     const filtered = reports.filter(report => {
       const status = String(report.status || "pending").toLowerCase();
       return filter === "all" || status === filter;
@@ -581,8 +863,10 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
     filtered.forEach(report => {
       const id = report.report_id ?? report.id;
       const status = String(report.status || "pending").toLowerCase();
+
       const item = document.createElement("article");
       item.className = "item";
+
       item.innerHTML =
         '<div class="item-top"><h3>Report #' + escapeHTML(id ?? "Unknown") + '</h3>' +
         '<span class="pill ' + (status === "pending" ? "yellow" : status === "reviewed" ? "green" : "red") + '">' +
@@ -597,14 +881,17 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
       if (status === "pending" && id != null) {
         const actions = document.createElement("div");
         actions.className = "actions";
+
         const approve = document.createElement("button");
         approve.className = "success";
         approve.textContent = "Mark Reviewed";
         approve.addEventListener("click", () => updateReport(id, "approve"));
+
         const dismiss = document.createElement("button");
         dismiss.className = "danger";
         dismiss.textContent = "Dismiss Report";
         dismiss.addEventListener("click", () => updateReport(id, "dismiss"));
+
         actions.append(approve, dismiss);
         item.appendChild(actions);
       }
@@ -616,60 +903,60 @@ footer{margin-top:25px;padding-top:15px;border-top:1px solid var(--line);color:v
   async function updateReport(id, action) {
     const text = action === "approve" ? "mark this report as reviewed" : "dismiss this report";
     if (!confirm("Are you sure you want to " + text + "?")) return;
+
     try {
       await api("/admin/reports/" + encodeURIComponent(id), {
         method: "PATCH",
-        body: JSON.stringify({ action })
+        body: JSON.stringify({action})
       });
-      showNotice("Report updated successfully.", true);
+
+      showNotice("Report updated successfully.", "success");
       await loadReports();
+
     } catch (error) {
-      showNotice("Could not update report: " + error.message, false);
+      showNotice("Could not update report: " + error.message, "");
     }
   }
 
-  $("tokenButton").addEventListener("click", function () {
-    const value = prompt("Paste your existing admin access token. Keep it private.", getToken());
-    if (value === null) return;
-    if (value.trim()) localStorage.setItem(TOKEN_KEY, value.trim());
-    else localStorage.removeItem(TOKEN_KEY);
-    updateConnection();
-    showNotice(value.trim() ? "Token saved in this browser." : "Token cleared.", true);
-  });
+  async function refreshAll() {
+    const verified = await verifyAdmin();
 
-  $("clearTokenButton").addEventListener("click", function () {
-    if (!confirm("Clear the saved access token from this browser?")) return;
-    localStorage.removeItem(TOKEN_KEY);
-    users = []; posts = []; reports = [];
-    $("usersCount").textContent = "—";
-    $("postsCount").textContent = "—";
-    $("reportsCount").textContent = "—";
-    $("usersList").innerHTML = '<div class="empty">Token cleared. Set a valid admin token to load users.</div>';
-    $("postsList").innerHTML = '<div class="empty">Token cleared. Set a valid admin token to load posts.</div>';
-    $("reportsList").innerHTML = '<div class="empty">Token cleared. Set a valid admin token to load reports.</div>';
-    updateConnection();
-    showNotice("Token cleared from this browser.", true);
-  });
+    if (!verified) return;
 
-  $("refreshButton").addEventListener("click", async function () {
-    updateConnection();
-    await Promise.allSettled([loadUsers(), loadPosts(), loadReports()]);
-  });
+    await Promise.allSettled([
+      loadUsers(),
+      loadPosts(),
+      loadReports()
+    ]);
+  }
+
+  $("refreshButton").addEventListener("click", refreshAll);
 
   $("loadUsers").addEventListener("click", loadUsers);
-  $("overviewLoadUsers").addEventListener("click", () => { switchTab("users"); loadUsers(); });
+  $("overviewLoadUsers").addEventListener("click", () => {
+    switchTab("users");
+    loadUsers();
+  });
   $("userSearch").addEventListener("input", renderUsers);
   $("userFilter").addEventListener("change", renderUsers);
 
   $("loadPosts").addEventListener("click", loadPosts);
-  $("overviewLoadPosts").addEventListener("click", () => { switchTab("posts"); loadPosts(); });
+  $("overviewLoadPosts").addEventListener("click", () => {
+    switchTab("posts");
+    loadPosts();
+  });
   $("postSearch").addEventListener("input", renderPosts);
+  $("postFilter").addEventListener("change", renderPosts);
 
   $("loadReports").addEventListener("click", loadReports);
-  $("overviewLoadReports").addEventListener("click", () => { switchTab("reports"); loadReports(); });
+  $("overviewLoadReports").addEventListener("click", () => {
+    switchTab("reports");
+    loadReports();
+  });
   $("reportFilter").addEventListener("change", renderReports);
 
-  updateConnection();
+  refreshAll();
+
 })();
 </script>
 </body>
