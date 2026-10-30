@@ -201,6 +201,27 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+// Moderators receive only explicitly granted tools. Admins retain full access.
+function requireModeratorPermission(permission) {
+  return async function (req, res, next) {
+    if (String(req.user?.role || "").toLowerCase() === "admin") return next();
+    try {
+      const result = await pool.query(
+        `SELECT permissions FROM ft_moderators
+         WHERE user_id=$1 AND active=TRUE LIMIT 1`,
+        [String(req.user.id)]
+      );
+      const permissions = result.rows[0]?.permissions || {};
+      if (permissions[permission] === true) return next();
+      return res.status(403).json({
+        error: "You do not have permission to use this moderation tool."
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+}
+
 function publicUser(user) {
   return {
     id: String(user.id),
@@ -412,6 +433,17 @@ async function initializeDatabase() {
       body VARCHAR(3000) NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS ft_moderators (
+      user_id TEXT PRIMARY KEY,
+      username VARCHAR(50) NOT NULL,
+      permissions JSONB NOT NULL DEFAULT '{"moderation":true,"reports":false}'::jsonb,
+      active BOOLEAN NOT NULL DEFAULT TRUE,
+      granted_by TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS ft_moderators_active_idx
+      ON ft_moderators(active);
     CREATE TABLE IF NOT EXISTS ft_monetization (
       user_id TEXT PRIMARY KEY,
       enabled BOOLEAN NOT NULL DEFAULT FALSE,
@@ -1428,6 +1460,98 @@ app.patch("/api/notifications/read-all", requireAuth, async (req, res, next) => 
 });
 
 // ADMIN: dashboard
+// Moderator management: only a full Admin can grant, edit or revoke access.
+app.get("/api/admin/moderators", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const result = await pool.query(
+      `SELECT m.user_id,u.username,u.email,m.permissions,m.active,
+              m.granted_by,m.created_at,m.updated_at,
+              grantor.username AS granted_by_username
+       FROM ft_moderators m
+       LEFT JOIN users u ON u.id::text=m.user_id
+       LEFT JOIN users grantor ON grantor.id::text=m.granted_by
+       ORDER BY m.created_at DESC`
+    );
+    res.json({ moderators: result.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/admin/moderators", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const username = cleanText(req.body.username,50).replace(/^@/,"");
+    const supplied = Array.isArray(req.body.permissions) ? req.body.permissions : ["moderation"];
+    const allowed = ["moderation","reports"];
+    const permissions = {};
+    for (const key of allowed) permissions[key] = supplied.includes(key);
+    if (!username) return res.status(400).json({error:"Enter the user's username."});
+    if (!permissions.moderation && !permissions.reports) {
+      return res.status(400).json({error:"Select at least one moderator permission."});
+    }
+    const found = await pool.query(
+      `SELECT id::text AS id,username,email,role,account_status
+       FROM users WHERE LOWER(username)=LOWER($1) LIMIT 1`,
+      [username]
+    );
+    if (!found.rowCount) return res.status(404).json({error:"No user found with that username."});
+    const user = found.rows[0];
+    if (String(user.role).toLowerCase()==="admin") {
+      return res.status(400).json({error:"An Admin does not need a Moderator grant."});
+    }
+    if (String(user.account_status).toLowerCase()!=="active") {
+      return res.status(400).json({error:"This user account is not active."});
+    }
+    const result = await pool.query(
+      `INSERT INTO ft_moderators(user_id,username,permissions,active,granted_by)
+       VALUES($1,$2,$3::jsonb,TRUE,$4)
+       ON CONFLICT(user_id) DO UPDATE SET username=EXCLUDED.username,
+         permissions=EXCLUDED.permissions,active=TRUE,granted_by=EXCLUDED.granted_by,
+         updated_at=NOW()
+       RETURNING user_id,username,permissions,active,granted_by,created_at,updated_at`,
+      [user.id,user.username,JSON.stringify(permissions),String(req.user.id)]
+    );
+    res.status(201).json({message:"Moderator access saved.",moderator:{...result.rows[0],email:user.email}});
+  } catch(e) { next(e); }
+});
+
+app.patch("/api/admin/moderators/:userId", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const userId=cleanText(req.params.userId,100);
+    if (req.body.active===false) {
+      const r=await pool.query(
+        `UPDATE ft_moderators SET active=FALSE,updated_at=NOW()
+         WHERE user_id=$1 RETURNING user_id,username,permissions,active`,
+        [userId]
+      );
+      if(!r.rowCount) return res.status(404).json({error:"Moderator not found."});
+      return res.json({message:"Moderator access suspended.",moderator:r.rows[0]});
+    }
+    if (Array.isArray(req.body.permissions)) {
+      const allowed=["moderation","reports"], permissions={};
+      for(const key of allowed) permissions[key]=req.body.permissions.includes(key);
+      if(!permissions.moderation&&!permissions.reports) return res.status(400).json({error:"Select at least one permission, or remove the moderator."});
+      const r=await pool.query(
+        `UPDATE ft_moderators SET permissions=$2::jsonb,active=TRUE,updated_at=NOW()
+         WHERE user_id=$1 RETURNING user_id,username,permissions,active`,
+        [userId,JSON.stringify(permissions)]
+      );
+      if(!r.rowCount) return res.status(404).json({error:"Moderator not found."});
+      return res.json({message:"Moderator permissions updated.",moderator:r.rows[0]});
+    }
+    return res.status(400).json({error:"Provide active:false or a permissions array."});
+  } catch(e) { next(e); }
+});
+
+app.delete("/api/admin/moderators/:userId", requireAuth, requireAdmin, async(req,res,next) => {
+  try {
+    const r=await pool.query(
+      "DELETE FROM ft_moderators WHERE user_id=$1 RETURNING user_id,username",
+      [cleanText(req.params.userId,100)]
+    );
+    if(!r.rowCount) return res.status(404).json({error:"Moderator not found."});
+    res.json({message:"Moderator access removed.",moderator:r.rows[0]});
+  } catch(e) { next(e); }
+});
+
 app.get("/api/admin/dashboard", requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const result = await pool.query(`
@@ -1532,7 +1656,7 @@ app.get("/api/admin/posts", requireAuth, requireAdmin, async (req, res, next) =>
 });
 
 // ADMIN: review reported posts
-app.get("/api/admin/reports", requireAuth, requireAdmin, async (req, res, next) => {
+app.get("/api/admin/reports", requireAuth, requireModeratorPermission("reports"), async (req, res, next) => {
   try {
     const status = cleanText(req.query.status || "pending", 20);
     if (!["pending", "reviewed", "dismissed", "all"].includes(status)) {
@@ -1560,7 +1684,7 @@ app.get("/api/admin/reports", requireAuth, requireAdmin, async (req, res, next) 
   }
 });
 
-app.patch("/api/admin/reports/:id", requireAuth, requireAdmin, async (req, res, next) => {
+app.patch("/api/admin/reports/:id", requireAuth, requireModeratorPermission("reports"), async (req, res, next) => {
   try {
     const id = Number.parseInt(req.params.id, 10);
     const action = cleanText(req.body.action, 30).toLowerCase();
@@ -1897,8 +2021,8 @@ app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const
 app.post("/api/messages/media", requireAuth, async(req,res,next)=>{try{await purgeExpiredMessages();const recipientId=cleanText(req.body.recipient_id,100),url=cleanText(req.body.media_url,2000),type=cleanText(req.body.media_type,20),publicId=cleanText(req.body.media_public_id,500),content=cleanText(req.body.content,5000);if(!recipientId||recipientId===String(req.user.id)||!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type)||!publicId)return res.status(400).json({error:'Valid recipient, Cloudinary image/video URL and media_public_id are required.'});const recipient=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[recipientId]);if(!recipient.rowCount)return res.status(404).json({error:'Recipient not found.'});const r=await pool.query("INSERT INTO ft_messages(sender_id,recipient_id,content,media_url,media_type,media_public_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,sender_id,recipient_id,content,media_url,media_type,created_at,read_at",[String(req.user.id),recipientId,content,url,type,publicId]);await notifyUser(recipientId,req.user.id,'message',`New message from ${req.user.username}.`);res.status(201).json({item:r.rows[0],expires_at:new Date(Date.now()+72*60*60*1000).toISOString()});}catch(e){next(e);}});
 
 // Fail-closed moderation helper endpoints. No claim of AI protection until provider/add-on is configured.
-app.get("/api/admin/moderation/pending", requireAuth, requireAdmin, async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
-app.patch("/api/admin/moderation/posts/:id", requireAuth, requireAdmin, async(req,res,next)=>{
+app.get("/api/admin/moderation/pending", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
+app.patch("/api/admin/moderation/posts/:id", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{
   try {
     const id=Number.parseInt(req.params.id,10), action=cleanText(req.body.action,20).toLowerCase();
     if(!Number.isSafeInteger(id)||!["approve","reject"].includes(action)) return res.status(400).json({error:"Action must be approve or reject."});
@@ -1919,7 +2043,7 @@ app.patch("/api/admin/moderation/posts/:id", requireAuth, requireAdmin, async(re
     res.json({post:r.rows[0]});
   } catch(e) { next(e); }
 });
-app.patch("/api/admin/moderation/stories/:id", requireAuth, requireAdmin, async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_stories SET moderation_status=$1 WHERE id=$2 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,id]);if(!r.rowCount)return res.status(404).json({error:'Pending story not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your story was ${status}.`);res.json({story:r.rows[0]});}catch(e){next(e);}});
+app.patch("/api/admin/moderation/stories/:id", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_stories SET moderation_status=$1 WHERE id=$2 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,id]);if(!r.rowCount)return res.status(404).json({error:'Pending story not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your story was ${status}.`);res.json({story:r.rows[0]});}catch(e){next(e);}});
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
