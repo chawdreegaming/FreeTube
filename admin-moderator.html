@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111326"><title>Moderator Management - Boys vs Girls</title>
+<style>
+:root{color-scheme:dark;--bg:#111326;--card:#1a1c30;--line:#34364f;--text:#f4f4ff;--muted:#a6a7bd;--purple:#765cff;--green:#27c995;--red:#f0647b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#29204a,transparent 42%),var(--bg);color:var(--text);font:15px/1.6 system-ui,sans-serif}.wrap{max-width:900px;margin:auto;padding:18px 14px 40px}header,.row,.actions{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}h1{font-size:25px;margin:5px 0}h2{font-size:19px;margin:0 0 12px}.muted{color:var(--muted)}.card,.item{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px;margin:14px 0}.field{margin:12px 0}label{display:block;margin-bottom:6px;color:#d2d1e5}input{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:#101225;color:white;font:inherit}button,.link{border:0;border-radius:10px;padding:11px 15px;background:var(--purple);color:white;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}button.secondary{background:#353750}button.danger{background:#9c344a}button:disabled{opacity:.5}.checks{display:flex;gap:16px;flex-wrap:wrap}.checks label{display:flex;align-items:center;gap:7px}.checks input{width:auto}.notice{display:none;padding:12px;border-radius:10px;background:#492532;color:#ffdce3;margin:12px 0}.notice.ok{background:#123d32;color:#c3ffeb}.list{display:grid;gap:10px}.item{margin:0}.tag{display:inline-block;border-radius:30px;background:#30324b;padding:3px 9px;font-size:12px;margin:3px}.tag.green{background:#14513e;color:#c7ffeb}.small{font-size:12px}.actions{justify-content:flex-start;margin-top:12px}
+</style></head>
+<body><main class="wrap">
+<header><div><div class="muted small">BOYS VS GIRLS 💙💗 · ADMINISTRATION</div><h1>🛡️ Moderator Management</h1><div class="muted">ইউজারনেম দিয়ে Moderator যোগ করুন এবং অনুমতি নিয়ন্ত্রণ করুন।</div></div><a class="link" href="admin-dashboard.html">← Dashboard</a></header>
+<div id="notice" class="notice" role="status"></div>
+<section class="card"><div class="row"><h2>নতুন Moderator যোগ করুন</h2><span class="tag">Admin only</span></div>
+<div class="field"><label for="username">ব্যবহারকারীর Username</label><input id="username" maxlength="50" placeholder="যেমন: rahim_123" autocomplete="off"></div>
+<div class="field"><label>কোন কাজের অনুমতি দেবেন?</label><div class="checks">
+<label><input type="checkbox" id="permModeration" checked> ভিডিও / স্টোরি Approve ও Reject</label>
+<label><input type="checkbox" id="permReports"> রিপোর্ট দেখা ও ব্যবস্থা নেওয়া</label>
+</div></div>
+<p class="muted small">Moderator-কে Admin, Payment, Blue Badge, User Management বা Moderator Management-এর অনুমতি দেওয়া হবে না।</p>
+<button id="addButton">＋ Add Moderator</button></section>
+<section class="card"><div class="row"><h2>Moderator তালিকা</h2><button class="secondary" id="refresh">Refresh</button></div><div id="list" class="list"><div class="muted">Loading...</div></div></section>
+</main>
+<script>
+(function(){
+"use strict";
+const API="https://freetube-backend-a222.onrender.com/api",TOKEN_KEY="freetube_access_token", $=id=>document.getElementById(id);
+function show(msg,ok){const n=$("notice");n.textContent=msg;n.className="notice"+(ok?" ok":"");n.style.display="block"}
+function token(){return(localStorage.getItem(TOKEN_KEY)||"").trim()}
+async function api(path,opts={}){const t=token();if(!t)throw Error("মূল অ্যাপে Admin account দিয়ে লগইন করুন।");let r=await fetch(API+path,{...opts,headers:{...(opts.headers||{}),Authorization:"Bearer "+t,...(opts.body?{"Content-Type":"application/json"}:{})},cache:"no-store"});let d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed ("+r.status+")");return d}
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function load(){const root=$("list");root.innerHTML='<div class="muted">Loading moderators...</div>';try{const d=await api("/admin/moderators");const rows=d.moderators||[];if(!rows.length){root.innerHTML='<div class="muted">এখনো কোনো Moderator যোগ করা হয়নি।</div>';return}root.innerHTML=rows.map(m=>{const p=m.permissions||{};return `<article class="item"><div class="row"><strong>@${esc(m.username)}</strong><span class="tag ${m.active?"green":""}">${m.active?"Active":"Suspended"}</span></div><div class="muted small">${esc(m.email||"")}</div><div><span class="tag">${p.moderation?"Video moderation":"No video moderation"}</span><span class="tag">${p.reports?"Reports access":"No reports access"}</span></div><div class="actions"><button class="secondary" data-action="edit" data-id="${esc(m.user_id)}" data-moderation="${!!p.moderation}" data-reports="${!!p.reports}">Edit permissions</button><button class="secondary" data-action="toggle" data-id="${esc(m.user_id)}" data-active="${!!m.active}">${m.active?"Suspend":"Reactivate"}</button><button class="danger" data-action="remove" data-id="${esc(m.user_id)}">Remove</button></div></article>`}).join("")}catch(e){root.innerHTML='<div class="muted">'+esc(e.message)+'</div>';show(e.message,false)}}
+$("addButton").addEventListener("click",async()=>{const username=$("username").value.trim().replace(/^@/,""),permissions=[];if($("permModeration").checked)permissions.push("moderation");if($("permReports").checked)permissions.push("reports");if(!username)return show("Username লিখুন।",false);if(!permissions.length)return show("কমপক্ষে একটি permission নির্বাচন করুন।",false);try{await api("/admin/moderators",{method:"POST",body:JSON.stringify({username,permissions})});$("username").value="";show("Moderator সফলভাবে যোগ করা হয়েছে।",true);await load()}catch(e){show(e.message,false)}});
+$("refresh").addEventListener("click",load);
+$("list").addEventListener("click",async ev=>{const b=ev.target.closest("button[data-action]");if(!b)return;const id=b.dataset.id,action=b.dataset.action;try{if(action==="edit"){const permissions=[];if(confirm("ভিডিও moderation permission দিতে চান?"))permissions.push("moderation");if(confirm("Reports access দিতে চান?"))permissions.push("reports");if(!permissions.length)return show("কমপক্ষে একটি permission দরকার। Remove করতে চাইলে Remove চাপুন।",false);await api("/admin/moderators/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({permissions})});show("Permission আপডেট হয়েছে।",true)}else if(action==="toggle"){const active=b.dataset.active!=="true";await api("/admin/moderators/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({active})});show(active?"Moderator reactivated.":"Moderator suspended.",true)}else if(action==="remove"){if(!confirm("এই Moderator-এর সব access বাতিল করবেন?"))return;await api("/admin/moderators/"+encodeURIComponent(id),{method:"DELETE"});show("Moderator access সরানো হয়েছে।",true)}await load()}catch(e){show(e.message,false)}});
+load();
+})();
+</script></body></html>
