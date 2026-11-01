@@ -79,15 +79,7 @@ input[type=file]{display:none}
 .post-time{font-size:10px;color:var(--muted);font-weight:normal}
 .post-content{font-size:13px;line-height:1.65;white-space:pre-wrap;margin:7px 0}
 .post-media{display:block;width:100%;max-height:420px;object-fit:contain;margin-top:8px;border-radius:10px;background:#090815}
-.post-meta{display:flex;gap:13px;margin-top:9px;flex-wrap:wrap}
-.reaction-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:9px;border-top:1px solid var(--border)}
-.reaction-button{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:6px 9px;border:1px solid var(--border);border-radius:20px;background:#ffffff08;color:var(--muted);font-size:11px;font-weight:700;transition:background .15s,border-color .15s,transform .15s}
-.reaction-button:active{transform:scale(.96)}
-.reaction-button.active{color:#fff;border-color:#a78bfa;background:#a78bfa25}
-.reaction-button:disabled{opacity:.55;cursor:wait}
-.reaction-button .emoji{font-size:15px;line-height:1}
-.reaction-total{margin-left:auto;color:var(--muted);font-size:10px;white-space:nowrap}
-@media(max-width:380px){.reaction-button{padding:6px 7px;font-size:10px;gap:4px}}
+.post-meta{display:flex;gap:13px;margin-top:9px}
 .ad-banner-slot{width:100%;min-height:50px;margin:9px 0;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#100f2088;border-top:1px solid #ffffff12;border-bottom:1px solid #ffffff12}
 .ad-banner-slot iframe{max-width:100%;border:0}
 .ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -113,6 +105,29 @@ input[type=file]{display:none}
  .friend-card img,.friend-fallback{width:40px;height:40px}
  .friend-name{font-size:9px}.btn{font-size:10px;padding:9px 4px}
 }
+
+.post-interactions{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.reaction-list{display:flex;flex-wrap:wrap;gap:7px}
+.reaction-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid #ffffff20;border-radius:24px;background:#ffffff08;color:var(--muted);font-size:12px;font-weight:800}
+.reaction-btn.active{border-color:var(--purple);background:#a78bfa25;color:#fff;box-shadow:0 0 0 1px #a78bfa55}
+.reaction-btn:disabled{opacity:.55}
+.reaction-total{margin-left:auto;align-self:center;color:var(--muted);font-size:11px}
+.comment-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px}
+.comment-toggle{border:0;background:none;color:var(--blue);font-size:12px;font-weight:800;padding:7px 0}
+.comment-form{display:flex;align-items:center;gap:8px;margin-top:8px}
+.comment-input{flex:1;min-width:0;padding:11px 13px;border:1px solid var(--border);border-radius:22px;background:#ffffff0b;color:var(--text);outline:none;font-size:13px}
+.comment-input:focus{border-color:var(--purple)}
+.comment-send{border:0;border-radius:22px;padding:10px 14px;background:var(--gradient);color:#17142e;font-weight:900;font-size:12px}
+.comment-send:disabled{opacity:.5}
+.comments-list{display:grid;gap:10px;margin-top:12px}
+.comment-item{display:flex;gap:9px;align-items:flex-start}
+.comment-avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--panel2);flex:0 0 32px}
+.comment-bubble{min-width:0;flex:1;padding:9px 11px;border-radius:13px;background:#ffffff0b}
+.comment-author{font-size:12px;font-weight:900;margin-bottom:4px}
+.comment-text{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.comment-time{font-size:10px;color:var(--muted);margin-top:4px}
+.comments-empty{font-size:12px;color:var(--muted);padding:8px 0}
+
 </style>
 </head>
 <body>
@@ -564,55 +579,6 @@ function relativeTime(value){
  if(days<365)return months+"mo ago";
  return Math.floor(days/365)+"y ago";
 }
-const REACTIONS=[
- {key:"love",emoji:"❤️",label:"Love"},
- {key:"haha",emoji:"😂",label:"Haha"},
- {key:"sad",emoji:"😢",label:"Sad"},
- {key:"angry",emoji:"😡",label:"Angry"}
-];
-function safeCount(value){const n=Number(value);return Number.isFinite(n)&&n>0?Math.floor(n):0}
-function renderReactionBar(post,postIdValue){
- const bar=document.createElement("div");bar.className="reaction-bar";
- const counts={...(post.reaction_counts||{})};
- let mine=String(post.my_reaction||post.user_reaction||"").toLowerCase();
- if(!REACTIONS.some(x=>x.key===mine))mine="";
- const buttons=new Map();
- const total=document.createElement("span");total.className="reaction-total";
- const update=()=>{
-  let sum=0;
-  REACTIONS.forEach(item=>{
-   const n=safeCount(counts[item.key]);sum+=n;
-   const button=buttons.get(item.key);
-   button.querySelector(".reaction-count").textContent=String(n);
-   button.classList.toggle("active",mine===item.key);
-   button.setAttribute("aria-pressed",mine===item.key?"true":"false");
-  });
-  total.textContent=sum+ (sum===1?" reaction":" reactions");
- };
- REACTIONS.forEach(item=>{
-  const button=document.createElement("button");button.type="button";button.className="reaction-button";
-  button.setAttribute("aria-label",item.label+" reaction");button.setAttribute("aria-pressed","false");
-  const emoji=document.createElement("span");emoji.className="emoji";emoji.textContent=item.emoji;
-  const label=document.createElement("span");label.textContent=item.label;
-  const count=document.createElement("span");count.className="reaction-count";count.textContent=String(safeCount(counts[item.key]));
-  button.append(emoji,label,count);buttons.set(item.key,button);
-  button.addEventListener("click",async()=>{
-   if(button.disabled)return;
-   buttons.forEach(b=>b.disabled=true);
-   try{
-    const result=await api("/posts/"+encodeURIComponent(postIdValue)+"/reaction",{method:"POST",body:JSON.stringify({reaction:item.key})});
-    mine=String(result.reaction||"").toLowerCase();
-    if(!REACTIONS.some(x=>x.key===mine))mine="";
-    Object.keys(counts).forEach(key=>delete counts[key]);
-    Object.assign(counts,result.reaction_counts||{});
-    update();
-   }catch(error){toast(error.message||"Could not save reaction.");}
-   finally{buttons.forEach(b=>b.disabled=false);}
-  });
-  bar.append(button);
- });
- bar.append(total);update();return bar;
-}
 function mountAdBanner(slot){
  if(slot.dataset.loaded==="1")return;
  slot.dataset.loaded="1";
@@ -626,6 +592,123 @@ function mountAdBanner(slot){
  adScript.async=true;
  slot.appendChild(adScript);
 }
+
+const REACTION_TYPES=[
+ {key:"love",label:"Love",emoji:"❤️"},
+ {key:"haha",label:"Haha",emoji:"😂"},
+ {key:"sad",label:"Sad",emoji:"😢"},
+ {key:"angry",label:"Angry",emoji:"😡"}
+];
+function safeCount(value){const n=Number(value);return Number.isFinite(n)&&n>0?Math.floor(n):0}
+function makeReactionControls(post,postCard){
+ const wrap=document.createElement("div");wrap.className="post-interactions";
+ const row=document.createElement("div");row.className="reaction-list";
+ const counts={...(post.reaction_counts||{})};
+ let mine=String(post.my_reaction||post.user_reaction||"").toLowerCase();
+ const total=()=>REACTION_TYPES.reduce((sum,r)=>sum+safeCount(counts[r.key]),0);
+ const totalLabel=document.createElement("span");totalLabel.className="reaction-total";
+ function paint(){
+  row.querySelectorAll("button[data-reaction]").forEach(btn=>{
+   const key=btn.dataset.reaction;
+   btn.classList.toggle("active",mine===key);
+   btn.setAttribute("aria-pressed",mine===key?"true":"false");
+   const type=REACTION_TYPES.find(r=>r.key===key);
+   btn.textContent=type.emoji+" "+type.label+" "+safeCount(counts[key]);
+  });
+  totalLabel.textContent=total()+" reaction"+(total()===1?"":"s");
+ }
+ REACTION_TYPES.forEach(type=>{
+  const btn=document.createElement("button");btn.type="button";btn.className="reaction-btn";
+  btn.dataset.reaction=type.key;
+  btn.addEventListener("click",async()=>{
+   if(btn.disabled)return;
+   const previous=mine;btn.disabled=true;
+   try{
+    const result=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{
+     method:"POST",body:JSON.stringify({reaction:type.key})
+    });
+    mine=result.reaction||null;
+    Object.keys(counts).forEach(k=>delete counts[k]);
+    Object.assign(counts,result.reaction_counts||{});
+    post.reaction_counts={...counts};post.my_reaction=mine;
+    post.like_count=result.reaction_count??total();
+    const like=postCard.querySelector(".post-meta span");
+    if(like)like.innerHTML='<i class="fa-regular fa-heart"></i> '+safeCount(post.like_count);
+    paint();
+   }catch(error){toast("Reaction failed: "+error.message);mine=previous}
+   finally{btn.disabled=false;paint()}
+  });
+  row.append(btn);
+ });
+ row.append(totalLabel);wrap.append(row);paint();
+ return wrap;
+}
+function commentAvatar(comment){
+ return comment.avatar_url||comment.avatar||FALLBACK_AVATAR;
+}
+function renderComment(comment){
+ const item=document.createElement("div");item.className="comment-item";
+ const avatar=document.createElement("img");avatar.className="comment-avatar";avatar.alt="";setImg(avatar,commentAvatar(comment),FALLBACK_AVATAR);
+ const bubble=document.createElement("div");bubble.className="comment-bubble";
+ const author=document.createElement("div");author.className="comment-author";
+ author.textContent=String(comment.display_name||comment.username||"User");
+ const text=document.createElement("div");text.className="comment-text";text.textContent=String(comment.content||"");
+ const time=document.createElement("div");time.className="comment-time";time.textContent=relativeTime(comment.created_at);
+ bubble.append(author,text);if(time.textContent)bubble.append(time);
+ item.append(avatar,bubble);return item;
+}
+function makeComments(post,postCard){
+ const wrap=document.createElement("div");wrap.className="post-comments";
+ const toolbar=document.createElement("div");toolbar.className="comment-toolbar";
+ const toggle=document.createElement("button");toggle.type="button";toggle.className="comment-toggle";
+ const list=document.createElement("div");list.className="comments-list";list.hidden=true;
+ let loaded=false,loadingComments=false,expanded=false;
+ const commentCount=()=>safeCount(post.comment_count);
+ function paintToggle(){toggle.textContent=(expanded?"Hide comments":"View comments")+" ("+commentCount()+")";}
+ async function loadComments(){
+  if(loadingComments)return;
+  loadingComments=true;list.replaceChildren();
+  const loading=document.createElement("div");loading.className="comments-empty";loading.textContent="Loading comments...";list.append(loading);
+  try{
+   const result=await api("/posts/"+encodeURIComponent(post.id)+"/comments");
+   const comments=Array.isArray(result.comments)?result.comments:[];
+   list.replaceChildren();
+   if(!comments.length){const empty=document.createElement("div");empty.className="comments-empty";empty.textContent="No comments yet. Be the first to comment.";list.append(empty)}
+   else comments.forEach(comment=>list.append(renderComment(comment)));
+   loaded=true;
+  }catch(error){
+   list.replaceChildren();const failed=document.createElement("div");failed.className="comments-empty";failed.textContent="Could not load comments: "+error.message;list.append(failed);
+  }finally{loadingComments=false}
+ }
+ toggle.addEventListener("click",async()=>{
+  expanded=!expanded;list.hidden=!expanded;paintToggle();
+  if(expanded&&!loaded)await loadComments();
+ });
+ toolbar.append(toggle);wrap.append(toolbar);
+ const form=document.createElement("form");form.className="comment-form";
+ const input=document.createElement("input");input.className="comment-input";input.type="text";input.maxLength=2000;input.placeholder="Write a comment...";
+ input.setAttribute("aria-label","Write a comment");
+ const send=document.createElement("button");send.className="comment-send";send.type="submit";send.textContent="Send";
+ form.append(input,send);
+ form.addEventListener("submit",async event=>{
+  event.preventDefault();const content=input.value.trim();if(!content||send.disabled)return;
+  send.disabled=true;send.textContent="Sending...";
+  try{
+   await api("/posts/"+encodeURIComponent(post.id)+"/comments",{
+    method:"POST",body:JSON.stringify({content})
+   });
+   input.value="";
+   post.comment_count=commentCount()+1;
+   const commentMeta=postCard.querySelectorAll(".post-meta span")[1];
+   if(commentMeta)commentMeta.innerHTML='<i class="fa-regular fa-comment"></i> '+post.comment_count;
+   expanded=true;list.hidden=false;paintToggle();loaded=false;await loadComments();
+   toast("Comment added.");
+  }catch(error){toast("Comment failed: "+error.message)}
+  finally{send.disabled=false;send.textContent="Send"}
+ });
+ wrap.append(form,list);paintToggle();return wrap;
+}
+
 async function loadPosts(force=false){
  if(postsLoading&&!force)return;
  postsLoading=true;
@@ -673,9 +756,11 @@ async function loadPosts(force=false){
     const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s)
    });
    card.append(meta);
-   const reactionPostId=String(p.id||p.post_id||"");
-   if(reactionPostId){
-    card.append(renderReactionBar(p,reactionPostId));
+   const postKey=String(p.id??p.post_id??"");
+   if(postKey){
+    p.id=postKey;
+    card.append(makeReactionControls(p,card));
+    card.append(makeComments(p,card));
    }
 
    /* Full post date/time is intentionally not displayed. */
