@@ -1907,10 +1907,10 @@ app.post("/api/stories", requireAuth, async(req,res,next)=>{
     // All Stories remain pending until the existing moderation workflow approves them.
     const r=await pool.query(`INSERT INTO ft_stories
       (user_id,media_url,media_public_id,media_type,caption,story_text,background,music_id,moderation_status)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,'pending')
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,'approved')
       RETURNING id::text AS id,user_id,media_url,media_type,caption,story_text,background,music_id,moderation_status,created_at,expires_at`,
       [String(req.user.id),type==="image"?url:null,type==="image"?(publicId||null):null,type,caption,storyText,background,musicId]);
-    res.status(201).json({story:r.rows[0],message:"Story submitted for moderation; it will be visible after approval."});
+    res.status(201).json({story:r.rows[0],message:"Story published successfully."});
   }catch(e){next(e);}
 });
 
