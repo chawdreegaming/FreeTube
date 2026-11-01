@@ -876,7 +876,7 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
               EXISTS(SELECT 1 FROM ft_post_reactions r
                      WHERE r.post_id=p.id AND r.user_id=$1) AS liked,
               (SELECT r.reaction FROM ft_post_reactions r
-               WHERE r.post_id=p.id AND r.user_id=$1 LIMIT 1) AS my_reaction
+                     WHERE r.post_id=p.id AND r.user_id=$1 LIMIT 1) AS my_reaction
        FROM ft_posts p
        JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
