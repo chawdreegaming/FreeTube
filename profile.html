@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -80,7 +79,15 @@ input[type=file]{display:none}
 .post-time{font-size:10px;color:var(--muted);font-weight:normal}
 .post-content{font-size:13px;line-height:1.65;white-space:pre-wrap;margin:7px 0}
 .post-media{display:block;width:100%;max-height:420px;object-fit:contain;margin-top:8px;border-radius:10px;background:#090815}
-.post-meta{display:flex;gap:13px;margin-top:9px}
+.post-meta{display:flex;gap:13px;margin-top:9px;flex-wrap:wrap}
+.reaction-bar{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:11px;padding-top:9px;border-top:1px solid var(--border)}
+.reaction-button{display:inline-flex;align-items:center;gap:5px;min-height:34px;padding:6px 9px;border:1px solid var(--border);border-radius:20px;background:#ffffff08;color:var(--muted);font-size:11px;font-weight:700;transition:background .15s,border-color .15s,transform .15s}
+.reaction-button:active{transform:scale(.96)}
+.reaction-button.active{color:#fff;border-color:#a78bfa;background:#a78bfa25}
+.reaction-button:disabled{opacity:.55;cursor:wait}
+.reaction-button .emoji{font-size:15px;line-height:1}
+.reaction-total{margin-left:auto;color:var(--muted);font-size:10px;white-space:nowrap}
+@media(max-width:380px){.reaction-button{padding:6px 7px;font-size:10px;gap:4px}}
 .ad-banner-slot{width:100%;min-height:50px;margin:9px 0;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#100f2088;border-top:1px solid #ffffff12;border-bottom:1px solid #ffffff12}
 .ad-banner-slot iframe{max-width:100%;border:0}
 .ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -557,6 +564,55 @@ function relativeTime(value){
  if(days<365)return months+"mo ago";
  return Math.floor(days/365)+"y ago";
 }
+const REACTIONS=[
+ {key:"love",emoji:"❤️",label:"Love"},
+ {key:"haha",emoji:"😂",label:"Haha"},
+ {key:"sad",emoji:"😢",label:"Sad"},
+ {key:"angry",emoji:"😡",label:"Angry"}
+];
+function safeCount(value){const n=Number(value);return Number.isFinite(n)&&n>0?Math.floor(n):0}
+function renderReactionBar(post,postIdValue){
+ const bar=document.createElement("div");bar.className="reaction-bar";
+ const counts={...(post.reaction_counts||{})};
+ let mine=String(post.my_reaction||post.user_reaction||"").toLowerCase();
+ if(!REACTIONS.some(x=>x.key===mine))mine="";
+ const buttons=new Map();
+ const total=document.createElement("span");total.className="reaction-total";
+ const update=()=>{
+  let sum=0;
+  REACTIONS.forEach(item=>{
+   const n=safeCount(counts[item.key]);sum+=n;
+   const button=buttons.get(item.key);
+   button.querySelector(".reaction-count").textContent=String(n);
+   button.classList.toggle("active",mine===item.key);
+   button.setAttribute("aria-pressed",mine===item.key?"true":"false");
+  });
+  total.textContent=sum+ (sum===1?" reaction":" reactions");
+ };
+ REACTIONS.forEach(item=>{
+  const button=document.createElement("button");button.type="button";button.className="reaction-button";
+  button.setAttribute("aria-label",item.label+" reaction");button.setAttribute("aria-pressed","false");
+  const emoji=document.createElement("span");emoji.className="emoji";emoji.textContent=item.emoji;
+  const label=document.createElement("span");label.textContent=item.label;
+  const count=document.createElement("span");count.className="reaction-count";count.textContent=String(safeCount(counts[item.key]));
+  button.append(emoji,label,count);buttons.set(item.key,button);
+  button.addEventListener("click",async()=>{
+   if(button.disabled)return;
+   buttons.forEach(b=>b.disabled=true);
+   try{
+    const result=await api("/posts/"+encodeURIComponent(postIdValue)+"/reaction",{method:"POST",body:JSON.stringify({reaction:item.key})});
+    mine=String(result.reaction||"").toLowerCase();
+    if(!REACTIONS.some(x=>x.key===mine))mine="";
+    Object.keys(counts).forEach(key=>delete counts[key]);
+    Object.assign(counts,result.reaction_counts||{});
+    update();
+   }catch(error){toast(error.message||"Could not save reaction.");}
+   finally{buttons.forEach(b=>b.disabled=false);}
+  });
+  bar.append(button);
+ });
+ bar.append(total);update();return bar;
+}
 function mountAdBanner(slot){
  if(slot.dataset.loaded==="1")return;
  slot.dataset.loaded="1";
@@ -617,6 +673,10 @@ async function loadPosts(force=false){
     const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s)
    });
    card.append(meta);
+   const reactionPostId=String(p.id||p.post_id||"");
+   if(reactionPostId){
+    card.append(renderReactionBar(p,reactionPostId));
+   }
 
    /* Full post date/time is intentionally not displayed. */
    box.append(card);
