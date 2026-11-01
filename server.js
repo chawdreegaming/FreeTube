@@ -1,3 +1,4 @@
+```javascript
 require("dotenv").config();
 
 const express = require("express");
@@ -68,7 +69,8 @@ const upload = multer({
   fileFilter(req, file, callback) {
     const types = [
       "image/jpeg", "image/png", "image/webp", "image/gif",
-      "video/mp4", "video/webm", "video/quicktime"
+      "video/mp4", "video/webm", "video/quicktime",
+      "audio/mpeg", "audio/mp3", "audio/mp4", "audio/wav", "audio/x-wav", "audio/ogg"
     ];
     if (!types.includes(file.mimetype)) {
       return callback(new Error(
@@ -123,7 +125,7 @@ async function verifyPassword(password, storedHash) {
     const expected = Buffer.from(parts[2], "hex");
     if (expected.length !== 64) return false;
     const actual = await scryptAsync(password, parts[1], 64);
-    return crypto.timingSafeEqual(expected, actual);
+    return crypto.timingSafeEqual(actual, expected);
   } catch (_) {
     return false;
   }
@@ -258,19 +260,36 @@ function checkFileSignature(buffer, type) {
   if (type === "video/webm") {
     return buffer.subarray(0, 4).equals(Buffer.from([26,69,223,163]));
   }
+  if (type === "audio/wav" || type === "audio/x-wav") {
+    return buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
+      buffer.subarray(8, 12).toString("ascii") === "WAVE";
+  }
+  if (type === "audio/ogg") {
+    return buffer.subarray(0, 4).toString("ascii") === "OggS";
+  }
+  if (type === "audio/mp4") {
+    return buffer.subarray(4, 8).toString("ascii") === "ftyp";
+  }
+  if (type === "audio/mpeg" || type === "audio/mp3") {
+    return buffer.subarray(0, 3).toString("ascii") === "ID3" ||
+      (buffer[0] === 0xFF && (buffer[1] & 0xE0) === 0xE0);
+  }
   return false;
 }
 
 function sendCloudinaryUpload(buffer, mimetype) {
   return new Promise((resolve, reject) => {
-    const resourceType = mimetype.startsWith("video/") ? "video" : "image";
+    const resourceType = (mimetype.startsWith("video/") || mimetype.startsWith("audio/"))
+      ? "video" : "image";
     const stream = cloudinary.uploader.upload_stream(
       {
         folder: "freetube", resource_type: resourceType,
         quality: "auto:good", fetch_format: "auto",
         ...(resourceType === "image"
           ? { transformation: [{ width: 1920, height: 1920, crop: "limit" }] }
-          : { transformation: [{ width: 1280, crop: "limit" }] })
+          : (mimetype.startsWith("audio/")
+              ? {}
+              : { transformation: [{ width: 1280, crop: "limit" }] }))
       },
       (error, result) => {
         if (error) return reject(error);
@@ -351,6 +370,7 @@ async function initializeDatabase() {
       PRIMARY KEY(follower_id, following_id),
       CHECK(follower_id <> following_id)
     );
+    );
 
     CREATE TABLE IF NOT EXISTS ft_post_reports (
       id BIGSERIAL PRIMARY KEY,
@@ -411,6 +431,23 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
     );
+    CREATE TABLE IF NOT EXISTS ft_story_music (
+      id BIGSERIAL PRIMARY KEY,
+      title VARCHAR(120) NOT NULL,
+      artist VARCHAR(120) NOT NULL DEFAULT 'Free Music',
+      audio_url TEXT NOT NULL,
+      audio_public_id TEXT,
+      license_name VARCHAR(160) NOT NULL,
+      license_url TEXT NOT NULL,
+      attribution TEXT NOT NULL DEFAULT '',
+      active BOOLEAN NOT NULL DEFAULT TRUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    ALTER TABLE ft_stories ALTER COLUMN media_url DROP NOT NULL;
+    ALTER TABLE ft_stories ALTER COLUMN media_type DROP NOT NULL;
+    ALTER TABLE ft_stories ADD COLUMN IF NOT EXISTS story_text VARCHAR(500) NOT NULL DEFAULT '';
+    ALTER TABLE ft_stories ADD COLUMN IF NOT EXISTS background VARCHAR(30) NOT NULL DEFAULT 'purple';
+    ALTER TABLE ft_stories ADD COLUMN IF NOT EXISTS music_id BIGINT REFERENCES ft_story_music(id) ON DELETE SET NULL;
     CREATE TABLE IF NOT EXISTS ft_friend_requests (
       id BIGSERIAL PRIMARY KEY,
       sender_id TEXT NOT NULL,
@@ -702,8 +739,7 @@ app.post("/api/auth/login", async (req, res, next) => {
     if (String(user.account_status).toLowerCase() !== "active") {
       return res.status(403).json({ error: "This account is not active." });
     }
-
-    await pool.query(
+        await pool.query(
       `INSERT INTO ft_profiles(user_id,display_name)
        VALUES($1,$2) ON CONFLICT(user_id) DO NOTHING`,
       [String(user.id), user.username]
@@ -840,7 +876,7 @@ app.post("/api/media/upload", requireAuth, (req, res, next) => {
     if (error) return next(error);
     try {
       if (!req.file) {
-        return res.status(400).json({ error: "Select an image or video." });
+        return res.status(400).json({ error: "Select a supported image, video or audio file." });
       }
       if (!checkFileSignature(req.file.buffer, req.file.mimetype)) {
         return res.status(400).json({ error: "The file content does not match its type." });
@@ -874,9 +910,7 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
               (SELECT COUNT(*) FROM ft_comments c WHERE c.post_id=p.id) AS comment_count,
               (SELECT COUNT(*) FROM ft_post_views v WHERE v.post_id=p.id) AS view_count,
               EXISTS(SELECT 1 FROM ft_post_reactions r
-                     WHERE r.post_id=p.id AND r.user_id=$1) AS liked,
-              (SELECT r.reaction FROM ft_post_reactions r
-                     WHERE r.post_id=p.id AND r.user_id=$1 LIMIT 1) AS my_reaction
+                     WHERE r.post_id=p.id AND r.user_id=$1) AS liked
        FROM ft_posts p
        JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
@@ -1075,7 +1109,7 @@ app.post("/api/posts/:id/view", requireAuth, async (req, res, next) => {
     });
   } catch (e) {
     next(e);
-  }
+      }
 });
 
 // Backward-compatible route: the old Like action now means Love reaction.
@@ -1229,7 +1263,7 @@ app.get("/api/users/:userId/followers", async (req, res, next) => {
        FROM unique_relations r JOIN users u ON u.id::text=r.person_id
        LEFT JOIN ft_profiles p ON p.user_id=u.id::text
        WHERE u.account_status='active'
-       ORDER BY r.relation_at DESC LIMIT 100`, 
+       ORDER BY r.relation_at DESC LIMIT 100`,
       [id]
     );
     res.json({ users: result.rows });
@@ -1254,7 +1288,7 @@ app.get("/api/users/:userId/following", async (req, res, next) => {
        FROM unique_relations r JOIN users u ON u.id::text=r.person_id
        LEFT JOIN ft_profiles p ON p.user_id=u.id::text
        WHERE u.account_status='active'
-       ORDER BY r.relation_at DESC LIMIT 100`, 
+       ORDER BY r.relation_at DESC LIMIT 100`,
       [id]
     );
     res.json({ users: result.rows });
@@ -1444,7 +1478,6 @@ app.patch("/api/notifications/:id/read", requireAuth, async (req, res, next) => 
     next(e);
   }
 });
-
 app.patch("/api/notifications/read-all", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
@@ -1801,22 +1834,102 @@ async function purgeExpiredStories(){
   const r=await pool.query("DELETE FROM ft_stories WHERE expires_at<=NOW() RETURNING media_public_id,media_type");
   if(cloudinaryConfigured) for(const row of r.rows){if(row.media_public_id) cloudinary.uploader.destroy(row.media_public_id,{resource_type:row.media_type==='video'?'video':'image'}).catch(()=>{});}
 }
-app.post("/api/stories", requireAuth, async(req,res,next)=>{
+// Story music library. Tracks are added by an admin after checking the licence.
+app.get("/api/story-music", requireAuth, async(req,res,next)=>{
   try{
-    const url=cleanText(req.body.media_url,2000), publicId=cleanText(req.body.media_public_id,500), type=cleanText(req.body.media_type,20), caption=cleanText(req.body.caption,500);
-    if(!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type))return res.status(400).json({error:"Upload a valid image/video to Cloudinary first."});
-    // Fail closed for media until moderation has been configured and verified.
-    const moderationReady=String(process.env.CLOUDINARY_MODERATION_ENABLED||'').toLowerCase()==='true';
-    const status=moderationReady?'pending':'pending';
-    const r=await pool.query(`INSERT INTO ft_stories(user_id,media_url,media_public_id,media_type,caption,moderation_status)
-      VALUES($1,$2,$3,$4,$5,$6) RETURNING id::text AS id,user_id,media_url,media_type,caption,moderation_status,created_at,expires_at`,[String(req.user.id),url,publicId||null,type,caption,status]);
-    res.status(201).json({story:r.rows[0],message:"Story submitted for moderation; it will not be public until approved."});
+    const r=await pool.query(`SELECT id::text AS id,title,artist,audio_url,license_name,license_url,attribution
+      FROM ft_story_music WHERE active=TRUE ORDER BY title ASC LIMIT 200`);
+    res.json({tracks:r.rows});
   }catch(e){next(e);}
 });
+
+app.post("/api/admin/story-music", requireAuth, requireAdmin, async(req,res,next)=>{
+  try{
+    const title=cleanText(req.body.title,120);
+    const artist=cleanText(req.body.artist,120)||"Free Music";
+    const audioUrl=cleanText(req.body.audio_url,2000);
+    const publicId=cleanText(req.body.audio_public_id,500);
+    const licenseName=cleanText(req.body.license_name,160);
+    const licenseUrl=cleanText(req.body.license_url,1000);
+    const attribution=cleanText(req.body.attribution,1000);
+    if(!title||!audioUrl.startsWith("https://res.cloudinary.com/")||
+       !licenseName||!licenseUrl.startsWith("https://")){
+      return res.status(400).json({error:"Provide a title, Cloudinary audio URL, licence name and licence URL."});
+    }
+    const r=await pool.query(`INSERT INTO ft_story_music(title,artist,audio_url,audio_public_id,license_name,license_url,attribution)
+      VALUES($1,$2,$3,$4,$5,$6,$7)
+      RETURNING id::text AS id,title,artist,audio_url,license_name,license_url,attribution`,
+      [title,artist,audioUrl,publicId||null,licenseName,licenseUrl,attribution]);
+    res.status(201).json({track:r.rows[0],message:"Free music track added to the Story library."});
+  }catch(e){next(e);}
+});
+
+app.patch("/api/admin/story-music/:id", requireAuth, requireAdmin, async(req,res,next)=>{
+  try{
+    const id=Number.parseInt(req.params.id,10);
+    if(!Number.isSafeInteger(id))return res.status(400).json({error:"Invalid music track ID."});
+    const active=req.body.active===true;
+    const r=await pool.query("UPDATE ft_story_music SET active=$1 WHERE id=$2 RETURNING id::text AS id,active",[active,id]);
+    if(!r.rowCount)return res.status(404).json({error:"Music track not found."});
+    res.json({track:r.rows[0]});
+  }catch(e){next(e);}
+});
+
+app.post("/api/stories", requireAuth, async(req,res,next)=>{
+  try{
+    const type=cleanText(req.body.media_type,20).toLowerCase();
+    const url=cleanText(req.body.media_url,2000);
+    const publicId=cleanText(req.body.media_public_id,500);
+    const caption=cleanText(req.body.caption,500);
+    const storyText=cleanText(req.body.story_text,500);
+    const allowedBackgrounds=["purple","blue","pink","orange","green","black"];
+    const background=allowedBackgrounds.includes(cleanText(req.body.background,30))
+      ? cleanText(req.body.background,30) : "purple";
+    const musicId=req.body.music_id ? Number.parseInt(req.body.music_id,10) : null;
+
+    if(!["image","text"].includes(type)){
+      return res.status(400).json({error:"Stories support photos and text only. Video is not allowed."});
+    }
+    if(type==="image"&&!url.startsWith("https://res.cloudinary.com/")){
+      return res.status(400).json({error:"Upload a valid photo to Cloudinary first."});
+    }
+    if(type==="text"&&(!storyText||url)){
+      return res.status(400).json({error:"Enter Story text. Text Stories do not need a photo."});
+    }
+    if(musicId!==null&&!Number.isSafeInteger(musicId)){
+      return res.status(400).json({error:"Invalid music selection."});
+    }
+    if(musicId!==null){
+      const track=await pool.query("SELECT id FROM ft_story_music WHERE id=$1 AND active=TRUE",[musicId]);
+      if(!track.rowCount)return res.status(400).json({error:"This music track is no longer available."});
+    }
+
+    // All Stories remain pending until the existing moderation workflow approves them.
+    const r=await pool.query(`INSERT INTO ft_stories
+      (user_id,media_url,media_public_id,media_type,caption,story_text,background,music_id,moderation_status)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,'pending')
+      RETURNING id::text AS id,user_id,media_url,media_type,caption,story_text,background,music_id,moderation_status,created_at,expires_at`,
+      [String(req.user.id),type==="image"?url:null,type==="image"?(publicId||null):null,type,caption,storyText,background,musicId]);
+    res.status(201).json({story:r.rows[0],message:"Story submitted for moderation; it will be visible after approval."});
+  }catch(e){next(e);}
+});
+
 app.get("/api/stories", requireAuth, async(req,res,next)=>{
-  try{await purgeExpiredStories();const r=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.caption,s.created_at,s.expires_at,u.username,p.display_name,p.avatar_url
-    FROM ft_stories s JOIN users u ON u.id::text=s.user_id LEFT JOIN ft_profiles p ON p.user_id=s.user_id
-    WHERE s.expires_at>NOW() AND s.moderation_status='approved' AND u.account_status='active' ORDER BY s.created_at DESC LIMIT 100`);res.json({stories:r.rows});}catch(e){next(e);}
+  try{
+    await purgeExpiredStories();
+    const r=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.caption,
+      s.story_text,s.background,s.music_id,s.created_at,s.expires_at,
+      u.username,p.display_name,p.avatar_url,
+      m.title AS music_title,m.artist AS music_artist,m.audio_url AS music_url,
+      m.license_name AS music_license_name,m.license_url AS music_license_url,m.attribution AS music_attribution
+      FROM ft_stories s JOIN users u ON u.id::text=s.user_id
+      LEFT JOIN ft_profiles p ON p.user_id=s.user_id
+      LEFT JOIN ft_story_music m ON m.id=s.music_id AND m.active=TRUE
+      WHERE s.expires_at>NOW() AND s.moderation_status='approved'
+        AND u.account_status='active'
+      ORDER BY s.created_at DESC LIMIT 100`);
+    res.json({stories:r.rows});
+  }catch(e){next(e);}
 });
 
 // Friend request and friend list APIs.
@@ -2099,4 +2212,3 @@ async function shutdown() {
 
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
-startServer();
