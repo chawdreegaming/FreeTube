@@ -874,7 +874,9 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
               (SELECT COUNT(*) FROM ft_comments c WHERE c.post_id=p.id) AS comment_count,
               (SELECT COUNT(*) FROM ft_post_views v WHERE v.post_id=p.id) AS view_count,
               EXISTS(SELECT 1 FROM ft_post_reactions r
-                     WHERE r.post_id=p.id AND r.user_id=$1) AS liked
+                     WHERE r.post_id=p.id AND r.user_id=$1) AS liked,
+              (SELECT r.reaction FROM ft_post_reactions r
+               WHERE r.post_id=p.id AND r.user_id=$1 LIMIT 1) AS my_reaction
        FROM ft_posts p
        JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
