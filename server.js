@@ -1925,7 +1925,9 @@ app.get("/api/stories", requireAuth, async(req,res,next)=>{
       FROM ft_stories s JOIN users u ON u.id::text=s.user_id
       LEFT JOIN ft_profiles p ON p.user_id=s.user_id
       LEFT JOIN ft_story_music m ON m.id=s.music_id AND m.active=TRUE
-      WHERE s.expires_at>NOW() AND s.moderation_status='approved'
+      WHERE s.expires_at > NOW()
+  AND s.moderation_status IN ('approved', 'pending')
+  AND u.account_status = 'active'
         AND u.account_status='active'
       ORDER BY s.created_at DESC LIMIT 100`);
     res.json({stories:r.rows});
