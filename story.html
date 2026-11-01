@@ -1,421 +1,816 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#171321">
-<title>Boys vs Girls — Create Story</title>
+<title>Boys vs Girls — Story Editor</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-:root{--bg:#111019;--panel:#201d2d;--panel2:#292538;--line:#ffffff20;--text:#fff;--muted:#b9b3c9;--accent:#a78bfa;--green:#42e6a4;--danger:#ff7185}
+:root{
+ --bg:#111019;--panel:#211e2d;--line:#ffffff20;
+ --text:#fff;--muted:#b9b3c9;--accent:#a78bfa;
+ --blue:#0866ff;--green:#42e6a4;--danger:#ff7185
+}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 [hidden]{display:none!important}
-body{min-height:100vh;min-height:100dvh;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-button,input,textarea{font:inherit}button{color:inherit;cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
-.app{max-width:650px;min-height:100dvh;margin:auto;padding-bottom:95px;background:linear-gradient(180deg,#211c31,#12111a 55%)}
-.topbar{position:sticky;top:0;z-index:8;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top)) 15px 12px;background:#171321ed;border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}
-.icon-btn{width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:#ffffff0d;display:grid;place-items:center}
-.brand{font-size:20px;font-weight:900;flex:1}.brand span{color:var(--accent)}
-.top-note{font-size:11px;color:var(--green);font-weight:800}
-.heading{padding:21px 16px 5px;font-size:25px;font-weight:900}
-.subheading{padding:0 16px 17px;color:var(--muted);font-size:13px;line-height:1.55}
-.panel{margin:0 12px 15px;padding:15px;border:1px solid var(--line);border-radius:19px;background:#211e2df0;box-shadow:0 12px 30px #0003}
-.panel-title{font-size:15px;font-weight:800;margin-bottom:12px}
-.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
-.mode-tab{border:1px solid var(--line);border-radius:13px;padding:12px 8px;background:#ffffff08;font-weight:800;color:var(--muted)}
-.mode-tab.active{background:#a78bfa20;border-color:var(--accent);color:#fff}
-.pick{width:100%;min-height:54px;border:1px dashed #a78bfa88;border-radius:14px;background:#a78bfa12;display:flex;align-items:center;justify-content:center;gap:10px;font-weight:800}
-.pick i{color:var(--accent);font-size:20px}
-.preview{position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;width:100%;aspect-ratio:9/14;max-height:570px;min-height:260px;border-radius:16px;background:#111;border:1px solid var(--line);margin-top:13px}
-#previewImage{display:none;width:100%;height:100%;position:absolute;inset:0;object-fit:contain;background:#08080b}
-.text-canvas{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:35px;text-align:center;white-space:pre-wrap;overflow-wrap:anywhere;font-size:28px;font-weight:900;line-height:1.35;text-shadow:0 2px 9px #0009}
-.preview-placeholder{text-align:center;color:var(--muted);padding:22px;font-size:13px;line-height:1.6}
-.preview-placeholder i{display:block;font-size:42px;color:var(--accent);margin-bottom:12px}
-.preview-caption{position:absolute;left:12px;right:12px;bottom:14px;text-align:center;font-size:15px;line-height:1.4;text-shadow:0 2px 7px #000;overflow-wrap:anywhere}
-.preview-tools{position:absolute;right:10px;top:10px;z-index:3;display:flex;gap:8px}
-.small-btn{width:38px;height:38px;border:1px solid #ffffff55;border-radius:50%;background:#0009;display:grid;place-items:center}
-.field-label{display:block;margin:14px 0 7px;font-size:13px;font-weight:800}
-textarea,input[type=text]{width:100%;border:1px solid var(--line);border-radius:12px;background:#ffffff0b;color:#fff;padding:12px;outline:none}
-textarea{min-height:78px;resize:vertical;line-height:1.5}
-textarea:focus,input:focus{border-color:var(--accent)}
+body{background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;min-height:100dvh}
+button,input,textarea,select{font:inherit}
+button{color:inherit;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.app{max-width:650px;margin:auto;min-height:100dvh;background:#171321;position:relative;padding-bottom:25px}
+.topbar{height:65px;display:flex;align-items:center;gap:15px;padding:0 16px;border-bottom:1px solid var(--line);background:#171321;position:sticky;top:0;z-index:10}
+.icon-btn{width:42px;height:42px;border:0;border-radius:50%;background:#ffffff12;font-size:19px}
+.brand{font-size:20px;font-weight:900;flex:1}
+.brand span{color:var(--accent)}
+.top-note{color:var(--green);font-size:12px;font-weight:800}
+.page{padding:18px 15px}
+.heading{font-size:25px;font-weight:900;margin-bottom:7px}
+.subheading{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.panel{padding:14px;border:1px solid var(--line);border-radius:19px;background:var(--panel);margin-bottom:15px}
+.section-title{font-size:15px;font-weight:800;margin-bottom:12px}
+.mode-tabs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:15px}
+.mode-tab{padding:13px 8px;border:1px solid var(--line);border-radius:13px;background:#ffffff08;color:var(--muted);font-weight:800}
+.mode-tab.active{border-color:var(--accent);background:#a78bfa20;color:#fff}
+.pick{width:100%;height:58px;border:1px dashed #a78bfa99;border-radius:14px;background:#a78bfa12;font-weight:800;font-size:15px}
+.pick i{color:var(--accent);margin-right:8px;font-size:19px}
+.gallery-help{font-size:11px;color:var(--muted);margin:9px 2px 0}
+.selected-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}
+.thumb{position:relative;aspect-ratio:1;border-radius:11px;overflow:hidden;border:2px solid transparent;background:#111}
+.thumb.active{border-color:var(--accent)}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb button{position:absolute;right:3px;top:3px;width:23px;height:23px;border:0;border-radius:50%;background:#000b;font-size:11px}
+.thumb .number{position:absolute;bottom:4px;left:5px;background:#000b;border-radius:5px;padding:2px 6px;font-size:10px}
+.editor{position:relative;width:100%;aspect-ratio:9/14;max-height:680px;min-height:300px;background:#08080b;border-radius:16px;overflow:hidden;margin-top:14px;border:1px solid var(--line)}
+.editor img{width:100%;height:100%;object-fit:contain;display:block}
+.editor.text-editor{display:flex;align-items:center;justify-content:center;padding:25px}
+.editor-text{position:absolute;left:8%;right:8%;top:50%;transform:translateY(-50%);text-align:center;font-size:28px;font-weight:900;white-space:pre-wrap;overflow-wrap:anywhere;text-shadow:0 2px 9px #000}
+.editor-sticker{position:absolute;left:50%;top:24%;transform:translateX(-50%);font-size:52px;text-shadow:0 3px 8px #000}
+.editor-caption{position:absolute;bottom:17px;left:12px;right:12px;text-align:center;font-size:14px;text-shadow:0 2px 8px #000;overflow-wrap:anywhere}
+.editor-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:var(--muted);padding:25px}
+.editor-empty i{font-size:45px;color:var(--accent);margin-bottom:14px}
+.editor-empty p{font-size:13px;line-height:1.6;margin-top:7px}
+.editor-top-tools{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:3}
+.round-tool{width:37px;height:37px;border:1px solid #ffffff55;border-radius:50%;background:#0009;display:grid;place-items:center}
+.toolbar{display:flex;gap:8px;overflow-x:auto;padding:14px 0 8px;scrollbar-width:none}
+.toolbar::-webkit-scrollbar{display:none}
+.tool{flex:0 0 68px;min-height:66px;border:1px solid var(--line);border-radius:13px;background:#ffffff09;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;font-size:11px;color:#eee}
+.tool i{font-size:22px;color:#d6c5ff}
+.tool.active{border-color:var(--accent);background:#a78bfa20}
+.field-label{display:block;font-size:13px;font-weight:800;margin:14px 0 7px}
+textarea,input[type=text],select{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff0b;color:#fff;outline:none}
+textarea{min-height:76px;resize:vertical;line-height:1.5}
 textarea::placeholder,input::placeholder{color:#aaa4b8}
+select option{background:#211e2d;color:#fff}
 .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-top:6px}
-.color-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-.color-dot{width:31px;height:31px;border:2px solid #ffffff50;border-radius:50%}
-.color-dot.active{outline:2px solid white;outline-offset:2px}
-.music-box{margin-top:14px;border:1px solid var(--line);border-radius:14px;padding:12px;background:#ffffff06}
+.tool-panel{margin-top:12px;padding:13px;border:1px solid var(--line);border-radius:13px;background:#ffffff07}
+.tool-panel-title{font-size:13px;font-weight:800;margin-bottom:10px}
+.sticker-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.sticker{height:43px;border:1px solid var(--line);border-radius:10px;background:#ffffff09;font-size:24px}
+.filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.filter-btn{padding:10px 4px;border:1px solid var(--line);border-radius:10px;background:#ffffff09;font-size:11px}
+.filter-btn.active{border-color:var(--accent);background:#a78bfa22}
 .music-head{display:flex;align-items:center;gap:10px}
-.music-head i{color:#f5c96b;font-size:21px}
-.music-head strong{font-size:14px;flex:1}
+.music-head i{font-size:22px;color:#f5c96b}
+.music-head div{flex:1}
 .music-head small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-.secondary{border:1px solid var(--line);border-radius:11px;background:#ffffff0d;padding:9px 12px;font-size:12px;font-weight:800}
-.selected-track{margin-top:10px;color:#e5dcff;font-size:12px;line-height:1.5}
-.track-list{display:grid;gap:8px;margin-top:12px;max-height:260px;overflow:auto}
-.track{display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#ffffff08}
-.track-info{min-width:0;flex:1}
-.track-info strong{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.track-info small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
-.track-actions{display:flex;gap:7px}
-.track-actions button{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#ffffff0d}
-.notice{padding:11px 12px;margin-top:14px;border-radius:12px;background:#a78bfa12;border:1px solid #a78bfa35;color:#e7ddff;font-size:12px;line-height:1.6}
-.primary{width:100%;border:0;border-radius:13px;padding:14px;margin-top:15px;background:linear-gradient(110deg,#b79aff,#8b6cf0);color:#171024;font-weight:900}
-.status{font-size:12px;line-height:1.6;margin-top:11px;overflow-wrap:anywhere}
-.status.error{color:#ff9da8}.status.success{color:var(--green)}
-.progress{height:5px;background:#ffffff18;border-radius:9px;overflow:hidden;margin-top:9px}
+.secondary{border:1px solid var(--line);border-radius:10px;background:#ffffff0d;padding:9px 12px;font-size:12px;font-weight:800}
+.track-list{display:grid;gap:8px;margin-top:12px;max-height:230px;overflow:auto}
+.track{display:flex;align-items:center;gap:8px;padding:10px;border:1px solid var(--line);border-radius:11px;background:#ffffff08}
+.track-info{flex:1;min-width:0}
+.track-info strong{display:block;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track-info small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.track button{width:34px;height:34px;border:1px solid var(--line);border-radius:50%;background:#ffffff0d}
+.caption-box{margin-top:14px}
+.notice{padding:11px;border:1px solid #a78bfa35;border-radius:12px;background:#a78bfa12;color:#e7ddff;font-size:12px;line-height:1.6;margin-top:14px}
+.share-row{display:flex;align-items:center;gap:10px;margin-top:15px}
+.audience{flex:1;border:1px solid var(--line);border-radius:12px;background:#ffffff0b;padding:11px;font-size:12px}
+.audience strong{display:block;margin-top:4px}
+.share-btn{flex:1.3;border:0;border-radius:12px;background:var(--blue);color:white;padding:14px;font-size:16px;font-weight:900}
+.share-btn:disabled{opacity:.5}
+.status{font-size:12px;line-height:1.6;margin-top:12px;overflow-wrap:anywhere}
+.status.error{color:#ff9da8}
+.status.success{color:var(--green)}
+.progress{height:5px;border-radius:8px;background:#ffffff18;overflow:hidden;margin-top:10px}
 .progress div{height:100%;width:0;background:var(--green);transition:width .2s}
-.story-list{display:flex;gap:12px;overflow-x:auto;padding:2px 1px 10px}
-.story-card{position:relative;flex:0 0 105px;height:155px;border:1px solid var(--line);border-radius:15px;overflow:hidden;background:#30283e;display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);z-index:50;background:#292536;border:1px solid var(--line);border-radius:12px;padding:12px 17px;font-size:13px;max-width:90%}
+.story-list{display:flex;gap:11px;overflow-x:auto;padding:3px 1px 10px}
+.story-card{position:relative;flex:0 0 105px;height:155px;border-radius:14px;overflow:hidden;background:#30283e;display:flex;align-items:center;justify-content:center;border:1px solid var(--line)}
 .story-card img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
-.story-card.text-card{padding:9px;text-align:center;font-weight:900;font-size:13px;line-height:1.35;overflow-wrap:anywhere}
+.story-card.text-card{padding:9px;text-align:center;font-weight:900;font-size:13px}
 .story-card:after{content:"";position:absolute;inset:48% 0 0;background:linear-gradient(transparent,#000b);pointer-events:none}
-.story-avatar{position:absolute;top:7px;left:7px;width:30px;height:30px;border:2px solid var(--accent);border-radius:50%;background:#292633;display:grid;place-items:center;z-index:2;overflow:hidden}
+.story-avatar{position:absolute;top:7px;left:7px;width:31px;height:31px;border:2px solid #a78bfa;border-radius:50%;background:#292633;display:grid;place-items:center;z-index:2;overflow:hidden}
 .story-avatar img{width:100%;height:100%;object-fit:cover}
-.story-name{position:absolute;z-index:2;left:7px;right:7px;bottom:8px;font-size:11px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}
-.bottom-nav{position:fixed;z-index:10;left:50%;bottom:0;transform:translateX(-50%);width:min(650px,100%);display:grid;grid-template-columns:repeat(4,1fr);padding:9px 5px calc(9px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#191723ed;backdrop-filter:blur(20px)}
-.nav-item{text-decoration:none;color:#c5c0d1;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px}
-.nav-item i{font-size:19px}.nav-item.active{color:var(--accent)}
-.viewer{position:fixed;inset:0;z-index:30;background:#050507;display:flex;align-items:center;justify-content:center}
-.viewer-content{position:relative;width:min(100%,520px);height:100%;height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#08080b}
+.story-name{position:absolute;z-index:2;left:7px;right:7px;bottom:8px;font-size:11px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{padding:18px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
+.viewer{position:fixed;inset:0;z-index:40;background:#050507;display:flex;align-items:center;justify-content:center}
+.viewer-content{position:relative;width:min(100%,520px);height:100dvh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#08080b}
 .viewer-image{width:100%;height:100%;object-fit:contain}
-.viewer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px;text-align:center;font-size:31px;font-weight:900;line-height:1.35;white-space:pre-wrap;overflow-wrap:anywhere;text-shadow:0 2px 10px #0009}
-.viewer-top{position:absolute;top:0;left:0;right:0;padding:calc(14px + env(safe-area-inset-top)) 14px 12px;z-index:3;background:linear-gradient(#000b,transparent);pointer-events:none}
+.viewer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:40px;text-align:center;font-size:30px;font-weight:900;white-space:pre-wrap;overflow-wrap:anywhere}
+.viewer-top{position:absolute;top:0;left:0;right:0;padding:calc(15px + env(safe-area-inset-top)) 14px 12px;z-index:3;background:linear-gradient(#000b,transparent)}
 .viewer-progress{height:3px;background:#ffffff55;border-radius:5px;overflow:hidden;margin-bottom:13px}
-.viewer-progress>div{height:100%;width:0;background:white}
+.viewer-progress div{height:100%;width:0;background:white}
 .viewer-user{display:flex;align-items:center;gap:10px}
 .viewer-avatar{width:38px;height:38px;border-radius:50%;background:#333;object-fit:cover}
-.viewer-username{font-weight:800;font-size:13px}.viewer-expiry{font-size:11px;color:#ddd;margin-top:4px}
-.viewer-caption{position:absolute;bottom:65px;left:17px;right:17px;z-index:3;text-align:center;font-size:15px;line-height:1.5;text-shadow:0 2px 8px #000;overflow-wrap:anywhere;pointer-events:none}
-.viewer-music{position:absolute;bottom:22px;left:16px;z-index:4;padding:8px 11px;border-radius:20px;background:#0009;font-size:11px;max-width:85%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.viewer-username{font-size:13px;font-weight:800}
+.viewer-expiry{font-size:11px;color:#ddd;margin-top:4px}
+.viewer-caption{position:absolute;bottom:35px;left:15px;right:15px;z-index:3;text-align:center;font-size:14px;text-shadow:0 2px 8px #000}
 .viewer-close{position:absolute;top:calc(17px + env(safe-area-inset-top));right:14px;z-index:5;width:39px;height:39px;border:0;border-radius:50%;background:#0009}
-.viewer-prev,.viewer-next{position:absolute;top:22%;bottom:15%;width:35%;border:0;background:transparent;z-index:2}
+.viewer-prev,.viewer-next{position:absolute;top:25%;bottom:12%;width:35%;border:0;background:transparent;z-index:2}
 .viewer-prev{left:0}.viewer-next{right:0}
-.toast{position:fixed;z-index:50;bottom:85px;left:50%;transform:translateX(-50%);max-width:90%;padding:12px 17px;background:#252231;border:1px solid var(--line);border-radius:13px;box-shadow:0 5px 20px #0005;font-size:13px}
-@media(min-width:600px){.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
+@media(min-width:600px){.page{padding:22px}.app{border-left:1px solid var(--line);border-right:1px solid var(--line)}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <button class="icon-btn" id="backBtn" type="button" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button>
-    <div class="brand">Boys <span>♡Girls</span></div>
-    <div class="top-note"><i class="fa-regular fa-clock"></i> 24 HOURS</div>
-  </header>
+<header class="topbar">
+<button class="icon-btn" id="backBtn" type="button" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+<div class="brand">Boys <span>♡Girls</span></div>
+<div class="top-note"><i class="fa-regular fa-clock"></i> 24 HOURS</div>
+</header>
 
-  <h1 class="heading">Create story</h1>
-  <p class="subheading">Share a photo or a text moment. Stories disappear automatically after 24 hours.</p>
+<main class="page">
+<h1 class="heading">Create story</h1>
+<p class="subheading">Share photos or a text moment with your friends. Stories disappear automatically after 24 hours.</p>
 
-  <section class="panel">
-    <div class="mode-tabs">
-      <button class="mode-tab active" id="photoMode" type="button"><i class="fa-regular fa-image"></i> Photo story</button>
-      <button class="mode-tab" id="textMode" type="button"><i class="fa-solid fa-font"></i> Text story</button>
-    </div>
-
-    <div id="photoTools">
-      <button class="pick" id="chooseImage" type="button"><i class="fa-regular fa-images"></i> Choose photo from Gallery</button>
-      <input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
-    </div>
-
-    <div class="preview" id="preview">
-      <div class="preview-placeholder" id="placeholder">
-        <i class="fa-regular fa-image"></i>
-        <strong>Your Story preview</strong>
-        <p style="margin-top:7px">Choose a photo or switch to Text Story.</p>
-      </div>
-      <img id="previewImage" alt="Story photo preview">
-      <div class="text-canvas" id="previewText" hidden></div>
-      <div class="preview-caption" id="previewCaption" hidden></div>
-      <div class="preview-tools" id="previewTools" hidden>
-        <button class="small-btn" id="removePhoto" type="button" aria-label="Remove photo"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-    </div>
-
-    <div id="textTools" hidden>
-      <label class="field-label" for="storyText">Your text</label>
-      <textarea id="storyText" maxlength="500" placeholder="What would you like to share?"></textarea>
-      <div class="meta"><span>Text Story</span><span id="textCount">0/500</span></div>
-      <label class="field-label">Background colour</label>
-      <div class="color-row" id="backgroundChoices">
-        <button class="color-dot active" type="button" data-bg="purple" style="background:linear-gradient(135deg,#4c2b80,#a65aa8)" aria-label="Purple"></button>
-        <button class="color-dot" type="button" data-bg="blue" style="background:linear-gradient(135deg,#064b91,#22a6d5)" aria-label="Blue"></button>
-        <button class="color-dot" type="button" data-bg="pink" style="background:linear-gradient(135deg,#9b245e,#f17b9c)" aria-label="Pink"></button>
-        <button class="color-dot" type="button" data-bg="orange" style="background:linear-gradient(135deg,#a43d20,#f3a33c)" aria-label="Orange"></button>
-        <button class="color-dot" type="button" data-bg="green" style="background:linear-gradient(135deg,#075c49,#20b78a)" aria-label="Green"></button>
-        <button class="color-dot" type="button" data-bg="black" style="background:linear-gradient(135deg,#111,#555)" aria-label="Black"></button>
-      </div>
-    </div>
-
-    <label class="field-label" for="caption">Caption (optional)</label>
-    <textarea id="caption" maxlength="500" placeholder="Add a caption to your photo..."></textarea>
-    <div class="meta"><span>Caption appears on the Story</span><span id="captionCount">0/500</span></div>
-
-    <div class="music-box">
-      <div class="music-head">
-        <i class="fa-solid fa-music"></i>
-        <div style="flex:1"><strong>Music library</strong><small>Choose free music for your Story</small></div>
-        <button class="secondary" id="openMusic" type="button">Browse</button>
-      </div>
-      <div class="selected-track" id="selectedTrack">No music selected</div>
-      <div class="track-list" id="trackList" hidden></div>
-      <audio id="musicPreview" preload="none"></audio>
-      <p class="meta" style="line-height:1.5">Only tracks uploaded by the Admin with a verified reuse licence appear here.</p>
-    </div>
-
-    <div class="notice"><i class="fa-solid fa-shield-heart"></i> Photo and Text Stories only. Video uploads are disabled. Stories expire after 24 hours and may need Admin approval before appearing publicly.</div>
-    <button class="primary" id="publishBtn" type="button"><i class="fa-solid fa-paper-plane"></i> Publish Story</button>
-    <div class="progress" id="progress" hidden><div id="progressBar"></div></div>
-    <div class="status" id="status" role="status" aria-live="polite"></div>
-  </section>
-
-  <section class="panel">
-    <h2 class="panel-title"><i class="fa-regular fa-circle-play" style="color:var(--accent)"></i> Active Stories</h2>
-    <div class="story-list" id="storyList"><div class="empty" style="width:100%">Loading Stories...</div></div>
-    <div class="status" id="listStatus" role="status"></div>
-    <button class="secondary" id="refreshStories" type="button"><i class="fa-solid fa-rotate"></i> Refresh Stories</button>
-  </section>
+<section class="panel">
+<div class="mode-tabs">
+<button class="mode-tab active" id="photoMode" type="button"><i class="fa-regular fa-image"></i> Photo</button>
+<button class="mode-tab" id="textMode" type="button"><i class="fa-solid fa-font"></i> Text</button>
 </div>
 
-<nav class="bottom-nav" aria-label="Main navigation">
-  <a class="nav-item" href="home.html"><i class="fa-solid fa-house"></i><span>Home</span></a>
-  <a class="nav-item" href="discover.html"><i class="fa-solid fa-compass"></i><span>Pulse</span></a>
-  <a class="nav-item" href="notifications.html"><i class="fa-regular fa-bell"></i><span>Notifications</span></a>
-  <a class="nav-item active" href="profile.html"><i class="fa-regular fa-user"></i><span>Profile</span></a>
-</nav>
+<div id="photoTools">
+<button class="pick" id="chooseImage" type="button"><i class="fa-regular fa-images"></i> Choose photos from Gallery</button>
+<input id="imageInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+<p class="gallery-help">Select one or multiple photos. Tap a thumbnail to edit that photo.</p>
+<div class="selected-grid" id="selectedGrid"></div>
+</div>
+
+<div class="editor" id="editor">
+<div class="editor-empty" id="editorEmpty">
+<i class="fa-regular fa-image"></i>
+<strong>Your Story preview</strong>
+<p>Select a photo or switch to Text Story.</p>
+</div>
+<img id="editorImage" alt="Story preview" hidden>
+<div class="editor-text" id="editorText" hidden></div>
+<div class="editor-sticker" id="editorSticker" hidden></div>
+<div class="editor-caption" id="editorCaption" hidden></div>
+<div class="editor-top-tools" id="editorTopTools" hidden>
+<button class="round-tool" id="removeCurrent" type="button" title="Remove photo"><i class="fa-solid fa-trash"></i></button>
+<button class="round-tool" id="resetFilter" type="button" title="Reset filter"><i class="fa-solid fa-rotate-left"></i></button>
+</div>
+</div>
+
+<div id="textTools" hidden>
+<label class="field-label" for="storyText">Your Text Story</label>
+<textarea id="storyText" maxlength="500" placeholder="What would you like to share?"></textarea>
+<div class="meta"><span>Text Story</span><span id="textCount">0/500</span></div>
+</div>
+
+<div class="toolbar" id="editorToolbar">
+<button class="tool" type="button" data-tool="text"><i class="fa-solid fa-font"></i><span>Text</span></button>
+<button class="tool" type="button" data-tool="music"><i class="fa-solid fa-music"></i><span>Music</span></button>
+<button class="tool" type="button" data-tool="stickers"><i class="fa-regular fa-face-smile"></i><span>Stickers</span></button>
+<button class="tool" type="button" data-tool="effects"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Effects</span></button>
+<button class="tool" type="button" data-tool="mention"><i class="fa-solid fa-at"></i><span>Mention</span></button>
+<button class="tool" type="button" data-tool="link"><i class="fa-solid fa-link"></i><span>Link</span></button>
+</div>
+
+<div class="tool-panel" id="textPanel" hidden>
+<div class="tool-panel-title">Add text to your photo</div>
+<textarea id="overlayInput" maxlength="180" placeholder="Type something..."></textarea>
+<button class="secondary" id="applyText" type="button" style="margin-top:9px">Add text to Story</button>
+</div>
+
+<div class="tool-panel" id="stickerPanel" hidden>
+<div class="tool-panel-title">Choose a sticker</div>
+<div class="sticker-grid" id="stickerGrid">
+<button class="sticker" type="button">❤️</button>
+<button class="sticker" type="button">😍</button>
+<button class="sticker" type="button">😂</button>
+<button class="sticker" type="button">🔥</button>
+<button class="sticker" type="button">🥰</button>
+<button class="sticker" type="button">💙</button>
+<button class="sticker" type="button">💗</button>
+<button class="sticker" type="button">👏</button>
+<button class="sticker" type="button">🎉</button>
+<button class="sticker" type="button">😎</button>
+<button class="sticker" type="button">🌹</button>
+<button class="sticker" type="button">⭐</button>
+</div>
+</div>
+
+<div class="tool-panel" id="effectsPanel" hidden>
+<div class="tool-panel-title">Photo effects</div>
+<div class="filter-grid">
+<button class="filter-btn active" data-filter="normal" type="button">Original</button>
+<button class="filter-btn" data-filter="grayscale(1)" type="button">B&W</button>
+<button class="filter-btn" data-filter="sepia(.8)" type="button">Vintage</button>
+<button class="filter-btn" data-filter="brightness(1.2) saturate(1.3)" type="button">Bright</button>
+<button class="filter-btn" data-filter="contrast(1.3) saturate(1.2)" type="button">Vivid</button>
+<button class="filter-btn" data-filter="saturate(.5)" type="button">Soft</button>
+</div>
+</div>
+
+<div class="tool-panel" id="musicPanel" hidden>
+<div class="music-head">
+<i class="fa-solid fa-music"></i>
+<div><strong>Music library</strong><small>Choose music for your Story</small></div>
+<button class="secondary" id="loadMusic" type="button">Browse</button>
+</div>
+<div class="meta" id="selectedTrack">No music selected</div>
+<div class="track-list" id="trackList" hidden></div>
+<audio id="musicPreview" preload="none"></audio>
+</div>
+
+<div class="tool-panel" id="mentionPanel" hidden>
+<div class="tool-panel-title">Mention someone in your caption</div>
+<input type="text" id="mentionInput" placeholder="Enter username, e.g. @username">
+<button class="secondary" id="addMention" type="button" style="margin-top:9px">Add to caption</button>
+</div>
+
+<div class="tool-panel" id="linkPanel" hidden>
+<div class="tool-panel-title">Add a link to your caption</div>
+<input type="text" id="linkInput" placeholder="https://example.com">
+<button class="secondary" id="addLink" type="button" style="margin-top:9px">Add link to caption</button>
+</div>
+
+<div class="caption-box">
+<label class="field-label" for="caption">Caption (optional)</label>
+<textarea id="caption" maxlength="500" placeholder="Write a caption..."></textarea>
+<div class="meta"><span>Caption appears on your Story</span><span id="captionCount">0/500</span></div>
+</div>
+
+<div class="notice"><i class="fa-solid fa-shield-heart"></i> Photo and Text Stories only. Video uploads are disabled. Stories publish immediately and expire after 24 hours.</div>
+
+<div class="share-row">
+<div class="audience"><i class="fa-solid fa-earth-americas"></i> Audience<strong>Public</strong></div>
+<button class="share-btn" id="publishBtn" type="button"><i class="fa-solid fa-paper-plane"></i> Share</button>
+</div>
+<div class="progress" id="progress" hidden><div id="progressBar"></div></div>
+<div class="status" id="status" role="status" aria-live="polite"></div>
+</section>
+
+<section class="panel">
+<h2 class="section-title"><i class="fa-regular fa-circle-play" style="color:var(--accent)"></i> Active Stories</h2>
+<div class="story-list" id="storyList"><div class="empty">Loading Stories...</div></div>
+<div class="status" id="listStatus"></div>
+<button class="secondary" id="refreshStories" type="button"><i class="fa-solid fa-rotate"></i> Refresh Stories</button>
+</section>
+</main>
+</div>
 
 <div class="viewer" id="viewer" hidden>
-  <div class="viewer-content" id="viewerContent">
-    <div class="viewer-top">
-      <div class="viewer-progress"><div id="viewerProgress"></div></div>
-      <div class="viewer-user">
-        <img class="viewer-avatar" id="viewerAvatar" alt="">
-        <div><div class="viewer-username" id="viewerUsername"></div><div class="viewer-expiry" id="viewerExpiry"></div></div>
-      </div>
-    </div>
-    <button class="viewer-close" id="closeViewer" type="button" aria-label="Close Story"><i class="fa-solid fa-xmark"></i></button>
-    <button class="viewer-prev" id="viewerPrev" type="button" aria-label="Previous Story"></button>
-    <button class="viewer-next" id="viewerNext" type="button" aria-label="Next Story"></button>
-    <img class="viewer-image" id="viewerImage" alt="Story" hidden>
-    <div class="viewer-text" id="viewerText" hidden></div>
-    <div class="viewer-caption" id="viewerCaption"></div>
-    <div class="viewer-music" id="viewerMusic" hidden></div>
-    <audio id="viewerAudio" preload="none"></audio>
-  </div>
+<div class="viewer-content">
+<div class="viewer-top">
+<div class="viewer-progress"><div id="viewerProgress"></div></div>
+<div class="viewer-user">
+<img class="viewer-avatar" id="viewerAvatar" alt="">
+<div><div class="viewer-username" id="viewerUsername"></div><div class="viewer-expiry" id="viewerExpiry"></div></div>
 </div>
-<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+</div>
+<button class="viewer-close" id="closeViewer" type="button"><i class="fa-solid fa-xmark"></i></button>
+<button class="viewer-prev" id="viewerPrev" type="button"></button>
+<button class="viewer-next" id="viewerNext" type="button"></button>
+<img class="viewer-image" id="viewerImage" alt="Story" hidden>
+<div class="viewer-text" id="viewerText" hidden></div>
+<div class="viewer-caption" id="viewerCaption"></div>
+<audio id="viewerAudio" preload="none"></audio>
+</div>
+</div>
+<div class="toast" id="toast" hidden></div>
 
 <script>
 "use strict";
-(() => {
-  const API_BASE = "https://freetube-backend-a222.onrender.com/api";
-  const TOKEN_KEY = "freetube_access_token";
-  const $ = id => document.getElementById(id);
-  const state = {
-    mode:"image", file:null, previewUrl:null, stories:[], tracks:[],
-    selectedTrack:null, background:"purple", viewingIndex:-1,
-    timer:null, progressTimer:null, uploadBusy:false, audioPreviewTrack:null
-  };
-  const backgrounds = {
-    purple:"linear-gradient(145deg,#39215f,#9153a5)",
-    blue:"linear-gradient(145deg,#063c78,#1b9fc5)",
-    pink:"linear-gradient(145deg,#81234e,#e66d9a)",
-    orange:"linear-gradient(145deg,#87351f,#e89a35)",
-    green:"linear-gradient(145deg,#064b3c,#19a77d)",
-    black:"linear-gradient(145deg,#080808,#41414a)"
-  };
-  function token(){try{return localStorage.getItem(TOKEN_KEY)||"";}catch(_){return "";}}
-  function authHeaders(){const h={};if(token())h.Authorization="Bearer "+token();return h;}
-  async function api(path,options={}){
-    let response;
-    try{response=await fetch(API_BASE+path,{...options,headers:{...authHeaders(),...(options.headers||{})},cache:"no-store"});}
-    catch(_){throw new Error("Could not connect to the server. Check your internet connection.");}
-    const raw=await response.text();let data={};
-    try{data=raw?JSON.parse(raw):{};}catch(_){data={message:raw};}
-    if(!response.ok)throw new Error(data.error||data.message||"Request failed ("+response.status+").");
-    return data;
-  }
-  function setStatus(message,kind=""){ $("status").textContent=message;$("status").className="status "+kind; }
-  function toast(message){$("toast").textContent=message;$("toast").hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$("toast").hidden=true,3000);}
-  function safeDate(v){if(!v)return null;const d=new Date(v);return Number.isNaN(d.getTime())?null:d;}
-  function expiryText(v){const d=safeDate(v);if(!d)return "24h";const ms=d-Date.now();if(ms<=0)return "Expired";const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return h?h+"h "+m+"m left":Math.max(1,m)+"m left";}
-  function stopAudio(){const a=$("musicPreview");a.pause();a.removeAttribute("src");a.load();state.audioPreviewTrack=null;}
-  function resetPhoto(){
-    if(state.previewUrl)URL.revokeObjectURL(state.previewUrl);
-    state.previewUrl=null;state.file=null;$("imageInput").value="";
-    $("previewImage").removeAttribute("src");$("previewImage").style.display="none";
-    $("previewTools").hidden=true;updatePreview();
-  }
-  function setMode(mode){
-    state.mode=mode;
-    $("photoMode").classList.toggle("active",mode==="image");
-    $("textMode").classList.toggle("active",mode==="text");
-    $("photoTools").hidden=mode!=="image";$("textTools").hidden=mode!=="text";
-    $("caption").placeholder=mode==="image"?"Add a caption to your photo...":"Add an optional caption...";
-    updatePreview();
-  }
-  function updatePreview(){
-    const imageMode=state.mode==="image";
-    const hasPhoto=Boolean(state.previewUrl);
-    const text= $("storyText").value.trim();
-    $("placeholder").hidden=imageMode?hasPhoto:Boolean(text);
-    $("previewImage").style.display=imageMode&&hasPhoto?"block":"none";
-    $("previewText").hidden=imageMode||!text;
-    $("previewText").textContent=text;
-    $("preview").style.background=imageMode?"#09090b":backgrounds[state.background];
-    $("previewText").style.background=backgrounds[state.background];
-    $("previewCaption").hidden=!$("caption").value.trim();
-    $("previewCaption").textContent=$("caption").value.trim();
-    $("previewTools").hidden=!hasPhoto;
-  }
-  function selectPhoto(file){
-    if(!file)return;
-    if(!token()){toast("Please log in before creating a Story.");return;}
-    const allowed=["image/jpeg","image/png","image/webp","image/gif"];
-    if(!allowed.includes(file.type)){toast("Choose a JPG, PNG, WEBP or GIF photo. Video is not supported.");return;}
-    if(file.size>20*1024*1024){toast("Maximum photo size is 20 MB.");return;}
-    resetPhoto();state.file=file;state.previewUrl=URL.createObjectURL(file);
-    $("previewImage").src=state.previewUrl;updatePreview();setStatus("");
-  }
-  async function uploadPhoto(file){
-    const form=new FormData();form.append("file",file);
-    const result=await api("/media/upload",{method:"POST",body:form});
-    if(!result.media||!result.media.url)throw new Error("Media server did not return the photo URL.");
-    return result.media;
-  }
-  async function publish(){
-    if(state.uploadBusy)return;
-    if(!token()){setStatus("Please log in first.","error");return;}
-    const storyText=$("storyText").value.trim();
-    if(state.mode==="image"&&!state.file){setStatus("Choose a photo first.","error");return;}
-    if(state.mode==="text"&&!storyText){setStatus("Write something for your Text Story.","error");return;}
-    state.uploadBusy=true;$("publishBtn").disabled=true;$("chooseImage").disabled=true;
-    $("progress").hidden=false;$("progressBar").style.width="8%";setStatus("Preparing your Story...");
-    try{
-      let media={url:"",public_id:""};
-      if(state.mode==="image"){setStatus("Uploading your photo...");media=await uploadPhoto(state.file);}
-      $("progressBar").style.width="70%";setStatus("Publishing your Story...");
-      const payload={
-        media_type:state.mode,
-        media_url:media.url||"",
-        media_public_id:media.public_id||"",
-        caption:$("caption").value.trim(),
-        story_text:state.mode==="text"?storyText:"",
-        background:state.background,
-        music_id:state.selectedTrack?state.selectedTrack.id:null
-      };
-      const result=await api("/stories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
-      $("progressBar").style.width="100%";$("caption").value="";$("storyText").value="";
-      $("captionCount").textContent="0/500";$("textCount").textContent="0/500";
-      resetPhoto();updatePreview();setStatus(result.message||"Story submitted for review.","success");toast("Story submitted for Admin approval.");
-      await loadStories();
-    }catch(error){console.error(error);setStatus("Story publishing failed: "+error.message,"error");}
-    finally{state.uploadBusy=false;$("publishBtn").disabled=false;$("chooseImage").disabled=false;setTimeout(()=>$("progress").hidden=true,900);}
-  }
-  function renderTracks(){
-    const list=$("trackList");list.replaceChildren();
-    if(!state.tracks.length){
-      const empty=document.createElement("div");empty.className="empty";
-      empty.innerHTML='No approved music tracks yet.<br><a href="https://mixkit.co/free-stock-music/" target="_blank" rel="noopener" style="color:#c5adff">Browse Mixkit free music</a>. An Admin must upload a track and verify its licence before it appears here.';
-      list.appendChild(empty);return;
+(()=>{
+const API_BASE="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const $=id=>document.getElementById(id);
+const state={
+ mode:"image",files:[],urls:[],current:0,filter:"normal",
+ overlayText:"",sticker:"",background:"purple",
+ tracks:[],selectedTrack:null,stories:[],
+ uploadBusy:false,viewingIndex:-1,timer:null,progressTimer:null,
+ audioPreviewTrack:null
+};
+const filters={
+ normal:"none",
+ "grayscale(1)":"grayscale(1)",
+ "sepia(.8)":"sepia(.8)",
+ "brightness(1.2) saturate(1.3)":"brightness(1.2) saturate(1.3)",
+ "contrast(1.3) saturate(1.2)":"contrast(1.3) saturate(1.2)",
+ "saturate(.5)":"saturate(.5)"
+};
+const backgrounds={
+ purple:"linear-gradient(145deg,#39215f,#9153a5)",
+ blue:"linear-gradient(145deg,#063c78,#1b9fc5)",
+ pink:"linear-gradient(145deg,#81234e,#e66d9a)",
+ orange:"linear-gradient(145deg,#87351f,#e89a35)",
+ green:"linear-gradient(145deg,#064b3c,#19a77d)",
+ black:"linear-gradient(145deg,#080808,#41414a)"
+};
+function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return""}}
+function headers(){const h={};if(token())h.Authorization="Bearer "+token();return h}
+async function api(path,options={}){
+ let response;
+ try{
+  response=await fetch(API_BASE+path,{
+   ...options,
+   headers:{...headers(),...(options.headers||{})},
+   cache:"no-store"
+  });
+ }catch(_){throw new Error("Could not connect to the server. Check your internet connection.")}
+ const raw=await response.text();let data={};
+ try{data=raw?JSON.parse(raw):{}}catch(_){data={message:raw}}
+ if(!response.ok)throw new Error(data.error||data.message||"Request failed ("+response.status+").");
+ return data;
+}
+function setStatus(message,kind=""){
+ $("status").textContent=message;
+ $("status").className="status "+kind;
+}
+function toast(message){
+ $("toast").textContent=message;$("toast").hidden=false;
+ clearTimeout(toast.timer);
+ toast.timer=setTimeout(()=>$("toast").hidden=true,3000);
+}
+function safeDate(value){
+ if(!value)return null;
+ const d=new Date(value);
+ return Number.isNaN(d.getTime())?null:d;
+}
+function expiryText(value){
+ const d=safeDate(value);if(!d)return"24h";
+ const ms=d-Date.now();if(ms<=0)return"Expired";
+ const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);
+ return h?h+"h "+m+"m left":Math.max(1,m)+"m left";
+}
+function stopPreviewAudio(){
+ const audio=$("musicPreview");
+ audio.pause();audio.removeAttribute("src");audio.load();
+ state.audioPreviewTrack=null;
+}
+function resetEditorTools(){
+ state.overlayText="";state.sticker="";
+ $("overlayInput").value="";
+ $("editorText").hidden=true;
+ $("editorSticker").hidden=true;
+ $("editorText").textContent="";
+ $("editorSticker").textContent="";
+}
+function updateEditor(){
+ const hasPhoto=state.files.length>0;
+ const isText=state.mode==="text";
+ $("editorEmpty").hidden=hasPhoto||isText;
+ $("editorImage").hidden=!hasPhoto||isText;
+ $("editorText").hidden=!state.overlayText||isText;
+ $("editorSticker").hidden=!state.sticker||isText;
+ $("editorCaption").hidden=!$("caption").value.trim();
+ $("editorCaption").textContent=$("caption").value.trim();
+ $("editor").classList.toggle("text-editor",isText);
+ if(isText){
+  $("editor").style.background=backgrounds[state.background];
+  $("editorText").hidden=!$("storyText").value.trim();
+  $("editorText").textContent=$("storyText").value.trim();
+  $("editorText").style.position="relative";
+  $("editorText").style.left="auto";
+  $("editorText").style.right="auto";
+  $("editorText").style.top="auto";
+  $("editorText").style.transform="none";
+  $("editorText").style.padding="20px";
+  $("editorImage").hidden=true;
+ }else if(hasPhoto){
+  $("editor").style.background="#08080b";
+  $("editorImage").src=state.urls[state.current];
+  $("editorImage").style.filter=state.filter;
+  $("editorText").style.position="absolute";
+  $("editorText").style.left="8%";
+  $("editorText").style.right="8%";
+  $("editorText").style.top="50%";
+  $("editorText").style.transform="translateY(-50%)";
+  $("editorText").style.padding="0";
+ }
+ $("editorTopTools").hidden=!hasPhoto||isText;
+ renderThumbs();
+}
+function renderThumbs(){
+ const grid=$("selectedGrid");grid.replaceChildren();
+ state.files.forEach((file,index)=>{
+  const wrap=document.createElement("div");
+  wrap.className="thumb"+(index===state.current?" active":"");
+  const img=document.createElement("img");
+  img.src=state.urls[index];img.alt="Selected photo "+(index+1);
+  const number=document.createElement("span");
+  number.className="number";number.textContent=index+1;
+  const remove=document.createElement("button");
+  remove.type="button";remove.innerHTML='<i class="fa-solid fa-xmark"></i>';
+  remove.setAttribute("aria-label","Remove photo "+(index+1));
+  remove.addEventListener("click",e=>{
+   e.stopPropagation();removePhoto(index);
+  });
+  wrap.append(img,number,remove);
+  wrap.addEventListener("click",()=>{state.current=index;resetEditorTools();updateEditor();});
+  grid.appendChild(wrap);
+ });
+}
+function removePhoto(index){
+ if(state.urls[index])URL.revokeObjectURL(state.urls[index]);
+ state.files.splice(index,1);state.urls.splice(index,1);
+ state.current=Math.max(0,Math.min(state.current,state.files.length-1));
+ resetEditorTools();updateEditor();
+}
+function selectFiles(fileList){
+ const files=Array.from(fileList||[]);
+ if(!files.length)return;
+ if(!token()){toast("Please log in before creating a Story.");return}
+ const allowed=["image/jpeg","image/png","image/webp","image/gif"];
+ const valid=files.filter(file=>allowed.includes(file.type)&&file.size<=20*1024*1024);
+ if(valid.length!==files.length)toast("Some files were skipped. Use JPG, PNG, WEBP or GIF up to 20 MB each.");
+ if(!valid.length)return;
+ valid.forEach(file=>{
+  if(state.files.length>=10)return;
+  state.files.push(file);state.urls.push(URL.createObjectURL(file));
+ });
+ state.current=state.files.length?state.files.length-1:0;
+ $("imageInput").value="";
+ setMode("image");resetEditorTools();updateEditor();
+ setStatus(state.files.length+" photo(s) selected.");
+}
+function setMode(mode){
+ state.mode=mode;
+ $("photoMode").classList.toggle("active",mode==="image");
+ $("textMode").classList.toggle("active",mode==="text");
+ $("photoTools").hidden=mode!=="image";
+ $("textTools").hidden=mode!=="text";
+ $("editorToolbar").hidden=mode==="text";
+ $("editorTopTools").hidden=mode!=="image"||!state.files.length;
+ updateEditor();
+}
+function openTool(name){
+ const map={
+  text:"textPanel",music:"musicPanel",stickers:"stickerPanel",
+  effects:"effectsPanel",mention:"mentionPanel",link:"linkPanel"
+ };
+ Object.values(map).forEach(id=>$(id).hidden=true);
+ document.querySelectorAll(".tool").forEach(b=>b.classList.remove("active"));
+ const button=document.querySelector('[data-tool="'+name+'"]');
+ if(button)button.classList.add("active");
+ const panel=$(map[name]);
+ if(panel){
+  panel.hidden=!panel.hidden;
+  if(name==="music"&&!panel.hidden)loadTracks();
+ }
+}
+function applyFilter(filter){
+ state.filter=filter;
+ document.querySelectorAll(".filter-btn").forEach(b=>{
+  b.classList.toggle("active",b.dataset.filter===filter);
+ });
+ updateEditor();
+}
+function drawEditedImage(file){
+ return new Promise((resolve,reject)=>{
+  const img=new Image();
+  const url=URL.createObjectURL(file);
+  img.onload=()=>{
+   try{
+    const width=1080,height=1680;
+    const canvas=document.createElement("canvas");
+    canvas.width=width;canvas.height=height;
+    const ctx=canvas.getContext("2d");
+    const scale=Math.max(width/img.width,height/img.height);
+    const w=img.width*scale,h=img.height*scale;
+    const x=(width-w)/2,y=(height-h)/2;
+    ctx.filter=filters[state.filter]||"none";
+    ctx.drawImage(img,x,y,w,h);
+    ctx.filter="none";
+    if(state.overlayText){
+     ctx.textAlign="center";ctx.textBaseline="middle";
+     ctx.fillStyle="#fff";ctx.strokeStyle="#000";
+     ctx.lineWidth=5;ctx.font="bold 65px Arial";
+     const words=state.overlayText.split(/\s+/);
+     const lines=[];let line="";
+     words.forEach(word=>{
+      const test=line?line+" "+word:word;
+      if(ctx.measureText(test).width>width-120&&line){lines.push(line);line=word}
+      else line=test;
+     });
+     if(line)lines.push(line);
+     const lineHeight=78;
+     const start=height/2-(lines.length-1)*lineHeight/2;
+     lines.forEach((text,i)=>{
+      ctx.strokeText(text,width/2,start+i*lineHeight);
+      ctx.fillText(text,width/2,start+i*lineHeight);
+     });
     }
-    state.tracks.forEach(track=>{
-      const row=document.createElement("div");row.className="track";
-      const info=document.createElement("div");info.className="track-info";
-      const title=document.createElement("strong");title.textContent=track.title||"Untitled track";
-      const artist=document.createElement("small");artist.textContent=(track.artist||"Free Music")+" · "+(track.license_name||"Licence details");
-      info.append(title,artist);
-      const actions=document.createElement("div");actions.className="track-actions";
-      const play=document.createElement("button");play.type="button";play.title="Preview music";play.innerHTML='<i class="fa-solid fa-play"></i>';
-      play.addEventListener("click",()=>previewTrack(track));
-      const choose=document.createElement("button");choose.type="button";choose.title="Use this music";choose.innerHTML='<i class="fa-solid fa-check"></i>';
-      choose.addEventListener("click",()=>{state.selectedTrack=track;$("selectedTrack").textContent="Selected: "+track.title+" — "+(track.artist||"Free Music");stopAudio();toast("Music added to your Story.");});
-      actions.append(play,choose);row.append(info,actions);
-      if(track.license_url){const link=document.createElement("a");link.href=track.license_url;link.target="_blank";link.rel="noopener";link.textContent="Licence";link.style.cssText="font-size:10px;color:#c5adff;margin-left:6px";row.append(link);}
-      list.appendChild(row);
-    });
+    if(state.sticker){
+     ctx.textAlign="center";ctx.font="120px Arial";
+     ctx.fillText(state.sticker,width/2,height*.25);
+    }
+    canvas.toBlob(blob=>{
+     URL.revokeObjectURL(url);
+     if(!blob){reject(new Error("Could not prepare the edited photo."));return}
+     resolve(new File([blob],"story-edited.jpg",{type:"image/jpeg"}));
+    },"image/jpeg",.92);
+   }catch(error){URL.revokeObjectURL(url);reject(error)}
+  };
+  img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error("Could not read selected photo."))};
+  img.src=url;
+ });
+}
+async function uploadPhoto(file){
+ const form=new FormData();form.append("file",file);
+ const result=await api("/media/upload",{method:"POST",body:form});
+ if(!result.media||!result.media.url)throw new Error("Media server did not return the photo URL.");
+ return result.media;
+}
+async function publish(){
+ if(state.uploadBusy)return;
+ if(!token()){setStatus("Please log in first.","error");return}
+ const text=$("storyText").value.trim();
+ if(state.mode==="image"&&!state.files.length){setStatus("Choose at least one photo first.","error");return}
+ if(state.mode==="text"&&!text){setStatus("Write something for your Text Story.","error");return}
+ state.uploadBusy=true;
+ $("publishBtn").disabled=true;$("chooseImage").disabled=true;
+ $("progress").hidden=false;
+ $("progressBar").style.width="3%";
+ try{
+  const total=state.mode==="image"?state.files.length:1;
+  for(let i=0;i<total;i++){
+   let media={url:"",public_id:""};
+   if(state.mode==="image"){
+    setStatus("Preparing photo "+(i+1)+" of "+total+"...");
+    let file=state.files[i];
+    if(i===state.current&&(state.filter!=="normal"||state.overlayText||state.sticker)){
+     file=await drawEditedImage(file);
+    }
+    setStatus("Uploading photo "+(i+1)+" of "+total+"...");
+    media=await uploadPhoto(file);
+   }
+   const payload={
+    media_type:state.mode,
+    media_url:media.url||"",
+    media_public_id:media.public_id||"",
+    caption:$("caption").value.trim(),
+    story_text:state.mode==="text"?text:"",
+    background:state.background,
+    music_id:state.selectedTrack?state.selectedTrack.id:null
+   };
+   setStatus("Publishing Story "+(i+1)+" of "+total+"...");
+   await api("/stories",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+   });
+   $("progressBar").style.width=Math.round((i+1)/total*100)+"%";
   }
-  async function previewTrack(track){
-    if(!track.audio_url){toast("This track has no preview file yet.");return;}
-    const audio=$("musicPreview");
-    if(state.audioPreviewTrack===track.id&&!audio.paused){audio.pause();return;}
-    stopAudio();audio.src=track.audio_url;state.audioPreviewTrack=track.id;
-    try{await audio.play();}catch(_){toast("Could not play this music preview.");}
+  $("caption").value="";$("storyText").value="";
+  $("captionCount").textContent="0/500";$("textCount").textContent="0/500";
+  state.files.forEach((_,i)=>{if(state.urls[i])URL.revokeObjectURL(state.urls[i])});
+  state.files=[];state.urls=[];state.current=0;
+  state.filter="normal";resetEditorTools();stopPreviewAudio();
+  updateEditor();
+  setStatus("Your Story is now published and visible to everyone.","success");
+  toast("Story published successfully!");
+  await loadStories();
+ }catch(error){
+  console.error(error);
+  setStatus("Story publishing failed: "+error.message,"error");
+ }finally{
+  state.uploadBusy=false;
+  $("publishBtn").disabled=false;$("chooseImage").disabled=false;
+  setTimeout(()=>$("progress").hidden=true,900);
+ }
+}
+function renderTracks(){
+ const list=$("trackList");list.replaceChildren();
+ if(!state.tracks.length){
+  const empty=document.createElement("div");empty.className="empty";
+  empty.textContent="No music tracks are available yet.";
+  list.appendChild(empty);return;
+ }
+ state.tracks.forEach(track=>{
+  const row=document.createElement("div");row.className="track";
+  const info=document.createElement("div");info.className="track-info";
+  const title=document.createElement("strong");title.textContent=track.title||"Untitled track";
+  const artist=document.createElement("small");artist.textContent=(track.artist||"Free Music")+" · "+(track.license_name||"Music");
+  info.append(title,artist);
+  const play=document.createElement("button");play.type="button";play.title="Preview";
+  play.innerHTML='<i class="fa-solid fa-play"></i>';
+  play.addEventListener("click",()=>previewTrack(track));
+  const choose=document.createElement("button");choose.type="button";choose.title="Select music";
+  choose.innerHTML='<i class="fa-solid fa-check"></i>';
+  choose.addEventListener("click",()=>{
+   state.selectedTrack=track;
+   $("selectedTrack").textContent="Selected: "+track.title;
+   stopPreviewAudio();toast("Music selected.");
+  });
+  row.append(info,play,choose);list.appendChild(row);
+ });
+}
+async function previewTrack(track){
+ if(!track.audio_url){toast("This track has no preview file.");return}
+ const audio=$("musicPreview");
+ if(state.audioPreviewTrack===track.id&&!audio.paused){audio.pause();return}
+ stopPreviewAudio();audio.src=track.audio_url;state.audioPreviewTrack=track.id;
+ try{await audio.play()}catch(_){toast("Could not play this music preview.")}
+}
+async function loadTracks(){
+ if(!token()){toast("Please log in to load music.");return}
+ $("trackList").hidden=false;
+ $("trackList").innerHTML='<div class="empty">Loading music...</div>';
+ try{
+  const result=await api("/story-music");
+  state.tracks=Array.isArray(result.tracks)?result.tracks:[];
+  renderTracks();
+ }catch(error){
+  $("trackList").innerHTML='<div class="empty">Music library is unavailable.</div>';
+ }
+}
+function activeStories(){
+ return state.stories.filter(s=>{
+  const d=safeDate(s.expires_at||s.expiresAt);
+  return d&&d>Date.now();
+ });
+}
+function renderStories(){
+ const list=$("storyList");list.replaceChildren();
+ const stories=activeStories();
+ if(!stories.length){
+  const empty=document.createElement("div");empty.className="empty";
+  empty.style.width="100%";
+  empty.textContent="No active Stories yet. Published Stories will appear here.";
+  list.appendChild(empty);return;
+ }
+ stories.forEach((story,index)=>{
+  const card=document.createElement("button");
+  card.type="button";
+  card.className="story-card"+(story.media_type==="text"?" text-card":"");
+  const username=story.display_name||story.username||"User";
+  card.setAttribute("aria-label","View Story by "+username);
+  if(story.media_type==="image"&&story.media_url){
+   const img=document.createElement("img");img.src=story.media_url;img.alt="";img.loading="lazy";card.appendChild(img);
+  }else{
+   card.style.background=backgrounds[story.background]||backgrounds.purple;
+   const txt=document.createElement("span");txt.textContent=story.story_text||"Text Story";card.appendChild(txt);
   }
-  async function loadTracks(){
-    if(!token())return;
-    try{const result=await api("/story-music");state.tracks=Array.isArray(result.tracks)?result.tracks:[];renderTracks();}
-    catch(error){console.warn("Music library:",error.message);$("trackList").innerHTML='<div class="empty">Music library is temporarily unavailable.</div>';}
-  }
-  function activeStories(){return state.stories.filter(s=>{const d=safeDate(s.expires_at||s.expiresAt);return d&&d>Date.now();});}
-  function renderStories(){
-    const list=$("storyList");list.replaceChildren();const stories=activeStories();
-    if(!stories.length){const empty=document.createElement("div");empty.className="empty";empty.style.width="100%";empty.textContent="No active Stories yet. Your approved photo and text Stories will appear here.";list.appendChild(empty);return;}
-    stories.forEach((story,index)=>{
-      const card=document.createElement("button");card.type="button";card.className="story-card"+(story.media_type==="text"?" text-card":"");
-      const username=story.display_name||story.username||"User";card.setAttribute("aria-label","View Story by "+username);
-      if(story.media_type==="image"&&story.media_url){const img=document.createElement("img");img.src=story.media_url;img.alt="";img.loading="lazy";card.appendChild(img);}
-      else{card.style.background=backgrounds[story.background]||backgrounds.purple;const txt=document.createElement("span");txt.textContent=story.story_text||"Text Story";card.appendChild(txt);}
-      const avatar=document.createElement("div");avatar.className="story-avatar";
-      if(story.avatar_url){const img=document.createElement("img");img.src=story.avatar_url;img.alt="";avatar.appendChild(img);}else avatar.innerHTML='<i class="fa-regular fa-user"></i>';
-      const name=document.createElement("div");name.className="story-name";name.textContent=username;card.append(avatar,name);
-      card.addEventListener("click",()=>openStory(index));list.appendChild(card);
-    });
-  }
-  async function loadStories(){
-    $("listStatus").textContent="";
-    if(!token()){$("storyList").innerHTML='<div class="empty">Log in to load Stories.</div>';$("listStatus").textContent="Sign in and refresh to view Stories.";$("listStatus").className="status error";return;}
-    $("storyList").innerHTML='<div class="empty"><i class="fa-solid fa-spinner fa-spin"></i> Loading Stories...</div>';
-    try{const result=await api("/stories");const arr=Array.isArray(result)?result:(Array.isArray(result.stories)?result.stories:[]);state.stories=arr.filter(s=>s.media_type==="image"||s.media_type==="text");renderStories();}
-    catch(error){$("storyList").innerHTML='<div class="empty">Could not load Stories. Please try again.</div>';$("listStatus").textContent=error.message;$("listStatus").className="status error";}
-  }
-  function closeStory(){
-    clearTimeout(state.timer);clearInterval(state.progressTimer);state.timer=null;state.progressTimer=null;
-    const audio=$("viewerAudio");audio.pause();audio.removeAttribute("src");audio.load();
-    $("viewerImage").removeAttribute("src");$("viewer").hidden=true;state.viewingIndex=-1;
-  }
-  function openStory(index){
-    const story=activeStories()[index];if(!story)return;
-    clearTimeout(state.timer);clearInterval(state.progressTimer);
-    const audio=$("viewerAudio");audio.pause();audio.removeAttribute("src");audio.load();
-    state.viewingIndex=index;$("viewer").hidden=false;
-    $("viewerUsername").textContent=story.display_name||story.username||"User";
-    $("viewerExpiry").textContent=expiryText(story.expires_at);
-    $("viewerAvatar").src=story.avatar_url||"";
-    $("viewerProgress").style.width="0%";
-    $("viewerCaption").textContent=story.caption||"";
-    const isText=story.media_type==="text";
-    $("viewerImage").hidden=isText;$("viewerText").hidden=!isText;
-    if(isText){$("viewerText").textContent=story.story_text||"";$("viewerText").style.background=backgrounds[story.background]||backgrounds.purple;}
-    else{$("viewerImage").src=story.media_url||"";}
-    if(story.music_url){
-      $("viewerMusic").hidden=false;$("viewerMusic").textContent="♫ "+(story.music_title||"Music")+" · "+(story.music_artist||"");
-      audio.src=story.music_url;audio.currentTime=0;audio.play().catch(()=>{});
-    }else{$("viewerMusic").hidden=true;}
-    const duration=8000,started=Date.now();
-    state.progressTimer=setInterval(()=>{$("viewerProgress").style.width=Math.min(100,(Date.now()-started)/duration*100)+"%";},80);
-    state.timer=setTimeout(nextStory,duration);
-  }
-  function nextStory(){const list=activeStories();if(state.viewingIndex+1<list.length)openStory(state.viewingIndex+1);else closeStory();}
-  function previousStory(){if(state.viewingIndex>0)openStory(state.viewingIndex-1);}
-
-  $("photoMode").addEventListener("click",()=>setMode("image"));
-  $("textMode").addEventListener("click",()=>setMode("text"));
-  $("chooseImage").addEventListener("click",()=>$("imageInput").click());
-  $("imageInput").addEventListener("change",e=>selectPhoto(e.target.files[0]));
-  $("removePhoto").addEventListener("click",resetPhoto);
-  $("storyText").addEventListener("input",()=>{$("textCount").textContent=$("storyText").value.length+"/500";updatePreview();});
-  $("caption").addEventListener("input",()=>{$("captionCount").textContent=$("caption").value.length+"/500";updatePreview();});
-  $("backgroundChoices").addEventListener("click",e=>{const b=e.target.closest("[data-bg]");if(!b)return;state.background=b.dataset.bg;document.querySelectorAll(".color-dot").forEach(x=>x.classList.toggle("active",x===b));updatePreview();});
-  $("openMusic").addEventListener("click",()=>{$("trackList").hidden=!$("trackList").hidden;if(!$("trackList").hidden)loadTracks();});
-  $("publishBtn").addEventListener("click",publish);
-  $("refreshStories").addEventListener("click",loadStories);
-  $("closeViewer").addEventListener("click",closeStory);
-  $("viewerNext").addEventListener("click",nextStory);
-  $("viewerPrev").addEventListener("click",previousStory);
-  $("backBtn").addEventListener("click",()=>{if(history.length>1)history.back();else location.href="home.html";});
-  document.addEventListener("keydown",e=>{if($("viewer").hidden)return;if(e.key==="Escape")closeStory();if(e.key==="ArrowRight")nextStory();if(e.key==="ArrowLeft")previousStory();});
-  if(!token())setStatus("Log in to create a Story. If you are already logged in, sign in again.","error");
-  loadStories();loadTracks();
-  setInterval(()=>{state.stories=state.stories.filter(s=>{const d=safeDate(s.expires_at);return d&&d>Date.now();});if(!$("viewer").hidden&&state.viewingIndex>=activeStories().length)closeStory();renderStories();},30000);
+  const avatar=document.createElement("div");avatar.className="story-avatar";
+  if(story.avatar_url){
+   const img=document.createElement("img");img.src=story.avatar_url;img.alt="";avatar.appendChild(img);
+  }else avatar.innerHTML='<i class="fa-regular fa-user"></i>';
+  const name=document.createElement("div");name.className="story-name";name.textContent=username;
+  card.append(avatar,name);
+  card.addEventListener("click",()=>openStory(index));
+  list.appendChild(card);
+ });
+}
+async function loadStories(){
+ $("listStatus").textContent="";
+ if(!token()){
+  $("storyList").innerHTML='<div class="empty">Log in to load Stories.</div>';
+  $("listStatus").textContent="Sign in and refresh to view Stories.";
+  $("listStatus").className="status error";return;
+ }
+ $("storyList").innerHTML='<div class="empty">Loading Stories...</div>';
+ try{
+  const result=await api("/stories");
+  const arr=Array.isArray(result)?result:(Array.isArray(result.stories)?result.stories:[]);
+  state.stories=arr.filter(s=>s.media_type==="image"||s.media_type==="text");
+  renderStories();
+ }catch(error){
+  $("storyList").innerHTML='<div class="empty">Could not load Stories. Please try again.</div>';
+  $("listStatus").textContent=error.message;
+  $("listStatus").className="status error";
+ }
+}
+function closeStory(){
+ clearTimeout(state.timer);clearInterval(state.progressTimer);
+ state.timer=null;state.progressTimer=null;
+ const audio=$("viewerAudio");audio.pause();audio.removeAttribute("src");audio.load();
+ $("viewerImage").removeAttribute("src");
+ $("viewer").hidden=true;state.viewingIndex=-1;
+}
+function openStory(index){
+ const story=activeStories()[index];if(!story)return;
+ clearTimeout(state.timer);clearInterval(state.progressTimer);
+ const audio=$("viewerAudio");audio.pause();audio.removeAttribute("src");audio.load();
+ state.viewingIndex=index;$("viewer").hidden=false;
+ $("viewerUsername").textContent=story.display_name||story.username||"User";
+ $("viewerExpiry").textContent=expiryText(story.expires_at||story.expiresAt);
+ $("viewerAvatar").src=story.avatar_url||"";
+ $("viewerProgress").style.width="0%";
+ $("viewerCaption").textContent=story.caption||"";
+ const isText=story.media_type==="text";
+ $("viewerImage").hidden=isText;$("viewerText").hidden=!isText;
+ if(isText){
+  $("viewerText").textContent=story.story_text||"";
+  $("viewerText").style.background=backgrounds[story.background]||backgrounds.purple;
+ }else $("viewerImage").src=story.media_url||"";
+ const duration=8000,started=Date.now();
+ state.progressTimer=setInterval(()=>{
+  $("viewerProgress").style.width=Math.min(100,(Date.now()-started)/duration*100)+"%";
+ },80);
+ state.timer=setTimeout(nextStory,duration);
+}
+function nextStory(){
+ const list=activeStories();
+ if(state.viewingIndex+1<list.length)openStory(state.viewingIndex+1);
+ else closeStory();
+}
+function previousStory(){
+ if(state.viewingIndex>0)openStory(state.viewingIndex-1);
+}
+$("photoMode").addEventListener("click",()=>setMode("image"));
+$("textMode").addEventListener("click",()=>setMode("text"));
+$("chooseImage").addEventListener("click",()=>$("imageInput").click());
+$("imageInput").addEventListener("change",e=>selectFiles(e.target.files));
+$("removeCurrent").addEventListener("click",()=>removePhoto(state.current));
+$("resetFilter").addEventListener("click",()=>{
+ applyFilter("normal");resetEditorTools();
+});
+$("storyText").addEventListener("input",()=>{
+ $("textCount").textContent=$("storyText").value.length+"/500";
+ updateEditor();
+});
+$("caption").addEventListener("input",()=>{
+ $("captionCount").textContent=$("caption").value.length+"/500";
+ updateEditor();
+});
+document.querySelectorAll(".tool").forEach(button=>{
+ button.addEventListener("click",()=>openTool(button.dataset.tool));
+});
+$("applyText").addEventListener("click",()=>{
+ const value=$("overlayInput").value.trim();
+ if(!value){toast("Write some text first.");return}
+ state.overlayText=value;
+ $("editorText").textContent=value;
+ $("editorText").hidden=false;
+ updateEditor();toast("Text added to your photo.");
+});
+$("stickerGrid").addEventListener("click",e=>{
+ const button=e.target.closest(".sticker");if(!button)return;
+ state.sticker=button.textContent;
+ $("editorSticker").textContent=state.sticker;
+ $("editorSticker").hidden=false;
+ updateEditor();toast("Sticker added.");
+});
+document.querySelectorAll(".filter-btn").forEach(button=>{
+ button.addEventListener("click",()=>applyFilter(button.dataset.filter));
+});
+$("loadMusic").addEventListener("click",()=>{
+ $("trackList").hidden=!$("trackList").hidden;
+ if(!$("trackList").hidden)loadTracks();
+});
+$("addMention").addEventListener("click",()=>{
+ const value=$("mentionInput").value.trim();
+ if(!value){toast("Enter a username.");return}
+ const mention=value.startsWith("@")?value:"@"+value;
+ $("caption").value=($("caption").value+" "+mention).trim().slice(0,500);
+ $("captionCount").textContent=$("caption").value.length+"/500";
+ updateEditor();toast("Mention added to caption.");
+});
+$("addLink").addEventListener("click",()=>{
+ const value=$("linkInput").value.trim();
+ if(!/^https?:\/\/\S+/i.test(value)){toast("Enter a valid http or https link.");return}
+ $("caption").value=($("caption").value+" "+value).trim().slice(0,500);
+ $("captionCount").textContent=$("caption").value.length+"/500";
+ updateEditor();toast("Link added to caption.");
+});
+$("publishBtn").addEventListener("click",publish);
+$("refreshStories").addEventListener("click",loadStories);
+$("closeViewer").addEventListener("click",closeStory);
+$("viewerNext").addEventListener("click",nextStory);
+$("viewerPrev").addEventListener("click",previousStory);
+$("backBtn").addEventListener("click",()=>{
+ if(history.length>1)history.back();else location.href="home.html";
+});
+document.addEventListener("keydown",e=>{
+ if($("viewer").hidden)return;
+ if(e.key==="Escape")closeStory();
+ if(e.key==="ArrowRight")nextStory();
+ if(e.key==="ArrowLeft")previousStory();
+});
+let touchStartX=0;
+$("viewer").addEventListener("touchstart",e=>{
+ touchStartX=e.changedTouches[0].screenX;
+},{passive:true});
+$("viewer").addEventListener("touchend",e=>{
+ const diff=e.changedTouches[0].screenX-touchStartX;
+ if(Math.abs(diff)>60){if(diff<0)nextStory();else previousStory()}
+},{passive:true});
+if(!token())setStatus("Log in to create a Story. If you are already logged in, sign in again.","error");
+loadStories();
+updateEditor();
+setInterval(()=>{
+ state.stories=state.stories.filter(s=>{
+  const d=safeDate(s.expires_at||s.expiresAt);
+  return d&&d>Date.now();
+ });
+ if(!$("viewer").hidden&&state.viewingIndex>=activeStories().length)closeStory();
+ renderStories();
+},30000);
 })();
 </script>
 </body>
