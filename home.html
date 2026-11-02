@@ -64,7 +64,14 @@ button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .post-time{font-size:11px;color:var(--muted);margin-top:4px}
 .profile-clickable{cursor:pointer}.profile-clickable:active{opacity:.75}
 .post-options{background:none;color:var(--muted);font-size:19px;padding:6px 8px}
+
+/* Post text: collapsed and expandable */
 .post-body-text{padding:0 15px 11px;font-size:14px;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.post-body-text.collapsed .post-text-content{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.post-text-content{min-width:0}
+.see-more-btn{display:inline-block;margin-top:5px;padding:2px 0;background:none;color:#69b7ff;font-size:13px;font-weight:700}
+.see-more-btn:active{opacity:.7}
+
 .post-media-container{width:100%;background:#000;max-height:480px;overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative}
 .post-media-container img,.post-media-container video{width:100%;max-height:480px;object-fit:contain;display:block}
 .post-media-container video{background:#000}
@@ -214,6 +221,7 @@ let loading=false,refreshInProgress=false;
 let storyGroups=[],activeStoryGroup=0,activeStoryIndex=0;
 let storyTimer=null,storyPaused=false,storyStartedAt=0,storyRemaining=6000;
 const pendingReactions=new Set(),viewRequestsInSession=new Set();
+
 function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function toast(message){const el=document.getElementById("toast");el.textContent=message;el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2800)}
@@ -237,14 +245,40 @@ function openFavorites(){if(requireLogin())location.href="favorites.html"}
 function openCreatePost(){if(requireLogin())location.href="create.html"}
 function openCreateStory(){if(requireLogin())location.href="story.html"}
 function openAdminOrSecurity(){if(!requireLogin())return;location.href=String(currentUser?.role||"").toLowerCase()==="admin"?"admin.html":"settings.html"}
+
+/* Find profile pictures from common API response formats */
 function findAvatar(source){
   if(!source||typeof source!=="object")return "";
-  const keys=["avatar_url","avatarUrl","profile_picture","profilePicture","profile_image","profileImage","photo_url","photoURL","image_url","imageUrl","avatar","picture"];
-  for(const key of keys){const v=source[key];if(typeof v==="string"&&v.trim())return v.trim();if(v&&typeof v==="object"){const u=v.url||v.secure_url||v.src;if(typeof u==="string"&&u.trim())return u.trim()}}
-  for(const key of ["user","author","profile","data","account"]){if(source[key]&&typeof source[key]==="object"){const found=findAvatar(source[key]);if(found)return found}}
+  const keys=[
+    "avatar_url","avatarUrl","profile_picture","profilePicture",
+    "profile_image","profileImage","profile_photo","profilePhoto",
+    "photo_url","photoURL","image_url","imageUrl","avatar",
+    "picture","photo","profile_pic","profilePic","user_image",
+    "userImage","thumbnail"
+  ];
+  for(const key of keys){
+    const v=source[key];
+    if(typeof v==="string"&&v.trim())return v.trim();
+    if(v&&typeof v==="object"){
+      const u=v.url||v.secure_url||v.src||v.path;
+      if(typeof u==="string"&&u.trim())return u.trim();
+    }
+  }
+  for(const key of ["user","author","profile","data","account","me"]){
+    if(source[key]&&typeof source[key]==="object"){
+      const found=findAvatar(source[key]);if(found)return found;
+    }
+  }
   return "";
 }
-function setAvatar(el,url){if(!el)return;el.onerror=function(){this.onerror=null;this.src=FALLBACK_AVATAR};el.src=url||FALLBACK_AVATAR}
+function myAvatar(){
+  return findAvatar(currentUser)||FALLBACK_AVATAR;
+}
+function setAvatar(el,url){
+  if(!el)return;
+  el.onerror=function(){this.onerror=null;this.src=FALLBACK_AVATAR};
+  el.src=url||FALLBACK_AVATAR;
+}
 function count(value){const n=Number(value);return Number.isFinite(n)&&n>=0?n:0}
 function hasActiveBlueBadge(source){
   if(!source||typeof source!=="object")return false;
@@ -253,6 +287,7 @@ function hasActiveBlueBadge(source){
 }
 function blueBadgeHTML(source){return hasActiveBlueBadge(source)?' <i class="fa-solid fa-circle-check blue-badge" title="Verified account" aria-label="Verified account"></i>':""}
 function relativeTime(date){const t=new Date(date).getTime();if(!Number.isFinite(t))return "Just now";const m=Math.max(0,Math.floor((Date.now()-t)/60000));if(m<1)return "Just now";if(m<60)return m+"m ago";if(m<1440)return Math.floor(m/60)+"h ago";return Math.floor(m/1440)+"d ago"}
+
 function normalizePost(post){
   const author=post.user||post.author||post.profile||{};
   const profileUsername=String(post.author_username||post.user_username||post.username||author.username||author.handle||"").trim().replace(/^@/,"");
@@ -262,11 +297,18 @@ function normalizePost(post){
   const raw=post.reaction_counts||post.reactions_count||{};
   const counts={love:count(raw.love??raw.loves??post.love_count),angry:count(raw.angry??raw.angries??post.angry_count),sad:count(raw.sad??raw.sads??post.sad_count),haha:count(raw.haha??raw.hahas??post.haha_count)};
   const myReaction=REACTIONS[post.my_reaction]?post.my_reaction:(REACTIONS[post.reaction]?post.reaction:null);
-  return {...post,id:String(post.id),username:displayName,profileUsername,authorId:post.user_id??post.author_id??author.id??post.userId??"",avatar:findAvatar(post)||findAvatar(author)||FALLBACK_AVATAR,blueBadge:hasActiveBlueBadge(post)||hasActiveBlueBadge(author),content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,comments:count(post.comment_count??post.comments_count),views:count(post.view_count??post.views),time:relativeTime(post.created_at)};
+  const authorId=post.user_id??post.author_id??author.id??post.userId??"";
+  const myId=String(currentUser?.id??currentUser?.user_id??"");
+  const isMine=!!myId&&String(authorId)===myId;
+  const avatar=findAvatar(post)||findAvatar(author)||(isMine?myAvatar():FALLBACK_AVATAR);
+  return {...post,id:String(post.id),username:displayName,profileUsername,authorId,avatar,blueBadge:hasActiveBlueBadge(post)||hasActiveBlueBadge(author),content:post.content||"",src:post.media_url||post.url||"",type,counts,myReaction,comments:count(post.comment_count??post.comments_count),views:count(post.view_count??post.views),time:relativeTime(post.created_at)};
 }
 async function loadMe(){
-  const data=await api("/auth/me");currentUser=data.user||data.profile||data.data?.user||data.data||{};
-  const avatar=findAvatar(data)||findAvatar(currentUser);setAvatar(document.getElementById("composerAvatar"),avatar);setAvatar(document.getElementById("createStoryAvatar"),avatar);
+  const data=await api("/auth/me");
+  currentUser=data.user||data.profile||data.data?.user||data.data||{};
+  const avatar=findAvatar(data)||findAvatar(currentUser)||FALLBACK_AVATAR;
+  setAvatar(document.getElementById("composerAvatar"),avatar);
+  setAvatar(document.getElementById("createStoryAvatar"),avatar);
 }
 async function loadFeed(){
   if(loading)return;loading=true;document.getElementById("feed").innerHTML='<div class="loading">Loading posts...</div>';
@@ -282,11 +324,11 @@ function normalizeStory(s){
   const text=s.story_text||s.content||"";
   const expires=new Date(s.expires_at||s.expiresAt||Date.now()+86400000).getTime();
   const userId=s.user_id??s.userId??user.id??user.user_id??"";
-  const username=String(s.display_name||user.display_name||s.username||user.username||s.handle||"Boys vs Girls User");
+  const username=String(s.display_name||user.display_name||s.username||user.username||user.handle||"Boys vs Girls User");
   return {
     id:String(s.id??s.story_id??Math.random()),
     userId:String(userId||username.toLowerCase()),
-    username,handle:String(s.username||user.username||s.handle||""),
+    username,handle:String(s.username||user.username||user.handle||""),
     avatar:findAvatar(s)||findAvatar(user)||FALLBACK_AVATAR,
     mediaUrl:s.media_url||s.mediaUrl||s.url||s.image_url||"",
     type:type==="text"||(!s.media_url&&!s.mediaUrl&&!s.url&&text)?"text":"image",
@@ -338,18 +380,13 @@ function isMyStoryGroup(group){
 function renderStories(){
   const el=document.getElementById("stories");
   const myGroup=storyGroups.find(isMyStoryGroup);
-  let html='<button class="story-card create-story" onclick="openCreateStory()"><div class="create-cover"><img src="'+esc(findAvatar(currentUser)||FALLBACK_AVATAR)+'" alt=""></div><span class="create-plus"><i class="fa-solid fa-plus"></i></span><span class="create-label">'+(myGroup?"Add to story":"Create story")+'</span></button>';
+  let html='<button class="story-card create-story" onclick="openCreateStory()"><div class="create-cover"><img src="'+esc(myAvatar())+'" alt=""></div><span class="create-plus"><i class="fa-solid fa-plus"></i></span><span class="create-label">'+(myGroup?"Add to story":"Create story")+'</span></button>';
   storyGroups.forEach((g,index)=>{
-    const last=g.stories[g.stories.length-1];
-    if(!last)return;
+    const last=g.stories[g.stories.length-1];if(!last)return;
     const seen=g.stories.every(s=>s.seen);
-    const cover=last.type==="image"&&last.mediaUrl
-      ?'<img class="story-cover" src="'+esc(last.mediaUrl)+'" alt="" loading="lazy">'
-      :'<div class="text-preview">'+esc(last.text||last.caption||"Story")+'</div>';
+    const cover=last.type==="image"&&last.mediaUrl?'<img class="story-cover" src="'+esc(last.mediaUrl)+'" alt="" loading="lazy">':'<div class="text-preview">'+esc(last.text||last.caption||"Story")+'</div>';
     const cls=last.type==="text"?"story-card text-cover ":"story-card ";
-    html+='<button class="'+cls+(seen?"seen":"unseen")+'" onclick="openStoryGroup('+index+')">'+cover+
-      '<span class="story-ring"><img src="'+esc(g.avatar)+'" alt=""></span>'+
-      '<span class="story-name">'+esc(g.username)+'</span></button>';
+    html+='<button class="'+cls+(seen?"seen":"unseen")+'" onclick="openStoryGroup('+index+')">'+cover+'<span class="story-ring"><img src="'+esc(g.avatar)+'" alt=""></span><span class="story-name">'+esc(g.username)+'</span></button>';
   });
   if(!storyGroups.length)html+='<div class="story-empty">No stories yet. Be the first to share one!</div>';
   el.innerHTML=html;
@@ -357,24 +394,18 @@ function renderStories(){
 async function loadStories(){
   const el=document.getElementById("stories");
   try{
-    const data=await api("/stories");
-    const rawStories=extractStoriesResponse(data);
-    const list=rawStories.map(normalizeStory);
-    storyGroups=groupStories(list);
-    renderStories();
-    if(!rawStories.length){
-      console.info("Stories API returned an empty list:",data);
-    }
+    const data=await api("/stories");const rawStories=extractStoriesResponse(data);
+    storyGroups=groupStories(rawStories.map(normalizeStory));renderStories();
+    if(!rawStories.length)console.info("Stories API returned an empty list:",data);
   }catch(error){
     console.error("Stories loading failed:",error);
-    el.innerHTML='<button class="story-card create-story" onclick="openCreateStory()"><div class="create-cover"><img src="'+esc(findAvatar(currentUser)||FALLBACK_AVATAR)+'" alt=""></div><span class="create-plus"><i class="fa-solid fa-plus"></i></span><span class="create-label">Create story</span></button><div class="story-empty">Could not load stories: '+esc(error.message)+' <button onclick="loadStories()" style="color:#8fc5ff">Retry</button></div>';
+    el.innerHTML='<button class="story-card create-story" onclick="openCreateStory()"><div class="create-cover"><img src="'+esc(myAvatar())+'" alt=""></div><span class="create-plus"><i class="fa-solid fa-plus"></i></span><span class="create-label">Create story</span></button><div class="story-empty">Could not load stories: '+esc(error.message)+' <button onclick="loadStories()" style="color:#8fc5ff">Retry</button></div>';
   }
 }
 function openStoryGroup(index){
   const group=storyGroups[index];if(!group||!group.stories.length)return;
   activeStoryGroup=index;activeStoryIndex=0;storyPaused=false;storyRemaining=6000;
-  document.getElementById("storyViewer").classList.add("open");
-  document.body.style.overflow="hidden";showCurrentStory();
+  document.getElementById("storyViewer").classList.add("open");document.body.style.overflow="hidden";showCurrentStory();
 }
 function showCurrentStory(){
   clearTimeout(storyTimer);
@@ -383,10 +414,8 @@ function showCurrentStory(){
   if(story.expiresAt<=Date.now()){nextStory();return}
   const image=document.getElementById("storyViewerImage"),text=document.getElementById("storyViewerText");
   image.hidden=true;text.hidden=true;
-  if(story.type==="image"&&story.mediaUrl){
-    image.src=story.mediaUrl;image.hidden=false;
-    image.onerror=()=>{image.hidden=true;text.hidden=false;text.textContent="This story could not be loaded."};
-  }else{text.textContent=story.text||story.caption||"";text.style.background=storyBackground(story.background);text.hidden=false}
+  if(story.type==="image"&&story.mediaUrl){image.src=story.mediaUrl;image.hidden=false;image.onerror=()=>{image.hidden=true;text.hidden=false;text.textContent="This story could not be loaded."}}
+  else{text.textContent=story.text||story.caption||"";text.style.background=storyBackground(story.background);text.hidden=false}
   document.getElementById("storyViewerName").textContent=group.username;
   setAvatar(document.getElementById("storyViewerAvatar"),group.avatar);
   document.getElementById("storyViewerTime").textContent=relativeTime(story.createdAt);
@@ -412,10 +441,7 @@ function pauseStory(){
   if(!storyPaused)startStoryTimer();
 }
 function nextStory(){const group=storyGroups[activeStoryGroup];if(!group)return;if(activeStoryIndex<group.stories.length-1){activeStoryIndex++;storyRemaining=6000;showCurrentStory()}else nextStoryGroup()}
-function previousStory(){
-  if(activeStoryIndex>0){activeStoryIndex--;storyRemaining=6000;showCurrentStory()}
-  else{const prev=storyGroups[activeStoryGroup-1];if(prev){activeStoryGroup--;activeStoryIndex=prev.stories.length-1;storyRemaining=6000;showCurrentStory()}}
-}
+function previousStory(){if(activeStoryIndex>0){activeStoryIndex--;storyRemaining=6000;showCurrentStory()}else{const prev=storyGroups[activeStoryGroup-1];if(prev){activeStoryGroup--;activeStoryIndex=prev.stories.length-1;storyRemaining=6000;showCurrentStory()}}}
 function nextStoryGroup(){if(activeStoryGroup<storyGroups.length-1){activeStoryGroup++;activeStoryIndex=0;storyRemaining=6000;showCurrentStory()}else closeStoryViewer()}
 function closeStoryViewer(){clearTimeout(storyTimer);storyPaused=false;storyRemaining=6000;document.getElementById("storyViewer").classList.remove("open");document.body.style.overflow="";loadStories()}
 document.addEventListener("keydown",event=>{
@@ -441,6 +467,34 @@ function mountAdBanners(feed){
     adScript.src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";adScript.async=true;slot.appendChild(adScript);
   });
 }
+
+/* Build expandable post text */
+function postTextHTML(content,id){
+  return '<div class="post-body-text collapsed" data-post-text="'+esc(id)+'"><div class="post-text-content">'+esc(content)+'</div><button type="button" class="see-more-btn" data-see-more="'+esc(id)+'" hidden>See more</button></div>';
+}
+function setupPostText(){
+  document.querySelectorAll("[data-post-text]").forEach(box=>{
+    const content=box.querySelector(".post-text-content");
+    const button=box.querySelector(".see-more-btn");
+    if(!content||!button)return;
+    box.classList.add("collapsed");
+    button.hidden=false;
+    button.textContent="See more";
+    requestAnimationFrame(()=>{
+      const needsExpand=content.scrollHeight>content.clientHeight+2;
+      button.hidden=!needsExpand;
+    });
+  });
+}
+function togglePostText(id){
+  const box=Array.from(document.querySelectorAll("[data-post-text]")).find(el=>el.dataset.postText===String(id));
+  if(!box)return;
+  const button=box.querySelector(".see-more-btn");
+  const expanded=!box.classList.contains("collapsed");
+  box.classList.toggle("collapsed",expanded);
+  if(button)button.textContent=expanded?"See more":"See less";
+}
+
 function render(list=videos){
   const feed=document.getElementById("feed");
   if(!list.length){feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';return}
@@ -450,8 +504,10 @@ function render(list=videos){
     else if(v.type==="photo"&&v.src)media='<div class="post-media-container"><img src="'+esc(v.src)+'" alt="Post image" loading="lazy" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"></div>';
     const c=v.counts,total=count(c.love)+count(c.angry)+count(c.sad)+count(c.haha);
     const summary=(c.love?'<span class="reaction-emoji">❤️</span>':"")+(c.angry?'<span class="reaction-emoji">😡</span>':"")+(c.sad?'<span class="reaction-emoji">😢</span>':"")+(c.haha?'<span class="reaction-emoji">😂</span>':"")+'<span>'+total+'</span>';
-    return '<article class="post-card" data-id="'+esc(v.id)+'" id="post-'+esc(v.id)+'"><div class="post-header"><div class="post-user-info"><img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(v.avatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"><div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+(v.blueBadge?' <i class="fa-solid fa-circle-check blue-badge" title="Verified account"></i>':"")+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div><button class="post-options" onclick="postOptions(\''+esc(v.id)+'\')" aria-label="Post options"><i class="fa-solid fa-ellipsis"></i></button></div>'+(v.content?'<div class="post-body-text">'+esc(v.content)+'</div>':"")+media+'<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div><div class="post-actions-bar">'+reactionButtonHTML(v)+'<button class="post-action-btn" onclick="comments(\''+esc(v.id)+'\')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost(\''+esc(v.id)+'\')"><i class="fa-solid fa-share"></i> Share</button></div></article>'+((index+1)%2===0?'<div class="ad-banner-slot" data-adsterra-slot><span class="ad-banner-label">Advertisement</span></div>':"");
+    const authorAvatar=v.avatar||(String(v.authorId)===String(currentUser?.id)?myAvatar():FALLBACK_AVATAR);
+    return '<article class="post-card" data-id="'+esc(v.id)+'" id="post-'+esc(v.id)+'"><div class="post-header"><div class="post-user-info"><img class="post-avatar profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" src="'+esc(authorAvatar)+'" alt="Profile picture" role="link" tabindex="0" onerror="this.onerror=null;this.src=\''+FALLBACK_AVATAR+'\'"><div><div class="post-author profile-clickable" data-profile-username="'+esc(v.profileUsername)+'" data-user-id="'+esc(v.authorId)+'" role="link" tabindex="0">'+esc(v.username)+(v.blueBadge?' <i class="fa-solid fa-circle-check blue-badge" title="Verified account"></i>':"")+'</div><div class="post-time">'+esc(v.time)+' · <i class="fa-solid fa-earth-americas"></i></div></div></div><button class="post-options" onclick="postOptions(\''+esc(v.id)+'\')" aria-label="Post options"><i class="fa-solid fa-ellipsis"></i></button></div>'+(v.content?postTextHTML(v.content,v.id):"")+media+'<div class="post-stats"><span class="reaction-summary">'+(total?summary:'<span>0 reactions</span>')+'</span><span class="comment-count">'+count(v.comments)+' comments</span><span class="view-count"><i class="fa-solid fa-eye"></i> '+count(v.views)+' views</span></div><div class="post-actions-bar">'+reactionButtonHTML(v)+'<button class="post-action-btn" onclick="comments(\''+esc(v.id)+'\')"><i class="fa-regular fa-comment"></i> Comment</button><button class="post-action-btn" onclick="sharePost(\''+esc(v.id)+'\')"><i class="fa-solid fa-share"></i> Share</button></div></article>'+((index+1)%2===0?'<div class="ad-banner-slot" data-adsterra-slot><span class="ad-banner-label">Advertisement</span></div>':"");
   }).join("");
+  setupPostText();
   mountAdBanners(feed);setupVideoAutoplay();setupPostViewObserver();
 }
 function updateOnePost(post){
@@ -473,6 +529,8 @@ document.addEventListener("pointerdown",event=>{
 document.addEventListener("pointermove",event=>{if(!holdTimer)return;if(Math.abs(event.clientX-holdStartX)>12||Math.abs(event.clientY-holdStartY)>12)clearHold()});
 document.addEventListener("pointerup",clearHold);document.addEventListener("pointercancel",clearHold);
 document.addEventListener("click",event=>{
+  const more=event.target.closest("[data-see-more]");
+  if(more){event.preventDefault();event.stopPropagation();togglePostText(more.dataset.seeMore);return}
   const author=event.target.closest("[data-profile-username]");
   if(author){event.preventDefault();event.stopPropagation();openUserProfile(author.dataset.profileUsername,author.dataset.userId);return}
   const like=event.target.closest("[data-like-button]");
@@ -481,6 +539,8 @@ document.addEventListener("click",event=>{
 });
 document.addEventListener("keydown",event=>{
   if(event.key!=="Enter"&&event.key!==" ")return;
+  const more=event.target.closest("[data-see-more]");
+  if(more){event.preventDefault();togglePostText(more.dataset.seeMore);return}
   const el=event.target.closest("[data-profile-username]");if(el){event.preventDefault();openUserProfile(el.dataset.profileUsername,el.dataset.userId)}
 });
 function openUserProfile(username,userId){
