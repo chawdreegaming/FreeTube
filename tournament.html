@@ -156,8 +156,10 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <div class="list-item"><span>🎮 Game UID</span><strong id="gameUid">Not added</strong></div>
  <div class="list-item"><span>🏆 Joined Matches</span><strong id="joinedCount">0</strong></div>
  <div class="list-item" onclick="openWallet()" style="cursor:pointer"><span>💰 My Wallet</span><strong id="profileWalletBalance" style="color:var(--green)">৳0.00 →</strong></div>
+ <button class="full-btn" style="width:100%;margin-top:18px" id="socialLoginButton" onclick="openAuth()">LOGIN WITH BOYS VS GIRLS</button>
  <button class="action-btn" style="width:100%;margin-top:10px" id="editProfileButton" onclick="editProfile()" disabled>EDIT PROFILE</button>
  <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="adminButton" onclick="goTo('admin')">ADMIN DASHBOARD</button>
+ <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="socialLogoutButton" onclick="logout()">RETURN TO SOCIAL APP</button>
  <p class="note">No separate Tournament login or registration. Sign in to BOYS VS GIRLS Social App first; this app uses that existing session.</p>
 </section>
 
@@ -312,7 +314,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <script>
 "use strict";
 /* Bᴏʏs♡Gɪʀʟs ESports — Social App session frontend.
-   API contract implemented next in Social App backend. */
+   API bridge mounted at /api/tournament in the Social App backend. */
 const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,isAdmin=false,tournamentCounts={},adminRegistrationRows=[],walletBalance=0,paymentMethods=[],adminWalletFilter="all",transactions=[];
@@ -357,6 +359,8 @@ function updateAccountUI(state="CONNECTED",errorText=""){
  document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";
  document.getElementById("joinedCount").textContent=joined.length;
  document.getElementById("editProfileButton").disabled=!connected;
+ document.getElementById("socialLoginButton").style.display=connected?"none":"block";
+ document.getElementById("socialLogoutButton").style.display=connected?"block":"none";
  document.getElementById("adminButton").style.display=isAdmin?"block":"none";
  document.getElementById("profileWalletBalance").textContent=money(walletBalance);
 }
@@ -386,7 +390,16 @@ document.getElementById("editTournamentForm").addEventListener("submit",async e=
 async function deleteTournament(id){if(!confirm("Delete this tournament?"))return;try{await api(`/admin/tournaments/${id}`,{method:"DELETE"});await loadTournaments()}catch(e){notify(e.message)}}async function loadAdminRegistrations(){try{const id=registrationTournamentSelect.value,d=await api(`/admin/registrations/${id}`);adminRegistrationRows=d.registrations||[];adminRegistrationList.innerHTML=adminRegistrationRows.map((r,i)=>`<div class="registration-card"><b>${i+1}. ${escapeHTML(r.display_name||r.username||"Player")}</b><p>UID: ${escapeHTML(r.free_fire_uid||"Not added")}</p><p>${escapeHTML(r.player_id)}</p><button class="action-btn danger-btn" onclick="removeRegistration('${r.player_id}','${id}')">REMOVE</button></div>`).join("")||'<div class="empty">No registrations.</div>';registrationTotal.textContent=adminRegistrationRows.length;registrationActive.textContent=adminRegistrationRows.filter(x=>x.status==="registered").length;registrationOther.textContent=adminRegistrationRows.filter(x=>x.status!=="registered").length}catch(e){notify(e.message)}}async function removeRegistration(player_id,tournament_id){if(!confirm("Remove this registration?"))return;try{await api(`/admin/registrations/${tournament_id}/${player_id}`,{method:"DELETE"});await loadAdminRegistrations();await loadTournaments()}catch(e){notify(e.message)}}
 async function loadAdminWalletRequests(filter="all",btn){adminWalletFilter=filter;if(btn){document.querySelectorAll("#admin .filter-btn").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}try{const d=await api("/admin/requests?type="+encodeURIComponent(filter));adminWalletRequests.innerHTML=(d.requests||[]).map(r=>`<div class="request-card"><b>${escapeHTML(r.request_type)} • ${money(r.amount)}</b><p>${escapeHTML(r.method_code)} • ${escapeHTML(r.status)}</p><p>${escapeHTML(r.transaction_reference||r.account_info||"")}</p><p>${formatDate(r.created_at)}</p><button class="small-btn" onclick="reviewWalletRequest('${r.id}','approve')">Approve</button> <button class="small-btn danger-btn" onclick="reviewWalletRequest('${r.id}','reject')">Reject</button></div>`).join("")||'<div class="empty">No requests.</div>'}catch(e){adminWalletRequests.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}async function reviewWalletRequest(id,action){try{await api(`/admin/requests/${id}/${action}`,{method:"POST",body:"{}"});await loadAdminWalletRequests(adminWalletFilter)}catch(e){notify(e.message)}}async function loadAdminPaymentMethods(){try{const d=await api("/payment-methods?all=1");const rows=d.methods||[];adminPaymentMethods.innerHTML=rows.map(m=>`<div class="wallet-method"><b>${escapeHTML(m.display_name)}</b><p>${escapeHTML(m.receiver_details||"")}</p><button class="small-btn" onclick="openPaymentEdit('${m.method_code}')">Edit</button></div>`).join("")||'<div class="empty">No payment methods.</div>'}catch(e){adminPaymentMethods.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}function openPaymentEdit(code){const m=paymentMethods.find(x=>x.method_code===code);if(!m)return;paymentEditCode.value=code;paymentEditName.value=m.display_name;paymentEditReceiver.value=m.receiver_details||"";paymentEditInstructions.value=m.instructions||"";paymentEditEnabled.value=String(m.enabled);openModal("paymentEditModal")}document.getElementById("paymentEditForm").addEventListener("submit",async e=>{e.preventDefault();try{await api(`/admin/payment-methods/${paymentEditCode.value}`,{method:"PATCH",body:JSON.stringify({receiver_details:paymentEditReceiver.value,instructions:paymentEditInstructions.value,enabled:paymentEditEnabled.value==="true"})});closeModal("paymentEditModal");await loadAdminPaymentMethods();await loadPaymentMethods()}catch(x){notify(x.message)}});
 async function getRoom(id){try{const d=await api(`/rooms/${id}`);return d.room||null}catch{return null}}function roomHTML(r){return r?`<div class="room-box"><h3>🎮 MATCH ROOM INFORMATION</h3><p>Room ID: ${escapeHTML(r.room_id||"Not announced")}</p><p>Password: ${escapeHTML(r.room_password||"Not announced")}</p></div>`:'<div class="notice">Room information is not available.</div>'}function copyText(v){navigator.clipboard?.writeText(v).then(()=>notify("Copied."))}function showNotifications(){notify("Notifications are available in BOYS VS GIRLS Social App.")}
-async function startApp(){if(!token()){updateAccountUI("NO_SESSION");document.getElementById("tournamentList").innerHTML='<div class="empty">Tournament list is public. Sign in to BOYS VS GIRLS Social App to join tournaments.</div>'}await loadAccount();await loadTournaments()}startApp();
+async function startApp(){
+ if(!token()){
+  updateAccountUI("NO_SESSION");
+  const list=document.getElementById("tournamentList");
+  if(list)list.innerHTML='<div class="empty">Tournament list is public. To join, first sign in to BOYS VS GIRLS Social App, then open this tournament card again. Keep both apps in the same browser/WebView.</div>';
+ }
+ await loadAccount();
+ await loadTournaments();
+}
+startApp();
 
 </script>
 </body>
