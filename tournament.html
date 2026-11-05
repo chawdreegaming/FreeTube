@@ -156,11 +156,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <div class="list-item"><span>🎮 Game UID</span><strong id="gameUid">Not added</strong></div>
  <div class="list-item"><span>🏆 Joined Matches</span><strong id="joinedCount">0</strong></div>
  <div class="list-item" onclick="openWallet()" style="cursor:pointer"><span>💰 My Wallet</span><strong id="profileWalletBalance" style="color:var(--green)">৳0.00 →</strong></div>
- <button class="full-btn" style="margin-top:18px" id="authButton" onclick="openAuth()">LOGIN / REGISTER</button>
  <button class="action-btn" style="width:100%;margin-top:10px" id="editProfileButton" onclick="editProfile()" disabled>EDIT PROFILE</button>
  <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="adminButton" onclick="goTo('admin')">ADMIN DASHBOARD</button>
- <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="logoutButton" onclick="logout()">LOG OUT</button>
- <p class="note">Use your BOYS VS GIRLS Social App account. No separate tournament password is needed.</p>
+ <p class="note">No separate Tournament login or registration. Sign in to BOYS VS GIRLS Social App first; this app uses that existing session.</p>
 </section>
 
 <section class="page" id="admin">
@@ -206,19 +204,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <button class="nav-btn" data-page="profile" onclick="goTo('profile')"><b>◉</b>Profile</button>
 </nav>
 
-<!-- AUTH -->
-<div class="modal" id="authModal"><div class="modal-content">
- <div class="modal-head"><h2 id="authTitle">Player Login</h2><button class="close-btn" onclick="closeModal('authModal')">✕</button></div>
- <div class="notice">Use the same account you use in BOYS VS GIRLS Social App. Login there first, then return here.</div>
- <div id="authForm">
-  <div class="field" id="authNameField" style="display:none"><label>Player Name</label><input id="authName" maxlength="60" placeholder="Your display name"></div>
-  <div class="field"><label>Email</label><input id="authEmail" type="email" required autocomplete="email"></div>
-  <div class="field"><label>Password</label><input id="authPassword" type="password" minlength="6" required autocomplete="current-password"></div>
-  <button class="full-btn" id="authSubmit" type="submit">LOGIN</button>
- </div>
- <div class="auth-switch" id="authSwitch" onclick="window.location.href='https://chawdreegaming.github.io/FreeTube/'">OPEN BOYS VS GIRLS LOGIN</div>
-</div></div>
-
+<!-- No separate tournament login/register. Uses BOYS VS GIRLS session. -->
 <!-- PROFILE -->
 <div class="modal" id="profileModal"><div class="modal-content">
  <div class="modal-head"><h2>Edit Profile</h2><button class="close-btn" onclick="closeModal('profileModal')">✕</button></div>
@@ -333,11 +319,11 @@ let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,is
 function token(){return localStorage.getItem(TOKEN_KEY)||""}
 async function api(path,options={}){const headers={"Content-Type":"application/json",...(options.headers||{})};if(token())headers.Authorization="Bearer "+token();const res=await fetch(API_BASE_URL+"/tournament"+path,{...options,headers,credentials:"include",cache:"no-store"});let data={};try{data=await res.json()}catch{}if(!res.ok)throw new Error(data.error||data.message||`Request failed (${res.status})`);return data}
 function money(n){return "৳"+Number(n||0).toLocaleString("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2})}function formatDate(d){const x=new Date(d);return isNaN(x)?"Date to be announced":x.toLocaleString("en-BD",{dateStyle:"medium",timeStyle:"short"})}function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}function notify(s){alert(s)}function openModal(id){document.getElementById(id)?.classList.add("show")}function closeModal(id){document.getElementById(id)?.classList.remove("show")}
-function goTo(page){if(page==="admin"&&!isAdmin)return notify("Admin access only.");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="matches")renderMatches();if(page==="leaderboard")renderLeaderboard();if(page==="admin")renderAdmin();window.scrollTo({top:0,behavior:"smooth"})}function openProfile(){goTo("profile")}function openAuth(){if(!token()){notify("প্রথমে BOYS VS GIRLS Social App-এ লগইন করুন, তারপর এখানে ফিরে আসুন।");return}loadAccount().then(()=>goTo("profile"))}
+function goTo(page){if(page==="admin"&&!isAdmin)return notify("Admin access only.");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="matches")renderMatches();if(page==="leaderboard")renderLeaderboard();if(page==="admin")renderAdmin();window.scrollTo({top:0,behavior:"smooth"})}function openProfile(){goTo("profile")}function openAuth(){if(!token()){notify("প্রথমে BOYS VS GIRLS Social App-এ লগইন করুন, তারপর এখানে ফিরে আসুন।");window.location.href="https://chawdreegaming.github.io/FreeTube/";return}loadAccount().then(()=>goTo("profile"))}
 function mapTournament(r){return{id:r.id,name:r.title||r.name,mode:r.mode,map:r.map||"To be announced",fee:+(r.entry_fee??r.fee??0),prize:+(r.prize_pool??r.prize??0),slots:+(r.max_players??r.slots??0),joined:+(r.registered_count??r.joined??tournamentCounts[r.id]??0),date:r.scheduled_at||r.date,status:r.status}}
 async function loadAccount(){if(!token()){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();return}try{const d=await fetch(API_BASE_URL+"/auth/me",{headers:{Authorization:"Bearer "+token()},credentials:"include",cache:"no-store"});const me=await d.json();if(!d.ok)throw new Error(me.error||"Social App session expired");const u=me.user||me;currentUser={id:u.id,email:u.email};const p=await api("/me");profile=p.profile||p;isAdmin=profile.role==="admin";joined=(p.registrations||[]).map(x=>x.tournament_id);walletBalance=Number(p.wallet?.balance||0);updateAccountUI()}catch(e){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();notify(e.message)}}
-function updateAccountUI(){const guest=!currentUser,name=profile?.display_name||profile?.username||"Guest Player";document.getElementById("profileName").textContent=name;document.getElementById("profileEmail").textContent=currentUser?.email||"Not logged in";document.getElementById("profileAvatar").textContent=name.charAt(0).toUpperCase();document.getElementById("profileRole").textContent=guest?"GUEST":isAdmin?"ADMIN":"PLAYER";document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";document.getElementById("joinedCount").textContent=joined.length;document.getElementById("authButton").style.display=guest?"block":"none";document.getElementById("editProfileButton").disabled=guest;document.getElementById("adminButton").style.display=isAdmin?"block":"none";document.getElementById("logoutButton").style.display=guest?"none":"block";document.getElementById("profileWalletBalance").textContent=money(walletBalance)}
-async function logout(){notify("Social App থেকে লগআউট করলে Tournament App-ও লগআউট হবে।");goTo("home")}
+function updateAccountUI(){const guest=!currentUser,name=profile?.display_name||profile?.username||"Guest Player";document.getElementById("profileName").textContent=name;document.getElementById("profileEmail").textContent=currentUser?.email||"Not logged in";document.getElementById("profileAvatar").textContent=name.charAt(0).toUpperCase();document.getElementById("profileRole").textContent=guest?"GUEST":isAdmin?"ADMIN":"PLAYER";document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";document.getElementById("joinedCount").textContent=joined.length;document.getElementById("editProfileButton").disabled=guest;document.getElementById("adminButton").style.display=isAdmin?"block":"none";document.getElementById("profileWalletBalance").textContent=money(walletBalance)}
+async function logout(){notify("লগআউট করতে BOYS VS GIRLS Social App ব্যবহার করুন।");window.location.href="https://chawdreegaming.github.io/FreeTube/"}
 async function loadTournaments(){const list=document.getElementById("tournamentList");if(list)list.innerHTML='<div class="empty">Loading tournaments...</div>';try{const d=await api("/tournaments");const rows=d.tournaments||d.data||[];tournaments=rows.map(mapTournament);tournamentCounts={};rows.forEach(r=>tournamentCounts[r.id]=+(r.registered_count||0));renderAll()}catch(e){if(list)list.innerHTML='<div class="empty">'+escapeHTML(e.message)+"</div>"}}
 async function loadMyRegistrations(){if(!currentUser){joined=[];return}const d=await api("/registrations/mine");joined=(d.registrations||[]).map(x=>x.tournament_id)}
 async function loadWalletBalance(){if(!currentUser){walletBalance=0;updateAccountUI();return}const d=await api("/wallet");walletBalance=+(d.wallet?.balance??d.balance??0);updateAccountUI()}
