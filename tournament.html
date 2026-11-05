@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#171329">
+<title>Tournament | BOYS VS GIRLS</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --bg:#171329;
+  --card:#211b38;
+  --pink:#ed299f;
+  --blue:#397cff;
+  --text:#ffffff;
+  --muted:#aaa5c1;
+}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:Arial,sans-serif;
+  min-height:100vh;
+}
+
+header{
+  height:65px;
+  padding:0 18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:#19142c;
+  border-bottom:1px solid #39314e;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.logo{
+  font-size:23px;
+  font-weight:900;
+  background:linear-gradient(90deg,#438cff,#ed299f);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.back{
+  background:#302943;
+  border:1px solid #49415e;
+  color:white;
+  border-radius:50%;
+  width:40px;
+  height:40px;
+  font-size:23px;
+  cursor:pointer;
+}
+
+.container{
+  max-width:650px;
+  margin:auto;
+  padding:18px 15px 35px;
+}
+
+.hero{
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  min-height:230px;
+  padding:25px 20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  background:
+    linear-gradient(0deg,rgba(12,8,27,.98),rgba(12,8,27,.15)),
+    linear-gradient(135deg,#3155b8,#8b268b,#151329);
+  border:1px solid #51416e;
+}
+
+.hero-tag{
+  display:inline-block;
+  width:max-content;
+  background:linear-gradient(90deg,var(--blue),var(--pink));
+  padding:7px 13px;
+  border-radius:30px;
+  font-size:11px;
+  font-weight:bold;
+  margin-bottom:13px;
+}
+
+.hero h1{
+  font-size:29px;
+  line-height:1.2;
+  font-weight:900;
+}
+
+.hero p{
+  color:#ded9ed;
+  font-size:13px;
+  line-height:1.6;
+  margin-top:10px;
+}
+
+.section-title{
+  font-size:19px;
+  font-weight:800;
+  margin:25px 0 14px;
+}
+
+.app-card{
+  background:linear-gradient(145deg,#292044,#1d1831);
+  border:1px solid #493d61;
+  border-radius:18px;
+  padding:19px;
+}
+
+.app-heading{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin-bottom:15px;
+}
+
+.app-icon{
+  width:60px;
+  height:60px;
+  flex-shrink:0;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#397cff,#e72b9d);
+  font-size:25px;
+  font-weight:900;
+}
+
+.app-heading h2{
+  font-size:19px;
+  margin-bottom:5px;
+}
+
+.app-heading p{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.description{
+  color:#d0cadd;
+  font-size:14px;
+  line-height:1.8;
+  margin-bottom:18px;
+}
+
+.play-btn{
+  display:flex;
+  width:100%;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+  border-radius:12px;
+  background:linear-gradient(90deg,#397cff,#e92c9e);
+  color:white;
+  text-decoration:none;
+  font-size:16px;
+  font-weight:900;
+  letter-spacing:.5px;
+  box-shadow:0 5px 20px #e92c9e35;
+  transition:.2s;
+}
+
+.play-btn:active{
+  transform:scale(.97);
+}
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+}
+
+.feature{
+  background:var(--card);
+  border:1px solid #403650;
+  border-radius:14px;
+  padding:17px 12px;
+}
+
+.feature .icon{
+  font-size:25px;
+  margin-bottom:9px;
+}
+
+.feature h3{
+  font-size:13px;
+}
+
+.details{
+  background:var(--card);
+  border:1px solid #403650;
+  border-radius:15px;
+  padding:5px 15px;
+}
+
+.detail-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:14px 0;
+  border-bottom:1px solid #403650;
+  font-size:13px;
+}
+
+.detail-row:last-child{
+  border-bottom:none;
+}
+
+.detail-row span:first-child{
+  color:var(--muted);
+}
+
+.detail-row span:last-child{
+  text-align:right;
+  font-weight:bold;
+  overflow-wrap:anywhere;
+}
+
+.links{
+  background:var(--card);
+  border:1px solid #403650;
+  border-radius:15px;
+  padding:17px;
+}
+
+.link-item{
+  display:block;
+  padding:13px 0;
+  color:#8bb5ff;
+  text-decoration:none;
+  font-size:14px;
+  border-bottom:1px solid #403650;
+  overflow-wrap:anywhere;
+}
+
+.link-item:last-child{
+  border:none;
+}
+
+footer{
+  text-align:center;
+  color:#88819f;
+  font-size:11px;
+  padding:25px 10px;
+  line-height:1.8;
+}
+
+@media(max-width:360px){
+  .hero h1{font-size:24px}
+  .app-heading h2{font-size:16px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="back" onclick="goBack()">‹</button>
+  <div class="logo">BOYS VS GIRLS</div>
+  <div style="width:40px"></div>
+</header>
+
+<main class="container">
+
+  <section class="hero">
+    <div class="hero-tag">🎮 ESPORTS TOURNAMENT</div>
+    <h1>TOURNAMENT ZONE</h1>
+    <p>
+      Welcome to Bᴏʏs♡Gɪʀʟs ESports.
+      Create your squad, join Free Fire tournaments
+      and compete with other players!
+    </p>
+  </section>
+
+  <h2 class="section-title">🏆 Featured Tournament App</h2>
+
+  <section class="app-card">
+
+    <div class="app-heading">
+      <div class="app-icon">BG</div>
+      <div>
+        <h2>Bᴏʏs♡Gɪʀʟs ESports</h2>
+        <p>Free Fire • Esports / Gaming</p>
+      </div>
+    </div>
+
+    <p class="description">
+      Free Fire Tournament Management App.
+      নিজের স্কোয়াড তৈরি করুন, টুর্নামেন্টে যোগ দিন
+      এবং প্রতিযোগিতায় অংশ নিন।
+    </p>
+
+    <a
+      class="play-btn"
+      href="https://chawdreegaming.github.io/boys-girls-esports/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      🎮 PLAY NOW
+    </a>
+
+  </section>
+
+  <h2 class="section-title">⚡ Tournament Features</h2>
+
+  <section class="features">
+
+    <div class="feature">
+      <div class="icon">👥</div>
+      <h3>Create Squad</h3>
+    </div>
+
+    <div class="feature">
+      <div class="icon">🏆</div>
+      <h3>Join Tournament</h3>
+    </div>
+
+    <div class="feature">
+      <div class="icon">🎯</div>
+      <h3>Play Matches</h3>
+    </div>
+
+    <div class="feature">
+      <div class="icon">🥇</div>
+      <h3>Competition</h3>
+    </div>
+
+  </section>
+
+  <h2 class="section-title">📱 App Information</h2>
+
+  <section class="details">
+
+    <div class="detail-row">
+      <span>App Name</span>
+      <span>Boys ♡ Girls ESports</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Category</span>
+      <span>Esports / Gaming</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Game</span>
+      <span>Free Fire</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Platform</span>
+      <span>Android</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Version</span>
+      <span>1.0</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Android Support</span>
+      <span>Android 6.0+</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Package ID</span>
+      <span>com.boysgirls.esports</span>
+    </div>
+
+    <div class="detail-row">
+      <span>Developer</span>
+      <span>chawdreegaming</span>
+    </div>
+
+  </section>
+
+  <h2 class="section-title">🔗 Official Links</h2>
+
+  <section class="links">
+
+    <a
+      class="link-item"
+      href="https://github.com/chawdreegaming/boys-girls-esports"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      📁 GitHub Repository ↗
+    </a>
+
+    <a
+      class="link-item"
+      href="https://chawdreegaming.github.io/boys-girls-esports/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      🌐 Open Live Tournament App ↗
+    </a>
+
+  </section>
+
+</main>
+
+<footer>
+  <strong>BOYS VS GIRLS 💙💗</strong><br>
+  Bᴏʏs♡Gɪʀʟs ESports<br>
+  Free Fire Tournament Platform
+</footer>
+
+<script>
+function goBack(){
+  if(window.history.length > 1){
+    window.history.back();
+  }else{
+    window.location.href = "home.html";
+  }
+}
+</script>
+
+</body>
+</html>
