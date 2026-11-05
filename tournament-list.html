@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#090b18">
+<title>BOYS VS GIRLS — Tournaments</title>
+<style>
+:root{--bg:#090b18;--panel:#12162a;--panel2:#191e36;--line:#2a3152;--text:#f6f7ff;--muted:#9ca5c4;--blue:#42a5ff;--pink:#ff4fa3;--gold:#ffc857}
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:radial-gradient(circle at 10% 0%,#1b2450 0,transparent 34%),radial-gradient(circle at 100% 15%,#3b1640 0,transparent 30%),var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+button{font:inherit}
+.topbar{position:sticky;top:0;z-index:5;background:#090b18eF;border-bottom:1px solid #ffffff16;backdrop-filter:blur(14px);padding:14px 16px}
+.top-inner{max-width:1080px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{font-weight:900;letter-spacing:.2px;font-size:17px}.brand span:first-child{color:#58b4ff}.brand span:last-child{color:#ff70b4}
+.back{border:1px solid var(--line);background:#171b30;color:#fff;padding:9px 13px;border-radius:12px;text-decoration:none;font-size:13px;font-weight:700}
+.wrap{max-width:1080px;margin:auto;padding:22px 15px 50px}
+.hero{padding:24px 20px;border:1px solid #ffffff20;border-radius:22px;background:linear-gradient(115deg,#17264b,#251a42 60%,#401b3d);position:relative;overflow:hidden;margin-bottom:22px}
+.hero:after{content:"";position:absolute;width:210px;height:210px;border-radius:50%;right:-45px;top:-90px;background:linear-gradient(135deg,#4eb5ff66,#ff4fa366);filter:blur(2px)}
+.eyebrow{font-size:11px;letter-spacing:2px;color:#9ed5ff;font-weight:900;text-transform:uppercase}
+h1{font-size:clamp(26px,5vw,38px);line-height:1.12;margin:8px 0}
+.hero p{color:#c3c9e0;font-size:14px;max-width:560px;line-height:1.6}
+.stats{display:flex;gap:9px;flex-wrap:wrap;margin-top:17px}
+.stat{background:#080d20a8;border:1px solid #ffffff20;border-radius:12px;padding:9px 12px;font-size:12px;color:#cbd4ef}
+.stat b{color:white;margin-right:4px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:20px 0 14px}
+.toolbar h2{font-size:19px}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.filter{border:1px solid var(--line);background:#12162a;color:#aeb7d3;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:800;cursor:pointer}
+.filter.active{background:linear-gradient(100deg,#1879d4,#a12b89);border-color:transparent;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.card{min-width:0;overflow:hidden;border:1px solid #ffffff18;border-radius:19px;background:linear-gradient(180deg,#171c33,#101426);box-shadow:0 12px 32px #0004;transition:transform .18s,border-color .18s}
+.card:hover{transform:translateY(-3px);border-color:#5baeff88}
+.cover{height:174px;position:relative;overflow:hidden;background:#20264a}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.cover:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#090b18c9,transparent 70%)}
+.mode{position:absolute;z-index:1;left:12px;top:12px;background:#080b19c9;border:1px solid #ffffff35;padding:6px 9px;border-radius:8px;font-size:10px;font-weight:900;letter-spacing:.8px}
+.status{position:absolute;z-index:1;right:12px;top:12px;padding:6px 9px;border-radius:8px;font-size:10px;font-weight:900;background:#0e9b69;color:white}
+.status.upcoming{background:#2469d8}.status.closed{background:#555b70}
+.cover-title{position:absolute;z-index:1;left:15px;right:15px;bottom:13px;font-weight:1000;font-size:23px;text-shadow:0 2px 8px #000;letter-spacing:.4px}
+.content{padding:15px}
+.name{font-size:16px;font-weight:900;margin-bottom:6px}
+.desc{font-size:12px;color:var(--muted);line-height:1.5;min-height:35px}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:14px 0}
+.metric{background:#0b1022;border:1px solid #252d4b;border-radius:10px;padding:9px 7px;min-width:0}
+.metric small{display:block;color:#8994b7;font-size:10px;margin-bottom:4px}
+.metric b{font-size:13px;white-space:nowrap}
+.prize{color:#ffd36c!important}
+.card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.date{font-size:11px;color:#aab3cf;line-height:1.5}
+.join{border:0;border-radius:11px;padding:10px 15px;background:linear-gradient(100deg,#1688ec,#a72a91);color:white;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
+.join:disabled{opacity:.5;cursor:not-allowed}
+.notice,.empty,.loading{border:1px dashed #394263;border-radius:16px;padding:22px;text-align:center;color:#aab3cf;background:#11162a}
+.empty{display:none}
+.error{color:#ff9cae;font-size:12px;margin-top:10px}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.cover{height:190px}.wrap{padding-top:15px}.hero{padding:21px 17px}.card{border-radius:17px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="top-inner">
+  <div class="brand"><span>BOYS</span> VS <span>GIRLS 💙💗</span></div>
+  <a class="back" href="home.html">← Social Home</a>
+</div></header>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">Compete • Play • Win</div>
+    <h1>ESPORTS TOURNAMENTS</h1>
+    <p>Find your next match, join a team, and compete in BOYS VS GIRLS tournaments.</p>
+    <div class="stats"><div class="stat"><b id="totalCount">—</b> Tournaments</div><div class="stat"><b>SOLO · DUO · SQUAD</b> Game modes</div><div class="stat"><b>FREE & PAID</b> Entry types</div></div>
+  </section>
+  <div class="toolbar"><h2>Available Tournaments</h2><div class="filters">
+    <button class="filter active" data-filter="all">All</button><button class="filter" data-filter="upcoming">Upcoming</button><button class="filter" data-filter="live">Live</button><button class="filter" data-filter="completed">Completed</button>
+  </div></div>
+  <div id="loading" class="loading">Loading tournaments…</div>
+  <div id="tournamentGrid" class="grid"></div>
+  <div id="empty" class="empty">No tournaments found in this category.</div>
+  <div id="error" class="error"></div>
+</main>
+<script>
+/* Uses the existing BOYS VS GIRLS backend. Set API_BASE only if your deployment uses a different API origin. */
+const API_BASE = (window.BVG_API_BASE || "").replace(/\/$/,"");
+const API_URL = `${API_BASE}/api/tournament/tournaments`;
+let tournaments = [];
+let activeFilter = "all";
+const $ = id => document.getElementById(id);
+
+function escapeHTML(value=""){
+  return String(value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+function money(value, currency="BDT"){
+  const n = Number(value || 0);
+  return n === 0 ? "FREE" : `${currency === "BDT" ? "৳" : currency+" "}${n.toLocaleString()}`;
+}
+function statusOf(t){
+  const s = String(t.status || t.tournament_status || "").toLowerCase();
+  if(["live","ongoing","running","in_progress"].includes(s)) return "live";
+  if(["completed","finished","ended"].includes(s)) return "completed";
+  if(["closed","cancelled","canceled"].includes(s)) return "completed";
+  return "upcoming";
+}
+function statusLabel(s){return s==="live"?"LIVE":s==="completed"?"COMPLETED":"UPCOMING";}
+function dateLabel(v){
+  if(!v) return "Schedule to be announced";
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? escapeHTML(v) : d.toLocaleString([], {dateStyle:"medium",timeStyle:"short"});
+}
+function fallbackArt(t, index){
+  const palettes=[["#0b4d83","#9a276d"],["#1c2d69","#5a2a83"],["#075b58","#183d85"],["#7a2b4f","#202b69"]];
+  const p=palettes[index%palettes.length];
+  const title=String(t.title || t.name || "BVG TOURNAMENT").replace(/[<>&]/g,"").slice(0,24);
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="${p[0]}"/><stop offset="1" stop-color="${p[1]}"/></linearGradient><pattern id="p" width="42" height="42" patternUnits="userSpaceOnUse"><path d="M0 42L42 0" stroke="#fff" stroke-opacity=".08" stroke-width="2"/></pattern></defs><rect width="900" height="420" fill="url(#g)"/><rect width="900" height="420" fill="url(#p)"/><circle cx="720" cy="120" r="180" fill="none" stroke="#fff" stroke-opacity=".15" stroke-width="24"/><circle cx="720" cy="120" r="125" fill="none" stroke="#fff" stroke-opacity=".12" stroke-width="3"/><path d="M0 350L260 110l145 145 130-130 365 295H0z" fill="#050817" fill-opacity=".35"/><text x="55" y="105" fill="#bde7ff" font-family="Arial" font-size="25" font-weight="bold" letter-spacing="8">BOYS VS GIRLS</text><text x="55" y="225" fill="#fff" font-family="Arial" font-size="58" font-weight="900">${escapeHTML(title.toUpperCase())}</text><text x="58" y="275" fill="#e8d5ff" font-family="Arial" font-size="23" letter-spacing="5">ESPORTS CHAMPIONSHIP</text><text x="58" y="360" fill="#fff" font-family="Arial" font-size="20" font-weight="bold">💙  COMPETE  •  WIN  💗</text></svg>`;
+  return "data:image/svg+xml;charset=UTF-8,"+encodeURIComponent(svg);
+}
+function getList(data){
+  if(Array.isArray(data)) return data;
+  if(Array.isArray(data.tournaments)) return data.tournaments;
+  if(Array.isArray(data.data)) return data.data;
+  if(data.data && Array.isArray(data.data.tournaments)) return data.data.tournaments;
+  return [];
+}
+function render(){
+  const list=tournaments.filter(t=>activeFilter==="all" || statusOf(t)===activeFilter);
+  $("totalCount").textContent=tournaments.length;
+  $("tournamentGrid").innerHTML=list.map((t,i)=>{
+    const status=statusOf(t);
+    const title=t.title || t.name || "Boys vs Girls Tournament";
+    const mode=String(t.mode || t.game_mode || "SQUAD").toUpperCase();
+    const fee=t.entry_fee ?? t.entryFee ?? t.entry_amount ?? 0;
+    const prize=t.prize_pool ?? t.prizePool ?? t.prize_amount ?? 0;
+    const registered=t.registered_count ?? t.registeredCount ?? t.total_teams ?? t.total_players ?? 0;
+    const max=t.max_players ?? t.maxPlayers ?? t.max_teams ?? "";
+    const img=t.banner_url || t.bannerUrl || t.image_url || t.imageUrl || t.thumbnail_url || fallbackArt(t,i);
+    const schedule=t.start_at || t.startAt || t.match_date || t.matchDate || t.tournament_date || "";
+    const id=t.id ?? t.tournament_id ?? "";
+    return `<article class="card">
+      <div class="cover"><img src="${escapeHTML(img)}" alt="${escapeHTML(title)} tournament banner" onerror="this.onerror=null;this.src='${fallbackArt(t,i)}'">
+        <span class="mode">${escapeHTML(mode)}</span><span class="status ${status}">${statusLabel(status)}</span>
+        <div class="cover-title">${escapeHTML(title)}</div></div>
+      <div class="content"><div class="name">${escapeHTML(title)}</div>
+        <div class="desc">${escapeHTML(t.description || t.details || "Join the competition and prove your skills.")}</div>
+        <div class="metrics">
+          <div class="metric"><small>ENTRY FEE</small><b>${money(fee,t.currency||"BDT")}</b></div>
+          <div class="metric"><small>PRIZE POOL</small><b class="prize">${money(prize,t.currency||"BDT")}</b></div>
+          <div class="metric"><small>REGISTERED</small><b>${escapeHTML(registered)}${max?"/"+escapeHTML(max):""}</b></div>
+        </div>
+        <div class="card-foot"><div class="date">🗓 ${dateLabel(schedule)}</div>
+          <button class="join" ${status==="completed"?"disabled":""} onclick="openTournament('${escapeHTML(id)}')">${status==="completed"?"View Result":"View Details →"}</button>
+        </div>
+      </div></article>`;
+  }).join("");
+  $("empty").style.display=list.length?"none":"block";
+}
+function openTournament(id){
+  if(!id){location.href="tournament-profile.html";return;}
+  location.href=`tournament-details.html?id=${encodeURIComponent(id)}`;
+}
+document.querySelectorAll(".filter").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".filter").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");activeFilter=btn.dataset.filter;render();
+}));
+async function loadTournaments(){
+  try{
+    const token=localStorage.getItem("freetube_access_token") || sessionStorage.getItem("freetube_access_token") || "";
+    const headers={Accept:"application/json"};if(token)headers.Authorization=`Bearer ${token}`;
+    const response=await fetch(API_URL,{method:"GET",headers,credentials:"include",cache:"no-store"});
+    if(!response.ok) throw new Error(`Server response: ${response.status}`);
+    const data=await response.json();
+    tournaments=getList(data);
+    $("loading").style.display="none";render();
+  }catch(err){
+    $("loading").style.display="none";
+    $("error").textContent="Tournament data could not be loaded yet. Connect this page to the Tournament API in server.js. "+err.message;
+    // A designed empty state is shown instead of inventing live tournament records.
+    tournaments=[];render();
+  }
+}
+loadTournaments();
+</script>
+</body>
+</html>
