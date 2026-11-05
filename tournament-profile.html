@@ -1,91 +1,519 @@
+
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#171329">
-<title>Tournament Profile - Boys vs Girls</title>
+<meta name="theme-color" content="#111329">
+<title>Game Center - BOYS VS GIRLS</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
 <style>
-:root{--bg:#111329;--panel:#1b1832;--panel2:#211b3b;--line:#ffffff20;--muted:#bcb6d0;--blue:#278bff;--pink:#f22e9b;--cyan:#35c7ff}
+:root{
+ --bg:#111329;
+ --panel:#1c1933;
+ --line:#ffffff20;
+ --muted:#bcb6d0;
+ --blue:#278bff;
+ --pink:#f22e9b;
+ --cyan:#35c7ff;
+}
 *{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
-body{min-height:100vh;color:#fff;background:radial-gradient(circle at 10% 0%,#26356b 0,transparent 35%),radial-gradient(circle at 95% 12%,#5a1e58 0,transparent 32%),var(--bg)}
-button,input{font:inherit}button{cursor:pointer;border:0;color:inherit}.app{max-width:620px;min-height:100vh;margin:auto;padding-bottom:34px}
-.topbar{height:60px;padding:0 16px;display:flex;align-items:center;gap:13px;background:#171329ed;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
-.back{width:38px;height:38px;border-radius:50%;background:#ffffff12;border:1px solid var(--line);font-size:16px}.brand{font-weight:900;font-size:17px;letter-spacing:-.3px}.brand span{background:linear-gradient(90deg,var(--blue),#a33cff,var(--pink));color:transparent;background-clip:text}
-.hero{margin:16px 14px 0;padding:22px 18px;border:1px solid #f22e9b55;border-radius:20px;background:linear-gradient(130deg,#183b72,#332052 58%,#591c50);box-shadow:0 12px 35px #0004;position:relative;overflow:hidden}.hero:after{content:'🏆';position:absolute;right:16px;top:15px;font-size:55px;opacity:.17}.eyebrow{font-size:10px;letter-spacing:2px;color:#a9d9ff;font-weight:800}.hero h1{font-size:25px;margin:7px 0 5px}.hero p{font-size:12px;color:#e1d8f2;max-width:78%;line-height:1.5}
-.card{margin:14px;background:linear-gradient(145deg,#211d3b,#19172f);border:1px solid var(--line);border-radius:17px;padding:16px;box-shadow:0 8px 24px #0002}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.section-head h2{font-size:15px}.section-head small{font-size:10px;color:var(--muted)}
-.identity{display:flex;align-items:center;gap:13px}.avatar{width:66px;height:66px;border-radius:50%;object-fit:cover;border:2px solid #f22e9b;box-shadow:0 0 0 4px #f22e9b20;background:#30264c}.name{font-size:17px;font-weight:800;overflow-wrap:anywhere}.username{font-size:12px;color:var(--muted);margin-top:4px}.linked{display:inline-flex;gap:5px;align-items:center;margin-top:7px;color:#8ed6ff;font-size:10px;font-weight:700}
-.field-label{display:block;font-size:12px;font-weight:700;margin:14px 0 7px;color:#e7e2f2}.field{width:100%;height:46px;padding:0 13px;color:#fff;background:#ffffff0b;border:1px solid #ffffff26;border-radius:11px;outline:none;font-size:14px}.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35c7ff19}.field::placeholder{color:#827b99}.hint{font-size:10px;color:var(--muted);line-height:1.5;margin-top:7px}.save{width:100%;margin-top:17px;padding:13px;border-radius:12px;background:linear-gradient(100deg,var(--blue),#853cff,var(--pink));font-weight:800;font-size:14px;box-shadow:0 7px 18px #7a36ff35}.save:disabled{opacity:.55;cursor:wait}.info{display:flex;gap:10px;padding:12px;border-radius:12px;background:#278bff13;border:1px solid #278bff35;color:#d7eaff;font-size:11px;line-height:1.55}.info i{color:#6ebaff;margin-top:2px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.action{padding:13px 9px;border-radius:12px;background:#ffffff0c;border:1px solid var(--line);font-size:12px;font-weight:700}.action i{display:block;font-size:18px;color:#e88bff;margin-bottom:7px}.status{padding:10px 12px;margin:0 14px 12px;border-radius:10px;background:#ffffff0b;color:var(--muted);font-size:11px;display:none}.status.show{display:block}.status.error{color:#ffaaaa;border:1px solid #ff6a6a55}.status.success{color:#9cf0c0;border:1px solid #55d99555}
-@media(min-width:600px){.hero{margin-top:22px}.card{margin-top:16px}}
+body{
+ min-height:100vh;color:#fff;
+ background:
+ radial-gradient(circle at 10% 0%,#26356b 0,transparent 35%),
+ radial-gradient(circle at 95% 12%,#5a1e58 0,transparent 32%),
+ var(--bg);
+}
+button,input{font:inherit}
+button{cursor:pointer;border:0;color:inherit}
+.app{max-width:620px;min-height:100vh;margin:auto;padding-bottom:35px}
+
+/* HEADER */
+.topbar{
+ height:60px;padding:0 16px;display:flex;align-items:center;gap:13px;
+ background:#171329ed;border-bottom:1px solid var(--line);
+ position:sticky;top:0;z-index:10;backdrop-filter:blur(14px)
+}
+.back{
+ width:38px;height:38px;border-radius:50%;
+ background:#ffffff12;border:1px solid var(--line);font-size:16px
+}
+.brand{font-weight:900;font-size:17px;letter-spacing:-.3px}
+.brand span{
+ background:linear-gradient(90deg,var(--blue),#a33cff,var(--pink));
+ color:transparent;background-clip:text
+}
+
+/* COMMON CARD */
+.card{
+ margin:12px 14px;
+ background:linear-gradient(145deg,#211d3b,#19172f);
+ border:1px solid var(--line);
+ border-radius:16px;padding:13px;
+ box-shadow:0 8px 24px #0002
+}
+.section-head{
+ display:flex;align-items:center;justify-content:space-between;
+ margin-bottom:11px;gap:8px
+}
+.section-head h2{font-size:14px}
+.section-head small{font-size:9px;color:var(--muted);letter-spacing:.5px}
+
+/* SOCIAL ACCOUNT */
+.identity{display:flex;align-items:center;gap:12px}
+.avatar{
+ width:57px;height:57px;border-radius:50%;object-fit:cover;
+ border:2px solid var(--pink);
+ box-shadow:0 0 0 3px #f22e9b20;background:#30264c
+}
+.name{font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.username{font-size:12px;color:var(--muted);margin-top:4px}
+.linked{
+ display:inline-flex;gap:5px;align-items:center;margin-top:6px;
+ color:#8ed6ff;font-size:10px;font-weight:700
+}
+
+/* COMPACT FREE FIRE DETAILS */
+.details-card{padding:12px 14px}
+.details-card .section-head{margin-bottom:7px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.field-label{
+ display:block;font-size:11px;font-weight:700;
+ margin:5px 0 6px;color:#e7e2f2
+}
+.field{
+ width:100%;height:39px;padding:0 10px;color:#fff;
+ background:#ffffff0b;border:1px solid #ffffff26;
+ border-radius:9px;outline:none;font-size:12px
+}
+.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35c7ff19}
+.field::placeholder{color:#827b99}
+.save{
+ width:100%;margin-top:10px;padding:10px;border-radius:9px;
+ background:linear-gradient(100deg,var(--blue),#853cff,var(--pink));
+ font-weight:800;font-size:12px;
+ box-shadow:0 5px 14px #7a36ff30
+}
+.save:disabled{opacity:.55;cursor:wait}
+.hint{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
+
+/* STATUS */
+.status{
+ padding:10px 12px;margin:10px 14px;border-radius:10px;
+ background:#ffffff0b;color:var(--muted);font-size:11px;display:none
+}
+.status.show{display:block}
+.status.error{color:#ffaaaa;border:1px solid #ff6a6a55}
+.status.success{color:#9cf0c0;border:1px solid #55d99555}
+
+/* GAME SECTION */
+.game-section{margin:19px 14px 0}
+.game-heading{
+ display:flex;align-items:center;justify-content:space-between;
+ margin-bottom:12px
+}
+.game-heading h2{font-size:19px;font-weight:900}
+.game-heading span{font-size:10px;color:#a9d9ff;font-weight:800;letter-spacing:1px}
+.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* GAME CARD */
+.game-card{
+ position:relative;display:block;text-decoration:none;color:#fff;
+ border:1px solid #ffffff25;border-radius:16px;
+ overflow:hidden;min-width:0;background:#171a35;
+ box-shadow:0 9px 25px #0004;transition:.2s
+}
+.game-card:active{transform:scale(.97)}
+.game-art{
+ height:135px;position:relative;overflow:hidden;
+ display:flex;align-items:center;justify-content:center
+}
+.game-art:after{
+ content:"";position:absolute;inset:0;
+ background:linear-gradient(0deg,#080b1ee8,transparent 85%)
+}
+.game-art i{
+ position:relative;z-index:1;font-size:55px;
+ filter:drop-shadow(0 5px 13px #0008)
+}
+.game-tag{
+ position:absolute;z-index:2;top:9px;left:9px;
+ padding:5px 8px;border-radius:7px;
+ background:#080b19bb;border:1px solid #ffffff30;
+ font-size:9px;font-weight:900;letter-spacing:.7px
+}
+.art-label{
+ position:absolute;z-index:2;bottom:10px;left:11px;
+ font-size:10px;font-weight:900;letter-spacing:1.5px;
+ text-shadow:0 2px 6px #000
+}
+
+/* BR ART */
+.br-art{
+ background:
+ radial-gradient(circle at 70% 32%,#ffb64c77 0,transparent 22%),
+ linear-gradient(135deg,#123f70,#09162d 60%,#71351d)
+}
+.br-art:before{
+ content:"";position:absolute;width:180px;height:180px;
+ border:2px solid #ffffff22;border-radius:50%;
+ right:-35px;top:-55px;
+ box-shadow:0 0 0 18px #ffffff09,0 0 0 38px #ffffff07
+}
+.br-art i{color:#d5eaff}
+
+/* CLASH ART */
+.clash-art{
+ background:
+ radial-gradient(circle at 30% 35%,#ff5cba88 0,transparent 24%),
+ linear-gradient(135deg,#541e65,#20143c 60%,#9a285f)
+}
+.clash-art:before{
+ content:"";position:absolute;width:130px;height:130px;
+ border:16px solid #ffffff12;border-radius:28px;
+ transform:rotate(35deg);right:-30px;top:10px
+}
+.clash-art i{color:#ffb8e3}
+
+/* CUP ART */
+.cup-card{grid-column:1/-1}
+.cup-art{
+ height:155px;
+ background:
+ radial-gradient(circle at 50% 40%,#ffd66b55 0,transparent 30%),
+ linear-gradient(115deg,#123c52,#102c40 48%,#472052)
+}
+.cup-art:before{
+ content:"";position:absolute;inset:0;
+ background:
+ linear-gradient(90deg,transparent 49.5%,#ffffff12 50%,transparent 50.5%),
+ repeating-linear-gradient(0deg,transparent 0 29px,#ffffff09 30px 31px);
+ transform:perspective(180px) rotateX(8deg) scale(1.3)
+}
+.cup-art i{
+ font-size:67px;color:#ffd66b;
+ filter:drop-shadow(0 0 15px #ffcb4c88)
+}
+.cup-art .art-label{color:#ffe6a4}
+.cup-badge{
+ position:absolute;z-index:2;right:10px;top:10px;
+ padding:6px 9px;border-radius:7px;
+ color:#231707;background:linear-gradient(90deg,#ffe28a,#f6a832);
+ font-size:9px;font-weight:1000;letter-spacing:.8px
+}
+.game-info{padding:11px 12px 13px}
+.game-title{font-size:15px;font-weight:1000;letter-spacing:.4px}
+.game-desc{font-size:10px;color:#bcb6d0;margin-top:4px;line-height:1.5}
+.game-bottom{
+ display:flex;justify-content:space-between;align-items:center;
+ margin-top:10px;padding-top:9px;border-top:1px solid #ffffff17
+}
+.game-bottom span{font-size:9px;color:#a9d9ff;font-weight:800}
+.play-btn{
+ padding:7px 10px;border-radius:8px;
+ background:linear-gradient(100deg,#1688ec,#a72a91);
+ font-size:10px;font-weight:900
+}
+.cup-card .game-title{color:#ffe09a;font-size:17px}
+.cup-card .game-desc{max-width:90%}
+.cup-card .game-bottom span{color:#ffda8b}
+
+/* FOOTER */
+.home-link{
+ display:block;margin:16px 14px 0;padding:12px;
+ border:1px solid var(--line);border-radius:11px;
+ color:#d7d1e8;text-align:center;text-decoration:none;
+ font-size:12px;font-weight:700;background:#ffffff08
+}
+@media(max-width:370px){
+ .game-grid{gap:8px}
+ .game-art{height:115px}
+ .cup-art{height:140px}
+ .card{margin-left:10px;margin-right:10px}
+ .game-section{margin-left:10px;margin-right:10px}
+}
 </style>
 </head>
+
 <body>
 <div class="app">
-<header class="topbar"><button class="back" type="button" onclick="history.length>1?history.back():location.href='home.html'" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button><div class="brand"><span>BOYS VS GIRLS</span> 💙💗</div></header>
-<section class="hero"><div class="eyebrow">ESPORTS • PLAYER CENTER</div><h1>Tournament Profile</h1><p>Set up your Free Fire player details and use your social account to join tournaments.</p></section>
-<div id="status" class="status" role="status"></div>
+
+<header class="topbar">
+ <button class="back" type="button"
+ onclick="history.length>1?history.back():location.href='home.html'"
+ aria-label="Go back">
+ <i class="fa-solid fa-arrow-left"></i>
+ </button>
+ <div class="brand"><span>BOYS VS GIRLS</span> 💙💗</div>
+</header>
+
+<!-- SOCIAL ACCOUNT CONNECT CARD -->
 <section class="card">
- <div class="section-head"><h2><i class="fa-solid fa-user-astronaut" style="color:#e88bff;margin-right:7px"></i>Social Account</h2><small>CONNECTED ACCOUNT</small></div>
- <div class="identity"><img id="avatar" class="avatar" src="https://placehold.co/120x120/30264c/ffffff?text=Player" alt="Profile picture"><div><div id="displayName" class="name">Loading profile...</div><div id="username" class="username">Please wait</div><div class="linked"><i class="fa-solid fa-circle-check"></i> Social profile connected</div></div></div>
- <p class="hint">Your social profile name and picture are displayed here automatically. You do not need to create another account.</p>
+ <div class="section-head">
+  <h2><i class="fa-solid fa-user-astronaut" style="color:#e88bff;margin-right:6px"></i>Social Account</h2>
+  <small>CONNECTED ACCOUNT</small>
+ </div>
+ <div class="identity">
+  <img id="avatar" class="avatar"
+   src="https://placehold.co/120x120/30264c/ffffff?text=Player"
+   alt="Profile picture">
+  <div>
+   <div id="displayName" class="name">Loading profile...</div>
+   <div id="username" class="username">Please wait</div>
+   <div class="linked"><i class="fa-solid fa-circle-check"></i> Social profile connected</div>
+  </div>
+ </div>
 </section>
-<section class="card">
- <div class="section-head"><h2><i class="fa-solid fa-gamepad" style="color:#35c7ff;margin-right:7px"></i>Free Fire Details</h2><small>PLAYER INFORMATION</small></div>
+
+<div id="status" class="status" role="status"></div>
+
+<!-- COMPACT FREE FIRE DETAILS -->
+<section class="card details-card">
+ <div class="section-head">
+  <h2><i class="fa-solid fa-gamepad" style="color:#35c7ff;margin-right:6px"></i>Free Fire Details</h2>
+  <small>PLAYER INFO</small>
+ </div>
+
  <form id="profileForm">
-  <label class="field-label" for="ffName">Free Fire In-Game Name</label>
-  <input class="field" id="ffName" name="ffName" maxlength="40" placeholder="Enter your Free Fire name" autocomplete="off" required>
-  <label class="field-label" for="ffUid">Free Fire UID</label>
-  <input class="field" id="ffUid" name="ffUid" maxlength="20" inputmode="numeric" pattern="[0-9]{5,20}" placeholder="Enter your Free Fire UID" autocomplete="off" required>
-  <p class="hint">Enter the UID carefully. It will be used to identify your player in tournament registrations.</p>
-  <button class="save" id="saveBtn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Tournament Profile</button>
+  <div class="field-row">
+   <div>
+    <label class="field-label" for="ffName">Game Name</label>
+    <input class="field" id="ffName" name="ffName"
+     maxlength="40" placeholder="Free Fire Name"
+     autocomplete="off" required>
+   </div>
+   <div>
+    <label class="field-label" for="ffUid">Game UID</label>
+    <input class="field" id="ffUid" name="ffUid"
+     maxlength="20" inputmode="numeric"
+     pattern="[0-9]{5,20}" placeholder="Free Fire UID"
+     autocomplete="off" required>
+   </div>
+  </div>
+
+  <button class="save" id="saveBtn" type="submit">
+   <i class="fa-solid fa-floppy-disk"></i> Save Game Details
+  </button>
  </form>
 </section>
-<section class="card">
- <div class="section-head"><h2>Next Steps</h2><small>TOURNAMENT</small></div>
- <div class="actions">
-  <button class="action" type="button" onclick="location.href='tournament-list.html'"><i class="fa-solid fa-trophy"></i>Browse Tournaments</button>
-  <button class="action" type="button" onclick="location.href='home.html'"><i class="fa-solid fa-house"></i>Back to Social Home</button>
+
+<!-- GAME CARDS -->
+<section class="game-section">
+ <div class="game-heading">
+  <h2>Choose Your Game</h2>
+  <span>SELECT MODE</span>
  </div>
- <p class="hint">Tournament list and registration options will appear here when the Tournament section is enabled on the server.</p>
+
+ <div class="game-grid">
+
+  <!-- BR MATCH -->
+  <a class="game-card" href="tournament-list.html?mode=br">
+   <div class="game-art br-art">
+    <span class="game-tag">BATTLE ROYALE</span>
+    <i class="fa-solid fa-crosshairs"></i>
+    <span class="art-label">SURVIVE • FIGHT • WIN</span>
+   </div>
+   <div class="game-info">
+    <div class="game-title">BR MATCH</div>
+    <div class="game-desc">Solo, Duo & Squad battle tournaments.</div>
+    <div class="game-bottom">
+     <span>FREE & PAID</span>
+     <b class="play-btn">PLAY <i class="fa-solid fa-arrow-right"></i></b>
+    </div>
+   </div>
+  </a>
+
+  <!-- CLASH SQUAD -->
+  <a class="game-card" href="tournament-list.html?mode=clash">
+   <div class="game-art clash-art">
+    <span class="game-tag">TEAM BATTLE</span>
+    <i class="fa-solid fa-shield-halved"></i>
+    <span class="art-label">TEAM UP • DOMINATE</span>
+   </div>
+   <div class="game-info">
+    <div class="game-title">CLASH SQUAD</div>
+    <div class="game-desc">Fast 4 vs 4 team competition.</div>
+    <div class="game-bottom">
+     <span>4 VS 4</span>
+     <b class="play-btn">PLAY <i class="fa-solid fa-arrow-right"></i></b>
+    </div>
+   </div>
+  </a>
+
+  <!-- FREE FIRE CUP -->
+  <a class="game-card cup-card" href="free-fire-cup.html">
+   <div class="game-art cup-art">
+    <span class="game-tag">SPECIAL CHAMPIONSHIP</span>
+    <span class="cup-badge">KNOCKOUT</span>
+    <i class="fa-solid fa-trophy"></i>
+    <span class="art-label">13 TEAMS • ONE CHAMPION</span>
+   </div>
+   <div class="game-info">
+    <div class="game-title">FREE FIRE CUP 🏆</div>
+    <div class="game-desc">
+     Football-style team knockout championship.
+     Round 1 → Round 2 → Super 8 → Semi Final → Grand Final.
+    </div>
+    <div class="game-bottom">
+     <span>13 TEAMS • CHAMPIONSHIP</span>
+     <b class="play-btn">VIEW CUP <i class="fa-solid fa-arrow-right"></i></b>
+    </div>
+   </div>
+  </a>
+
+ </div>
 </section>
+
+<a class="home-link" href="home.html">
+ <i class="fa-solid fa-house"></i> Back to Social Home
+</a>
+
 </div>
+
 <script>
 'use strict';
+
 const API_BASE='https://freetube-backend-a222.onrender.com/api';
 const TOKEN_KEY='freetube_access_token';
 const $=id=>document.getElementById(id);
-function getToken(){try{return localStorage.getItem(TOKEN_KEY)||''}catch(_){return ''}}
-function showStatus(message,type=''){const el=$('status');el.textContent=message;el.className='status show '+type}
-async function api(path,options={}){
- const headers={...(options.headers||{})};const t=getToken();if(t)headers.Authorization='Bearer '+t;
- if(options.body)headers['Content-Type']='application/json';
- let response;try{response=await fetch(API_BASE+path,{...options,headers,cache:'no-store'})}catch(_){throw new Error('Cannot connect to the Boys vs Girls server. Check your internet connection.')}
- const data=await response.json().catch(()=>({}));
- if(response.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}location.replace('auth.html?mode=login');throw new Error('Session expired. Please log in again.')}
- if(!response.ok)throw new Error(data.error||data.message||'Request failed.');return data;
+
+function getToken(){
+ try{return localStorage.getItem(TOKEN_KEY)||''}
+ catch(_){return ''}
 }
-async function loadProfile(){
- if(!getToken()){location.replace('auth.html?mode=login');return}
+
+function showStatus(message,type=''){
+ const el=$('status');
+ el.textContent=message;
+ el.className='status show '+type;
+}
+
+async function api(path,options={}){
+ const headers={...(options.headers||{})};
+ const token=getToken();
+
+ if(token)headers.Authorization='Bearer '+token;
+ if(options.body)headers['Content-Type']='application/json';
+
+ let response;
+
  try{
-  const me=await api('/auth/me');const user=me.user||{};
-  $('username').textContent='@'+(user.username||'');$('displayName').textContent=user.display_name||user.username||'Player';
-  if(user.username){const p=await api('/profile/'+encodeURIComponent(user.username));const profile=p.profile||{};$('displayName').textContent=profile.display_name||user.username;$('avatar').src=profile.avatar_url||$('avatar').src;}
-  const tournament=await api('/tournament/profile');const p=tournament.profile||tournament.tournamentProfile||{};
-  $('ffName').value=p.ff_name||p.free_fire_name||'';$('ffUid').value=p.ff_uid||p.free_fire_uid||'';
+  response=await fetch(API_BASE+path,{
+   ...options,
+   headers,
+   credentials:'include',
+   cache:'no-store'
+  });
+ }catch(_){
+  throw new Error('Cannot connect to the Boys vs Girls server. Check your internet connection.');
+ }
+
+ const data=await response.json().catch(()=>({}));
+
+ if(response.status===401){
+  try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+  location.replace('auth.html?mode=login');
+  throw new Error('Session expired. Please log in again.');
+ }
+
+ if(!response.ok){
+  throw new Error(data.error||data.message||'Request failed.');
+ }
+
+ return data;
+}
+
+async function loadProfile(){
+
+ if(!getToken()){
+  location.replace('auth.html?mode=login');
+  return;
+ }
+
+ try{
+  const me=await api('/auth/me');
+  const user=me.user||{};
+
+  $('username').textContent='@'+(user.username||'');
+  $('displayName').textContent=
+   user.display_name||user.username||'Player';
+
+  if(user.username){
+   const result=await api('/profile/'+encodeURIComponent(user.username));
+   const profile=result.profile||{};
+
+   $('displayName').textContent=
+    profile.display_name||user.display_name||user.username;
+
+   if(profile.avatar_url){
+    $('avatar').src=profile.avatar_url;
+   }
+  }
+
+  const tournament=await api('/tournament/profile');
+  const profile=
+   tournament.profile||tournament.tournamentProfile||{};
+
+  $('ffName').value=
+   profile.ff_name||profile.free_fire_name||'';
+
+  $('ffUid').value=
+   profile.ff_uid||profile.free_fire_uid||'';
+
  }catch(error){
-  if(/404|not found|Cannot GET/i.test(error.message))showStatus('Tournament profile API is not available yet. The page is ready; connect it after the Tournament API is added to server.js.','error');
-  else showStatus(error.message,'error');
+
+  if(/404|not found|Cannot GET/i.test(error.message)){
+   showStatus(
+    'Tournament profile API is not available yet. Please enable the Tournament API in server.js.',
+    'error'
+   );
+  }else{
+   showStatus(error.message,'error');
+  }
  }
 }
+
 $('profileForm').addEventListener('submit',async event=>{
- event.preventDefault();const ffName=$('ffName').value.trim();const ffUid=$('ffUid').value.trim();
- if(!ffName||!/^[0-9]{5,20}$/.test(ffUid)){showStatus('Enter your Free Fire name and a valid numeric UID (5–20 digits).','error');return}
- const btn=$('saveBtn');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
- try{await api('/tournament/profile',{method:'PUT',body:JSON.stringify({ff_name:ffName,ff_uid:ffUid})});showStatus('Tournament profile saved successfully.','success')}
- catch(error){showStatus(error.message,'error')}
- finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Tournament Profile'}
+
+ event.preventDefault();
+
+ const ffName=$('ffName').value.trim();
+ const ffUid=$('ffUid').value.trim();
+
+ if(!ffName||!/^[0-9]{5,20}$/.test(ffUid)){
+  showStatus('Enter your Free Fire name and a valid numeric UID (5–20 digits).','error');
+  return;
+ }
+
+ const btn=$('saveBtn');
+ btn.disabled=true;
+ btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+
+ try{
+
+  await api('/tournament/profile',{
+   method:'PUT',
+   body:JSON.stringify({
+    ff_name:ffName,
+    ff_uid:ffUid
+   })
+  });
+
+  showStatus('Game details saved successfully.','success');
+
+ }catch(error){
+
+  showStatus(error.message,'error');
+
+ }finally{
+
+  btn.disabled=false;
+  btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Game Details';
+ }
 });
+
 loadProfile();
 </script>
 </body>
