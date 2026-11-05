@@ -11,12 +11,57 @@
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
 <section class="card"><div class="item-top"><div><h3>Admin Connection</h3><div id="connection" class="muted small">Checking admin access...</div></div><span class="pill yellow" id="adminBadge">Checking...</span></div><p class="muted small">Uses the login token saved by the main app. Admin permission is verified by the backend.</p></section>
 <section class="stats"><div class="stat"><div class="muted">Users Loaded</div><div class="stat-value" id="usersCount">—</div></div><div class="stat"><div class="muted">Pending Videos</div><div class="stat-value" id="postsCount">—</div></div><div class="stat"><div class="muted">Pending Reports</div><div class="stat-value" id="pendingCount">—</div></div><div class="stat"><div class="muted">Reports Loaded</div><div class="stat-value" id="reportsCount">—</div></div></section>
-<nav class="tabs"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="users">Users</button><button class="tab" data-tab="posts">Pending Videos</button><button class="tab" data-tab="approved">Approved Videos</button><button class="tab" data-tab="reports">Reports</button></nav>
+<nav class="tabs"><button class="tab active" data-tab="overview">Overview</button><button class="tab" data-tab="users">Users</button><button class="tab" data-tab="posts">Pending Videos</button><button class="tab" data-tab="approved">Approved Videos</button><button class="tab" data-tab="reports">Reports</button><button class="tab" data-tab="tournaments">Tournaments</button></nav>
 <section id="overview" class="panel active"><div class="card"><h2>Welcome to App Management</h2><p class="muted">Photos publish immediately. Only video posts wait for admin approval. Rejecting a video deletes only that video and its own media.</p><div class="toolbar"><button data-open="users">Manage Users</button><button data-open="posts">Review Videos</button><button data-open="approved">Approved Videos</button><button data-open="reports">Review Reports</button></div><div class="actions"><button class="secondary" id="overviewLoadUsers">Load Users</button><button class="secondary" id="overviewLoadPosts">Load Pending Videos</button><button class="secondary" id="overviewLoadApproved">Load Approved Videos</button><button class="secondary" id="overviewLoadReports">Load Reports</button></div></div><div class="card"><h2>Other Admin Sections</h2><div class="toolbar"><a href="admin.html"><button class="secondary">Main Dashboard</button></a><a href="admin-payments.html"><button class="secondary">Blue Badge Management</button></a><a href="admin-notifications.html"><button class="secondary">Notification Management</button></a></div></div></section>
 <section id="users" class="panel"><div class="card"><div class="item-top"><h2>User Management</h2><button id="loadUsers">Load Users</button></div><div class="toolbar"><div class="field"><label for="userSearch">Search users</label><input id="userSearch" placeholder="Name, username, email or ID"></div><div class="field"><label for="userFilter">Status</label><select id="userFilter"><option value="all">All loaded users</option><option value="active">Active</option><option value="banned">Banned / Blocked</option></select></div></div><p class="muted small">Up to 200 users are returned per request. Admin accounts cannot be banned here.</p></div><div id="usersList" class="list"><div class="empty">Click Load Users to begin.</div></div></section>
 <section id="posts" class="panel"><div class="card"><div class="item-top"><h2>Pending Video Approval</h2><button id="loadPosts">Refresh Videos</button></div><p class="muted small">This list contains only pending video posts. Photo posts and approved/rejected posts are not shown here. Reject permanently deletes only the selected video post and its own Cloudinary media.</p></div><div id="postsList" class="list"><div class="empty">Click Refresh Videos to load pending videos.</div></div></section>
 <section id="approved" class="panel"><div class="card"><div class="item-top"><h2>Approved Videos</h2><button id="loadApproved">Refresh Approved Videos</button></div><p class="muted small">Videos approved by Admin or Moderator and currently published. This is a view-only list; it does not change or delete posts.</p></div><div id="approvedList" class="list"><div class="empty">Click Refresh Approved Videos to load approved videos.</div></div></section>
 <section id="reports" class="panel"><div class="card"><div class="item-top"><h2>Reports Management</h2><button id="loadReports">Load Reports</button></div><div class="toolbar"><div class="field"><label for="reportFilter">Report status</label><select id="reportFilter"><option value="all">All reports</option><option value="pending">Pending</option><option value="reviewed">Reviewed</option><option value="dismissed">Dismissed</option></select></div></div><p class="muted small">Mark Reviewed or Dismiss changes only the report status. Delete Post permanently removes only the reported post, its related database records, and its own media.</p></div><div id="reportsList" class="list"><div class="empty">Click Load Reports to begin.</div></div></section>
+
+<section id="tournaments" class="panel">
+  <div class="card">
+    <div class="item-top"><div><h2>Tournament Management</h2><p class="muted small">Create and manage Free Fire tournaments. Only Admin can create teams and register players.</p></div><button id="loadTournaments">Refresh Tournaments</button></div>
+    <div id="tournamentNotice" class="notice" role="status" aria-live="polite"></div>
+    <h3>Create Tournament</h3>
+    <form id="createTournamentForm">
+      <div class="toolbar">
+        <div class="field"><label for="tTitle">Tournament Name</label><input id="tTitle" maxlength="120" required placeholder="e.g. Friday Squad Championship"></div>
+        <div class="field"><label for="tMode">Mode</label><select id="tMode"><option>Solo</option><option>Duo</option><option selected>Squad</option></select></div>
+        <div class="field"><label for="tMap">Map</label><select id="tMap"><option>Bermuda</option><option>Purgatory</option><option>Kalahari</option><option>Alpine</option><option>NexTerra</option></select></div>
+      </div>
+      <div class="toolbar">
+        <div class="field"><label for="tEntry">Entry Fee (0 = Free)</label><input id="tEntry" type="number" min="0" step="0.01" value="0" required></div>
+        <div class="field"><label for="tPrize">Fixed Prize Pool</label><input id="tPrize" type="number" min="0" step="0.01" value="0" required></div>
+        <div class="field"><label for="tPrizeMode">Prize Calculation</label><select id="tPrizeMode"><option value="fixed">Fixed Prize</option><option value="dynamic">Dynamic (% of entry collection)</option></select></div>
+        <div class="field"><label for="tPrizePercent">Dynamic Prize Percentage</label><input id="tPrizePercent" type="number" min="0" max="100" step="0.01" value="0"></div>
+      </div>
+      <div class="toolbar">
+        <div class="field"><label for="tMax">Maximum Players / Teams</label><input id="tMax" type="number" min="1" value="100" required></div>
+        <div class="field"><label for="tDate">Match Date & Time</label><input id="tDate" type="datetime-local"></div>
+        <div class="field"><label for="tBanner">Banner Image URL (HTTPS)</label><input id="tBanner" type="url" placeholder="https://..."></div>
+      </div>
+      <div class="field"><label for="tDescription">Description</label><input id="tDescription" maxlength="2000" placeholder="Tournament rules and information"></div>
+      <div class="actions"><button type="submit" id="createTournamentBtn">Create Tournament</button></div>
+    </form>
+  </div>
+  <div class="card">
+    <div class="item-top"><h2>Tournament List</h2><span class="pill" id="tournamentCount">0 tournaments</span></div>
+    <div id="tournamentsList" class="list"><div class="empty">Click Refresh Tournaments to load tournaments.</div></div>
+  </div>
+  <div class="card" id="teamManagerCard">
+    <h2>Admin Team Registration</h2>
+    <p class="muted small">Teams are created only by Admin. Add exactly four main players. No substitutes. Player changes are allowed only before the match starts.</p>
+    <div class="toolbar"><div class="field"><label for="teamTournament">Select Tournament</label><select id="teamTournament"><option value="">Load tournaments first</option></select></div><div class="field"><label for="teamName">Team Name</label><input id="teamName" maxlength="80" placeholder="Enter team name"></div></div>
+    <div class="toolbar"><div class="field"><label for="p1name">Player 1 Name</label><input id="p1name" maxlength="80"></div><div class="field"><label for="p1uid">Player 1 Free Fire UID</label><input id="p1uid" inputmode="numeric" maxlength="20"></div></div>
+    <div class="toolbar"><div class="field"><label for="p2name">Player 2 Name</label><input id="p2name" maxlength="80"></div><div class="field"><label for="p2uid">Player 2 Free Fire UID</label><input id="p2uid" inputmode="numeric" maxlength="20"></div></div>
+    <div class="toolbar"><div class="field"><label for="p3name">Player 3 Name</label><input id="p3name" maxlength="80"></div><div class="field"><label for="p3uid">Player 3 Free Fire UID</label><input id="p3uid" inputmode="numeric" maxlength="20"></div></div>
+    <div class="toolbar"><div class="field"><label for="p4name">Player 4 Name</label><input id="p4name" maxlength="80"></div><div class="field"><label for="p4uid">Player 4 Free Fire UID</label><input id="p4uid" inputmode="numeric" maxlength="20"></div></div>
+    <div class="actions"><button id="createTeamBtn" type="button">Create & Register Team</button><button class="secondary" id="loadTeamsBtn" type="button">Load Registered Teams</button></div>
+    <div id="teamsList" class="list" style="margin-top:12px"><div class="empty">Select a tournament and load teams.</div></div>
+    <p class="muted small">Team registration, roster editing and match-lock actions require the matching Tournament Admin API endpoints in server.js.</p>
+  </div>
+</section>
+
 <footer>Boys vs Girls 💙💗 — App Management<br>All administrative permissions are enforced by the backend.</footer></main>
 <script>
 (function(){"use strict";
@@ -37,7 +82,86 @@ async function moderate(id,action){const verb=action==="approve"?"approve":"perm
 async function loadReports(){if(!adminVerified)return notice("Admin access is not verified.");empty("reportsList","Loading reports...");try{const d=await api("/admin/reports?status=all");reports=Array.isArray(d.reports)?d.reports:[];$("reportsCount").textContent=reports.length;$("pendingCount").textContent=reports.filter(r=>String(r.status||"pending")==="pending").length;renderReports();notice("Reports loaded: "+reports.length,"success")}catch(e){empty("reportsList","Could not load reports. "+e.message);notice("Reports could not be loaded: "+e.message)}}
 function renderReports(){const f=$("reportFilter").value,list=reports.filter(r=>f==="all"||String(r.status||"pending").toLowerCase()===f),root=$("reportsList");root.innerHTML="";if(!list.length)return empty("reportsList","No reports for this filter.");list.forEach(r=>{const id=r.report_id??r.id,status=String(r.status||"pending").toLowerCase(),el=document.createElement("article");el.className="item";el.innerHTML='<div class="item-top"><h3>Report #'+esc(id)+'</h3><span class="pill '+(status==="pending"?"yellow":status==="reviewed"?"green":"red")+'">'+esc(status)+'</span></div><p><strong>Reason:</strong> '+esc(r.reason||"No reason provided")+'</p><p style="white-space:pre-wrap">'+esc(r.content||"[No post text]")+'</p><div class="muted small">Reporter: '+esc(r.reporter_username||r.reporter_id||"Unknown")+' · Post author: '+esc(r.author_username||r.post_owner_id||"Unknown")+' · Post ID: '+esc(r.post_id??"Unknown")+' · Reported: '+esc(r.reported_at||r.created_at||"—")+'</div>';const acts=document.createElement("div");acts.className="actions";if(status==="pending"){const review=document.createElement("button");review.className="success";review.textContent="Mark Reviewed";review.onclick=()=>updateReport(id,"approve");const dismiss=document.createElement("button");dismiss.className="secondary";dismiss.textContent="Dismiss Report";dismiss.onclick=()=>updateReport(id,"dismiss");acts.append(review,dismiss)}if(r.post_id!=null){const del=document.createElement("button");del.className="danger";del.textContent="Delete Reported Post";del.onclick=()=>updateReport(id,"delete_post");acts.appendChild(del)}if(acts.children.length)el.appendChild(acts);root.appendChild(el)})}
 async function updateReport(id,action){const msg=action==="delete_post"?"PERMANENTLY delete only the post linked to this report and its associated data/media":"update this report";if(!confirm("Are you sure you want to "+msg+"? This cannot be undone."))return;try{const d=await api("/admin/reports/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({action})});notice(action==="delete_post"?"Reported post deleted. Only that post and its linked data were removed."+(d.media_deleted===false?" Cloudinary cleanup could not be confirmed.":"") :"Report status updated.","success");await loadReports();if(action==="delete_post")await loadPosts()}catch(e){notice("Could not update report: "+e.message)}}
-async function refresh(){if(!await verify())return;await Promise.allSettled([loadUsers(),loadPosts(),loadApprovedVideos(),loadReports()])}
+
+let tournamentsData=[];
+function tNotice(message,type){const n=$("tournamentNotice");n.textContent=message;n.className="notice"+(type?" "+type:"");n.style.display="block"}
+async function loadTournaments(){
+ if(!adminVerified)return tNotice("Admin access is not verified.");
+ $("tournamentsList").innerHTML='<div class="empty">Loading tournaments...</div>';
+ try{
+  const d=await api("/tournament/tournaments");
+  tournamentsData=Array.isArray(d.tournaments)?d.tournaments:[];
+  $("tournamentCount").textContent=tournamentsData.length+" tournaments";
+  $("teamTournament").innerHTML='<option value="">Select tournament</option>'+tournamentsData.map(t=>'<option value="'+esc(t.id)+'">'+esc(t.title)+' · '+esc(t.mode)+' · '+esc(t.status)+'</option>').join("");
+  const root=$("tournamentsList");root.innerHTML="";
+  if(!tournamentsData.length){empty("tournamentsList","No tournaments created yet.");return}
+  tournamentsData.forEach(t=>{
+   const el=document.createElement("article");el.className="item";
+   const fee=Number(t.entry_fee||0),prize=Number(t.prize_pool||0);
+   el.innerHTML='<div class="item-top"><div><h3>'+esc(t.title)+'</h3><div class="muted small">#'+esc(t.id)+' · '+esc(t.mode)+' · '+esc(t.map_name||"")+'</div></div><span class="pill '+(t.status==="live"?"green":t.status==="completed"?"red":"yellow")+'">'+esc(t.status)+'</span></div><p class="muted small">'+esc(t.description||"No description")+'</p><p class="muted small">Entry: '+(fee===0?"FREE":fee.toLocaleString())+' · Prize: '+prize.toLocaleString()+' · Registered: '+esc(t.registered_count??0)+' / '+esc(t.max_players??"—")+' · Starts: '+esc(t.scheduled_at||"TBA")+'</p><div class="actions"><button class="secondary" data-team-tournament="'+esc(t.id)+'">Manage Teams</button><button class="secondary" data-status-tournament="'+esc(t.id)+'" data-status="live">Set Live</button><button class="secondary" data-status-tournament="'+esc(t.id)+'" data-status="completed">Complete</button><button class="danger" data-status-tournament="'+esc(t.id)+'" data-status="cancelled">Cancel</button></div>';
+   root.appendChild(el);
+  });
+  root.querySelectorAll("[data-team-tournament]").forEach(b=>b.onclick=()=>{$("teamTournament").value=b.dataset.teamTournament;loadTeams()});
+  root.querySelectorAll("[data-status-tournament]").forEach(b=>b.onclick=()=>changeTournamentStatus(b.dataset.statusTournament,b.dataset.status));
+  tNotice("Tournaments loaded: "+tournamentsData.length,"success");
+ }catch(e){empty("tournamentsList","Could not load tournaments. "+e.message);tNotice("Tournament loading failed: "+e.message)}
+}
+$("createTournamentForm").addEventListener("submit",async e=>{
+ e.preventDefault();if(!adminVerified)return tNotice("Admin access is not verified.");
+ const payload={title:$("tTitle").value.trim(),description:$("tDescription").value.trim(),mode:$("tMode").value,map_name:$("tMap").value,entry_fee:Number($("tEntry").value),prize_pool:Number($("tPrize").value),prize_mode:$("tPrizeMode").value,prize_percentage:Number($("tPrizePercent").value),max_players:Number($("tMax").value),scheduled_at:$("tDate").value?new Date($("tDate").value).toISOString():null,banner_url:$("tBanner").value.trim()};
+ const btn=$("createTournamentBtn");btn.disabled=true;
+ try{await api("/tournament/tournaments",{method:"POST",body:JSON.stringify(payload)});e.target.reset();$("tEntry").value="0";$("tPrize").value="0";$("tPrizePercent").value="0";$("tMax").value="100";tNotice("Tournament created successfully.","success");await loadTournaments()}
+ catch(err){tNotice("Could not create tournament: "+err.message)}
+ finally{btn.disabled=false}
+});
+async function changeTournamentStatus(id,status){
+ if(!confirm("Change tournament #"+id+" to "+status+"?"))return;
+ try{await api("/tournament/tournaments/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({status})});tNotice("Tournament status updated.","success");await loadTournaments()}
+ catch(e){tNotice("Could not update tournament. "+e.message)}
+}
+async function createTeam(){
+ if(!adminVerified)return tNotice("Admin access is not verified.");
+ const tournamentId=$("teamTournament").value,teamName=$("teamName").value.trim();
+ const players=[1,2,3,4].map(i=>({name:$("p"+i+"name").value.trim(),uid:$("p"+i+"uid").value.trim()}));
+ if(!tournamentId||!teamName||players.some(p=>!p.name||!/^[0-9]{5,20}$/.test(p.uid))){return tNotice("Select a tournament, enter team name and provide all four player names and numeric UIDs (5–20 digits).")}
+ try{
+  await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams",{method:"POST",body:JSON.stringify({team_name:teamName,players})});
+  $("teamName").value="";[1,2,3,4].forEach(i=>{$("p"+i+"name").value="";$("p"+i+"uid").value=""});
+  tNotice("Team registered successfully.","success");await loadTeams();await loadTournaments();
+ }catch(e){tNotice("Could not register team: "+e.message)}
+}
+async function loadTeams(){
+ if(!adminVerified)return tNotice("Admin access is not verified.");
+ const id=$("teamTournament").value;if(!id)return empty("teamsList","Select a tournament first.");
+ empty("teamsList","Loading registered teams...");
+ try{
+  const d=await api("/tournament/admin/tournaments/"+encodeURIComponent(id)+"/teams");
+  const teams=Array.isArray(d.teams)?d.teams:[];
+  const root=$("teamsList");root.innerHTML="";
+  if(!teams.length)return empty("teamsList","No teams registered for this tournament.");
+  teams.forEach(team=>{
+   const el=document.createElement("article");el.className="item";
+   const players=Array.isArray(team.players)?team.players:[];
+   el.innerHTML='<div class="item-top"><h3>'+esc(team.team_name)+'</h3><span class="pill '+(team.roster_locked?"red":"green")+'">'+(team.roster_locked?"Roster Locked":"Roster Editable")+'</span></div><div class="muted small">Team ID: '+esc(team.id)+' · '+esc(team.status||"registered")+'</div><div class="muted small">'+players.map((p,i)=>'P'+(i+1)+': '+esc(p.name)+' (UID '+esc(p.uid)+')').join("<br>")+'</div>';
+   if(!team.roster_locked){const b=document.createElement("button");b.className="secondary";b.textContent="Edit 4 Players";b.onclick=()=>editTeamRoster(team,id);el.appendChild(b)}
+   root.appendChild(el);
+  });
+ }catch(e){empty("teamsList","Could not load teams. "+e.message)}
+}
+function editTeamRoster(team,tournamentId){
+ const current=Array.isArray(team.players)?team.players:[];
+ const values=[1,2,3,4].map((n)=>({name:prompt("Player "+n+" name",current[n-1]?.name||""),uid:null}));
+ if(values.some(v=>v.name===null))return;
+ for(let i=0;i<4;i++){values[i].uid=prompt("Player "+(i+1)+" Free Fire UID",current[i]?.uid||"");if(values[i].uid===null)return}
+ if(values.some(v=>!v.name.trim()||!/^[0-9]{5,20}$/.test(v.uid.trim())))return tNotice("Invalid player name or UID.");
+ if(!confirm("Save the updated roster? Roster can only be changed before match starts."))return;
+ api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams/"+encodeURIComponent(team.id),{method:"PATCH",body:JSON.stringify({players:values})}).then(()=>{tNotice("Team roster updated.","success");loadTeams()}).catch(e=>tNotice("Roster update failed: "+e.message));
+}
+$("loadTournaments").onclick=loadTournaments;
+$("createTeamBtn").onclick=createTeam;
+$("loadTeamsBtn").onclick=loadTeams;
+
+async function refresh(){if(!await verify())return;await Promise.allSettled([loadUsers(),loadPosts(),loadApprovedVideos(),loadReports(),loadTournaments()])}
 $("refreshButton").onclick=refresh;$("loadUsers").onclick=loadUsers;$("loadPosts").onclick=loadPosts;$("loadReports").onclick=loadReports;$("loadApproved").onclick=loadApprovedVideos;$("overviewLoadUsers").onclick=()=>{tab("users");loadUsers()};$("overviewLoadPosts").onclick=()=>{tab("posts");loadPosts()};$("overviewLoadApproved").onclick=()=>{tab("approved");loadApprovedVideos()};$("overviewLoadReports").onclick=()=>{tab("reports");loadReports()};$("userSearch").oninput=renderUsers;$("userFilter").onchange=renderUsers;$("reportFilter").onchange=renderReports;refresh();
 })();
 </script></body></html>
