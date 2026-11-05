@@ -148,9 +148,9 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <div class="section-title"><h2>My Profile</h2><span>PLAYER ACCOUNT</span></div>
  <div class="profile-card">
   <div class="avatar" id="profileAvatar">P</div>
-  <h2 id="profileName">Guest Player</h2>
-  <p id="profileEmail">Not logged in</p>
-  <div style="margin-top:12px"><span class="tag" id="profileRole">GUEST</span></div>
+  <h2 id="profileName">Checking Social Account…</h2>
+  <p id="profileEmail">Connecting to BOYS VS GIRLS Social App</p>
+  <div style="margin-top:12px"><span class="tag" id="profileRole">CONNECTING</span></div>
  </div>
  <div class="section-title"><h2>Account</h2></div>
  <div class="list-item"><span>🎮 Game UID</span><strong id="gameUid">Not added</strong></div>
@@ -316,13 +316,50 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
 const TOKEN_KEY="freetube_access_token";
 let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,isAdmin=false,tournamentCounts={},adminRegistrationRows=[],walletBalance=0,paymentMethods=[],adminWalletFilter="all",transactions=[];
-function token(){return localStorage.getItem(TOKEN_KEY)||""}
+function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
 async function api(path,options={}){const headers={"Content-Type":"application/json",...(options.headers||{})};if(token())headers.Authorization="Bearer "+token();const res=await fetch(API_BASE_URL+"/tournament"+path,{...options,headers,credentials:"include",cache:"no-store"});let data={};try{data=await res.json()}catch{}if(!res.ok)throw new Error(data.error||data.message||`Request failed (${res.status})`);return data}
 function money(n){return "৳"+Number(n||0).toLocaleString("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2})}function formatDate(d){const x=new Date(d);return isNaN(x)?"Date to be announced":x.toLocaleString("en-BD",{dateStyle:"medium",timeStyle:"short"})}function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}function notify(s){alert(s)}function openModal(id){document.getElementById(id)?.classList.add("show")}function closeModal(id){document.getElementById(id)?.classList.remove("show")}
-function goTo(page){if(page==="admin"&&!isAdmin)return notify("Admin access only.");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="matches")renderMatches();if(page==="leaderboard")renderLeaderboard();if(page==="admin")renderAdmin();window.scrollTo({top:0,behavior:"smooth"})}function openProfile(){goTo("profile")}function openAuth(){if(!token()){notify("প্রথমে BOYS VS GIRLS Social App-এ লগইন করুন, তারপর এখানে ফিরে আসুন।");window.location.href="https://chawdreegaming.github.io/FreeTube/";return}loadAccount().then(()=>goTo("profile"))}
+function goTo(page){if(page==="admin"&&!isAdmin)return notify("Admin access only.");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="matches")renderMatches();if(page==="leaderboard")renderLeaderboard();if(page==="admin")renderAdmin();window.scrollTo({top:0,behavior:"smooth"})}function openProfile(){goTo("profile")}function openAuth(){if(!token()){window.location.href="https://chawdreegaming.github.io/FreeTube/auth.html?mode=login";return}loadAccount().then(()=>goTo("profile"))}
 function mapTournament(r){return{id:r.id,name:r.title||r.name,mode:r.mode,map:r.map||"To be announced",fee:+(r.entry_fee??r.fee??0),prize:+(r.prize_pool??r.prize??0),slots:+(r.max_players??r.slots??0),joined:+(r.registered_count??r.joined??tournamentCounts[r.id]??0),date:r.scheduled_at||r.date,status:r.status}}
-async function loadAccount(){if(!token()){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();return}try{const d=await fetch(API_BASE_URL+"/auth/me",{headers:{Authorization:"Bearer "+token()},credentials:"include",cache:"no-store"});const me=await d.json();if(!d.ok)throw new Error(me.error||"Social App session expired");const u=me.user||me;currentUser={id:u.id,email:u.email};const p=await api("/me");profile=p.profile||p;isAdmin=profile.role==="admin";joined=(p.registrations||[]).map(x=>x.tournament_id);walletBalance=Number(p.wallet?.balance||0);updateAccountUI()}catch(e){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();notify(e.message)}}
-function updateAccountUI(){const guest=!currentUser,name=profile?.display_name||profile?.username||"Guest Player";document.getElementById("profileName").textContent=name;document.getElementById("profileEmail").textContent=currentUser?.email||"Not logged in";document.getElementById("profileAvatar").textContent=name.charAt(0).toUpperCase();document.getElementById("profileRole").textContent=guest?"GUEST":isAdmin?"ADMIN":"PLAYER";document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";document.getElementById("joinedCount").textContent=joined.length;document.getElementById("editProfileButton").disabled=guest;document.getElementById("adminButton").style.display=isAdmin?"block":"none";document.getElementById("profileWalletBalance").textContent=money(walletBalance)}
+async function loadAccount(){
+ const accessToken=token();
+ if(!accessToken){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI("NO_SESSION");return false}
+ try{
+  const response=await fetch(API_BASE_URL+"/auth/me",{headers:{Authorization:"Bearer "+accessToken},credentials:"include",cache:"no-store"});
+  const me=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(me.error||me.message||"Social App session expired. Please sign in again.");
+  const u=me.user||me.profile||me;
+  if(!u.id)throw new Error("Social App did not return a valid account.");
+  currentUser={id:u.id,email:u.email||u.email_address||""};
+  const p=await api("/me");
+  profile=p.profile||{};
+  if(!profile.display_name&&!profile.username){profile.display_name=u.full_name||u.name||u.username||u.email||"Boys vs Girls Player"}
+  isAdmin=String(u.role||profile.role||"").toLowerCase()==="admin"||p.is_admin===true;
+  if(isAdmin)profile.role="admin";
+  joined=(p.registrations||[]).map(x=>x.tournament_id);
+  walletBalance=Number(p.wallet?.balance??0);
+  updateAccountUI("CONNECTED");
+  return true;
+ }catch(e){
+  currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;
+  updateAccountUI("CONNECTION_ERROR",e.message);
+  console.error("Social account connection:",e);
+  return false;
+ }
+}
+function updateAccountUI(state="CONNECTED",errorText=""){
+ const connected=!!currentUser;
+ const name=connected?(profile?.display_name||profile?.username||"Boys vs Girls Player"):state==="NO_SESSION"?"Social Login Required":"Account Connection Failed";
+ document.getElementById("profileName").textContent=name;
+ document.getElementById("profileEmail").textContent=connected?(currentUser.email||"BOYS VS GIRLS account connected"):state==="NO_SESSION"?"Please sign in to BOYS VS GIRLS Social App first":(errorText||"Could not verify your Social App session");
+ document.getElementById("profileAvatar").textContent=connected?name.charAt(0).toUpperCase():"!";
+ document.getElementById("profileRole").textContent=connected?(isAdmin?"ADMIN":"PLAYER"):state==="NO_SESSION"?"NOT CONNECTED":"CONNECTION ERROR";
+ document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";
+ document.getElementById("joinedCount").textContent=joined.length;
+ document.getElementById("editProfileButton").disabled=!connected;
+ document.getElementById("adminButton").style.display=isAdmin?"block":"none";
+ document.getElementById("profileWalletBalance").textContent=money(walletBalance);
+}
 async function logout(){notify("লগআউট করতে BOYS VS GIRLS Social App ব্যবহার করুন।");window.location.href="https://chawdreegaming.github.io/FreeTube/"}
 async function loadTournaments(){const list=document.getElementById("tournamentList");if(list)list.innerHTML='<div class="empty">Loading tournaments...</div>';try{const d=await api("/tournaments");const rows=d.tournaments||d.data||[];tournaments=rows.map(mapTournament);tournamentCounts={};rows.forEach(r=>tournamentCounts[r.id]=+(r.registered_count||0));renderAll()}catch(e){if(list)list.innerHTML='<div class="empty">'+escapeHTML(e.message)+"</div>"}}
 async function loadMyRegistrations(){if(!currentUser){joined=[];return}const d=await api("/registrations/mine");joined=(d.registrations||[]).map(x=>x.tournament_id)}
@@ -349,7 +386,7 @@ document.getElementById("editTournamentForm").addEventListener("submit",async e=
 async function deleteTournament(id){if(!confirm("Delete this tournament?"))return;try{await api(`/admin/tournaments/${id}`,{method:"DELETE"});await loadTournaments()}catch(e){notify(e.message)}}async function loadAdminRegistrations(){try{const id=registrationTournamentSelect.value,d=await api(`/admin/registrations/${id}`);adminRegistrationRows=d.registrations||[];adminRegistrationList.innerHTML=adminRegistrationRows.map((r,i)=>`<div class="registration-card"><b>${i+1}. ${escapeHTML(r.display_name||r.username||"Player")}</b><p>UID: ${escapeHTML(r.free_fire_uid||"Not added")}</p><p>${escapeHTML(r.player_id)}</p><button class="action-btn danger-btn" onclick="removeRegistration('${r.player_id}','${id}')">REMOVE</button></div>`).join("")||'<div class="empty">No registrations.</div>';registrationTotal.textContent=adminRegistrationRows.length;registrationActive.textContent=adminRegistrationRows.filter(x=>x.status==="registered").length;registrationOther.textContent=adminRegistrationRows.filter(x=>x.status!=="registered").length}catch(e){notify(e.message)}}async function removeRegistration(player_id,tournament_id){if(!confirm("Remove this registration?"))return;try{await api(`/admin/registrations/${tournament_id}/${player_id}`,{method:"DELETE"});await loadAdminRegistrations();await loadTournaments()}catch(e){notify(e.message)}}
 async function loadAdminWalletRequests(filter="all",btn){adminWalletFilter=filter;if(btn){document.querySelectorAll("#admin .filter-btn").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}try{const d=await api("/admin/requests?type="+encodeURIComponent(filter));adminWalletRequests.innerHTML=(d.requests||[]).map(r=>`<div class="request-card"><b>${escapeHTML(r.request_type)} • ${money(r.amount)}</b><p>${escapeHTML(r.method_code)} • ${escapeHTML(r.status)}</p><p>${escapeHTML(r.transaction_reference||r.account_info||"")}</p><p>${formatDate(r.created_at)}</p><button class="small-btn" onclick="reviewWalletRequest('${r.id}','approve')">Approve</button> <button class="small-btn danger-btn" onclick="reviewWalletRequest('${r.id}','reject')">Reject</button></div>`).join("")||'<div class="empty">No requests.</div>'}catch(e){adminWalletRequests.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}async function reviewWalletRequest(id,action){try{await api(`/admin/requests/${id}/${action}`,{method:"POST",body:"{}"});await loadAdminWalletRequests(adminWalletFilter)}catch(e){notify(e.message)}}async function loadAdminPaymentMethods(){try{const d=await api("/payment-methods?all=1");const rows=d.methods||[];adminPaymentMethods.innerHTML=rows.map(m=>`<div class="wallet-method"><b>${escapeHTML(m.display_name)}</b><p>${escapeHTML(m.receiver_details||"")}</p><button class="small-btn" onclick="openPaymentEdit('${m.method_code}')">Edit</button></div>`).join("")||'<div class="empty">No payment methods.</div>'}catch(e){adminPaymentMethods.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}function openPaymentEdit(code){const m=paymentMethods.find(x=>x.method_code===code);if(!m)return;paymentEditCode.value=code;paymentEditName.value=m.display_name;paymentEditReceiver.value=m.receiver_details||"";paymentEditInstructions.value=m.instructions||"";paymentEditEnabled.value=String(m.enabled);openModal("paymentEditModal")}document.getElementById("paymentEditForm").addEventListener("submit",async e=>{e.preventDefault();try{await api(`/admin/payment-methods/${paymentEditCode.value}`,{method:"PATCH",body:JSON.stringify({receiver_details:paymentEditReceiver.value,instructions:paymentEditInstructions.value,enabled:paymentEditEnabled.value==="true"})});closeModal("paymentEditModal");await loadAdminPaymentMethods();await loadPaymentMethods()}catch(x){notify(x.message)}});
 async function getRoom(id){try{const d=await api(`/rooms/${id}`);return d.room||null}catch{return null}}function roomHTML(r){return r?`<div class="room-box"><h3>🎮 MATCH ROOM INFORMATION</h3><p>Room ID: ${escapeHTML(r.room_id||"Not announced")}</p><p>Password: ${escapeHTML(r.room_password||"Not announced")}</p></div>`:'<div class="notice">Room information is not available.</div>'}function copyText(v){navigator.clipboard?.writeText(v).then(()=>notify("Copied."))}function showNotifications(){notify("Notifications are available in BOYS VS GIRLS Social App.")}
-async function startApp(){if(!token()){updateAccountUI();document.getElementById("tournamentList").innerHTML='<div class="empty">Tournament list loads publicly. Log in to BOYS VS GIRLS to join.</div>'}try{await loadAccount();await loadTournaments()}catch(e){console.error(e)}}startApp();
+async function startApp(){if(!token()){updateAccountUI("NO_SESSION");document.getElementById("tournamentList").innerHTML='<div class="empty">Tournament list is public. Sign in to BOYS VS GIRLS Social App to join tournaments.</div>'}await loadAccount();await loadTournaments()}startApp();
 
 </script>
 </body>
