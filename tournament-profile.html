@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171329">
+<title>Tournament Profile - Boys vs Girls</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{--bg:#111329;--panel:#1b1832;--panel2:#211b3b;--line:#ffffff20;--muted:#bcb6d0;--blue:#278bff;--pink:#f22e9b;--cyan:#35c7ff}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
+body{min-height:100vh;color:#fff;background:radial-gradient(circle at 10% 0%,#26356b 0,transparent 35%),radial-gradient(circle at 95% 12%,#5a1e58 0,transparent 32%),var(--bg)}
+button,input{font:inherit}button{cursor:pointer;border:0;color:inherit}.app{max-width:620px;min-height:100vh;margin:auto;padding-bottom:34px}
+.topbar{height:60px;padding:0 16px;display:flex;align-items:center;gap:13px;background:#171329ed;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}
+.back{width:38px;height:38px;border-radius:50%;background:#ffffff12;border:1px solid var(--line);font-size:16px}.brand{font-weight:900;font-size:17px;letter-spacing:-.3px}.brand span{background:linear-gradient(90deg,var(--blue),#a33cff,var(--pink));color:transparent;background-clip:text}
+.hero{margin:16px 14px 0;padding:22px 18px;border:1px solid #f22e9b55;border-radius:20px;background:linear-gradient(130deg,#183b72,#332052 58%,#591c50);box-shadow:0 12px 35px #0004;position:relative;overflow:hidden}.hero:after{content:'🏆';position:absolute;right:16px;top:15px;font-size:55px;opacity:.17}.eyebrow{font-size:10px;letter-spacing:2px;color:#a9d9ff;font-weight:800}.hero h1{font-size:25px;margin:7px 0 5px}.hero p{font-size:12px;color:#e1d8f2;max-width:78%;line-height:1.5}
+.card{margin:14px;background:linear-gradient(145deg,#211d3b,#19172f);border:1px solid var(--line);border-radius:17px;padding:16px;box-shadow:0 8px 24px #0002}.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.section-head h2{font-size:15px}.section-head small{font-size:10px;color:var(--muted)}
+.identity{display:flex;align-items:center;gap:13px}.avatar{width:66px;height:66px;border-radius:50%;object-fit:cover;border:2px solid #f22e9b;box-shadow:0 0 0 4px #f22e9b20;background:#30264c}.name{font-size:17px;font-weight:800;overflow-wrap:anywhere}.username{font-size:12px;color:var(--muted);margin-top:4px}.linked{display:inline-flex;gap:5px;align-items:center;margin-top:7px;color:#8ed6ff;font-size:10px;font-weight:700}
+.field-label{display:block;font-size:12px;font-weight:700;margin:14px 0 7px;color:#e7e2f2}.field{width:100%;height:46px;padding:0 13px;color:#fff;background:#ffffff0b;border:1px solid #ffffff26;border-radius:11px;outline:none;font-size:14px}.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35c7ff19}.field::placeholder{color:#827b99}.hint{font-size:10px;color:var(--muted);line-height:1.5;margin-top:7px}.save{width:100%;margin-top:17px;padding:13px;border-radius:12px;background:linear-gradient(100deg,var(--blue),#853cff,var(--pink));font-weight:800;font-size:14px;box-shadow:0 7px 18px #7a36ff35}.save:disabled{opacity:.55;cursor:wait}.info{display:flex;gap:10px;padding:12px;border-radius:12px;background:#278bff13;border:1px solid #278bff35;color:#d7eaff;font-size:11px;line-height:1.55}.info i{color:#6ebaff;margin-top:2px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.action{padding:13px 9px;border-radius:12px;background:#ffffff0c;border:1px solid var(--line);font-size:12px;font-weight:700}.action i{display:block;font-size:18px;color:#e88bff;margin-bottom:7px}.status{padding:10px 12px;margin:0 14px 12px;border-radius:10px;background:#ffffff0b;color:var(--muted);font-size:11px;display:none}.status.show{display:block}.status.error{color:#ffaaaa;border:1px solid #ff6a6a55}.status.success{color:#9cf0c0;border:1px solid #55d99555}
+@media(min-width:600px){.hero{margin-top:22px}.card{margin-top:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="topbar"><button class="back" type="button" onclick="history.length>1?history.back():location.href='home.html'" aria-label="Go back"><i class="fa-solid fa-arrow-left"></i></button><div class="brand"><span>BOYS VS GIRLS</span> 💙💗</div></header>
+<section class="hero"><div class="eyebrow">ESPORTS • PLAYER CENTER</div><h1>Tournament Profile</h1><p>Set up your Free Fire player details and use your social account to join tournaments.</p></section>
+<div id="status" class="status" role="status"></div>
+<section class="card">
+ <div class="section-head"><h2><i class="fa-solid fa-user-astronaut" style="color:#e88bff;margin-right:7px"></i>Social Account</h2><small>CONNECTED ACCOUNT</small></div>
+ <div class="identity"><img id="avatar" class="avatar" src="https://placehold.co/120x120/30264c/ffffff?text=Player" alt="Profile picture"><div><div id="displayName" class="name">Loading profile...</div><div id="username" class="username">Please wait</div><div class="linked"><i class="fa-solid fa-circle-check"></i> Social profile connected</div></div></div>
+ <p class="hint">Your social profile name and picture are displayed here automatically. You do not need to create another account.</p>
+</section>
+<section class="card">
+ <div class="section-head"><h2><i class="fa-solid fa-gamepad" style="color:#35c7ff;margin-right:7px"></i>Free Fire Details</h2><small>PLAYER INFORMATION</small></div>
+ <form id="profileForm">
+  <label class="field-label" for="ffName">Free Fire In-Game Name</label>
+  <input class="field" id="ffName" name="ffName" maxlength="40" placeholder="Enter your Free Fire name" autocomplete="off" required>
+  <label class="field-label" for="ffUid">Free Fire UID</label>
+  <input class="field" id="ffUid" name="ffUid" maxlength="20" inputmode="numeric" pattern="[0-9]{5,20}" placeholder="Enter your Free Fire UID" autocomplete="off" required>
+  <p class="hint">Enter the UID carefully. It will be used to identify your player in tournament registrations.</p>
+  <button class="save" id="saveBtn" type="submit"><i class="fa-solid fa-floppy-disk"></i> Save Tournament Profile</button>
+ </form>
+</section>
+<section class="card">
+ <div class="section-head"><h2>Next Steps</h2><small>TOURNAMENT</small></div>
+ <div class="actions">
+  <button class="action" type="button" onclick="location.href='tournaments.html'"><i class="fa-solid fa-trophy"></i>Browse Tournaments</button>
+  <button class="action" type="button" onclick="location.href='home.html'"><i class="fa-solid fa-house"></i>Back to Social Home</button>
+ </div>
+ <p class="hint">Tournament list and registration options will appear here when the Tournament section is enabled on the server.</p>
+</section>
+</div>
+<script>
+'use strict';
+const API_BASE='https://freetube-backend-a222.onrender.com/api';
+const TOKEN_KEY='freetube_access_token';
+const $=id=>document.getElementById(id);
+function getToken(){try{return localStorage.getItem(TOKEN_KEY)||''}catch(_){return ''}}
+function showStatus(message,type=''){const el=$('status');el.textContent=message;el.className='status show '+type}
+async function api(path,options={}){
+ const headers={...(options.headers||{})};const t=getToken();if(t)headers.Authorization='Bearer '+t;
+ if(options.body)headers['Content-Type']='application/json';
+ let response;try{response=await fetch(API_BASE+path,{...options,headers,cache:'no-store'})}catch(_){throw new Error('Cannot connect to the Boys vs Girls server. Check your internet connection.')}
+ const data=await response.json().catch(()=>({}));
+ if(response.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}location.replace('auth.html?mode=login');throw new Error('Session expired. Please log in again.')}
+ if(!response.ok)throw new Error(data.error||data.message||'Request failed.');return data;
+}
+async function loadProfile(){
+ if(!getToken()){location.replace('auth.html?mode=login');return}
+ try{
+  const me=await api('/auth/me');const user=me.user||{};
+  $('username').textContent='@'+(user.username||'');$('displayName').textContent=user.display_name||user.username||'Player';
+  if(user.username){const p=await api('/profile/'+encodeURIComponent(user.username));const profile=p.profile||{};$('displayName').textContent=profile.display_name||user.username;$('avatar').src=profile.avatar_url||$('avatar').src;}
+  const tournament=await api('/tournament/profile');const p=tournament.profile||tournament.tournamentProfile||{};
+  $('ffName').value=p.ff_name||p.free_fire_name||'';$('ffUid').value=p.ff_uid||p.free_fire_uid||'';
+ }catch(error){
+  if(/404|not found|Cannot GET/i.test(error.message))showStatus('Tournament profile API is not available yet. The page is ready; connect it after the Tournament API is added to server.js.','error');
+  else showStatus(error.message,'error');
+ }
+}
+$('profileForm').addEventListener('submit',async event=>{
+ event.preventDefault();const ffName=$('ffName').value.trim();const ffUid=$('ffUid').value.trim();
+ if(!ffName||!/^[0-9]{5,20}$/.test(ffUid)){showStatus('Enter your Free Fire name and a valid numeric UID (5–20 digits).','error');return}
+ const btn=$('saveBtn');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+ try{await api('/tournament/profile',{method:'PUT',body:JSON.stringify({ff_name:ffName,ff_uid:ffUid})});showStatus('Tournament profile saved successfully.','success')}
+ catch(error){showStatus(error.message,'error')}
+ finally{btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Tournament Profile'}
+});
+loadProfile();
+</script>
+</body>
+</html>
