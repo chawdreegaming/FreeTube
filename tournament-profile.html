@@ -1,17 +1,16 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#111329">
-<title>Game Center - BOYS VS GIRLS</title>
+<meta name="theme-color" content="#171329">
+<title>Boys vs Girls - Game Center</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
  --bg:#111329;
- --panel:#1c1933;
+ --panel:#1b1832;
  --line:#ffffff20;
  --muted:#bcb6d0;
  --blue:#278bff;
@@ -28,9 +27,9 @@ body{
 }
 button,input{font:inherit}
 button{cursor:pointer;border:0;color:inherit}
-.app{max-width:620px;min-height:100vh;margin:auto;padding-bottom:35px}
+.app{max-width:700px;min-height:100vh;margin:auto;padding-bottom:35px}
 
-/* HEADER */
+/* TOP BAR */
 .topbar{
  height:60px;padding:0 16px;display:flex;align-items:center;gap:13px;
  background:#171329ed;border-bottom:1px solid var(--line);
@@ -48,191 +47,173 @@ button{cursor:pointer;border:0;color:inherit}
 
 /* COMMON CARD */
 .card{
- margin:12px 14px;
+ margin:13px 14px;
  background:linear-gradient(145deg,#211d3b,#19172f);
  border:1px solid var(--line);
- border-radius:16px;padding:13px;
+ border-radius:19px;
+ padding:15px;
  box-shadow:0 8px 24px #0002
 }
 .section-head{
  display:flex;align-items:center;justify-content:space-between;
- margin-bottom:11px;gap:8px
+ gap:8px;margin-bottom:13px
 }
-.section-head h2{font-size:14px}
-.section-head small{font-size:9px;color:var(--muted);letter-spacing:.5px}
+.section-head h2{font-size:17px;font-weight:900}
+.section-head small{font-size:10px;color:var(--muted);letter-spacing:.5px}
 
 /* SOCIAL ACCOUNT */
-.identity{display:flex;align-items:center;gap:12px}
+.identity{display:flex;align-items:center;gap:13px;min-width:0}
 .avatar{
- width:57px;height:57px;border-radius:50%;object-fit:cover;
- border:2px solid var(--pink);
- box-shadow:0 0 0 3px #f22e9b20;background:#30264c
+ width:65px;height:65px;flex-shrink:0;border-radius:50%;
+ object-fit:cover;border:2px solid var(--pink);
+ box-shadow:0 0 0 4px #f22e9b20;background:#30264c
 }
-.name{font-size:16px;font-weight:800;overflow-wrap:anywhere}
-.username{font-size:12px;color:var(--muted);margin-top:4px}
+.name{font-size:18px;font-weight:900;overflow-wrap:anywhere}
+.username{font-size:13px;color:var(--muted);margin-top:4px}
 .linked{
- display:inline-flex;gap:5px;align-items:center;margin-top:6px;
- color:#8ed6ff;font-size:10px;font-weight:700
+ display:inline-flex;gap:5px;align-items:center;margin-top:7px;
+ color:#8ed6ff;font-size:11px;font-weight:800
 }
-
-/* COMPACT FREE FIRE DETAILS */
-.details-card{padding:12px 14px}
-.details-card .section-head{margin-bottom:7px}
-.field-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.field-label{
- display:block;font-size:11px;font-weight:700;
- margin:5px 0 6px;color:#e7e2f2
-}
-.field{
- width:100%;height:39px;padding:0 10px;color:#fff;
- background:#ffffff0b;border:1px solid #ffffff26;
- border-radius:9px;outline:none;font-size:12px
-}
-.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35c7ff19}
-.field::placeholder{color:#827b99}
-.save{
- width:100%;margin-top:10px;padding:10px;border-radius:9px;
- background:linear-gradient(100deg,var(--blue),#853cff,var(--pink));
- font-weight:800;font-size:12px;
- box-shadow:0 5px 14px #7a36ff30
-}
-.save:disabled{opacity:.55;cursor:wait}
-.hint{font-size:10px;color:var(--muted);line-height:1.45;margin-top:7px}
 
 /* STATUS */
 .status{
- padding:10px 12px;margin:10px 14px;border-radius:10px;
- background:#ffffff0b;color:var(--muted);font-size:11px;display:none
+ padding:10px 12px;margin:0 14px 12px;border-radius:11px;
+ background:#ffffff0b;color:var(--muted);font-size:12px;
+ line-height:1.5;display:none
 }
 .status.show{display:block}
 .status.error{color:#ffaaaa;border:1px solid #ff6a6a55}
 .status.success{color:#9cf0c0;border:1px solid #55d99555}
 
+/* THIN GAME DETAILS CARD */
+.details-card{padding:14px}
+.details-head{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:8px;margin-bottom:13px
+}
+.details-head h2{font-size:17px;font-weight:900}
+.details-head i{color:var(--cyan);margin-right:6px}
+.details-head small{font-size:10px;color:var(--muted)}
+.details-grid{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px
+}
+.field-wrap{min-width:0}
+.field-label{
+ display:block;font-size:12px;font-weight:800;
+ margin:0 0 7px;color:#e7e2f2
+}
+.field{
+ width:100%;height:45px;padding:0 12px;
+ color:#fff;background:#ffffff0b;
+ border:1px solid #ffffff26;border-radius:11px;
+ outline:none;font-size:13px;min-width:0
+}
+.field:focus{border-color:var(--cyan);box-shadow:0 0 0 3px #35c7ff19}
+.field::placeholder{color:#827b99}
+.save{
+ width:100%;margin-top:11px;padding:12px;
+ border-radius:11px;
+ background:linear-gradient(100deg,var(--blue),#853cff,var(--pink));
+ font-weight:900;font-size:14px;
+ box-shadow:0 7px 18px #7a36ff35
+}
+.save:disabled{opacity:.55;cursor:wait}
+
 /* GAME SECTION */
-.game-section{margin:19px 14px 0}
 .game-heading{
  display:flex;align-items:center;justify-content:space-between;
- margin-bottom:12px
+ gap:10px;margin:35px 19px 15px
 }
-.game-heading h2{font-size:19px;font-weight:900}
-.game-heading span{font-size:10px;color:#a9d9ff;font-weight:800;letter-spacing:1px}
-.game-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-
-/* GAME CARD */
+.game-heading h2{font-size:25px;font-weight:1000;letter-spacing:-.5px}
+.game-heading span{
+ font-size:11px;color:#a9d9ff;font-weight:900;letter-spacing:1px
+}
+.game-grid{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+ gap:14px;margin:0 14px
+}
 .game-card{
- position:relative;display:block;text-decoration:none;color:#fff;
- border:1px solid #ffffff25;border-radius:16px;
- overflow:hidden;min-width:0;background:#171a35;
- box-shadow:0 9px 25px #0004;transition:.2s
+ min-width:0;overflow:hidden;border-radius:22px;
+ background:linear-gradient(145deg,#211e3e,#17172f);
+ border:1px solid #ffffff25;
+ box-shadow:0 12px 30px #0004;
+ transition:transform .2s,border-color .2s
 }
-.game-card:active{transform:scale(.97)}
+.game-card:active{transform:scale(.98)}
+.game-card:hover{border-color:#7a8dff88}
+
+/* GAME ARTWORK MADE WITH HTML/CSS/SVG */
 .game-art{
- height:135px;position:relative;overflow:hidden;
+ height:155px;position:relative;overflow:hidden;
  display:flex;align-items:center;justify-content:center
 }
-.game-art:after{
- content:"";position:absolute;inset:0;
- background:linear-gradient(0deg,#080b1ee8,transparent 85%)
+.game-art.br{
+ background:
+ radial-gradient(circle at 70% 35%,#f7b64b55,transparent 25%),
+ linear-gradient(135deg,#123e69,#10152c 75%)
 }
-.game-art i{
- position:relative;z-index:1;font-size:55px;
- filter:drop-shadow(0 5px 13px #0008)
+.game-art.clash{
+ background:
+ radial-gradient(circle at 65% 35%,#ff56c455,transparent 35%),
+ linear-gradient(135deg,#64216d,#1b183a 75%)
 }
-.game-tag{
- position:absolute;z-index:2;top:9px;left:9px;
- padding:5px 8px;border-radius:7px;
- background:#080b19bb;border:1px solid #ffffff30;
- font-size:9px;font-weight:900;letter-spacing:.7px
+.game-art.cup{
+ background:
+ radial-gradient(circle at 50% 40%,#ffd36b55,transparent 35%),
+ linear-gradient(135deg,#145c56,#101a37 75%)
 }
+.game-art:before{
+ content:"";position:absolute;width:190px;height:190px;
+ border:1px solid #ffffff25;border-radius:50%;
+ box-shadow:0 0 0 16px #ffffff08,0 0 0 34px #ffffff05
+}
+.game-art svg{width:100%;height:100%;position:absolute;inset:0}
 .art-label{
- position:absolute;z-index:2;bottom:10px;left:11px;
- font-size:10px;font-weight:900;letter-spacing:1.5px;
- text-shadow:0 2px 6px #000
+ position:absolute;z-index:2;top:12px;left:12px;
+ padding:6px 10px;border-radius:8px;
+ background:#080b19d9;border:1px solid #ffffff35;
+ font-size:10px;font-weight:1000;letter-spacing:1px
 }
-
-/* BR ART */
-.br-art{
- background:
- radial-gradient(circle at 70% 32%,#ffb64c77 0,transparent 22%),
- linear-gradient(135deg,#123f70,#09162d 60%,#71351d)
+.art-bottom{
+ position:absolute;z-index:2;bottom:12px;left:12px;right:12px;
+ text-align:center;font-size:11px;font-weight:1000;
+ letter-spacing:2px;text-shadow:0 2px 5px #000
 }
-.br-art:before{
- content:"";position:absolute;width:180px;height:180px;
- border:2px solid #ffffff22;border-radius:50%;
- right:-35px;top:-55px;
- box-shadow:0 0 0 18px #ffffff09,0 0 0 38px #ffffff07
+.game-info{padding:14px}
+.game-title{font-size:20px;font-weight:1000;margin-bottom:7px}
+.game-desc{
+ font-size:12px;line-height:1.55;color:#bcb6d0;
+ min-height:38px
 }
-.br-art i{color:#d5eaff}
-
-/* CLASH ART */
-.clash-art{
- background:
- radial-gradient(circle at 30% 35%,#ff5cba88 0,transparent 24%),
- linear-gradient(135deg,#541e65,#20143c 60%,#9a285f)
+.game-foot{
+ border-top:1px solid #ffffff18;margin-top:12px;padding-top:11px;
+ display:flex;align-items:center;justify-content:space-between;gap:7px
 }
-.clash-art:before{
- content:"";position:absolute;width:130px;height:130px;
- border:16px solid #ffffff12;border-radius:28px;
- transform:rotate(35deg);right:-30px;top:10px
-}
-.clash-art i{color:#ffb8e3}
-
-/* CUP ART */
-.cup-card{grid-column:1/-1}
-.cup-art{
- height:155px;
- background:
- radial-gradient(circle at 50% 40%,#ffd66b55 0,transparent 30%),
- linear-gradient(115deg,#123c52,#102c40 48%,#472052)
-}
-.cup-art:before{
- content:"";position:absolute;inset:0;
- background:
- linear-gradient(90deg,transparent 49.5%,#ffffff12 50%,transparent 50.5%),
- repeating-linear-gradient(0deg,transparent 0 29px,#ffffff09 30px 31px);
- transform:perspective(180px) rotateX(8deg) scale(1.3)
-}
-.cup-art i{
- font-size:67px;color:#ffd66b;
- filter:drop-shadow(0 0 15px #ffcb4c88)
-}
-.cup-art .art-label{color:#ffe6a4}
-.cup-badge{
- position:absolute;z-index:2;right:10px;top:10px;
- padding:6px 9px;border-radius:7px;
- color:#231707;background:linear-gradient(90deg,#ffe28a,#f6a832);
- font-size:9px;font-weight:1000;letter-spacing:.8px
-}
-.game-info{padding:11px 12px 13px}
-.game-title{font-size:15px;font-weight:1000;letter-spacing:.4px}
-.game-desc{font-size:10px;color:#bcb6d0;margin-top:4px;line-height:1.5}
-.game-bottom{
- display:flex;justify-content:space-between;align-items:center;
- margin-top:10px;padding-top:9px;border-top:1px solid #ffffff17
-}
-.game-bottom span{font-size:9px;color:#a9d9ff;font-weight:800}
-.play-btn{
- padding:7px 10px;border-radius:8px;
+.game-type{font-size:11px;font-weight:900;color:#9ed8ff}
+.play{
+ padding:10px 12px;border-radius:11px;
  background:linear-gradient(100deg,#1688ec,#a72a91);
- font-size:10px;font-weight:900
+ font-size:12px;font-weight:1000;white-space:nowrap
 }
-.cup-card .game-title{color:#ffe09a;font-size:17px}
-.cup-card .game-desc{max-width:90%}
-.cup-card .game-bottom span{color:#ffda8b}
+.play i{margin-left:4px}
 
-/* FOOTER */
-.home-link{
- display:block;margin:16px 14px 0;padding:12px;
- border:1px solid var(--line);border-radius:11px;
- color:#d7d1e8;text-align:center;text-decoration:none;
- font-size:12px;font-weight:700;background:#ffffff08
-}
-@media(max-width:370px){
- .game-grid{gap:8px}
- .game-art{height:115px}
- .cup-art{height:140px}
- .card{margin-left:10px;margin-right:10px}
- .game-section{margin-left:10px;margin-right:10px}
+/* FREE FIRE CUP FEATURE */
+.cup-card{grid-column:1/-1}
+.cup-card .game-art{height:175px}
+.cup-card .game-title{font-size:22px}
+.cup-card .game-desc{min-height:auto}
+.cup-card .game-info{padding:15px}
+.cup-card .game-foot{margin-top:13px}
+
+/* SMALL SCREEN */
+@media(max-width:360px){
+ .game-grid{gap:9px;margin:0 10px}
+ .game-heading{margin-left:14px;margin-right:14px}
+ .game-heading h2{font-size:22px}
+ .game-info{padding:11px}
+ .game-title{font-size:17px}
+ .game-art{height:135px}
+ .play{padding:9px 9px;font-size:11px}
 }
 </style>
 </head>
@@ -244,7 +225,7 @@ button{cursor:pointer;border:0;color:inherit}
  <button class="back" type="button"
  onclick="history.length>1?history.back():location.href='home.html'"
  aria-label="Go back">
- <i class="fa-solid fa-arrow-left"></i>
+  <i class="fa-solid fa-arrow-left"></i>
  </button>
  <div class="brand"><span>BOYS VS GIRLS</span> 💙💗</div>
 </header>
@@ -252,124 +233,180 @@ button{cursor:pointer;border:0;color:inherit}
 <!-- SOCIAL ACCOUNT CONNECT CARD -->
 <section class="card">
  <div class="section-head">
-  <h2><i class="fa-solid fa-user-astronaut" style="color:#e88bff;margin-right:6px"></i>Social Account</h2>
+  <h2><i class="fa-solid fa-user-astronaut" style="color:#e88bff;margin-right:7px"></i>Social Account</h2>
   <small>CONNECTED ACCOUNT</small>
  </div>
+
  <div class="identity">
   <img id="avatar" class="avatar"
    src="https://placehold.co/120x120/30264c/ffffff?text=Player"
    alt="Profile picture">
-  <div>
+
+  <div style="min-width:0">
    <div id="displayName" class="name">Loading profile...</div>
    <div id="username" class="username">Please wait</div>
-   <div class="linked"><i class="fa-solid fa-circle-check"></i> Social profile connected</div>
+   <div class="linked">
+    <i class="fa-solid fa-circle-check"></i>
+    Social profile connected
+   </div>
   </div>
  </div>
 </section>
 
 <div id="status" class="status" role="status"></div>
 
-<!-- COMPACT FREE FIRE DETAILS -->
+<!-- SLIM GAME NAME + UID CARD -->
 <section class="card details-card">
- <div class="section-head">
-  <h2><i class="fa-solid fa-gamepad" style="color:#35c7ff;margin-right:6px"></i>Free Fire Details</h2>
+ <div class="details-head">
+  <h2><i class="fa-solid fa-gamepad"></i>Free Fire Details</h2>
   <small>PLAYER INFO</small>
  </div>
 
  <form id="profileForm">
-  <div class="field-row">
-   <div>
+  <div class="details-grid">
+
+   <div class="field-wrap">
     <label class="field-label" for="ffName">Game Name</label>
     <input class="field" id="ffName" name="ffName"
      maxlength="40" placeholder="Free Fire Name"
      autocomplete="off" required>
    </div>
-   <div>
+
+   <div class="field-wrap">
     <label class="field-label" for="ffUid">Game UID</label>
     <input class="field" id="ffUid" name="ffUid"
      maxlength="20" inputmode="numeric"
      pattern="[0-9]{5,20}" placeholder="Free Fire UID"
      autocomplete="off" required>
    </div>
+
   </div>
 
   <button class="save" id="saveBtn" type="submit">
-   <i class="fa-solid fa-floppy-disk"></i> Save Game Details
+   <i class="fa-solid fa-floppy-disk"></i>
+   Save Game Details
   </button>
  </form>
 </section>
 
 <!-- GAME CARDS -->
-<section class="game-section">
- <div class="game-heading">
-  <h2>Choose Your Game</h2>
-  <span>SELECT MODE</span>
- </div>
+<div class="game-heading">
+ <h2>Choose Your Game</h2>
+ <span>SELECT MODE</span>
+</div>
 
- <div class="game-grid">
+<div class="game-grid">
 
-  <!-- BR MATCH -->
-  <a class="game-card" href="tournament-list.html?mode=br">
-   <div class="game-art br-art">
-    <span class="game-tag">BATTLE ROYALE</span>
-    <i class="fa-solid fa-crosshairs"></i>
-    <span class="art-label">SURVIVE • FIGHT • WIN</span>
+ <!-- BR MATCH -->
+ <article class="game-card">
+  <div class="game-art br">
+   <span class="art-label">BATTLE ROYALE</span>
+
+   <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="200" cy="105" r="85" fill="none" stroke="#8bcaff" stroke-opacity=".13" stroke-width="3"/>
+    <circle cx="200" cy="105" r="61" fill="none" stroke="#8bcaff" stroke-opacity=".25" stroke-width="3"/>
+    <g fill="#d8eaff">
+     <path d="M200 43c-11 0-19 8-19 19v16h38V62c0-11-8-19-19-19z"/>
+     <path d="M200 167c11 0 19-8 19-19v-16h-38v16c0 11 8 19 19 19z"/>
+     <path d="M138 105c0-11 8-19 19-19h16v38h-16c-11 0-19-8-19-19z"/>
+     <path d="M262 105c0 11-8 19-19 19h-16V86h16c11 0 19 8 19 19z"/>
+     <circle cx="200" cy="105" r="22"/>
+     <circle cx="200" cy="105" r="9" fill="#26365d"/>
+    </g>
+   </svg>
+
+   <div class="art-bottom">SURVIVE • FIGHT • WIN</div>
+  </div>
+
+  <div class="game-info">
+   <div class="game-title">BR MATCH</div>
+   <div class="game-desc">Solo, Duo & Squad battle tournaments.</div>
+   <div class="game-foot">
+    <span class="game-type">FREE & PAID</span>
+    <button class="play" onclick="openGame('br-match.html')">
+     PLAY <i class="fa-solid fa-arrow-right"></i>
+    </button>
    </div>
-   <div class="game-info">
-    <div class="game-title">BR MATCH</div>
-    <div class="game-desc">Solo, Duo & Squad battle tournaments.</div>
-    <div class="game-bottom">
-     <span>FREE & PAID</span>
-     <b class="play-btn">PLAY <i class="fa-solid fa-arrow-right"></i></b>
-    </div>
-   </div>
-  </a>
+  </div>
+ </article>
 
-  <!-- CLASH SQUAD -->
-  <a class="game-card" href="tournament-list.html?mode=clash">
-   <div class="game-art clash-art">
-    <span class="game-tag">TEAM BATTLE</span>
-    <i class="fa-solid fa-shield-halved"></i>
-    <span class="art-label">TEAM UP • DOMINATE</span>
-   </div>
-   <div class="game-info">
-    <div class="game-title">CLASH SQUAD</div>
-    <div class="game-desc">Fast 4 vs 4 team competition.</div>
-    <div class="game-bottom">
-     <span>4 VS 4</span>
-     <b class="play-btn">PLAY <i class="fa-solid fa-arrow-right"></i></b>
-    </div>
-   </div>
-  </a>
+ <!-- CLASH SQUAD -->
+ <article class="game-card">
+  <div class="game-art clash">
+   <span class="art-label">TEAM BATTLE</span>
 
-  <!-- FREE FIRE CUP -->
-  <a class="game-card cup-card" href="free-fire-cup.html">
-   <div class="game-art cup-art">
-    <span class="game-tag">SPECIAL CHAMPIONSHIP</span>
-    <span class="cup-badge">KNOCKOUT</span>
-    <i class="fa-solid fa-trophy"></i>
-    <span class="art-label">13 TEAMS • ONE CHAMPION</span>
+   <svg viewBox="0 0 400 220" xmlns="http://www.w3.org/2000/svg">
+    <path d="M200 37L285 66v53c0 46-35 73-85 92-50-19-85-46-85-92V66z"
+     fill="#ffb8e8" fill-opacity=".95"/>
+    <path d="M200 58v126c39-16 63-39 63-70V82z" fill="#251638"/>
+    <path d="M200 58L137 79v35c0 31 24 54 63 70z" fill="#fff" fill-opacity=".15"/>
+    <path d="M200 37L285 66v53c0 46-35 73-85 92-50-19-85-46-85-92V66z"
+     fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="4"/>
+   </svg>
+
+   <div class="art-bottom">TEAM UP • DOMINATE</div>
+  </div>
+
+  <div class="game-info">
+   <div class="game-title">CLASH SQUAD</div>
+   <div class="game-desc">Fast 4 vs 4 team battle competition.</div>
+   <div class="game-foot">
+    <span class="game-type">4 VS 4</span>
+    <button class="play" onclick="openGame('clash-squad.html')">
+     PLAY <i class="fa-solid fa-arrow-right"></i>
+    </button>
    </div>
-   <div class="game-info">
-    <div class="game-title">FREE FIRE CUP 🏆</div>
-    <div class="game-desc">
-     Football-style team knockout championship.
-     Round 1 → Round 2 → Super 8 → Semi Final → Grand Final.
-    </div>
-    <div class="game-bottom">
-     <span>13 TEAMS • CHAMPIONSHIP</span>
-     <b class="play-btn">VIEW CUP <i class="fa-solid fa-arrow-right"></i></b>
-    </div>
+  </div>
+ </article>
+
+ <!-- FREE FIRE CUP -->
+ <article class="game-card cup-card">
+  <div class="game-art cup">
+   <span class="art-label">KNOCKOUT CHAMPIONSHIP</span>
+
+   <svg viewBox="0 0 700 250" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none" stroke="#ffe4a0" stroke-opacity=".35" stroke-width="3">
+     <path d="M350 25v35M350 60L180 115M350 60l170 55"/>
+     <path d="M180 115v38M520 115v38"/>
+     <path d="M180 153l-65 35M520 153l65 35"/>
+    </g>
+    <g fill="#ffd36c">
+     <path d="M350 30l-24 10v28c0 28 13 43 24 51 11-8 24-23 24-51V40z"/>
+     <path d="M326 45h-33v13c0 24 13 34 33 36M374 45h33v13c0 24-13 34-33 36"
+      fill="none" stroke="#ffd36c" stroke-width="8"/>
+     <path d="M330 116h40v10h-40zM322 130h56v10h-56z"/>
+     <path d="M350 6l7 14 16 2-12 11 3 16-14-8-14 8 3-16-12-11 16-2z"/>
+    </g>
+    <g fill="#fff" fill-opacity=".8">
+     <circle cx="180" cy="115" r="8"/><circle cx="520" cy="115" r="8"/>
+     <circle cx="115" cy="188" r="8"/><circle cx="585" cy="188" r="8"/>
+    </g>
+    <g fill="#d5ffe9" font-size="18" font-family="Arial" font-weight="bold">
+     <text x="100" y="225">ROUND 1</text>
+     <text x="290" y="225">SUPER 8</text>
+     <text x="495" y="225">FINAL</text>
+    </g>
+   </svg>
+
+   <div class="art-bottom">ONE CUP • ONE CHAMPION</div>
+  </div>
+
+  <div class="game-info">
+   <div class="game-title">FREE FIRE CUP 🏆</div>
+   <div class="game-desc">
+    Football-style team knockout championship. Round 1, Round 2,
+    Super 8, Semi Final and Grand Final.
    </div>
-  </a>
+   <div class="game-foot">
+    <span class="game-type">TEAM TOURNAMENT</span>
+    <button class="play" onclick="openGame('free-fire-cup.html')">
+     PLAY <i class="fa-solid fa-arrow-right"></i>
+    </button>
+   </div>
+  </div>
+ </article>
 
- </div>
-</section>
-
-<a class="home-link" href="home.html">
- <i class="fa-solid fa-house"></i> Back to Social Home
-</a>
-
+</div>
 </div>
 
 <script>
@@ -380,8 +417,10 @@ const TOKEN_KEY='freetube_access_token';
 const $=id=>document.getElementById(id);
 
 function getToken(){
- try{return localStorage.getItem(TOKEN_KEY)||''}
- catch(_){return ''}
+ try{
+  return localStorage.getItem(TOKEN_KEY) ||
+         sessionStorage.getItem(TOKEN_KEY) || '';
+ }catch(_){return ''}
 }
 
 function showStatus(message,type=''){
@@ -394,8 +433,8 @@ async function api(path,options={}){
  const headers={...(options.headers||{})};
  const token=getToken();
 
- if(token)headers.Authorization='Bearer '+token;
- if(options.body)headers['Content-Type']='application/json';
+ if(token) headers.Authorization='Bearer '+token;
+ if(options.body) headers['Content-Type']='application/json';
 
  let response;
 
@@ -406,27 +445,31 @@ async function api(path,options={}){
    credentials:'include',
    cache:'no-store'
   });
- }catch(_){
-  throw new Error('Cannot connect to the Boys vs Girls server. Check your internet connection.');
+ }catch(error){
+  throw new Error(
+   'Server connection failed. Please check your internet or try again later.'
+  );
  }
 
  const data=await response.json().catch(()=>({}));
 
  if(response.status===401){
-  try{localStorage.removeItem(TOKEN_KEY)}catch(_){}
+  try{
+   localStorage.removeItem(TOKEN_KEY);
+   sessionStorage.removeItem(TOKEN_KEY);
+  }catch(_){}
   location.replace('auth.html?mode=login');
   throw new Error('Session expired. Please log in again.');
  }
 
  if(!response.ok){
-  throw new Error(data.error||data.message||'Request failed.');
+  throw new Error(data.error||data.message||'Server request failed.');
  }
 
  return data;
 }
 
 async function loadProfile(){
-
  if(!getToken()){
   location.replace('auth.html?mode=login');
   return;
@@ -438,7 +481,7 @@ async function loadProfile(){
 
   $('username').textContent='@'+(user.username||'');
   $('displayName').textContent=
-   user.display_name||user.username||'Player';
+   user.display_name||user.full_name||user.username||'Player';
 
   if(user.username){
    const result=await api('/profile/'+encodeURIComponent(user.username));
@@ -463,27 +506,24 @@ async function loadProfile(){
    profile.ff_uid||profile.free_fire_uid||'';
 
  }catch(error){
-
-  if(/404|not found|Cannot GET/i.test(error.message)){
-   showStatus(
-    'Tournament profile API is not available yet. Please enable the Tournament API in server.js.',
-    'error'
-   );
-  }else{
-   showStatus(error.message,'error');
-  }
+  showStatus(error.message,'error');
  }
 }
 
+/* SAVE GAME DETAILS */
 $('profileForm').addEventListener('submit',async event=>{
-
  event.preventDefault();
 
  const ffName=$('ffName').value.trim();
  const ffUid=$('ffUid').value.trim();
 
- if(!ffName||!/^[0-9]{5,20}$/.test(ffUid)){
-  showStatus('Enter your Free Fire name and a valid numeric UID (5–20 digits).','error');
+ if(!ffName){
+  showStatus('Please enter your Free Fire Game Name.','error');
+  return;
+ }
+
+ if(!/^[0-9]{5,20}$/.test(ffUid)){
+  showStatus('Enter a valid Free Fire UID (5–20 digits).','error');
   return;
  }
 
@@ -492,7 +532,6 @@ $('profileForm').addEventListener('submit',async event=>{
  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
 
  try{
-
   await api('/tournament/profile',{
    method:'PUT',
    body:JSON.stringify({
@@ -504,15 +543,17 @@ $('profileForm').addEventListener('submit',async event=>{
   showStatus('Game details saved successfully.','success');
 
  }catch(error){
-
   showStatus(error.message,'error');
-
  }finally{
-
   btn.disabled=false;
   btn.innerHTML='<i class="fa-solid fa-floppy-disk"></i> Save Game Details';
  }
 });
+
+/* OPEN GAME PAGES */
+function openGame(page){
+ location.href=page;
+}
 
 loadProfile();
 </script>
