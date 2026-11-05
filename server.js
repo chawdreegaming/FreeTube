@@ -505,6 +505,54 @@ async function initializeDatabase() {
       ON ft_post_reports(status, created_at DESC);
     CREATE INDEX IF NOT EXISTS ft_post_views_post_idx
       ON ft_post_views(post_id);
+
+    -- Tournament tables are additive. Existing Social App tables/data are untouched.
+    CREATE TABLE IF NOT EXISTS ft_tournament_profiles (
+      user_id TEXT PRIMARY KEY,
+      free_fire_name VARCHAR(80) NOT NULL DEFAULT '',
+      free_fire_uid VARCHAR(40) NOT NULL UNIQUE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS ft_tournaments (
+      id BIGSERIAL PRIMARY KEY,
+      title VARCHAR(120) NOT NULL,
+      description VARCHAR(2000) NOT NULL DEFAULT '',
+      mode VARCHAR(20) NOT NULL DEFAULT 'Squad'
+        CHECK (mode IN ('Solo','Duo','Squad')),
+      map_name VARCHAR(80) NOT NULL DEFAULT 'Bermuda',
+      entry_fee NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (entry_fee >= 0),
+      prize_pool NUMERIC(12,2) NOT NULL DEFAULT 0 CHECK (prize_pool >= 0),
+      prize_mode VARCHAR(20) NOT NULL DEFAULT 'fixed'
+        CHECK (prize_mode IN ('fixed','dynamic')),
+      prize_percentage NUMERIC(5,2) NOT NULL DEFAULT 0
+        CHECK (prize_percentage >= 0 AND prize_percentage <= 100),
+      max_players INTEGER NOT NULL DEFAULT 100 CHECK (max_players > 0),
+      banner_url TEXT NOT NULL DEFAULT '',
+      scheduled_at TIMESTAMPTZ,
+      status VARCHAR(20) NOT NULL DEFAULT 'upcoming'
+        CHECK (status IN ('upcoming','live','completed','cancelled')),
+      created_by TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+
+    CREATE INDEX IF NOT EXISTS ft_tournaments_status_date_idx
+      ON ft_tournaments(status, scheduled_at);
+
+    CREATE TABLE IF NOT EXISTS ft_tournament_registrations (
+      id BIGSERIAL PRIMARY KEY,
+      tournament_id BIGINT NOT NULL REFERENCES ft_tournaments(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'registered'
+        CHECK (status IN ('registered','cancelled','disqualified')),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(tournament_id, user_id)
+    );
+
+    CREATE INDEX IF NOT EXISTS ft_tournament_registrations_tournament_idx
+      ON ft_tournament_registrations(tournament_id, created_at);
   `);
 
   const defaultPaymentMethods = [
@@ -540,7 +588,7 @@ async function initializeDatabase() {
 }
 
 app.get("/", (req, res) => {
-  res.json({ name: "FreeTube Backend API", status: "running", version: "3.0.0" });
+  res.json({ name: "FreeTube Backend API", status: "running", version: "3.1.0" });
 });
 
 app.get("/api/health", (req, res) => {
@@ -2007,9 +2055,207 @@ app.patch("/api/admin/moderation/posts/:id", requireAuth, requireModeratorPermis
   } catch(e) { next(e); }
 });
 
-// Tournament App API bridge: uses the existing Social App authentication.
-const createTournamentRouter = require("./tournament-api");
-app.use("/api/tournament", createTournamentRouter({ pool, requireAuth, requireAdmin }));
+
+// ============================================================
+// BOYS VS GIRLS TOURNAMENT API — PostgreSQL + Social App Auth
+// ============================================================
+
+function tournamentDbReady(res) {
+  if (!pool) {
+    res.status(503).json({ error: "Database is not configured." });
+    return false;
+  }
+  return true;
+}
+
+app.get("/api/tournament/tournaments", async (req, res, next) => {
+  if (!tournamentDbReady(res)) return;
+  try {
+    const result = await pool.query(`
+      SELECT t.id::text AS id, t.title, t.description, t.mode,
+             t.map_name, t.entry_fee::float8 AS entry_fee,
+             t.prize_pool::float8 AS prize_pool, t.prize_mode,
+             t.prize_percentage::float8 AS prize_percentage,
+             t.max_players, t.banner_url, t.scheduled_at, t.status,
+             t.created_at,
+             COUNT(r.id) FILTER (WHERE r.status='registered')::int AS registered_count
+      FROM ft_tournaments t
+      LEFT JOIN ft_tournament_registrations r ON r.tournament_id=t.id
+      WHERE t.status <> 'cancelled'
+      GROUP BY t.id
+      ORDER BY t.scheduled_at ASC NULLS LAST, t.created_at DESC
+    `);
+    res.json({ tournaments: result.rows });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/tournament/tournaments/:id", async (req, res, next) => {
+  if (!tournamentDbReady(res)) return;
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isSafeInteger(id) || id < 1) {
+      return res.status(400).json({ error: "Invalid tournament ID." });
+    }
+    const result = await pool.query(`
+      SELECT t.id::text AS id, t.title, t.description, t.mode,
+             t.map_name, t.entry_fee::float8 AS entry_fee,
+             t.prize_pool::float8 AS prize_pool, t.prize_mode,
+             t.prize_percentage::float8 AS prize_percentage,
+             t.max_players, t.banner_url, t.scheduled_at, t.status,
+             t.created_at,
+             COUNT(r.id) FILTER (WHERE r.status='registered')::int AS registered_count
+      FROM ft_tournaments t
+      LEFT JOIN ft_tournament_registrations r ON r.tournament_id=t.id
+      WHERE t.id=$1
+      GROUP BY t.id
+    `, [id]);
+    if (!result.rowCount) return res.status(404).json({ error: "Tournament not found." });
+    res.json({ tournament: result.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/tournament/profile", requireAuth, async (req, res, next) => {
+  try {
+    const result = await pool.query(`
+      SELECT tp.free_fire_name, tp.free_fire_uid, tp.updated_at,
+             u.username, COALESCE(NULLIF(p.display_name,''),u.username) AS display_name,
+             p.avatar_url
+      FROM users u
+      LEFT JOIN ft_profiles p ON p.user_id=u.id::text
+      LEFT JOIN ft_tournament_profiles tp ON tp.user_id=u.id::text
+      WHERE u.id::text=$1
+      LIMIT 1
+    `, [String(req.user.id)]);
+    if (!result.rowCount) return res.status(404).json({ error: "Social profile not found." });
+    res.json({ profile: result.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.put("/api/tournament/profile", requireAuth, async (req, res, next) => {
+  try {
+    const freeFireName = cleanText(req.body.free_fire_name, 80);
+    const freeFireUid = cleanText(req.body.free_fire_uid, 40);
+    if (!freeFireName || !/^[0-9]{5,20}$/.test(freeFireUid)) {
+      return res.status(400).json({
+        error: "Enter your Free Fire name and a valid numeric UID (5–20 digits)."
+      });
+    }
+    const result = await pool.query(`
+      INSERT INTO ft_tournament_profiles(user_id,free_fire_name,free_fire_uid,updated_at)
+      VALUES($1,$2,$3,NOW())
+      ON CONFLICT(user_id) DO UPDATE SET
+        free_fire_name=EXCLUDED.free_fire_name,
+        free_fire_uid=EXCLUDED.free_fire_uid,
+        updated_at=NOW()
+      RETURNING free_fire_name,free_fire_uid,updated_at
+    `, [String(req.user.id), freeFireName, freeFireUid]);
+    res.json({ message: "Tournament profile saved.", profile: result.rows[0] });
+  } catch (e) {
+    if (e.code === "23505") {
+      return res.status(409).json({ error: "This Free Fire UID is already linked to another account." });
+    }
+    next(e);
+  }
+});
+
+app.post("/api/tournament/tournaments", requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const title = cleanText(req.body.title, 120);
+    const description = cleanText(req.body.description, 2000);
+    const mode = cleanText(req.body.mode, 20);
+    const mapName = cleanText(req.body.map_name || "Bermuda", 80);
+    const entryFee = Number(req.body.entry_fee ?? 0);
+    const prizePool = Number(req.body.prize_pool ?? 0);
+    const prizeMode = cleanText(req.body.prize_mode || "fixed", 20);
+    const prizePercentage = Number(req.body.prize_percentage ?? 0);
+    const maxPlayers = Number.parseInt(req.body.max_players, 10);
+    const bannerUrl = cleanText(req.body.banner_url, 2000);
+    const scheduledAt = req.body.scheduled_at ? new Date(req.body.scheduled_at) : null;
+
+    if (!title || !["Solo","Duo","Squad"].includes(mode) ||
+        !Number.isFinite(entryFee) || entryFee < 0 ||
+        !Number.isFinite(prizePool) || prizePool < 0 ||
+        !["fixed","dynamic"].includes(prizeMode) ||
+        !Number.isFinite(prizePercentage) || prizePercentage < 0 || prizePercentage > 100 ||
+        !Number.isSafeInteger(maxPlayers) || maxPlayers < 1 ||
+        (scheduledAt && Number.isNaN(scheduledAt.getTime())) ||
+        (bannerUrl && !/^https:\/\/\//i.test(bannerUrl))) {
+      return res.status(400).json({ error: "Please provide valid tournament details." });
+    }
+
+    const result = await pool.query(`
+      INSERT INTO ft_tournaments
+        (title,description,mode,map_name,entry_fee,prize_pool,prize_mode,
+         prize_percentage,max_players,banner_url,scheduled_at,status,created_by)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'upcoming',$12)
+      RETURNING id::text AS id,title,description,mode,map_name,
+                entry_fee::float8 AS entry_fee,prize_pool::float8 AS prize_pool,
+                prize_mode,prize_percentage::float8 AS prize_percentage,
+                max_players,banner_url,scheduled_at,status,created_at
+    `, [title,description,mode,mapName,entryFee,prizePool,prizeMode,
+        prizePercentage,maxPlayers,bannerUrl,scheduledAt,String(req.user.id)]);
+    res.status(201).json({ message: "Tournament created.", tournament: result.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.patch("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isSafeInteger(id) || id < 1) return res.status(400).json({ error: "Invalid tournament ID." });
+    const current = await pool.query("SELECT * FROM ft_tournaments WHERE id=$1", [id]);
+    if (!current.rowCount) return res.status(404).json({ error: "Tournament not found." });
+    const old = current.rows[0], b = req.body;
+    const title = b.title === undefined ? old.title : cleanText(b.title,120);
+    const description = b.description === undefined ? old.description : cleanText(b.description,2000);
+    const mode = b.mode === undefined ? old.mode : cleanText(b.mode,20);
+    const mapName = b.map_name === undefined ? old.map_name : cleanText(b.map_name,80);
+    const entryFee = b.entry_fee === undefined ? Number(old.entry_fee) : Number(b.entry_fee);
+    const prizePool = b.prize_pool === undefined ? Number(old.prize_pool) : Number(b.prize_pool);
+    const prizeMode = b.prize_mode === undefined ? old.prize_mode : cleanText(b.prize_mode,20);
+    const prizePercentage = b.prize_percentage === undefined ? Number(old.prize_percentage) : Number(b.prize_percentage);
+    const maxPlayers = b.max_players === undefined ? old.max_players : Number.parseInt(b.max_players,10);
+    const bannerUrl = b.banner_url === undefined ? old.banner_url : cleanText(b.banner_url,2000);
+    const scheduledAt = b.scheduled_at === undefined ? old.scheduled_at : (b.scheduled_at ? new Date(b.scheduled_at) : null);
+    const status = b.status === undefined ? old.status : cleanText(b.status,20);
+    if (!title || !["Solo","Duo","Squad"].includes(mode) ||
+        !Number.isFinite(entryFee) || entryFee < 0 ||
+        !Number.isFinite(prizePool) || prizePool < 0 ||
+        !["fixed","dynamic"].includes(prizeMode) ||
+        !Number.isFinite(prizePercentage) || prizePercentage < 0 || prizePercentage > 100 ||
+        !Number.isSafeInteger(maxPlayers) || maxPlayers < 1 ||
+        !["upcoming","live","completed","cancelled"].includes(status) ||
+        (scheduledAt && Number.isNaN(new Date(scheduledAt).getTime())) ||
+        (bannerUrl && !/^https:\/\/\//i.test(bannerUrl))) {
+      return res.status(400).json({ error: "Invalid tournament details." });
+    }
+    const updated = await pool.query(`
+      UPDATE ft_tournaments SET title=$1,description=$2,mode=$3,map_name=$4,
+        entry_fee=$5,prize_pool=$6,prize_mode=$7,prize_percentage=$8,
+        max_players=$9,banner_url=$10,scheduled_at=$11,status=$12,updated_at=NOW()
+      WHERE id=$13
+      RETURNING id::text AS id,title,description,mode,map_name,
+        entry_fee::float8 AS entry_fee,prize_pool::float8 AS prize_pool,
+        prize_mode,prize_percentage::float8 AS prize_percentage,max_players,
+        banner_url,scheduled_at,status,created_at
+    `, [title,description,mode,mapName,entryFee,prizePool,prizeMode,
+        prizePercentage,maxPlayers,bannerUrl,scheduledAt,status,id]);
+    res.json({ tournament: updated.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.delete("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id,10);
+    if (!Number.isSafeInteger(id) || id < 1) return res.status(400).json({ error: "Invalid tournament ID." });
+    const result = await pool.query(
+      "UPDATE ft_tournaments SET status='cancelled',updated_at=NOW() WHERE id=$1 RETURNING id",
+      [id]
+    );
+    if (!result.rowCount) return res.status(404).json({ error: "Tournament not found." });
+    res.json({ message: "Tournament cancelled. Existing records were preserved." });
+  } catch (e) { next(e); }
+});
+
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
