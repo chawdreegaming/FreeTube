@@ -327,7 +327,12 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 "use strict";
 const SUPABASE_URL="https://irsgndxdbyqgfywpksns.supabase.co";
 const SUPABASE_KEY="sb_publishable_IvU7LDfEzjrGGhe_9vQRPw_tOpUzKky";
-const db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storage:window.sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+let db=null;
+if(window.supabase?.createClient){
+ db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
+  auth:{storage:window.sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+ });
+}
 
 let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,isAdmin=false,tournamentCounts={},adminRegistrationRows=[],walletBalance=0,paymentMethods=[],adminWalletFilter="all";
 
@@ -837,16 +842,44 @@ function renderAll(){renderHome();renderTournaments();renderMatches();if(isAdmin
 
 /* START */
 async function startApp(){
- if(!window.supabase){notify("Supabase library could not load. Check your internet connection.");return}
- try{await loadAccount();await loadTournaments()}
- catch(err){console.error(err);notify("Could not connect to your account. Please refresh the app.")}
-}
-db.auth.onAuthStateChange((event,session)=>{
- if(["SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED"].includes(event)){
-  setTimeout(async()=>{try{await loadAccount();await loadTournaments()}catch(err){console.error(err)}},0);
+ // Start the public tournament view even if account authentication is temporarily unavailable.
+ if(!db){
+  console.error("Supabase SDK could not load. Check the CDN/network connection.");
+  const list=document.getElementById("tournamentList");
+  if(list)list.innerHTML='<div class="empty">Connection unavailable. Please check your internet connection and reload.</div>';
+  updateAccountUI();
+  return;
  }
-});
+ updateAccountUI();
+ const accountTask=(async()=>{
+  try{
+   await loadAccount();
+  }catch(err){
+   console.error("Account session could not be restored:",err);
+   // Keep the app usable as a guest; do not block public tournament loading.
+   currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;
+   updateAccountUI();
+  }
+ })();
+ try{
+  await loadTournaments();
+ }catch(err){
+  console.error("Public tournament loading failed:",err);
+ }
+ await accountTask;
+}
+if(db){
+ db.auth.onAuthStateChange((event,session)=>{
+  if(["SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED"].includes(event)){
+   setTimeout(async()=>{
+    try{await loadAccount();await loadTournaments();}
+    catch(err){console.error("Account update failed:",err);}
+   },0);
+  }
+ });
+}
 startApp();
 </script>
 </body>
                                                                                                                                                                                                        </html>
+</html>
