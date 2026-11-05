@@ -400,21 +400,6 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY(post_id,user_id)
     );
-    CREATE TABLE IF NOT EXISTS ft_stories (
-      id BIGSERIAL PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      media_url TEXT NOT NULL,
-      media_public_id TEXT,
-      media_type VARCHAR(20) NOT NULL,
-      caption VARCHAR(500) NOT NULL DEFAULT '',
-      moderation_status VARCHAR(20) NOT NULL DEFAULT 'approved',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      expires_at TIMESTAMPTZ NOT NULL DEFAULT NOW() + INTERVAL '24 hours'
-    );
-    -- Stories publish immediately; release existing pending stories without touching rejected stories.
-    ALTER TABLE ft_stories ALTER COLUMN moderation_status SET DEFAULT 'approved';
-    UPDATE ft_stories SET moderation_status='approved'
-      WHERE moderation_status='pending' AND expires_at>NOW();
     CREATE TABLE IF NOT EXISTS ft_friend_requests (
       id BIGSERIAL PRIMARY KEY,
       sender_id TEXT NOT NULL,
@@ -502,8 +487,6 @@ async function initializeDatabase() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
 
-    CREATE INDEX IF NOT EXISTS ft_stories_expiry_idx ON ft_stories(expires_at);
-    CREATE INDEX IF NOT EXISTS ft_story_user_idx ON ft_stories(user_id,created_at DESC);
     CREATE INDEX IF NOT EXISTS ft_reactions_post_idx ON ft_post_reactions(post_id);
     CREATE INDEX IF NOT EXISTS ft_friend_requests_recipient_idx ON ft_friend_requests(recipient_id,status,created_at DESC);
     CREATE INDEX IF NOT EXISTS ft_manual_payments_status_idx ON ft_manual_payments(status,created_at DESC);
@@ -1797,28 +1780,6 @@ async function purgeExpiredMessages(){
   await pool.query("DELETE FROM ft_notifications WHERE type='message' AND created_at <= NOW() - INTERVAL '72 hours'");
 }
 
-// Stories expire after 24 hours; expired rows and Cloudinary assets are removed on access and periodically.
-async function purgeExpiredStories(){
-  if(!pool)return;
-  const r=await pool.query("DELETE FROM ft_stories WHERE expires_at<=NOW() RETURNING media_public_id,media_type");
-  if(cloudinaryConfigured) for(const row of r.rows){if(row.media_public_id) cloudinary.uploader.destroy(row.media_public_id,{resource_type:row.media_type==='video'?'video':'image'}).catch(()=>{});}
-}
-app.post("/api/stories", requireAuth, async(req,res,next)=>{
-  try{
-    const url=cleanText(req.body.media_url,2000), publicId=cleanText(req.body.media_public_id,500), type=cleanText(req.body.media_type,20), caption=cleanText(req.body.caption,500);
-    if(!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type))return res.status(400).json({error:"Upload a valid image/video to Cloudinary first."});
-    // Stories are published immediately; no admin approval is required.
-    const r=await pool.query(`INSERT INTO ft_stories(user_id,media_url,media_public_id,media_type,caption,moderation_status)
-      VALUES($1,$2,$3,$4,$5,'approved') RETURNING id::text AS id,user_id,media_url,media_type,caption,moderation_status,created_at,expires_at`,[String(req.user.id),url,publicId||null,type,caption]);
-    res.status(201).json({story:r.rows[0],message:"Story published successfully."});
-  }catch(e){next(e);}
-});
-app.get("/api/stories", requireAuth, async(req,res,next)=>{
-  try{await purgeExpiredStories();const r=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.caption,s.created_at,s.expires_at,u.username,p.display_name,p.avatar_url
-    FROM ft_stories s JOIN users u ON u.id::text=s.user_id LEFT JOIN ft_profiles p ON p.user_id=s.user_id
-    WHERE s.expires_at>NOW() AND s.moderation_status<>'rejected' AND u.account_status='active' ORDER BY s.created_at DESC LIMIT 100`);res.json({stories:r.rows});}catch(e){next(e);}
-});
-
 // Friend request and friend list APIs.
 app.post("/api/friends/request", requireAuth, async(req,res,next)=>{
   try{const target=cleanText(req.body.user_id,100),me=String(req.user.id);if(!target||target===me)return res.status(400).json({error:"Choose another user."});
@@ -2023,7 +1984,7 @@ app.get("/api/monetization/status", requireAuth, async(req,res,next)=>{try{const
 app.post("/api/messages/media", requireAuth, async(req,res,next)=>{try{await purgeExpiredMessages();const recipientId=cleanText(req.body.recipient_id,100),url=cleanText(req.body.media_url,2000),type=cleanText(req.body.media_type,20),publicId=cleanText(req.body.media_public_id,500),content=cleanText(req.body.content,5000);if(!recipientId||recipientId===String(req.user.id)||!url.startsWith('https://res.cloudinary.com/')||!['image','video'].includes(type)||!publicId)return res.status(400).json({error:'Valid recipient, Cloudinary image/video URL and media_public_id are required.'});const recipient=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[recipientId]);if(!recipient.rowCount)return res.status(404).json({error:'Recipient not found.'});const r=await pool.query("INSERT INTO ft_messages(sender_id,recipient_id,content,media_url,media_type,media_public_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING id,sender_id,recipient_id,content,media_url,media_type,created_at,read_at",[String(req.user.id),recipientId,content,url,type,publicId]);await notifyUser(recipientId,req.user.id,'message',`New message from ${req.user.username}.`);res.status(201).json({item:r.rows[0],expires_at:new Date(Date.now()+72*60*60*1000).toISOString()});}catch(e){next(e);}});
 
 // Fail-closed moderation helper endpoints. No claim of AI protection until provider/add-on is configured.
-app.get("/api/admin/moderation/pending", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video' ORDER BY p.created_at ASC LIMIT 200`);const stories=await pool.query(`SELECT s.id::text AS id,s.user_id,s.media_url,s.media_type,s.media_public_id,s.caption,s.created_at,u.username FROM ft_stories s LEFT JOIN users u ON u.id::text=s.user_id WHERE s.moderation_status='pending' AND s.expires_at>NOW() ORDER BY s.created_at ASC LIMIT 200`);res.json({posts:r.rows,stories:stories.rows});}catch(e){next(e);}});
+app.get("/api/admin/moderation/pending", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{try{const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.media_public_id,p.created_at,u.username FROM ft_posts p LEFT JOIN users u ON u.id::text=p.user_id WHERE p.moderation_status='pending' AND LOWER(COALESCE(p.media_type,''))='video' ORDER BY p.created_at ASC LIMIT 200`);res.json({posts:r.rows});}catch(e){next(e);}});
 app.patch("/api/admin/moderation/posts/:id", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{
   try {
     const id=Number.parseInt(req.params.id,10), action=cleanText(req.body.action,20).toLowerCase();
@@ -2045,7 +2006,10 @@ app.patch("/api/admin/moderation/posts/:id", requireAuth, requireModeratorPermis
     res.json({post:r.rows[0]});
   } catch(e) { next(e); }
 });
-app.patch("/api/admin/moderation/stories/:id", requireAuth, requireModeratorPermission("moderation"), async(req,res,next)=>{try{const id=Number.parseInt(req.params.id,10),action=req.body.action;if(!Number.isSafeInteger(id)||!['approve','reject'].includes(action))return res.status(400).json({error:'Action must be approve or reject.'});const status=action==='approve'?'approved':'rejected';const r=await pool.query("UPDATE ft_stories SET moderation_status=$1 WHERE id=$2 AND moderation_status='pending' RETURNING id::text AS id,user_id,moderation_status",[status,id]);if(!r.rowCount)return res.status(404).json({error:'Pending story not found.'});await notifyUser(r.rows[0].user_id,req.user.id,'moderation',`Your story was ${status}.`);res.json({story:r.rows[0]});}catch(e){next(e);}});
+
+// Tournament App API bridge: uses the existing Social App authentication.
+const createTournamentRouter = require("./tournament-api");
+app.use("/api/tournament", createTournamentRouter({ pool, requireAuth, requireAdmin }));
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
@@ -2078,9 +2042,7 @@ async function startServer() {
   try {
     if (pool) {
       await initializeDatabase();
-      setInterval(() => purgeExpiredStories().catch(e => console.error("Story cleanup failed:", e.message)), 15 * 60 * 1000).unref();
       setInterval(() => purgeExpiredMessages().catch(e => console.error("Message cleanup failed:", e.message)), 5 * 60 * 1000).unref();
-      await purgeExpiredStories().catch(e => console.error("Initial story cleanup failed:", e.message));
       await purgeExpiredMessages().catch(e => console.error("Initial message cleanup failed:", e.message));
     }
     app.listen(PORT, "0.0.0.0", () => {
