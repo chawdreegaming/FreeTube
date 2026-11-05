@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#090b14">
 <title>Bᴏʏs♡Gɪʀʟs ESports</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root{--bg:#090b14;--panel:#111522;--panel2:#171d2d;--cyan:#00e5ff;--purple:#a855f7;--green:#31e99a;--text:#f5f7ff;--muted:#929bb0;--border:rgba(255,255,255,.09)}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -160,7 +160,7 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
  <button class="action-btn" style="width:100%;margin-top:10px" id="editProfileButton" onclick="editProfile()" disabled>EDIT PROFILE</button>
  <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="adminButton" onclick="goTo('admin')">ADMIN DASHBOARD</button>
  <button class="action-btn" style="width:100%;margin-top:10px;display:none" id="logoutButton" onclick="logout()">LOG OUT</button>
- <p class="note">Your account and tournament information are stored in Supabase.</p>
+ <p class="note">Use your BOYS VS GIRLS Social App account. No separate tournament password is needed.</p>
 </section>
 
 <section class="page" id="admin">
@@ -209,14 +209,14 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 <!-- AUTH -->
 <div class="modal" id="authModal"><div class="modal-content">
  <div class="modal-head"><h2 id="authTitle">Player Login</h2><button class="close-btn" onclick="closeModal('authModal')">✕</button></div>
- <div class="notice">Create your player account or log in to join tournaments.</div>
- <form id="authForm">
+ <div class="notice">Use the same account you use in BOYS VS GIRLS Social App. Login there first, then return here.</div>
+ <div id="authForm">
   <div class="field" id="authNameField" style="display:none"><label>Player Name</label><input id="authName" maxlength="60" placeholder="Your display name"></div>
   <div class="field"><label>Email</label><input id="authEmail" type="email" required autocomplete="email"></div>
   <div class="field"><label>Password</label><input id="authPassword" type="password" minlength="6" required autocomplete="current-password"></div>
   <button class="full-btn" id="authSubmit" type="submit">LOGIN</button>
- </form>
- <div class="auth-switch" id="authSwitch" onclick="toggleAuthMode()">Create a new account</div>
+ </div>
+ <div class="auth-switch" id="authSwitch" onclick="window.location.href='https://chawdreegaming.github.io/FreeTube/'">OPEN BOYS VS GIRLS LOGIN</div>
 </div></div>
 
 <!-- PROFILE -->
@@ -325,561 +325,46 @@ button,input,select,textarea{font:inherit}button{cursor:pointer}
 
 <script>
 "use strict";
-const SUPABASE_URL="https://irsgndxdbyqgfywpksns.supabase.co";
-const SUPABASE_KEY="sb_publishable_IvU7LDfEzjrGGhe_9vQRPw_tOpUzKky";
-let db=null;
-if(window.supabase?.createClient){
- db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{
-  auth:{storage:window.sessionStorage,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
- });
-}
+/* Bᴏʏs♡Gɪʀʟs ESports — Social App session frontend.
+   API contract implemented next in Social App backend. */
+const API_BASE_URL="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,isAdmin=false,tournamentCounts={},adminRegistrationRows=[],walletBalance=0,paymentMethods=[],adminWalletFilter="all",transactions=[];
+function token(){return localStorage.getItem(TOKEN_KEY)||""}
+async function api(path,options={}){const headers={"Content-Type":"application/json",...(options.headers||{})};if(token())headers.Authorization="Bearer "+token();const res=await fetch(API_BASE_URL+"/tournament"+path,{...options,headers,credentials:"include",cache:"no-store"});let data={};try{data=await res.json()}catch{}if(!res.ok)throw new Error(data.error||data.message||`Request failed (${res.status})`);return data}
+function money(n){return "৳"+Number(n||0).toLocaleString("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2})}function formatDate(d){const x=new Date(d);return isNaN(x)?"Date to be announced":x.toLocaleString("en-BD",{dateStyle:"medium",timeStyle:"short"})}function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}function notify(s){alert(s)}function openModal(id){document.getElementById(id)?.classList.add("show")}function closeModal(id){document.getElementById(id)?.classList.remove("show")}
+function goTo(page){if(page==="admin"&&!isAdmin)return notify("Admin access only.");document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));document.getElementById(page)?.classList.add("active");document.querySelectorAll(".nav-btn").forEach(x=>x.classList.toggle("active",x.dataset.page===page));if(page==="matches")renderMatches();if(page==="leaderboard")renderLeaderboard();if(page==="admin")renderAdmin();window.scrollTo({top:0,behavior:"smooth"})}function openProfile(){goTo("profile")}function openAuth(){if(!token()){notify("প্রথমে BOYS VS GIRLS Social App-এ লগইন করুন, তারপর এখানে ফিরে আসুন।");return}loadAccount().then(()=>goTo("profile"))}
+function mapTournament(r){return{id:r.id,name:r.title||r.name,mode:r.mode,map:r.map||"To be announced",fee:+(r.entry_fee??r.fee??0),prize:+(r.prize_pool??r.prize??0),slots:+(r.max_players??r.slots??0),joined:+(r.registered_count??r.joined??tournamentCounts[r.id]??0),date:r.scheduled_at||r.date,status:r.status}}
+async function loadAccount(){if(!token()){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();return}try{const d=await fetch(API_BASE_URL+"/auth/me",{headers:{Authorization:"Bearer "+token()},credentials:"include",cache:"no-store"});const me=await d.json();if(!d.ok)throw new Error(me.error||"Social App session expired");const u=me.user||me;currentUser={id:u.id,email:u.email};const p=await api("/me");profile=p.profile||p;isAdmin=profile.role==="admin";joined=(p.registrations||[]).map(x=>x.tournament_id);walletBalance=Number(p.wallet?.balance||0);updateAccountUI()}catch(e){currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();notify(e.message)}}
+function updateAccountUI(){const guest=!currentUser,name=profile?.display_name||profile?.username||"Guest Player";document.getElementById("profileName").textContent=name;document.getElementById("profileEmail").textContent=currentUser?.email||"Not logged in";document.getElementById("profileAvatar").textContent=name.charAt(0).toUpperCase();document.getElementById("profileRole").textContent=guest?"GUEST":isAdmin?"ADMIN":"PLAYER";document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";document.getElementById("joinedCount").textContent=joined.length;document.getElementById("authButton").style.display=guest?"block":"none";document.getElementById("editProfileButton").disabled=guest;document.getElementById("adminButton").style.display=isAdmin?"block":"none";document.getElementById("logoutButton").style.display=guest?"none":"block";document.getElementById("profileWalletBalance").textContent=money(walletBalance)}
+async function logout(){notify("Social App থেকে লগআউট করলে Tournament App-ও লগআউট হবে।");goTo("home")}
+async function loadTournaments(){const list=document.getElementById("tournamentList");if(list)list.innerHTML='<div class="empty">Loading tournaments...</div>';try{const d=await api("/tournaments");const rows=d.tournaments||d.data||[];tournaments=rows.map(mapTournament);tournamentCounts={};rows.forEach(r=>tournamentCounts[r.id]=+(r.registered_count||0));renderAll()}catch(e){if(list)list.innerHTML='<div class="empty">'+escapeHTML(e.message)+"</div>"}}
+async function loadMyRegistrations(){if(!currentUser){joined=[];return}const d=await api("/registrations/mine");joined=(d.registrations||[]).map(x=>x.tournament_id)}
+async function loadWalletBalance(){if(!currentUser){walletBalance=0;updateAccountUI();return}const d=await api("/wallet");walletBalance=+(d.wallet?.balance??d.balance??0);updateAccountUI()}
+async function loadPaymentMethods(){const d=await api("/payment-methods");paymentMethods=d.methods||d.payment_methods||[];return paymentMethods}function enabledMethods(){return paymentMethods.filter(x=>x.enabled)}function methodLabel(c){return paymentMethods.find(x=>x.method_code===c)?.display_name||c}
+function renderMethodCards(){const b=document.getElementById("walletMethods"),m=enabledMethods();if(b)b.innerHTML=m.map(x=>`<div class="wallet-method"><strong>${escapeHTML(x.display_name)}</strong><p>${escapeHTML(x.instructions||"")}</p><p>${escapeHTML(x.receiver_details||"")}</p></div>`).join("")||'<div class="empty">No payment methods available.</div>'}
+async function openWallet(){if(!currentUser){openAuth();return}openModal("walletModal");try{await Promise.all([loadWalletBalance(),loadPaymentMethods(),loadTransactions()]);document.getElementById("walletBalance").textContent=money(walletBalance);renderMethodCards();renderTransactions();populatePaymentSelects()}catch(e){notify(e.message)}}async function loadTransactions(){const d=await api("/transactions/mine");transactions=d.transactions||[]}
+function renderTransactions(){const b=document.getElementById("walletTransactions");b.innerHTML=transactions.map(x=>`<div class="list-item"><span>${escapeHTML(x.description||x.transaction_type||"Transaction")}<small style="display:block;color:var(--muted)">${formatDate(x.created_at)}</small></span><strong>${x.direction==="credit"?"+":"−"}${money(x.amount)}</strong></div>`).join("")||'<div class="empty">No transactions yet.</div>'}
+function populatePaymentSelects(){for(const id of ["depositMethod","withdrawMethod"]){const el=document.getElementById(id);if(el)el.innerHTML=enabledMethods().map(m=>`<option value="${escapeHTML(m.method_code)}">${escapeHTML(m.display_name)}</option>`).join("")}}
+function openDeposit(){if(!currentUser){openAuth();return}closeModal("walletModal");openModal("depositModal");populatePaymentSelects();showDepositReceiver()}function showDepositReceiver(){const m=paymentMethods.find(x=>x.method_code===document.getElementById("depositMethod").value);document.getElementById("depositReceiver").innerHTML=m?`<div class="notice"><b>${escapeHTML(m.display_name)}</b><br>${escapeHTML(m.receiver_details||"")}<br>${escapeHTML(m.instructions||"")}</div>`:""}
+function openWithdrawal(){if(!currentUser){openAuth();return}closeModal("walletModal");document.getElementById("withdrawBalance").textContent=money(walletBalance);populatePaymentSelects();openModal("withdrawModal")}
+document.getElementById("depositForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/wallet/deposit",{method:"POST",body:JSON.stringify({method_code:depositMethod.value,amount:+depositAmount.value,account_info:depositAccount.value.trim(),transaction_reference:depositReference.value.trim()})});notify("Deposit request submitted for Admin review.");e.target.reset();closeModal("depositModal");await openWallet()}catch(x){notify(x.message)}finally{b.disabled=false}});
+document.getElementById("withdrawForm").addEventListener("submit",async e=>{e.preventDefault();const b=e.submitter;b.disabled=true;try{await api("/wallet/withdraw",{method:"POST",body:JSON.stringify({method_code:withdrawMethod.value,amount:+withdrawAmount.value,account_info:withdrawAccount.value.trim()})});notify("Withdrawal request submitted.");e.target.reset();closeModal("withdrawModal");await openWallet()}catch(x){notify(x.message)}finally{b.disabled=false}});
+function renderAll(){renderHome();renderTournaments();renderMatches();if(isAdmin)renderAdmin()}function renderTournaments(){const q=(document.getElementById("searchTournament")?.value||"").toLowerCase(),a=tournaments.filter(t=>(activeFilter==="All"||t.mode===activeFilter)&&(t.name.toLowerCase().includes(q)||t.mode.toLowerCase().includes(q)));document.getElementById("tournamentList").innerHTML=a.map(tournamentCard).join("")||'<div class="empty">No tournaments found.</div>'}function tournamentCard(t){const j=joined.includes(t.id),full=t.joined>=t.slots;return `<article class="tournament"><div class="tournament-banner"><strong>${escapeHTML(t.mode.toUpperCase())}</strong><span class="tag">${escapeHTML((t.status||"open").toUpperCase())}</span></div><div class="tournament-body"><h3>${escapeHTML(t.name)}</h3><div class="tournament-meta"><div class="meta"><small>ENTRY FEE</small><strong>${money(t.fee)}</strong></div><div class="meta"><small>PRIZE POOL</small><strong>${money(t.prize)}</strong></div><div class="meta"><small>MAP</small><strong>${escapeHTML(t.map)}</strong></div><div class="meta"><small>PLAYERS</small><strong>${t.joined}/${t.slots}</strong></div></div><div class="tournament-actions"><button class="action-btn" onclick="showDetails('${t.id}')">DETAILS</button><button class="action-btn join" onclick="joinTournament('${t.id}')" ${j||full||t.status!=="open"?"disabled":""}>${j?"JOINED":full?"FULL":"JOIN NOW"}</button></div></div></article>`}function renderHome(){document.getElementById("featuredList").innerHTML=tournaments.slice(0,2).map(tournamentCard).join("")||'<div class="empty">No featured tournaments yet.</div>';document.getElementById("statTournaments").textContent=tournaments.length;document.getElementById("statPlayers").textContent=tournaments.reduce((a,t)=>a+t.joined,0)}function setFilter(m,b){activeFilter=m;document.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));b.classList.add("active");renderTournaments()}function filterMode(m){activeFilter=m;goTo("tournaments");renderTournaments()}
+async function showDetails(id){const t=tournaments.find(x=>x.id===id);if(!t)return;document.getElementById("detailsContent").innerHTML=`<h2>${escapeHTML(t.name)}</h2><p class="note">${escapeHTML(t.mode)} • ${escapeHTML(t.map)} • ${formatDate(t.date)}</p><p class="note">Entry: ${money(t.fee)} | Prize: ${money(t.prize)} | Players: ${t.joined}/${t.slots}</p>`;openModal("detailsModal")}
+async function joinTournament(id){if(!currentUser){openAuth();return}if(!confirm("Join tournament? Entry fee: "+money(tournaments.find(x=>x.id===id)?.fee)))return;try{const d=await api("/join",{method:"POST",body:JSON.stringify({tournament_id:id})});notify("Registration successful. Remaining wallet: "+money(d.remaining_balance));await loadMyRegistrations();await loadTournaments();await loadWalletBalance()}catch(e){notify(e.message)}}
+async function renderMatches(){const b=document.getElementById("myMatches");if(!currentUser){b.innerHTML='<div class="empty">Login to see your matches.</div>';return}try{const d=await api("/registrations/mine");const rows=d.registrations||[];joined=rows.map(x=>x.tournament_id);b.innerHTML=rows.map(r=>{const t=tournaments.find(x=>x.id===r.tournament_id);return `<div class="list-item">${escapeHTML(t?.name||"Tournament")} <span class="tag">JOINED</span></div>`}).join("")||'<div class="empty">No joined tournaments.</div>'}catch(e){b.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}
+async function renderLeaderboard(){const b=document.getElementById("leaderboardList");try{const d=await api("/leaderboard");const rows=d.results||[];b.innerHTML=rows.map((r,i)=>`<div class="table-row"><strong>${i+1}</strong><span>${escapeHTML(r.display_name||r.username||"Player")}</span><strong>${r.total_points} pts</strong></div>`).join("")||'<div class="empty">No results published yet.</div>'}catch(e){b.innerHTML='<div class="empty">Leaderboard will be available after backend update.</div>'}}
+function editProfile(){if(!profile)return;editName.value=profile.display_name||"";editUsername.value=profile.username||"";editUid.value=profile.free_fire_uid||"";openModal("profileModal")}async function saveProfile(){try{const d=await api("/profile",{method:"PATCH",body:JSON.stringify({display_name:editName.value.trim(),username:editUsername.value.trim(),free_fire_uid:editUid.value.trim()})});profile=d.profile||d;updateAccountUI();closeModal("profileModal");notify("Profile updated.")}catch(e){notify(e.message)}}
+function renderAdmin(){if(!isAdmin)return;adminTotal.textContent=tournaments.length;adminJoined.textContent=tournaments.reduce((a,t)=>a+t.joined,0);adminTournamentList.innerHTML=tournaments.map(t=>`<div class="list-item"><div><b>${escapeHTML(t.name)}</b><p>${t.joined}/${t.slots}</p></div><div class="admin-actions"><button class="close-btn" onclick="openEditTournament('${t.id}')">Edit</button><button class="close-btn danger-btn" onclick="deleteTournament('${t.id}')">Delete</button></div></div>`).join("")||'<div class="empty">No tournaments.</div>';registrationTournamentSelect.innerHTML='<option value="">Choose a tournament</option>'+tournaments.map(t=>`<option value="${t.id}">${escapeHTML(t.name)}</option>`).join("");loadAdminWalletRequests(adminWalletFilter);loadAdminPaymentMethods()}
+function openCreateModal(){if(isAdmin)openModal("createModal")}document.getElementById("createForm").addEventListener("submit",async e=>{e.preventDefault();try{await api("/admin/tournaments",{method:"POST",body:JSON.stringify({title:newName.value.trim(),mode:newMode.value,map:newMap.value,entry_fee:+newFee.value,prize_pool:+newPrize.value,max_players:+newSlots.value,scheduled_at:new Date(newDate.value).toISOString()})});closeModal("createModal");e.target.reset();await loadTournaments();notify("Tournament created.")}catch(x){notify(x.message)}});
+async function openEditTournament(id){const t=tournaments.find(x=>x.id===id);if(!t)return;editTournamentId.value=t.id;editTournamentName.value=t.name;editTournamentMode.value=t.mode;editTournamentMap.value=t.map;editTournamentFee.value=t.fee;editTournamentPrize.value=t.prize;editTournamentSlots.value=t.slots;editTournamentStatus.value=t.status;editTournamentDate.value=new Date(new Date(t.date)-new Date(t.date).getTimezoneOffset()*60000).toISOString().slice(0,16);openModal("editTournamentModal");try{const r=await api(`/admin/tournaments/${id}/room`);editRoomId.value=r.room?.room_id||"";editRoomPassword.value=r.room?.room_password||""}catch{}}
+document.getElementById("editTournamentForm").addEventListener("submit",async e=>{e.preventDefault();try{const id=editTournamentId.value;await api(`/admin/tournaments/${id}`,{method:"PATCH",body:JSON.stringify({title:editTournamentName.value,mode:editTournamentMode.value,map:editTournamentMap.value,entry_fee:+editTournamentFee.value,prize_pool:+editTournamentPrize.value,max_players:+editTournamentSlots.value,scheduled_at:new Date(editTournamentDate.value).toISOString(),status:editTournamentStatus.value,room_id:editRoomId.value,room_password:editRoomPassword.value})});closeModal("editTournamentModal");await loadTournaments();notify("Tournament updated.")}catch(x){notify(x.message)}});
+async function deleteTournament(id){if(!confirm("Delete this tournament?"))return;try{await api(`/admin/tournaments/${id}`,{method:"DELETE"});await loadTournaments()}catch(e){notify(e.message)}}async function loadAdminRegistrations(){try{const id=registrationTournamentSelect.value,d=await api(`/admin/registrations/${id}`);adminRegistrationRows=d.registrations||[];adminRegistrationList.innerHTML=adminRegistrationRows.map((r,i)=>`<div class="registration-card"><b>${i+1}. ${escapeHTML(r.display_name||r.username||"Player")}</b><p>UID: ${escapeHTML(r.free_fire_uid||"Not added")}</p><p>${escapeHTML(r.player_id)}</p><button class="action-btn danger-btn" onclick="removeRegistration('${r.player_id}','${id}')">REMOVE</button></div>`).join("")||'<div class="empty">No registrations.</div>';registrationTotal.textContent=adminRegistrationRows.length;registrationActive.textContent=adminRegistrationRows.filter(x=>x.status==="registered").length;registrationOther.textContent=adminRegistrationRows.filter(x=>x.status!=="registered").length}catch(e){notify(e.message)}}async function removeRegistration(player_id,tournament_id){if(!confirm("Remove this registration?"))return;try{await api(`/admin/registrations/${tournament_id}/${player_id}`,{method:"DELETE"});await loadAdminRegistrations();await loadTournaments()}catch(e){notify(e.message)}}
+async function loadAdminWalletRequests(filter="all",btn){adminWalletFilter=filter;if(btn){document.querySelectorAll("#admin .filter-btn").forEach(x=>x.classList.remove("active"));btn.classList.add("active")}try{const d=await api("/admin/requests?type="+encodeURIComponent(filter));adminWalletRequests.innerHTML=(d.requests||[]).map(r=>`<div class="request-card"><b>${escapeHTML(r.request_type)} • ${money(r.amount)}</b><p>${escapeHTML(r.method_code)} • ${escapeHTML(r.status)}</p><p>${escapeHTML(r.transaction_reference||r.account_info||"")}</p><p>${formatDate(r.created_at)}</p><button class="small-btn" onclick="reviewWalletRequest('${r.id}','approve')">Approve</button> <button class="small-btn danger-btn" onclick="reviewWalletRequest('${r.id}','reject')">Reject</button></div>`).join("")||'<div class="empty">No requests.</div>'}catch(e){adminWalletRequests.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}async function reviewWalletRequest(id,action){try{await api(`/admin/requests/${id}/${action}`,{method:"POST",body:"{}"});await loadAdminWalletRequests(adminWalletFilter)}catch(e){notify(e.message)}}async function loadAdminPaymentMethods(){try{const d=await api("/payment-methods?all=1");const rows=d.methods||[];adminPaymentMethods.innerHTML=rows.map(m=>`<div class="wallet-method"><b>${escapeHTML(m.display_name)}</b><p>${escapeHTML(m.receiver_details||"")}</p><button class="small-btn" onclick="openPaymentEdit('${m.method_code}')">Edit</button></div>`).join("")||'<div class="empty">No payment methods.</div>'}catch(e){adminPaymentMethods.innerHTML='<div class="empty">'+escapeHTML(e.message)+'</div>'}}function openPaymentEdit(code){const m=paymentMethods.find(x=>x.method_code===code);if(!m)return;paymentEditCode.value=code;paymentEditName.value=m.display_name;paymentEditReceiver.value=m.receiver_details||"";paymentEditInstructions.value=m.instructions||"";paymentEditEnabled.value=String(m.enabled);openModal("paymentEditModal")}document.getElementById("paymentEditForm").addEventListener("submit",async e=>{e.preventDefault();try{await api(`/admin/payment-methods/${paymentEditCode.value}`,{method:"PATCH",body:JSON.stringify({receiver_details:paymentEditReceiver.value,instructions:paymentEditInstructions.value,enabled:paymentEditEnabled.value==="true"})});closeModal("paymentEditModal");await loadAdminPaymentMethods();await loadPaymentMethods()}catch(x){notify(x.message)}});
+async function getRoom(id){try{const d=await api(`/rooms/${id}`);return d.room||null}catch{return null}}function roomHTML(r){return r?`<div class="room-box"><h3>🎮 MATCH ROOM INFORMATION</h3><p>Room ID: ${escapeHTML(r.room_id||"Not announced")}</p><p>Password: ${escapeHTML(r.room_password||"Not announced")}</p></div>`:'<div class="notice">Room information is not available.</div>'}function copyText(v){navigator.clipboard?.writeText(v).then(()=>notify("Copied."))}function showNotifications(){notify("Notifications are available in BOYS VS GIRLS Social App.")}
+async function startApp(){if(!token()){updateAccountUI();document.getElementById("tournamentList").innerHTML='<div class="empty">Tournament list loads publicly. Log in to BOYS VS GIRLS to join.</div>'}try{await loadAccount();await loadTournaments()}catch(e){console.error(e)}}startApp();
 
-let tournaments=[],joined=[],activeFilter="All",currentUser=null,profile=null,isAdmin=false,tournamentCounts={},adminRegistrationRows=[],walletBalance=0,paymentMethods=[],adminWalletFilter="all";
-
-function money(n){return "৳"+Number(n||0).toLocaleString("en-BD",{minimumFractionDigits:2,maximumFractionDigits:2})}
-function formatDate(d){const date=new Date(d);return isNaN(date)?"Date to be announced":date.toLocaleString("en-BD",{dateStyle:"medium",timeStyle:"short"})}
-function escapeHTML(str){return String(str??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function notify(message){alert(message)}
-function openModal(id){document.getElementById(id).classList.add("show")}
-function closeModal(id){document.getElementById(id).classList.remove("show")}
-
-function goTo(page){
- if(page==="admin"&&!isAdmin){notify("Admin access only.");return}
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
- document.getElementById(page)?.classList.add("active");
- document.querySelectorAll(".nav-btn").forEach(b=>b.classList.toggle("active",b.dataset.page===page));
- if(page==="matches")renderMatches();
- if(page==="leaderboard")renderLeaderboard();
- if(page==="admin")renderAdmin();
- window.scrollTo({top:0,behavior:"smooth"});
-}
-function openProfile(){goTo("profile")}
-
-function mapTournament(row){return{id:row.id,name:row.title,mode:row.mode,map:row.map||"To be announced",fee:Number(row.entry_fee||0),prize:Number(row.prize_pool||0),slots:Number(row.max_players||0),joined:Number(tournamentCounts[row.id]||0),date:row.scheduled_at,status:row.status}}
-
-let authMode="login";
-function openAuth(){if(currentUser){goTo("profile");return}authMode="login";updateAuthModal();openModal("authModal")}
-function toggleAuthMode(){authMode=authMode==="login"?"register":"login";updateAuthModal()}
-function updateAuthModal(){
- const register=authMode==="register";
- document.getElementById("authTitle").textContent=register?"Create Player Account":"Player Login";
- document.getElementById("authNameField").style.display=register?"block":"none";
- document.getElementById("authName").required=register;
- document.getElementById("authPassword").autocomplete=register?"new-password":"current-password";
- document.getElementById("authSubmit").textContent=register?"CREATE ACCOUNT":"LOGIN";
- document.getElementById("authSwitch").textContent=register?"Already have an account? Login":"Create a new account";
-}
-document.getElementById("authForm").addEventListener("submit",async e=>{
- e.preventDefault();
- const email=document.getElementById("authEmail").value.trim(),password=document.getElementById("authPassword").value,name=document.getElementById("authName").value.trim(),submit=document.getElementById("authSubmit");
- submit.disabled=true;submit.textContent="PLEASE WAIT...";
- try{
-  let result;
-  if(authMode==="register"){
-   if(!name)throw new Error("Enter your player name.");
-   result=await db.auth.signUp({email,password,options:{data:{display_name:name}}});
-   if(result.error)throw result.error;
-   if(!result.data.session){notify("Account created. Check your email to confirm your account, then log in.");closeModal("authModal")}
-   else{notify("Account created successfully!");closeModal("authModal")}
-  }else{
-   result=await db.auth.signInWithPassword({email,password});
-   if(result.error)throw result.error;
-   closeModal("authModal");notify("Login successful!");
-  }
-  await loadAccount();await loadTournaments();
- }catch(err){notify(err.message||"Authentication failed.")}
- finally{submit.disabled=false;updateAuthModal()}
-});
-async function logout(){
- const {error}=await db.auth.signOut();if(error){notify(error.message);return}
- currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;
- updateAccountUI();await loadTournaments();goTo("home");notify("You have logged out.")
-}
-async function loadAccount(){
- const {data:{user},error}=await db.auth.getUser();if(error)throw error;
- currentUser=user;
- if(!user){profile=null;isAdmin=false;joined=[];walletBalance=0;updateAccountUI();return}
- const result=await db.from("profiles").select("id,username,display_name,free_fire_uid,role").eq("id",user.id).maybeSingle();
- if(result.error)throw result.error;profile=result.data;
- if(!profile){isAdmin=false;updateAccountUI();notify("Your profile is still being created. Please refresh in a moment.");return}
- isAdmin=profile.role==="admin";await loadMyRegistrations();updateAccountUI();await loadWalletBalance();
-}
-function updateAccountUI(){
- const guest=!currentUser,name=profile?.display_name||currentUser?.email?.split("@")[0]||"Guest Player";
- document.getElementById("profileName").textContent=name;
- document.getElementById("profileEmail").textContent=currentUser?.email||"Not logged in";
- document.getElementById("profileAvatar").textContent=name.charAt(0).toUpperCase();
- document.getElementById("profileRole").textContent=guest?"GUEST":isAdmin?"ADMIN":"PLAYER";
- document.getElementById("gameUid").textContent=profile?.free_fire_uid||"Not added";
- document.getElementById("joinedCount").textContent=joined.length;
- document.getElementById("authButton").style.display=guest?"block":"none";
- document.getElementById("editProfileButton").disabled=guest;
- document.getElementById("adminButton").style.display=isAdmin?"block":"none";
- document.getElementById("logoutButton").style.display=guest?"none":"block";
- document.getElementById("profileWalletBalance").textContent=money(walletBalance);
-}
-
-/* TOURNAMENT DATA */
-async function loadTournamentCounts(){
- const {data,error}=await db.rpc("get_tournament_counts");
- if(error){console.warn("Tournament count loading:",error.message);tournamentCounts={};return}
- tournamentCounts={};(data||[]).forEach(row=>tournamentCounts[row.tournament_id]=Number(row.registered_count||0));
-}
-async function loadTournaments(){
- const list=document.getElementById("tournamentList");if(list)list.innerHTML='<div class="empty">Loading tournaments...</div>';
- try{
-  await loadTournamentCounts();
-  const {data,error}=await db.from("tournaments").select("*").order("scheduled_at",{ascending:true});
-  if(error)throw error;tournaments=(data||[]).map(mapTournament);renderAll();
- }catch(err){console.error(err);if(list)list.innerHTML='<div class="empty">Could not load tournaments. Check Supabase connection and database permissions.</div>'}
-}
-async function loadMyRegistrations(){
- if(!currentUser){joined=[];return}
- const {data,error}=await db.from("tournament_registrations").select("tournament_id").eq("player_id",currentUser.id).eq("status","registered");
- if(error)throw error;joined=(data||[]).map(r=>r.tournament_id);
-}
-
-/* WALLET */
-async function loadWalletBalance(){
- if(!currentUser){walletBalance=0;updateAccountUI();return}
- const {data,error}=await db.from("wallets").select("balance").eq("user_id",currentUser.id).maybeSingle();
- if(error){console.error("Wallet balance:",error.message);return}
- walletBalance=Number(data?.balance||0);
- updateAccountUI();
-}
-async function loadPaymentMethods(){
- const {data,error}=await db.from("wallet_payment_methods").select("method_code,display_name,instructions,receiver_details,enabled").order("display_name");
- if(error)throw error;
- paymentMethods=(data||[]);
- return paymentMethods;
-}
-function enabledMethods(){return paymentMethods.filter(m=>m.enabled===true)}
-function methodLabel(code){return paymentMethods.find(m=>m.method_code===code)?.display_name||code}
-function renderMethodCards(){
- const box=document.getElementById("walletMethods");
- const methods=enabledMethods();
- box.innerHTML=methods.length?methods.map(m=>`<div class="wallet-method"><strong>${escapeHTML(m.display_name)}</strong><p>${escapeHTML(m.instructions||"Follow the payment instructions.")}</p><p>Receiver: ${escapeHTML(m.receiver_details||"Contact Admin for receiver details.")}</p></div>`).join(""):'<div class="empty">No payment methods are currently enabled.</div>';
-}
-async function openWallet(){
- if(!currentUser){notify("Please login first.");openAuth();return}
- openModal("walletModal");
- document.getElementById("walletTransactions").innerHTML='<div class="empty">Loading transactions...</div>';
- try{
-  await Promise.all([loadWalletBalance(),loadPaymentMethods()]);
-  document.getElementById("walletBalance").textContent=money(walletBalance);
-  renderMethodCards();
-  await loadWalletTransactions();
- }catch(err){console.error(err);document.getElementById("walletMethods").innerHTML='<div class="empty">Could not load payment methods: '+escapeHTML(err.message)+'</div>'}
-}
-async function loadWalletTransactions(){
- if(!currentUser)return;
- const {data,error}=await db.from("wallet_transactions").select("transaction_type,amount,direction,description,created_at").eq("user_id",currentUser.id).order("created_at",{ascending:false}).limit(50);
- const box=document.getElementById("walletTransactions");
- if(error){box.innerHTML='<div class="empty">Could not load transaction history: '+escapeHTML(error.message)+'</div>';return}
- if(!data?.length){box.innerHTML='<div class="empty">No wallet transactions yet.</div>';return}
- box.innerHTML=data.map(t=>`<div class="request-card"><strong>${escapeHTML(String(t.transaction_type||"transaction").replaceAll("_"," ").toUpperCase())}</strong><span style="float:right;color:${t.direction==="credit"?"var(--green)":"#ff9bb0"}">${t.direction==="credit"?"+":"−"}${money(t.amount)}</span><p>${escapeHTML(t.description||"Wallet transaction")}</p><p>${formatDate(t.created_at)}</p></div>`).join("");
-}
-function fillMethodSelect(id){
- const select=document.getElementById(id),methods=enabledMethods();
- select.innerHTML=methods.map(m=>`<option value="${escapeHTML(m.method_code)}">${escapeHTML(m.display_name)}</option>`).join("");
- if(!methods.length)select.innerHTML='<option value="">No enabled methods</option>';
-}
-function openDeposit(){
- if(!currentUser)return;
- fillMethodSelect("depositMethod");showDepositReceiver();openModal("depositModal");
-}
-function showDepositReceiver(){
- const code=document.getElementById("depositMethod").value,m=paymentMethods.find(x=>x.method_code===code);
- document.getElementById("depositReceiver").innerHTML=m?`<div class="wallet-method"><strong>${escapeHTML(m.display_name)} — Receiver Details</strong><p>${escapeHTML(m.receiver_details||"Receiver details have not been configured. Contact Admin.")}</p><p>${escapeHTML(m.instructions||"")}</p></div>`:'<div class="notice">No enabled payment method available.</div>';
-}
-document.getElementById("depositForm").addEventListener("submit",async e=>{
- e.preventDefault();
- if(!currentUser){notify("Please login first.");return}
- const method_code=document.getElementById("depositMethod").value,amount=Number(document.getElementById("depositAmount").value),account_info=document.getElementById("depositAccount").value.trim(),transaction_reference=document.getElementById("depositReference").value.trim(),btn=e.submitter;
- if(!method_code||!Number.isFinite(amount)||amount<=0||!account_info||!transaction_reference){notify("Please complete all deposit fields.");return}
- if(!enabledMethods().some(m=>m.method_code===method_code)){notify("This payment method is disabled.");return}
- btn.disabled=true;btn.textContent="SUBMITTING...";
- try{
-  const {error}=await db.from("wallet_requests").insert({user_id:currentUser.id,request_type:"deposit",method_code,amount,account_info,transaction_reference,status:"pending"});
-  if(error)throw error;
-  notify("Deposit request submitted. Admin will review it.");
-  e.target.reset();closeModal("depositModal");
-  await openWallet();
- }catch(err){notify(err.message||"Could not submit deposit request.")}
- finally{btn.disabled=false;btn.textContent="SUBMIT DEPOSIT REQUEST"}
-});
-function openWithdrawal(){
- if(!currentUser)return;
- fillMethodSelect("withdrawMethod");
- document.getElementById("withdrawBalance").textContent=money(walletBalance);
- openModal("withdrawModal");
-}
-document.getElementById("withdrawForm").addEventListener("submit",async e=>{
- e.preventDefault();
- if(!currentUser){notify("Please login first.");return}
- const method=document.getElementById("withdrawMethod").value,amount=Number(document.getElementById("withdrawAmount").value),account=document.getElementById("withdrawAccount").value.trim(),btn=e.submitter;
- if(!method||!Number.isFinite(amount)||amount<=0||!account){notify("Please complete all withdrawal fields.");return}
- if(amount>walletBalance){notify("Insufficient wallet balance.");return}
- if(!enabledMethods().some(m=>m.method_code===method)){notify("This payment method is disabled.");return}
- if(!confirm("Submit withdrawal request for "+money(amount)+"? This amount will be reserved from your wallet."))return;
- btn.disabled=true;btn.textContent="SUBMITTING...";
- try{
-  const {data,error}=await db.rpc("request_wallet_withdrawal",{p_method_code:method,p_amount:amount,p_account_info:account});
-  if(error)throw error;
-  notify(data?.message||"Withdrawal request submitted successfully.");
-  e.target.reset();closeModal("withdrawModal");
-  await loadWalletBalance();await openWallet();
- }catch(err){notify(err.message||"Could not submit withdrawal request.")}
- finally{btn.disabled=false;btn.textContent="SUBMIT WITHDRAWAL REQUEST"}
-});
-
-/* ADMIN WALLET */
-async function loadAdminWalletRequests(filter="all",button=null){
- if(!isAdmin)return;
- adminWalletFilter=filter;
- if(button){document.querySelectorAll("#admin .filter-btn").forEach(b=>b.classList.remove("active"));button.classList.add("active")}
- const box=document.getElementById("adminWalletRequests");box.innerHTML='<div class="empty">Loading wallet requests...</div>';
- try{
-  let query=db.from("wallet_requests").select("id,user_id,request_type,method_code,amount,account_info,transaction_reference,status,admin_note,created_at").order("created_at",{ascending:false}).limit(100);
-  if(filter!=="all")query=query.eq("request_type",filter);
-  const {data,error}=await query;if(error)throw error;
-  if(!data?.length){box.innerHTML='<div class="empty">No wallet requests found.</div>';return}
-  box.innerHTML=data.map(r=>`<div class="request-card">
-   <div class="registration-top"><strong>${escapeHTML(String(r.request_type).toUpperCase())} • ${money(r.amount)}</strong><span class="status-pill">${escapeHTML(String(r.status).toUpperCase())}</span></div>
-   <p>Method: ${escapeHTML(methodLabel(r.method_code))}</p>
-   <p>User ID: ${escapeHTML(r.user_id)}</p>
-   <p>Account: ${escapeHTML(r.account_info||"Not supplied")}</p>
-   <p>Reference: ${escapeHTML(r.transaction_reference||"Not supplied")}</p>
-   <p>Submitted: ${formatDate(r.created_at)}</p>
-   ${r.admin_note?`<p>Admin note: ${escapeHTML(r.admin_note)}</p>`:""}
-   ${r.status==="pending"?`<div class="admin-actions" style="margin-top:12px">
-    <button class="small-btn" onclick="reviewWalletRequest('${r.id}','approve','${r.request_type}')">APPROVE</button>
-    <button class="small-btn danger-btn" onclick="reviewWalletRequest('${r.id}','reject','${r.request_type}')">REJECT</button>
-   </div>`:""}
-  </div>`).join("");
- }catch(err){box.innerHTML='<div class="empty">Could not load requests: '+escapeHTML(err.message)+'</div>'}
-}
-async function reviewWalletRequest(id,action,type){
- if(!isAdmin)return;
- let note="";
- if(action==="reject"){note=prompt("Enter rejection reason (required):")||"";if(!note.trim()){notify("A rejection reason is required.");return}}
- if(!confirm((action==="approve"?"Approve":"Reject")+" this "+type+" request?"))return;
- try{
-  let result;
-  if(type==="deposit"){
-   result=action==="approve"
-    ?await db.rpc("admin_approve_wallet_deposit",{p_request_id:id})
-    :await db.rpc("admin_reject_wallet_deposit",{p_request_id:id,p_note:note});
-  }else{
-   result=action==="approve"
-    ?await db.rpc("admin_approve_wallet_withdrawal",{p_request_id:id,p_note:""})
-    :await db.rpc("admin_reject_wallet_withdrawal",{p_request_id:id,p_note:note});
-  }
-  if(result.error)throw result.error;
-  notify("Wallet request "+(action==="approve"?"approved":"rejected")+".");
-  await loadAdminWalletRequests(adminWalletFilter);
- }catch(err){notify(err.message||"Could not review wallet request.")}
-}
-async function loadAdminPaymentMethods(){
- if(!isAdmin)return;
- const box=document.getElementById("adminPaymentMethods");box.innerHTML='<div class="empty">Loading methods...</div>';
- try{
-  await loadPaymentMethods();
-  if(!paymentMethods.length){box.innerHTML='<div class="empty">No payment method rows found. Create the five method rows in Supabase first.</div>';return}
-  box.innerHTML=paymentMethods.map(m=>`<div class="request-card">
-   <div class="registration-top"><strong>${escapeHTML(m.display_name)}</strong><span class="status-pill">${m.enabled?"ENABLED":"DISABLED"}</span></div>
-   <p>Code: ${escapeHTML(m.method_code)}</p><p>Receiver: ${escapeHTML(m.receiver_details||"Not configured")}</p>
-   <p>Instructions: ${escapeHTML(m.instructions||"Not configured")}</p>
-   <button class="small-btn" style="margin-top:10px;width:100%" onclick="editPaymentMethod('${escapeHTML(m.method_code)}')">EDIT PAYMENT SETTINGS</button>
-  </div>`).join("");
- }catch(err){box.innerHTML='<div class="empty">Could not load payment settings: '+escapeHTML(err.message)+'</div>'}
-}
-function editPaymentMethod(code){
- const m=paymentMethods.find(x=>x.method_code===code);if(!m)return;
- document.getElementById("paymentEditCode").value=m.method_code;
- document.getElementById("paymentEditName").value=m.display_name;
- document.getElementById("paymentEditReceiver").value=m.receiver_details||"";
- document.getElementById("paymentEditInstructions").value=m.instructions||"";
- document.getElementById("paymentEditEnabled").value=String(!!m.enabled);
- openModal("paymentEditModal");
-}
-document.getElementById("paymentEditForm").addEventListener("submit",async e=>{
- e.preventDefault();if(!isAdmin)return;
- const code=document.getElementById("paymentEditCode").value;
- const receiver_details=document.getElementById("paymentEditReceiver").value.trim();
- const instructions=document.getElementById("paymentEditInstructions").value.trim();
- const enabled=document.getElementById("paymentEditEnabled").value==="true";
- const btn=e.submitter;btn.disabled=true;btn.textContent="SAVING...";
- try{
-  const {error}=await db.from("wallet_payment_methods").update({receiver_details,instructions,enabled}).eq("method_code",code);
-  if(error)throw error;
-  notify("Payment method settings updated.");
-  closeModal("paymentEditModal");
-  await loadAdminPaymentMethods();await loadPaymentMethods();
- }catch(err){notify(err.message||"Could not update payment settings. Check Admin UPDATE policy.")}
- finally{btn.disabled=false;btn.textContent="SAVE PAYMENT SETTINGS"}
-});
-
-/* ROOM DATA */
-async function getRoom(tournamentId){
- const {data,error}=await db.from("match_rooms").select("room_id,room_password,updated_at").eq("tournament_id",tournamentId).maybeSingle();
- if(error){console.error("Room loading:",error.message);return null}return data;
-}
-function roomHTML(room){
- if(!room||(!room.room_id&&!room.room_password))return '<div class="notice" style="margin-top:14px">Room ID and Password have not been announced yet.</div>';
- return `<div class="room-box"><h3>🎮 MATCH ROOM INFORMATION</h3>
- ${room.room_id?`<div class="room-value"><span>Room ID: <strong>${escapeHTML(room.room_id)}</strong></span><button class="copy-btn" onclick="copyText('${escapeHTML(room.room_id)}')">COPY ID</button></div>`:""}
- ${room.room_password?`<div class="room-value"><span>Password: <strong>${escapeHTML(room.room_password)}</strong></span><button class="copy-btn" onclick="copyText('${escapeHTML(room.room_password)}')">COPY PASSWORD</button></div>`:""}
- </div>`;
-}
-async function copyText(value){try{await navigator.clipboard.writeText(value);notify("Copied successfully.")}catch(e){notify("Copy is not available on this browser.")}}
-
-/* TOURNAMENT DISPLAY */
-function tournamentCard(t){
- const isJoined=joined.includes(t.id),full=t.joined>=t.slots;
- return `<article class="tournament"><div class="tournament-banner"><strong>${escapeHTML(t.mode.toUpperCase())}</strong><span class="tag">${escapeHTML((t.status||"open").toUpperCase())}</span></div>
- <div class="tournament-body"><h3>${escapeHTML(t.name)}</h3>
- <div class="tournament-meta">
- <div class="meta"><small>ENTRY FEE</small><strong>${money(t.fee)}</strong></div>
- <div class="meta"><small>PRIZE POOL</small><strong style="color:var(--green)">${money(t.prize)}</strong></div>
- <div class="meta"><small>MAP</small><strong>${escapeHTML(t.map)}</strong></div>
- <div class="meta"><small>PLAYERS</small><strong>${t.joined}/${t.slots}</strong></div>
- </div>
- <div class="tournament-actions">
- <button class="action-btn" onclick="showDetails('${t.id}')">DETAILS</button>
- <button class="action-btn join" onclick="joinTournament('${t.id}')" ${isJoined||full||t.status!=="open"?"disabled":""}>${isJoined?"JOINED":full?"FULL":t.status!=="open"?"CLOSED":"JOIN NOW"}</button>
- </div></div></article>`;
-}
-function renderTournaments(){
- const q=(document.getElementById("searchTournament")?.value||"").toLowerCase();
- const list=tournaments.filter(t=>(activeFilter==="All"||t.mode===activeFilter)&&(t.name.toLowerCase().includes(q)||t.mode.toLowerCase().includes(q)));
- document.getElementById("tournamentList").innerHTML=list.length?list.map(tournamentCard).join():'<div class="empty">No tournaments found.</div>';
-}
-function renderHome(){
- document.getElementById("featuredList").innerHTML=tournaments.slice(0,2).map(tournamentCard).join("")||'<div class="empty">No featured tournaments yet.</div>';
- document.getElementById("statTournaments").textContent=tournaments.length;
- document.getElementById("statPlayers").textContent=tournaments.reduce((a,t)=>a+t.joined,0);
-}
-function setFilter(mode,btn){activeFilter=mode;document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");renderTournaments()}
-function filterMode(mode){activeFilter=mode;goTo("tournaments");document.querySelectorAll("#tournaments .filter-btn").forEach(b=>b.classList.toggle("active",b.textContent.trim()===mode));renderTournaments()}
-
-async function showDetails(id){
- const t=tournaments.find(x=>x.id===id);if(!t)return;
- const box=document.getElementById("detailsContent"),registered=joined.includes(id);
- box.innerHTML=`<h2 style="margin-bottom:10px">${escapeHTML(t.name)}</h2><span class="tag">${escapeHTML(t.mode)}</span>
- <div class="tournament-meta" style="margin-top:18px">
- <div class="meta"><small>ENTRY FEE</small><strong>${money(t.fee)}</strong></div>
- <div class="meta"><small>PRIZE POOL</small><strong>${money(t.prize)}</strong></div>
- <div class="meta"><small>MAP</small><strong>${escapeHTML(t.map)}</strong></div>
- <div class="meta"><small>PLAYERS</small><strong>${t.joined}/${t.slots}</strong></div>
- <div class="meta"><small>DATE</small><strong>${formatDate(t.date)}</strong></div>
- <div class="meta"><small>STATUS</small><strong>${escapeHTML(t.status)}</strong></div></div>
- <div id="detailsRoomArea"></div>
- ${!currentUser?'<p class="note">Login to join this tournament.</p>':""}
- ${!registered&&!isAdmin?`<button class="full-btn" style="margin-top:15px" onclick="closeModal('detailsModal');joinTournament('${t.id}')">JOIN TOURNAMENT</button>`:""}`;
- openModal("detailsModal");
- const area=document.getElementById("detailsRoomArea");
- if(registered||isAdmin){const room=await getRoom(id);if(area)area.innerHTML=roomHTML(room)}
- else area.innerHTML='<div class="notice" style="margin-top:14px">Room information is available only to registered players.</div>';
-}
-
-/* JOIN - Entry fee is deducted inside the database RPC */
-async function joinTournament(id){
- if(!currentUser){notify("Please login before joining a tournament.");openAuth();return}
- const t=tournaments.find(x=>x.id===id);if(!t)return;
- if(joined.includes(id)){notify("You already joined this tournament.");return}
- if(t.joined>=t.slots){notify("Tournament is full.");return}
- if(t.status!=="open"){notify("This tournament is not open.");return}
- if(!confirm("Join "+t.name+"?\nEntry fee: "+money(t.fee)+"\nThis amount will be deducted from your Wallet automatically."))return;
- try{
-  const {data,error}=await db.rpc("join_tournament",{p_tournament_id:id});
-  if(error)throw error;
-  notify("Tournament registration successful!"+(data?.remaining_balance!==undefined?" Remaining Wallet: "+money(data.remaining_balance):""));
-  await loadMyRegistrations();await loadTournaments();await loadWalletBalance();renderMatches();
- }catch(err){
-  const msg=err.message||"Could not join tournament.";
-  notify(msg);
-  if(/insufficient|balance/i.test(msg)&&confirm("Your wallet balance may be insufficient. Open Wallet?"))openWallet();
- }
-}
-
-/* MATCHES */
-async function renderMatches(){
- const box=document.getElementById("myMatches");
- if(!currentUser){box.innerHTML='<div class="empty">Please login to see your matches.</div>';return}
- const list=tournaments.filter(t=>joined.includes(t.id));
- if(!list.length){box.innerHTML='<div class="empty">You have not joined any tournament yet.</div>';document.getElementById("joinedCount").textContent=joined.length;return}
- box.innerHTML='<div class="empty">Loading your match information...</div>';
- const cards=await Promise.all(list.map(async t=>{
-  const room=await getRoom(t.id);
-  return `<div class="list-item" style="display:block"><div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><div><strong>${escapeHTML(t.name)}</strong><p style="color:var(--muted);margin-top:5px">${escapeHTML(t.mode)} • ${formatDate(t.date)}</p></div><span class="tag">JOINED</span></div>${roomHTML(room)}<button class="action-btn" style="width:100%;margin-top:12px" onclick="showDetails('${t.id}')">VIEW MATCH DETAILS</button></div>`;
- }));
- box.innerHTML=cards.join();document.getElementById("joinedCount").textContent=joined.length;
-}
-
-/* LEADERBOARD */
-async function renderLeaderboard(){
- const box=document.getElementById("leaderboardList");box.innerHTML='<div class="empty">Loading leaderboard...</div>';
- const {data,error}=await db.from("match_results").select("player_id,total_points,profiles(display_name,username)").order("total_points",{ascending:false}).limit(50);
- if(error){box.innerHTML='<div class="empty">Could not load leaderboard.</div>';console.error(error);return}
- if(!data?.length){box.innerHTML='<div class="empty">No match results published yet.</div>';return}
- box.innerHTML=data.map((p,i)=>`<div class="table-row"><strong>${["🥇","🥈","🥉"][i]||"#"+(i+1)}</strong><span>${escapeHTML(p.profiles?.display_name||p.profiles?.username||"Player")}</span><strong style="color:var(--cyan)">${Number(p.total_points||0)} pts</strong></div>`).join("");
-}
-
-/* PROFILE */
-function editProfile(){
- if(!currentUser||!profile)return;
- document.getElementById("editName").value=profile.display_name||"";
- document.getElementById("editUsername").value=profile.username||"";
- document.getElementById("editUid").value=profile.free_fire_uid||"";
- openModal("profileModal");
-}
-async function saveProfile(){
- if(!currentUser||!profile)return;
- const display_name=document.getElementById("editName").value.trim(),username=document.getElementById("editUsername").value.trim().toLowerCase(),free_fire_uid=document.getElementById("editUid").value.trim();
- if(username&&!/^[a-z0-9_]{3,30}$/.test(username)){notify("Username must be 3–30 characters: lowercase letters, numbers or underscore.");return}
- const {data,error}=await db.from("profiles").update({display_name,username:username||null,free_fire_uid:free_fire_uid||null}).eq("id",currentUser.id).select("id,username,display_name,free_fire_uid,role").single();
- if(error){notify(error.message);return}
- profile=data;updateAccountUI();closeModal("profileModal");notify("Profile updated successfully.");
-}
-
-/* ADMIN */
-function renderAdmin(){
- if(!isAdmin)return;
- document.getElementById("adminTotal").textContent=tournaments.length;
- document.getElementById("adminJoined").textContent=tournaments.reduce((a,t)=>a+t.joined,0);
- document.getElementById("adminTournamentList").innerHTML=tournaments.map(t=>`<div class="list-item"><div style="min-width:0"><strong>${escapeHTML(t.name)}</strong><p style="color:var(--muted);margin-top:5px">${escapeHTML(t.mode)} • ${t.joined}/${t.slots}</p></div><div class="admin-actions"><button class="close-btn" onclick="openEditTournament('${t.id}')">Edit</button><button class="close-btn danger-btn" onclick="deleteTournament('${t.id}')">Delete</button></div></div>`).join("")||'<div class="empty">No tournaments created.</div>';
- populateRegistrationTournamentSelect();
- loadAdminWalletRequests(adminWalletFilter);
- loadAdminPaymentMethods();
-}
-function populateRegistrationTournamentSelect(){
- const select=document.getElementById("registrationTournamentSelect");if(!select)return;
- const old=select.value;
- select.innerHTML='<option value="">Choose a tournament</option>'+tournaments.map(t=>`<option value="${t.id}">${escapeHTML(t.name)}</option>`).join("");
- if(old&&tournaments.some(t=>t.id===old))select.value=old;
-}
-function openCreateModal(){if(!isAdmin){notify("Admin access only.");return}openModal("createModal")}
-document.getElementById("createForm").addEventListener("submit",async function(e){
- e.preventDefault();if(!isAdmin||!currentUser){notify("Admin access only.");return}
- const title=document.getElementById("newName").value.trim(),mode=document.getElementById("newMode").value,map=document.getElementById("newMap").value.trim()||"Bermuda",entry_fee=Number(document.getElementById("newFee").value),prize_pool=Number(document.getElementById("newPrize").value),max_players=Number(document.getElementById("newSlots").value),date=new Date(document.getElementById("newDate").value);
- if(!title||!Number.isFinite(entry_fee)||entry_fee<0||!Number.isFinite(prize_pool)||prize_pool<0||!Number.isInteger(max_players)||max_players<1||isNaN(date.getTime())){notify("Please check all tournament fields.");return}
- const button=this.querySelector("button[type=submit]");button.disabled=true;button.textContent="SAVING...";
- try{
-  const {error}=await db.from("tournaments").insert({title,mode,map,entry_fee,prize_pool,max_players,scheduled_at:date.toISOString(),status:"open",created_by:currentUser.id});
-  if(error)throw error;this.reset();closeModal("createModal");await loadTournaments();notify("Tournament created successfully.");
- }catch(err){notify(err.message||"Could not create tournament.")}
- finally{button.disabled=false;button.textContent="CREATE TOURNAMENT"}
-});
-async function openEditTournament(id){
- if(!isAdmin){notify("Admin access only.");return}
- const t=tournaments.find(x=>x.id===id);if(!t)return;
- document.getElementById("editTournamentId").value=t.id;
- document.getElementById("editTournamentName").value=t.name;
- document.getElementById("editTournamentMode").value=t.mode;
- document.getElementById("editTournamentMap").value=t.map;
- document.getElementById("editTournamentFee").value=t.fee;
- document.getElementById("editTournamentPrize").value=t.prize;
- document.getElementById("editTournamentSlots").value=t.slots;
- document.getElementById("editTournamentStatus").value=t.status||"open";
- const d=new Date(t.date);
- document.getElementById("editTournamentDate").value=!isNaN(d.getTime())?new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16):"";
- document.getElementById("editRoomId").value="";document.getElementById("editRoomPassword").value="";
- openModal("editTournamentModal");
- const room=await getRoom(id);
- if(room){document.getElementById("editRoomId").value=room.room_id||"";document.getElementById("editRoomPassword").value=room.room_password||""}
-}
-document.getElementById("editTournamentForm").addEventListener("submit",async function(e){
- e.preventDefault();if(!isAdmin||!currentUser){notify("Admin access only.");return}
- const id=document.getElementById("editTournamentId").value,title=document.getElementById("editTournamentName").value.trim(),mode=document.getElementById("editTournamentMode").value,map=document.getElementById("editTournamentMap").value.trim()||"Bermuda",entry_fee=Number(document.getElementById("editTournamentFee").value),prize_pool=Number(document.getElementById("editTournamentPrize").value),max_players=Number(document.getElementById("editTournamentSlots").value),date=new Date(document.getElementById("editTournamentDate").value),status=document.getElementById("editTournamentStatus").value,room_id=document.getElementById("editRoomId").value.trim(),room_password=document.getElementById("editRoomPassword").value.trim();
- if(!title||!Number.isFinite(entry_fee)||entry_fee<0||!Number.isFinite(prize_pool)||prize_pool<0||!Number.isInteger(max_players)||max_players<1||isNaN(date.getTime())){notify("Please check all tournament fields.");return}
- const old=tournaments.find(t=>t.id===id);
- if(old&&max_players<old.joined){notify("Maximum players cannot be lower than the current registered player count.");return}
- const button=document.getElementById("saveTournamentButton");button.disabled=true;button.textContent="SAVING...";
- try{
-  const {error:updateError}=await db.from("tournaments").update({title,mode,map,entry_fee,prize_pool,max_players,scheduled_at:date.toISOString(),status}).eq("id",id);
-  if(updateError)throw updateError;
-  const {error:roomError}=await db.from("match_rooms").upsert({tournament_id:id,room_id:room_id||null,room_password:room_password||null,updated_at:new Date().toISOString()},{onConflict:"tournament_id"});
-  if(roomError)throw roomError;
-  closeModal("editTournamentModal");await loadTournaments();await renderMatches();notify("Tournament and room information saved successfully.");
- }catch(err){console.error(err);notify(err.message||"Could not save tournament. Check Supabase permissions.")}
- finally{button.disabled=false;button.textContent="SAVE TOURNAMENT & ROOM"}
-});
-async function deleteTournament(id){
- if(!isAdmin)return;if(!confirm("Permanently delete this tournament and its registrations?"))return;
- const {error}=await db.from("tournaments").delete().eq("id",id);
- if(error){notify(error.message);return}
- await loadMyRegistrations();await loadTournaments();notify("Tournament deleted.");
-}
-async function loadAdminRegistrations(){
- if(!isAdmin){notify("Admin access only.");return}
- const tournamentId=document.getElementById("registrationTournamentSelect").value,box=document.getElementById("adminRegistrationList");
- if(!tournamentId){box.innerHTML='<div class="empty">Choose a tournament to see its players.</div>';updateRegistrationStats([]);return}
- box.innerHTML='<div class="empty">Loading registered players...</div>';
- try{
-  const {data,error}=await db.from("tournament_registrations").select("tournament_id,player_id,status,profiles(display_name,username,free_fire_uid)").eq("tournament_id",tournamentId).order("status",{ascending:true});
-  if(error)throw error;adminRegistrationRows=data||[];updateRegistrationStats(adminRegistrationRows);
-  if(!adminRegistrationRows.length){box.innerHTML='<div class="empty">No players have registered for this tournament yet.</div>';return}
-  box.innerHTML=adminRegistrationRows.map((r,index)=>{const p=r.profiles||{},name=p.display_name||p.username||"Player",status=String(r.status||"unknown");return `<div class="registration-card"><div class="registration-top"><strong>${index+1}. ${escapeHTML(name)}</strong><span class="status-pill">${escapeHTML(status.toUpperCase())}</span></div><p>Username: @${escapeHTML(p.username||"Not set")}</p><p>Free Fire UID: <strong style="color:var(--cyan)">${escapeHTML(p.free_fire_uid||"Not added")}</strong></p><p>Player ID: ${escapeHTML(r.player_id)}</p><button class="action-btn danger-btn" style="width:100%;margin-top:12px" onclick="removeRegistration('${escapeHTML(r.player_id)}','${escapeHTML(tournamentId)}')">REMOVE REGISTRATION</button></div>`}).join("");
- }catch(err){console.error(err);box.innerHTML='<div class="empty">Could not load registrations: '+escapeHTML(err.message)+'</div>'}
-}
-function updateRegistrationStats(rows){
- const total=rows.length,active=rows.filter(r=>r.status==="registered").length;
- document.getElementById("registrationTotal").textContent=total;document.getElementById("registrationActive").textContent=active;document.getElementById("registrationOther").textContent=total-active;
-}
-async function removeRegistration(playerId,tournamentId){
- if(!isAdmin)return;if(!confirm("Remove this player's registration from the selected tournament?"))return;
- try{
-  const {error}=await db.from("tournament_registrations").delete().eq("tournament_id",tournamentId).eq("player_id",playerId);
-  if(error)throw error;notify("Player registration removed.");await loadTournamentCounts();await loadTournaments();await loadAdminRegistrations();
- }catch(err){notify(err.message||"Could not remove registration. Check Admin permissions.")}
-}
-function showNotifications(){
- if(!currentUser){notify("Please login first.");openAuth();return}
- notify("Notifications feature will be connected in a later update.");
-}
-function renderAll(){renderHome();renderTournaments();renderMatches();if(isAdmin)renderAdmin()}
-
-/* START */
-async function startApp(){
- // Start the public tournament view even if account authentication is temporarily unavailable.
- if(!db){
-  console.error("Supabase SDK could not load. Check the CDN/network connection.");
-  const list=document.getElementById("tournamentList");
-  if(list)list.innerHTML='<div class="empty">Connection unavailable. Please check your internet connection and reload.</div>';
-  updateAccountUI();
-  return;
- }
- updateAccountUI();
- const accountTask=(async()=>{
-  try{
-   await loadAccount();
-  }catch(err){
-   console.error("Account session could not be restored:",err);
-   // Keep the app usable as a guest; do not block public tournament loading.
-   currentUser=null;profile=null;isAdmin=false;joined=[];walletBalance=0;
-   updateAccountUI();
-  }
- })();
- try{
-  await loadTournaments();
- }catch(err){
-  console.error("Public tournament loading failed:",err);
- }
- await accountTask;
-}
-if(db){
- db.auth.onAuthStateChange((event,session)=>{
-  if(["SIGNED_IN","SIGNED_OUT","TOKEN_REFRESHED"].includes(event)){
-   setTimeout(async()=>{
-    try{await loadAccount();await loadTournaments();}
-    catch(err){console.error("Account update failed:",err);}
-   },0);
-  }
- });
-}
-startApp();
 </script>
 </body>
                                                                                                                                                                                                        </html>
-</html>
