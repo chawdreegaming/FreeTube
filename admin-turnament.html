@@ -83,28 +83,33 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
 .knockout-stage strong{display:block;font-size:20px}
 .help{padding:11px;border:1px solid #354b70;border-radius:10px;background:#101e33;color:#cbd8ec;font-size:12px}
 .back-button{margin:0 0 14px;background:#263854}
+
+/* DASHBOARD: THREE COLUMN GRID */
 .dashboard-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:13px;
   margin-top:18px;
 }
 .dashboard-card{
+  min-width:0;
   min-height:125px;
-  padding:18px;
-  text-align:left;
+  padding:15px 10px;
+  text-align:center;
   border:1px solid #354b70;
   border-radius:17px;
   background:linear-gradient(145deg,#172c4b,#101b30);
   display:flex;
   flex-direction:column;
+  align-items:center;
   justify-content:center;
   gap:7px;
 }
 .dashboard-card .dash-icon{font-size:29px}
-.dashboard-card strong{font-size:15px}
-.dashboard-card span:last-child{font-size:12px;color:#a9bbd5;font-weight:500}
+.dashboard-card strong{font-size:14px;line-height:1.3}
+.dashboard-card span:last-child{font-size:11px;line-height:1.4;color:#a9bbd5;font-weight:500}
 .dashboard-card:hover{border-color:#568dff;background:linear-gradient(145deg,#203c67,#172744)}
+
 .payment-method{
   padding:15px;
   margin:12px 0;
@@ -133,12 +138,30 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   grid-template-columns:repeat(2,minmax(0,1fr));
   gap:12px;
 }
+
 @media(max-width:750px){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
 @media(max-width:480px){
   .container{padding:13px 10px 30px}
-  .grid,.dashboard-grid,.payment-grid{grid-template-columns:1fr}
+
+  /* Mobile dashboard also stays 3 columns */
+  .dashboard-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .dashboard-card{
+    min-height:112px;
+    padding:9px 5px;
+    border-radius:12px;
+    gap:6px;
+  }
+  .dashboard-card .dash-icon{font-size:23px}
+  .dashboard-card strong{font-size:11px;line-height:1.25}
+  .dashboard-card span:last-child{font-size:9px;line-height:1.3}
+
+  .grid,.payment-grid{grid-template-columns:1fr}
   .stat{padding:12px}
   .stat-value{font-size:21px}
   button{padding:9px 11px}
@@ -849,6 +872,8 @@ function renderTournamentList(){
     const status=String(t.status||"upcoming").toLowerCase();
     return title.includes(q)&&(filter==="all"||status===filter);
   });
+
+  $("tournamentCount").textContent=filtered.length+" Tournaments";
 
   if(!filtered.length){empty("tournamentsList","No matching tournaments found.");}
   else filtered.forEach(t=>{
