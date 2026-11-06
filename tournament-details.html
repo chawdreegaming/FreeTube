@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090d1b">
+<title>Tournament Details | BOYS VS GIRLS</title>
+
+<style>
+:root{
+  --bg:#090d1b;
+  --panel:#121a2d;
+  --panel2:#18233a;
+  --line:rgba(255,255,255,.09);
+  --text:#f5f7ff;
+  --muted:#9ca9c3;
+  --blue:#2696ff;
+  --pink:#ff4f9a;
+  --green:#20d69a;
+  --red:#ff5b6e;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#172443 0,#090d1b 48%);
+  color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;
+  min-height:100vh;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:15px 17px;
+  background:rgba(9,13,27,.94);
+  border-bottom:1px solid var(--line);
+  backdrop-filter:blur(14px);
+}
+.back{
+  width:38px;height:38px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:var(--panel);
+  color:white;
+  font-size:22px;
+  cursor:pointer;
+}
+.brand{font-weight:900;font-size:15px}
+.brand span{color:var(--pink)}
+.container{
+  width:min(760px,100%);
+  margin:auto;
+  padding:18px 14px 50px;
+}
+.banner{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  border-radius:19px;
+  background:linear-gradient(135deg,#183d71,#42204f);
+  border:1px solid var(--line);
+}
+.status-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:17px 0 10px;
+}
+.status{
+  display:inline-block;
+  padding:7px 12px;
+  border-radius:30px;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  background:rgba(38,150,255,.15);
+  color:#72bdff;
+  border:1px solid rgba(38,150,255,.3);
+}
+.status.live{color:#ff6d82;background:rgba(255,91,110,.12)}
+.status.completed{color:#aaa;background:rgba(255,255,255,.08)}
+.type{
+  color:#ff80b5;
+  font-size:12px;
+  font-weight:800;
+}
+h1{
+  font-size:25px;
+  line-height:1.25;
+  margin:10px 0;
+}
+.description{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.7;
+  white-space:pre-wrap;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
+  margin:20px 0;
+}
+.stat{
+  background:linear-gradient(145deg,#182640,#111a2c);
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:15px;
+}
+.stat small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:8px;
+}
+.stat strong{font-size:19px;word-break:break-word}
+.section{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:17px;
+  padding:17px;
+  margin-top:16px;
+}
+.section h2{
+  margin:0 0 15px;
+  font-size:17px;
+}
+.info-row{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  padding:11px 0;
+  border-bottom:1px solid var(--line);
+  font-size:13px;
+}
+.info-row:last-child{border-bottom:0}
+.info-row span:first-child{color:var(--muted)}
+.info-row strong{text-align:right}
+.primary{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:15px;
+  color:white;
+  font-weight:900;
+  font-size:15px;
+  background:linear-gradient(100deg,#167cff,#a33dff);
+  cursor:pointer;
+  margin-top:15px;
+}
+.primary:disabled{opacity:.5;cursor:not-allowed}
+.secondary{
+  display:block;
+  width:100%;
+  text-align:center;
+  padding:13px;
+  border-radius:12px;
+  background:var(--panel2);
+  color:white;
+  border:1px solid var(--line);
+  text-decoration:none;
+  margin-top:10px;
+  font-weight:800;
+  font-size:13px;
+}
+label{
+  display:block;
+  color:#c5cee0;
+  font-size:12px;
+  margin:13px 0 7px;
+  font-weight:700;
+}
+input{
+  width:100%;
+  padding:13px;
+  border-radius:11px;
+  border:1px solid var(--line);
+  outline:none;
+  background:#0b1323;
+  color:white;
+  font-size:14px;
+}
+input:focus{border-color:var(--blue)}
+.player-title{
+  color:#75baff;
+  font-weight:900;
+  font-size:13px;
+  margin-top:18px;
+}
+.notice{
+  color:#b8c6df;
+  background:rgba(38,150,255,.09);
+  border:1px solid rgba(38,150,255,.2);
+  padding:12px;
+  border-radius:11px;
+  font-size:12px;
+  line-height:1.6;
+  margin:12px 0;
+}
+.message{
+  display:none;
+  padding:12px;
+  border-radius:10px;
+  margin-top:12px;
+  font-size:13px;
+  line-height:1.5;
+}
+.message.error{display:block;background:rgba(255,91,110,.12);color:#ff9aaa}
+.message.success{display:block;background:rgba(32,214,154,.12);color:#65e7bb}
+.loading,.empty{
+  text-align:center;
+  padding:55px 15px;
+  color:var(--muted);
+}
+.hidden{display:none!important}
+footer{
+  text-align:center;
+  color:#66738d;
+  font-size:11px;
+  padding:25px 10px;
+}
+@media(min-width:600px){
+  .banner{height:300px}
+  h1{font-size:30px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <button class="back" onclick="history.back()" aria-label="Go back">‹</button>
+  <div class="brand">BOYS <span>VS</span> GIRLS 💙💗</div>
+</header>
+
+<main class="container">
+  <div id="loading" class="loading">Loading tournament details...</div>
+
+  <div id="content" class="hidden">
+
+    <img id="banner" class="banner" alt="Tournament banner">
+
+    <div class="status-row">
+      <span id="status" class="status">Upcoming</span>
+      <span id="type" class="type">TOURNAMENT</span>
+    </div>
+
+    <h1 id="title">Tournament</h1>
+    <p id="description" class="description"></p>
+
+    <div class="stats">
+      <div class="stat">
+        <small>PRIZE POOL</small>
+        <strong id="prize">৳0</strong>
+      </div>
+      <div class="stat">
+        <small>ENTRY FEE</small>
+        <strong id="fee">৳0</strong>
+      </div>
+      <div class="stat">
+        <small>REGISTERED PLAYERS</small>
+        <strong id="registered">0</strong>
+      </div>
+      <div class="stat">
+        <small>MAX PLAYERS</small>
+        <strong id="maxPlayers">—</strong>
+      </div>
+    </div>
+
+    <section class="section">
+      <h2>🏆 Tournament Information</h2>
+
+      <div class="info-row">
+        <span>Game Mode</span>
+        <strong id="mode">—</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Map</span>
+        <strong id="map">—</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Start Time</span>
+        <strong id="date">—</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Prize Type</span>
+        <strong id="prizeMode">—</strong>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>👥 Approved Teams</h2>
+      <div id="approvedTeams" class="description">Loading teams...</div>
+    </section>
+
+    <section class="section" id="registrationSection">
+      <h2>🎮 Join Tournament</h2>
+
+      <div class="notice">
+        Enter your team name and every player's Free Fire name and numeric UID.
+        Your registration will be submitted to the Admin for review.
+      </div>
+
+      <div id="loginNotice" class="notice hidden">
+        Please log in to your BOYS VS GIRLS account before registering.
+      </div>
+
+      <label for="teamName">Team Name</label>
+      <input id="teamName" maxlength="100" placeholder="Enter your team name">
+
+      <div id="playersContainer"></div>
+
+      <div id="formMessage" class="message"></div>
+
+      <button id="registerButton" class="primary" onclick="registerTeam()">
+        JOIN TOURNAMENT
+      </button>
+
+      <a class="secondary" href="profile.html">
+        Open Tournament Player Profile
+      </a>
+
+      <div class="notice">
+        Registration status: Pending Admin Review. Duplicate player UIDs
+        and incomplete player information will not be accepted.
+      </div>
+    </section>
+
+  </div>
+
+  <div id="empty" class="empty hidden">
+    Tournament not found.
+  </div>
+</main>
+
+<footer>BOYS VS GIRLS 💙💗 — E-SPORTS TOURNAMENT</footer>
+
+<script>
+"use strict";
+
+const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
+
+const params = new URLSearchParams(window.location.search);
+const tournamentId = params.get("id");
+
+let currentTournament = null;
+let requiredPlayers = 1;
+let isSubmitting = false;
+
+function getToken(){
+  return sessionStorage.getItem("freetube_access_token")
+    || localStorage.getItem("freetube_access_token")
+    || "";
+}
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#039;"
+  })[char]);
+}
+
+function formatMoney(value){
+  const amount = Number(value || 0);
+  return "৳" + amount.toLocaleString("en-IN");
+}
+
+function formatDate(value){
+  if(!value) return "Not scheduled";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "Not scheduled";
+
+  return date.toLocaleString("en-GB",{
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"2-digit",
+    minute:"2-digit"
+  });
+}
+
+function setMessage(message,type){
+  const box = document.getElementById("formMessage");
+  box.className = "message " + type;
+  box.textContent = message;
+}
+
+function getPlayerCount(tournament){
+  const type = String(tournament.tournament_type || "").toLowerCase();
+  const mode = String(tournament.mode || "").toLowerCase();
+
+  if(type === "free-fire-cup") return 4;
+  if(mode === "squad") return 4;
+  if(mode === "duo") return 2;
+  return 1;
+}
+
+async function apiRequest(path,options={}){
+  const headers = {
+    ...(options.headers || {})
+  };
+
+  if(options.body){
+    headers["Content-Type"] = "application/json";
+  }
+
+  const token = getToken();
+
+  if(token){
+    headers.Authorization = "Bearer " + token;
+  }
+
+  const response = await fetch(API_BASE_URL + path,{
+    ...options,
+    headers,
+    credentials:"include",
+    cache:"no-store"
+  });
+
+  const data = await response.json().catch(()=>({}));
+
+  if(!response.ok){
+    throw new Error(data.error || data.message || "Request failed.");
+  }
+
+  return data;
+}
+
+function createPlayerFields(){
+  const container = document.getElementById("playersContainer");
+  container.innerHTML = "";
+
+  for(let i=0;i<requiredPlayers;i++){
+    const block = document.createElement("div");
+    block.innerHTML = `
+      <div class="player-title">PLAYER ${i+1}</div>
+
+      <label for="playerName${i}">Free Fire Name</label>
+      <input
+        id="playerName${i}"
+        maxlength="80"
+        placeholder="Enter player ${i+1} name"
+        autocomplete="off"
+      >
+
+      <label for="playerUid${i}">Free Fire UID</label>
+      <input
+        id="playerUid${i}"
+        maxlength="20"
+        inputmode="numeric"
+        placeholder="Enter numeric UID"
+        autocomplete="off"
+      >
+    `;
+    container.appendChild(block);
+  }
+}
+
+function renderTournament(t){
+  currentTournament = t;
+  requiredPlayers = getPlayerCount(t);
+
+  document.getElementById("banner").src =
+    t.banner_url || "";
+
+  document.getElementById("banner").style.display =
+    t.banner_url ? "block" : "none";
+
+  document.getElementById("title").textContent =
+    t.title || "Tournament";
+
+  document.getElementById("description").textContent =
+    t.description || "No description available.";
+
+  document.getElementById("prize").textContent =
+    formatMoney(t.prize_pool);
+
+  document.getElementById("fee").textContent =
+    formatMoney(t.entry_fee);
+
+  document.getElementById("registered").textContent =
+    Number(t.registered_count || 0).toLocaleString();
+
+  document.getElementById("maxPlayers").textContent =
+    t.max_players ?? "—";
+
+  document.getElementById("mode").textContent =
+    t.mode || "—";
+
+  document.getElementById("map").textContent =
+    t.map_name || "—";
+
+  document.getElementById("date").textContent =
+    formatDate(t.scheduled_at);
+
+  document.getElementById("prizeMode").textContent =
+    t.prize_mode || "—";
+
+  document.getElementById("type").textContent =
+    String(t.tournament_type || "TOURNAMENT")
+      .replace(/-/g," ")
+      .toUpperCase();
+
+  const status = document.getElementById("status");
+  status.textContent = t.status || "Upcoming";
+  status.className = "status";
+
+  if(String(t.status).toLowerCase() === "live"){
+    status.classList.add("live");
+  }
+
+  if(String(t.status).toLowerCase() === "completed"){
+    status.classList.add("completed");
+  }
+
+  createPlayerFields();
+
+  const isOpen =
+    String(t.status).toLowerCase() === "upcoming";
+
+  const button = document.getElementById("registerButton");
+
+  if(!isOpen){
+    button.disabled = true;
+    button.textContent = "REGISTRATION CLOSED";
+  }
+
+  if(!getToken()){
+    document.getElementById("loginNotice")
+      .classList.remove("hidden");
+    button.disabled = true;
+    button.textContent = "LOGIN REQUIRED";
+  }
+
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("content").classList.remove("hidden");
+
+  loadApprovedTeams();
+}
+
+async function loadApprovedTeams(){
+  const box = document.getElementById("approvedTeams");
+
+  try{
+    const data = await apiRequest(
+      `/tournament/tournaments/${encodeURIComponent(tournamentId)}/teams`
+    );
+
+    const teams = data.teams || [];
+
+    if(!teams.length){
+      box.textContent = "No approved teams yet.";
+      return;
+    }
+
+    box.innerHTML = teams.map(team => `
+      <div class="info-row">
+        <span>${escapeHTML(team.team_name)}</span>
+        <strong>Approved</strong>
+      </div>
+    `).join("");
+
+  }catch(error){
+    box.textContent = "Unable to load approved teams.";
+  }
+}
+
+async function loadTournament(){
+  if(!tournamentId || !/^[0-9]+$/.test(tournamentId)){
+    throw new Error("Invalid tournament ID.");
+  }
+
+  // The list endpoint contains tournament_type, which is needed
+  // to determine the correct number of player UID fields.
+  const data = await apiRequest("/tournament/tournaments");
+
+  const tournaments = Array.isArray(data)
+    ? data
+    : data.tournaments || data.data?.tournaments || data.data || [];
+
+  const tournament = tournaments.find(item =>
+    String(item.id) === String(tournamentId)
+  );
+
+  if(!tournament){
+    throw new Error("Tournament not found.");
+  }
+
+  renderTournament(tournament);
+}
+
+async function registerTeam(){
+  if(isSubmitting) return;
+
+  if(!currentTournament){
+    setMessage("Tournament information is not ready.","error");
+    return;
+  }
+
+  const token = getToken();
+
+  if(!token){
+    setMessage("Please log in before registering.","error");
+    return;
+  }
+
+  const teamName =
+    document.getElementById("teamName").value.trim();
+
+  if(!teamName){
+    setMessage("Please enter your team name.","error");
+    return;
+  }
+
+  const players = [];
+
+  for(let i=0;i<requiredPlayers;i++){
+    const name = document.getElementById("playerName"+i).value.trim();
+    const uid = document.getElementById("playerUid"+i).value.trim();
+
+    if(!name){
+      setMessage("Please enter Player "+(i+1)+" Free Fire name.","error");
+      return;
+    }
+
+    if(!/^[0-9]{5,20}$/.test(uid)){
+      setMessage("Player "+(i+1)+" UID must contain 5–20 digits.","error");
+      return;
+    }
+
+    players.push({name,uid});
+  }
+
+  const uniqueUIDs = new Set(players.map(player=>player.uid));
+
+  if(uniqueUIDs.size !== players.length){
+    setMessage("A player UID cannot be repeated.","error");
+    return;
+  }
+
+  const button = document.getElementById("registerButton");
+
+  isSubmitting = true;
+  button.disabled = true;
+  button.textContent = "SUBMITTING...";
+
+  try{
+    const result = await apiRequest(
+      `/tournament/tournaments/${encodeURIComponent(tournamentId)}/register`,
+      {
+        method:"POST",
+        body:JSON.stringify({
+          team_name:teamName,
+          players
+        })
+      }
+    );
+
+    setMessage(
+      result.message || "Your team registration was submitted successfully.",
+      "success"
+    );
+
+    button.textContent = "REGISTRATION SUBMITTED";
+
+    document.getElementById("teamName").disabled = true;
+
+    for(let i=0;i<requiredPlayers;i++){
+      document.getElementById("playerName"+i).disabled = true;
+      document.getElementById("playerUid"+i).disabled = true;
+    }
+
+  }catch(error){
+    setMessage(error.message || "Registration failed.","error");
+    button.disabled = false;
+    button.textContent = "JOIN TOURNAMENT";
+    isSubmitting = false;
+  }
+}
+
+loadTournament().catch(error=>{
+  document.getElementById("loading").classList.add("hidden");
+  document.getElementById("empty").classList.remove("hidden");
+  document.getElementById("empty").textContent =
+    error.message || "Unable to load tournament.";
+});
+</script>
+
+</body>
+</html>
