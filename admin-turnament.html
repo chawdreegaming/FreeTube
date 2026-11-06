@@ -141,15 +141,16 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
 
 @media(max-width:750px){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dashboard-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 }
 
 @media(max-width:480px){
   .container{padding:13px 10px 30px}
 
-  /* Mobile dashboard also stays 3 columns */
   .dashboard-grid{
     grid-template-columns:repeat(3,minmax(0,1fr));
     gap:8px;
+    margin-top:15px;
   }
   .dashboard-card{
     min-height:112px;
@@ -193,25 +194,10 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
 
 <!-- DASHBOARD -->
 <section class="panel active" id="dashboard">
-  <div class="card">
-    <div class="row">
-      <div>
-        <h2>🏆 Tournament Control Center</h2>
-        <p class="muted small">Select a section to manage your eSports tournament system.</p>
-      </div>
-      <span class="pill green">Admin Panel</span>
-    </div>
 
-    <div class="row" style="margin-top:12px">
-      <div>
-        <h3>Admin Connection</h3>
-        <div id="connection" class="muted small">Checking admin access...</div>
-      </div>
-      <span class="pill yellow" id="adminBadge">Checking...</span>
-    </div>
-  </div>
-
+  <!-- DASHBOARD MENU CARDS -->
   <div class="dashboard-grid">
+
     <button class="dashboard-card" onclick="showTab('create')">
       <span class="dash-icon">🏆</span>
       <strong>Create Tournament</strong>
@@ -259,7 +245,35 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
       <strong>Refresh All Data</strong>
       <span>Reload tournament and wallet data</span>
     </button>
+
   </div>
+
+  <!-- TOURNAMENT CONTROL CENTER — BOTTOM -->
+  <div class="card" style="margin-top:25px">
+
+    <div class="row">
+      <div>
+        <h2>🏆 Tournament Control Center</h2>
+        <p class="muted small">
+          Select a section to manage your eSports tournament system.
+        </p>
+      </div>
+      <span class="pill green">Admin Panel</span>
+    </div>
+
+    <div class="row" style="margin-top:18px">
+      <div>
+        <h3>Admin Connection</h3>
+        <div id="connection" class="muted small">
+          Checking admin access...
+        </div>
+      </div>
+
+      <span class="pill yellow" id="adminBadge">Checking...</span>
+    </div>
+
+  </div>
+
 </section>
 
 <!-- CREATE TOURNAMENT -->
@@ -1291,14 +1305,7 @@ function renderWithdrawalList(){
   renderFilteredTransactions("withdrawal",$("withdrawStatus").value,"withdrawalsList");
 }
 
-/* PAYMENT SETTINGS
-   Required backend routes:
-   GET /admin/tournament/payment-settings
-   PUT /admin/tournament/payment-settings
-
-   These routes must be added to server.js.
-   No LocalStorage fallback is used for payment settings.
-*/
+/* PAYMENT SETTINGS */
 const paymentMethods=["bkash","nagad","rocket","binance","redotpay"];
 
 function setPaymentForm(data){
