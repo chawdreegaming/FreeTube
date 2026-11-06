@@ -1,973 +1,745 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#10132e">
-<title>BOYS VS GIRLS - Tournament Profile</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#11101c">
+<title>Tournament Profile | BOYS VS GIRLS</title>
 
 <style>
-:root{
-  --bg:#090d25;
-  --panel:#191a3b;
-  --line:#7775d766;
-  --blue:#168dff;
-  --cyan:#35e5ed;
-  --pink:#f02caa;
-  --purple:#9b48ff;
-  --gold:#ffc94e;
-  --muted:#bcbad6;
+:root {
+  --bg:#0d0c16;
+  --panel:#171625;
+  --panel2:#201e32;
+  --border:#302d46;
+  --text:#f4f2ff;
+  --muted:#a5a1ba;
+  --blue:#3988ff;
+  --pink:#ed4d9a;
+  --green:#27cf91;
+  --red:#ff6175;
+  --gold:#ffc85a;
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box}
 body{
-  min-height:100vh;color:#fff;
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
-  background:
-    radial-gradient(ellipse at 10% 0%,#37205d 0,transparent 35%),
-    radial-gradient(ellipse at 95% 15%,#411452 0,transparent 30%),
-    linear-gradient(145deg,#0b1029,#10102b 55%,#180d2b);
 }
-button,input{font:inherit}
-button{cursor:pointer;color:inherit;border:0}
-.app{width:100%;max-width:1100px;margin:auto;padding-bottom:30px}
-
-/* HEADER */
+button,input,select{font:inherit}
+button{cursor:pointer}
+.page{
+  width:100%;
+  max-width:850px;
+  margin:auto;
+  padding:16px 14px 40px;
+}
 .topbar{
-  min-height:88px;padding:10px 16px;
-  display:grid;grid-template-columns:55px 1fr 100px;
-  align-items:center;gap:10px;
-  background:#100e29ef;border-bottom:1px solid #ffffff20;
-  position:sticky;top:0;z-index:20;backdrop-filter:blur(15px);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
 }
-.top-actions,.top-left{display:flex;align-items:center;gap:9px}
-.icon-btn{
-  width:48px;height:48px;border-radius:50%;
-  display:grid;place-items:center;background:#ffffff10;
-  border:1px solid #ffffff35;font-size:19px;
+.brand{
+  font-weight:900;
+  font-size:17px;
+  letter-spacing:.3px;
 }
-.brand{text-align:center;min-width:0}
-.brand-name{
-  font-size:27px;font-weight:1000;
-  background:linear-gradient(90deg,#249aff,#bd55ff,#ff35b8);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  white-space:nowrap;
+.brand span:first-child{color:#56a0ff}
+.brand span:last-child{color:#ff6ab0}
+.back{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  color:white;
+  padding:10px 14px;
+  border-radius:10px;
 }
-.brand-sub{font-size:17px;color:#fff;margin-top:3px;font-weight:700}
-
-/* COMMON */
 .card{
-  margin:10px;
+  background:linear-gradient(145deg,#1b1930,#141321);
+  border:1px solid var(--border);
   border-radius:17px;
-  background:linear-gradient(130deg,#211b43,#171a39 65%,#27163f);
-  border:1px solid var(--line);
-  box-shadow:0 4px 13px #0004,inset 0 0 12px #ffffff05;
-  overflow:hidden;
+  padding:18px;
+  margin-bottom:15px;
 }
-.card-pad{padding:14px}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:9px;margin-bottom:10px;
+.profile-head{
+  display:flex;
+  align-items:center;
+  gap:15px;
 }
-.section-title{font-size:20px;font-weight:900}
-.section-title i{margin-right:7px;color:#c08aff}
-.section-sub{color:#9bbce9;font-size:13px;font-weight:900}
-.muted{color:var(--muted)}
-.small{font-size:13px}
-
-/* PROFILE BANNER */
-.profile-banner{
-  margin:12px 10px;min-height:175px;padding:18px;
-  border-radius:20px;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:space-between;gap:15px;
-  background:
-    radial-gradient(circle at 85% 45%,#a327a966,transparent 35%),
-    radial-gradient(circle at 10% 70%,#1265bb88,transparent 38%),
-    linear-gradient(115deg,#171b48,#27134a 55%,#47114e);
-  border:1px solid #c44fff77;box-shadow:0 5px 17px #0005;
-}
-.profile-banner:before{
-  content:"FREE FIRE";position:absolute;right:20px;bottom:10px;
-  font-size:42px;font-weight:1000;font-style:italic;
-  color:#f45bd1;opacity:.14;
-}
-.profile-main{display:flex;align-items:center;gap:20px;min-width:0;z-index:1}
-.avatar-wrap{position:relative;flex-shrink:0}
 .avatar{
-  width:135px;height:135px;border-radius:50%;object-fit:cover;
-  border:4px solid #e94aff;box-shadow:0 0 0 3px #168dff,0 0 18px #d72cff99;
-  background:#29244b;
+  width:76px;
+  height:76px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid var(--blue);
+  background:#29263d;
 }
-.crown{
-  position:absolute;top:-20px;left:45px;
-  color:#ffd34f;font-size:30px;text-shadow:0 2px 8px #ffb300;
+.name{
+  font-size:21px;
+  font-weight:800;
+  margin-bottom:5px;
 }
-.profile-name{font-size:29px;font-weight:1000;overflow-wrap:anywhere}
-.verified{color:#2da9ff;font-size:23px;margin-left:7px}
-.profile-username{font-size:20px;color:#d4c9ec;margin-top:5px}
-.player-tag{
-  display:inline-flex;align-items:center;gap:7px;
-  margin-top:9px;padding:7px 14px;border-radius:30px;
-  background:#9c36dc44;border:1px solid #db65ff;
-  font-size:15px;font-weight:900;
+.username{color:var(--muted);font-size:13px}
+.section-title{
+  font-size:16px;
+  font-weight:800;
+  margin:0 0 15px;
 }
-.connected{
-  z-index:1;max-width:300px;padding:13px 15px;
-  border-radius:14px;background:#101a39d9;
-  border:1px solid #249affaa;text-align:left;
+.section-title span{color:#65a7ff}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.field{margin-bottom:13px}
+.field label{
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+  margin-bottom:7px;
 }
-.connected strong{display:block;font-size:16px}
-.connected small{display:block;color:#d6cde9;margin-top:5px;font-size:13px}
-.connected i{color:#20d58c;margin-right:4px}
-
-/* DASHBOARD */
-.dashboard-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;margin:0 10px;
+.field input,.field select{
+  width:100%;
+  padding:13px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:#100f1b;
+  color:white;
+  outline:none;
 }
-.dashboard-grid .card{margin:0;min-width:0}
-.info-row{
-  display:flex;align-items:center;gap:10px;
-  min-height:60px;padding:9px 11px;margin-top:7px;
-  border:1px solid var(--line);border-radius:13px;background:#10152f99;
+.field input:focus,.field select:focus{border-color:var(--blue)}
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:12px 16px;
+  color:white;
+  font-weight:800;
+  background:linear-gradient(100deg,#287aff,#7554ed);
 }
-.info-icon{
-  width:38px;height:38px;display:grid;place-items:center;
-  border-radius:9px;background:#8c58e833;color:#c49aff;
-  flex-shrink:0;font-size:19px;
+.btn-pink{background:linear-gradient(100deg,#e94391,#a747dc)}
+.btn-green{background:linear-gradient(100deg,#159b72,#27cf91)}
+.btn-outline{
+  background:transparent;
+  border:1px solid var(--border);
+  color:white;
 }
-.info-content{min-width:0;flex:1}
-.info-label{font-size:14px;color:#c8c3dc}
-.info-value{font-size:17px;font-weight:900;margin-top:3px;overflow-wrap:anywhere}
-.edit-btn{
-  padding:8px 10px;border-radius:9px;background:#ffffff14;
-  border:1px solid #ffffff35;font-size:13px;font-weight:800;
+.btn:disabled{opacity:.55;cursor:not-allowed}
+.full{width:100%}
+.wallet{
+  background:linear-gradient(120deg,#174b94,#492a83);
+  border:1px solid #4168b3;
 }
-.wallet-balance{
-  text-align:center;padding:8px 0 16px;
-  font-size:39px;font-weight:1000;color:var(--cyan);
-  text-shadow:0 0 15px #20dce455;
+.wallet-label{color:#d4e3ff;font-size:13px}
+.balance{
+  font-size:34px;
+  font-weight:900;
+  margin:10px 0 17px;
 }
-.wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.wallet-btn{
-  padding:13px 8px;border-radius:12px;font-weight:900;
-  font-size:17px;display:flex;align-items:center;
-  justify-content:center;gap:8px;
-}
-.deposit-btn{background:linear-gradient(110deg,#0dc66f,#008a62)}
-.withdraw-btn{background:linear-gradient(110deg,#ed269a,#b91478)}
-
-/* PROFILE FORM */
-.modal-field{margin-bottom:12px}
-.modal-field label{display:block;font-size:13px;margin-bottom:6px;color:#d6d0e8}
-.modal-field input{
-  width:100%;padding:12px;border-radius:10px;
-  border:1px solid #ffffff35;background:#10152f;color:#fff;outline:none;
-}
-.modal-submit{
-  width:100%;padding:13px;border-radius:10px;
-  background:linear-gradient(100deg,#168dff,#a22bca);font-weight:900;
-}
-
-/* HISTORY LINKS */
-.history-links{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:10px;margin:12px 10px;
-}
-.history-link{
-  min-width:0;padding:15px;border-radius:15px;
-  background:linear-gradient(120deg,#292052,#1b1b3e);
-  border:1px solid #7775d777;
-  display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;
-}
-.history-link i:first-child{font-size:28px;color:#c28bff}
-.history-link span{min-width:0;flex:1}
-.history-link strong{display:block;font-size:17px}
-.history-link small{display:block;color:#c2bdd8;margin-top:4px;font-size:13px}
-.history-link .arrow{font-size:16px;color:#cbb9ef}
-
-/* TRANSACTIONS */
-.transaction-list{display:grid;gap:6px}
-.transaction{
-  display:grid;grid-template-columns:42px minmax(0,1fr) auto auto;
-  align-items:center;gap:10px;padding:9px;
-  border:1px solid var(--line);border-radius:13px;
-  background:#10152e99;min-width:0;
-}
-.transaction-icon{
-  width:38px;height:38px;border-radius:50%;
-  display:grid;place-items:center;font-size:17px;
-}
-.transaction-icon.deposit{background:#079b66;color:#fff}
-.transaction-icon.withdraw{background:#b82483;color:#fff}
-.transaction-name{font-size:16px;font-weight:900}
-.transaction-ref{font-size:12px;color:#aaa5c4;margin-top:3px;overflow-wrap:anywhere}
-.transaction-amount{font-size:17px;font-weight:900;white-space:nowrap}
-.transaction-date{font-size:13px;color:#c6c1d8;text-align:right;white-space:nowrap}
-.badge-status{
-  display:inline-block;padding:5px 9px;border-radius:20px;
-  font-size:12px;font-weight:900;white-space:nowrap;text-align:center;
-}
-.approved{background:#08794f;color:#caffdf;border:1px solid #22d48a}
-.pending{background:#874915;color:#ffe1a5;border:1px solid #f6a52d}
-.rejected{background:#7b2437;color:#ffd1dc;border:1px solid #ef607d}
-.empty{padding:18px;text-align:center;color:#aaa5c4;font-size:13px}
-
-/* GAME HISTORY */
-.game-history-row{
+.wallet-actions{display:flex;gap:10px}
+.wallet-actions button{flex:1}
+.grid{
   display:grid;
-  grid-template-columns:55px minmax(0,1fr) repeat(4,minmax(50px,auto)) auto;
-  align-items:center;gap:9px;padding:9px;
-  border-radius:12px;background:#10152e99;
-  border:1px solid var(--line);overflow:hidden;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:11px;
 }
-.game-thumb{
-  width:50px;height:50px;border-radius:9px;
-  display:grid;place-items:center;background:linear-gradient(135deg,#1479dc,#8b2fc7);
-  font-weight:1000;font-size:16px;
+.game{
+  display:block;
+  text-decoration:none;
+  color:white;
+  background:var(--panel2);
+  border:1px solid var(--border);
+  padding:17px 12px;
+  border-radius:13px;
+  transition:.2s;
 }
-.game-match{min-width:0}
-.game-match strong{display:block;font-size:15px}
-.game-match small{display:block;color:#bcb6d0;font-size:12px;margin-top:4px}
-.game-stat{text-align:center;border-left:1px solid #ffffff20;padding-left:8px}
-.game-stat small{display:block;color:#c6c1d8;font-size:12px}
-.game-stat strong{display:block;margin-top:4px;font-size:15px}
-.win{color:#1ee69b}
-.prize{color:#ffd24e}
-.view-all{color:#9ccaff;font-size:14px;font-weight:900;background:none;white-space:nowrap}
-
-/* GAME CARDS */
-.game-heading{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:8px;margin:22px 12px 12px;
+.game:hover{border-color:var(--blue);transform:translateY(-2px)}
+.game-icon{font-size:27px;margin-bottom:9px}
+.game strong{display:block;font-size:14px}
+.game small{color:var(--muted);display:block;margin-top:5px}
+.list-item{
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  font-size:13px;
 }
-.game-heading h2{font-size:27px;font-weight:1000}
-.game-heading h2 i{color:#c9baff;margin-right:7px}
-.game-heading span{font-size:14px;color:#9ccaff;font-weight:900;letter-spacing:.5px}
-.game-grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px;margin:0 10px;
+.list-item:last-child{border-bottom:0}
+.status{
+  display:inline-block;
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+  background:#343047;
+  color:#ddd7f7;
 }
-.game-card{
-  min-width:0;overflow:hidden;border-radius:18px;
-  background:linear-gradient(145deg,#22204a,#17172f);
-  border:1px solid #9d62ff88;box-shadow:0 5px 14px #0005;
+.status.approved,.status.verified{background:#123e32;color:#5ff0b8}
+.status.pending{background:#493a1b;color:#ffd879}
+.status.rejected{background:#4a202b;color:#ff8294}
+.empty{
+  text-align:center;
+  padding:20px 10px;
+  color:var(--muted);
+  font-size:13px;
 }
-.game-art{
-  height:155px;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-}
-.game-art.br{background:radial-gradient(circle at 50% 60%,#7b2dff,#10284e 70%)}
-.game-art.clash{background:radial-gradient(circle at 50% 50%,#b3278c,#201344 70%)}
-.game-art.cup{background:radial-gradient(circle at 50% 50%,#c47a1b,#14234d 75%)}
-.game-art:before{
-  content:"";position:absolute;width:150px;height:150px;
-  border:1px solid #ffffff33;border-radius:50%;
-  box-shadow:0 0 0 15px #ffffff0b,0 0 0 30px #ffffff08;
-}
-.game-art i{position:relative;z-index:1;font-size:65px;color:#ffe08a;text-shadow:0 5px 18px #0009}
-.game-art .art-label{
-  position:absolute;z-index:2;top:10px;left:5px;right:5px;
-  text-align:center;font-size:14px;font-weight:1000;font-style:italic;
-  text-shadow:0 2px 5px #000;letter-spacing:.7px;
-}
-.game-art .art-bottom{
-  position:absolute;z-index:2;bottom:9px;left:4px;right:4px;
-  text-align:center;font-size:22px;font-weight:1000;font-style:italic;
-  text-shadow:0 3px 7px #000;
-}
-.game-info{padding:13px}
-.game-title{font-size:19px;font-weight:1000;margin-bottom:7px}
-.game-desc{font-size:15px;line-height:1.5;color:#d0cbe1;min-height:66px}
-.game-foot{
-  border-top:1px solid #ffffff20;margin-top:10px;padding-top:10px;
-  display:flex;align-items:center;justify-content:space-between;gap:6px;
-}
-.game-type{
-  font-size:11px;font-weight:1000;color:#ffe17a;
-  border:1px solid #e8bd54;border-radius:20px;padding:7px 8px;white-space:nowrap;
-}
-.play{
-  padding:10px 13px;border-radius:22px;
-  background:linear-gradient(100deg,#08a9ef,#a52bcb);
-  border:1px solid #65dfff;font-size:14px;font-weight:1000;
-  white-space:nowrap;box-shadow:0 3px 8px #168cff55;
-}
-.play i{margin-left:4px}
-
-/* MODAL */
 .modal{
-  display:none;position:fixed;inset:0;z-index:50;
-  background:#050615d9;padding:14px;align-items:center;justify-content:center;
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#000b;
+  z-index:50;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
 }
 .modal.show{display:flex}
 .modal-box{
-  width:100%;max-width:420px;padding:18px;border-radius:16px;
-  background:#1b1a3c;border:1px solid #9c69ff88;box-shadow:0 20px 70px #0009;
+  width:100%;
+  max-width:430px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:17px;
+  padding:20px;
+  max-height:90vh;
+  overflow:auto;
 }
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
-.modal-head h3{font-size:20px}
-.close-modal{background:#ffffff16;width:35px;height:35px;border-radius:50%}
-.modal-note{font-size:12px;line-height:1.5;color:#aaa5c4;margin-top:10px}
-#status{display:none;font-size:14px}
-
-/* TABLET + MOBILE */
-@media(max-width:700px){
-  .topbar{min-height:62px;padding:7px 9px;grid-template-columns:38px 1fr 76px;gap:5px}
-  .icon-btn{width:35px;height:35px;font-size:14px}
-  .top-actions{gap:5px}
-  .brand-name{font-size:17px}
-  .brand-sub{font-size:11px}
-  .profile-banner{min-height:115px;padding:12px}
-  .profile-main{gap:11px}
-  .avatar{width:75px;height:75px}
-  .crown{font-size:18px;top:-12px;left:25px}
-  .profile-name{font-size:17px}
-  .verified{font-size:14px}
-  .profile-username{font-size:12px}
-  .player-tag{font-size:10px;padding:5px 8px}
-  .connected{max-width:155px;padding:8px}
-  .connected strong{font-size:10px}
-  .connected small{font-size:9px}
-  .profile-banner:before{font-size:24px}
-  .card{margin:7px}
-  .card-pad{padding:9px}
-  .section-title{font-size:13px}
-  .dashboard-grid{gap:7px;margin:0 7px}
-  .info-row{min-height:43px;padding:6px;gap:6px}
-  .info-icon{width:27px;height:27px;font-size:12px}
-  .info-label{font-size:10px}
-  .info-value{font-size:11px}
-  .edit-btn{font-size:10px;padding:6px}
-  .wallet-balance{font-size:23px;padding:8px 0 12px}
-  .wallet-btn{font-size:11px;padding:9px 3px;gap:5px}
-  .history-links{gap:7px;margin:8px 7px}
-  .history-link{padding:9px 7px;gap:6px}
-  .history-link i:first-child{font-size:18px}
-  .history-link strong{font-size:11px}
-  .history-link small{font-size:9px}
-  .history-link .arrow{font-size:10px}
-  .transaction{grid-template-columns:29px minmax(0,1fr) auto;gap:5px;padding:6px}
-  .transaction-icon{width:26px;height:26px;font-size:12px}
-  .transaction-name{font-size:11px}
-  .transaction-ref{font-size:9px}
-  .transaction-amount{font-size:11px}
-  .transaction-date{display:none}
-  .badge-status{font-size:9px;padding:4px 6px}
-  .game-history-row{
-    grid-template-columns:35px minmax(0,1fr) 35px 35px;
-    gap:4px;padding:6px;
-  }
-  .game-thumb{width:32px;height:32px;font-size:11px}
-  .game-match strong{font-size:10px}
-  .game-match small{font-size:9px}
-  .game-stat{padding-left:4px}
-  .game-stat small{font-size:8px}
-  .game-stat strong{font-size:10px}
-  .game-heading{margin:15px 9px 9px}
-  .game-heading h2{font-size:17px}
-  .game-heading span{font-size:9px}
-  .game-grid{gap:7px;margin:0 7px}
-  .game-art{height:90px}
-  .game-art i{font-size:39px}
-  .game-art .art-label{font-size:9px;top:6px}
-  .game-art .art-bottom{font-size:12px;bottom:6px}
-  .game-info{padding:7px}
-  .game-title{font-size:12px;margin-bottom:4px}
-  .game-desc{font-size:9px;min-height:45px}
-  .game-foot{margin-top:7px;padding-top:7px;gap:3px}
-  .game-type{font-size:7px;padding:4px}
-  .play{font-size:9px;padding:7px 8px}
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
 }
-@media(max-width:370px){
-  .connected{max-width:115px}
-  .connected strong{font-size:8px}
-  .connected small{font-size:8px}
-  .profile-name{font-size:14px}
-  .avatar{width:65px;height:65px}
-  .game-type{font-size:6px;padding:4px 3px}
-  .play{font-size:8px;padding:6px}
+.close{
+  background:#302d42;
+  color:white;
+  border:0;
+  border-radius:8px;
+  width:34px;
+  height:34px;
+}
+.notice{
+  background:#242139;
+  border:1px solid var(--border);
+  padding:11px;
+  border-radius:10px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+  margin-bottom:13px;
+}
+#message{
+  display:none;
+  padding:12px;
+  border-radius:10px;
+  margin-bottom:14px;
+  font-size:13px;
+}
+#message.show{display:block}
+#message.error{background:#49212d;color:#ff9aaa}
+#message.success{background:#123e32;color:#72f0bd}
+.loading{opacity:.6;pointer-events:none}
+@media(max-width:420px){
+  .page{padding:12px}
+  .card{padding:15px}
+  .balance{font-size:29px}
 }
 </style>
 </head>
 
 <body>
-<div class="app">
+<div class="page">
 
-<header class="topbar">
-  <div class="top-left">
-    <button class="icon-btn" type="button" onclick="history.length>1?history.back():location.href='home.html'" aria-label="Back">
-      <i class="fa-solid fa-arrow-left"></i>
-    </button>
+  <div class="topbar">
+    <div class="brand"><span>BOYS</span> VS <span>GIRLS 💗</span></div>
+    <button class="back" onclick="history.back()">← Back</button>
   </div>
-  <div class="brand">
-    <div class="brand-name">BOYS VS GIRLS 💙💗</div>
-    <div class="brand-sub">🏆 Tournament Profile</div>
-  </div>
-  <div class="top-actions">
-    <button class="icon-btn" type="button" onclick="location.href='notifications.html'" aria-label="Notifications"><i class="fa-regular fa-bell"></i></button>
-    <button class="icon-btn" type="button" onclick="location.href='settings.html'" aria-label="Settings"><i class="fa-solid fa-gear"></i></button>
-  </div>
-</header>
 
-<section class="profile-banner">
-  <div class="profile-main">
-    <div class="avatar-wrap">
-      <i class="fa-solid fa-crown crown"></i>
-      <img id="avatar" class="avatar" src="https://placehold.co/200x200/30264c/ffffff?text=Player" alt="Profile picture">
-    </div>
-    <div style="min-width:0">
-      <div class="profile-name"><span id="displayName">Loading profile...</span><i class="fa-solid fa-circle-check verified"></i></div>
-      <div class="profile-username" id="username">@loading</div>
-      <div class="player-tag"><i class="fa-solid fa-gamepad"></i> Tournament Player</div>
-    </div>
-  </div>
-  <div class="connected">
-    <strong><i class="fa-solid fa-link"></i> Linked with Social App <i class="fa-solid fa-circle-check"></i></strong>
-    <small>Boys vs Girls Account</small>
-  </div>
-</section>
+  <div id="message"></div>
 
-<div id="status" class="card card-pad" role="status" aria-live="polite"></div>
-
-<div class="dashboard-grid">
-  <section class="card card-pad">
-    <div class="section-head">
-      <h2 class="section-title"><i class="fa-solid fa-gamepad"></i> Free Fire Details</h2>
-      <button class="edit-btn" type="button" onclick="editGameDetails()"><i class="fa-solid fa-pen"></i> Edit</button>
-    </div>
-    <div class="info-row">
-      <div class="info-icon"><i class="fa-solid fa-user"></i></div>
-      <div class="info-content">
-        <div class="info-label">Game Name</div>
-        <div class="info-value" id="gameName">Not added</div>
+  <!-- SOCIAL PROFILE -->
+  <section class="card">
+    <div class="profile-head">
+      <img id="avatar" class="avatar" src="" alt="Profile">
+      <div>
+        <div class="name" id="userName">Loading...</div>
+        <div class="username" id="userUsername">@username</div>
+        <div class="muted" style="margin-top:7px">Tournament Player</div>
       </div>
     </div>
-    <div class="info-row">
-      <div class="info-icon"><i class="fa-solid fa-id-card"></i></div>
-      <div class="info-content">
-        <div class="info-label">Game UID</div>
-        <div class="info-value" id="gameUid">Not added</div>
-      </div>
-      <button class="edit-btn" type="button" onclick="copyUID()" aria-label="Copy UID"><i class="fa-regular fa-copy"></i></button>
-    </div>
-    <form id="profileForm" style="display:none;margin-top:10px">
-      <div class="modal-field">
-        <label for="ffName">Free Fire Game Name</label>
-        <input id="ffName" maxlength="40" placeholder="Enter Game Name" required>
-      </div>
-      <div class="modal-field">
-        <label for="ffUid">Free Fire UID</label>
-        <input id="ffUid" maxlength="20" inputmode="numeric" pattern="[0-9]{5,20}" placeholder="Enter Game UID" required>
-      </div>
-      <button class="modal-submit" id="saveBtn" type="submit">Save Game Details</button>
-    </form>
   </section>
 
-  <section class="card card-pad">
-    <div class="section-head">
-      <h2 class="section-title"><i class="fa-solid fa-wallet" style="color:#ffb943"></i> Tournament Wallet</h2>
+  <!-- FREE FIRE DETAILS -->
+  <section class="card">
+    <h2 class="section-title"><span>01.</span> Free Fire Details</h2>
+    <div class="field">
+      <label>Free Fire Game Name (IGN)</label>
+      <input id="gameName" type="text" maxlength="40" placeholder="Enter your Free Fire name">
     </div>
-    <div class="wallet-balance" id="walletBalance">৳ 0.00</div>
+    <div class="field">
+      <label>Free Fire UID</label>
+      <input id="gameUid" type="text" inputmode="numeric" maxlength="30" placeholder="Enter your Free Fire UID">
+    </div>
+    <button class="btn full" id="saveProfileBtn" onclick="saveGameProfile()">Save Free Fire Details</button>
+  </section>
+
+  <!-- TOURNAMENT WALLET -->
+  <section class="card wallet">
+    <div class="wallet-label">TOURNAMENT WALLET BALANCE</div>
+    <div class="balance" id="walletBalance">৳ 0.00</div>
     <div class="wallet-actions">
-      <button class="wallet-btn deposit-btn" type="button" onclick="openMoneyModal('deposit')"><i class="fa-solid fa-download"></i> Deposit</button>
-      <button class="wallet-btn withdraw-btn" type="button" onclick="openMoneyModal('withdraw')"><i class="fa-solid fa-upload"></i> Withdraw</button>
+      <button class="btn btn-green" onclick="openModal('depositModal')">＋ Deposit</button>
+      <button class="btn btn-pink" onclick="openModal('withdrawModal')">↗ Withdraw</button>
+    </div>
+    <p class="muted" style="color:#d4d9ff;margin:13px 0 0">
+      This wallet is separate from your Social App Wallet.
+    </p>
+  </section>
+
+  <!-- TRANSACTION HISTORY -->
+  <section class="card">
+    <h2 class="section-title"><span>02.</span> Transaction History</h2>
+    <div id="transactions">
+      <div class="empty">Loading transactions...</div>
+    </div>
+    <a href="transaction-history.html" class="btn btn-outline full"
+       style="display:block;text-align:center;text-decoration:none;margin-top:12px">
+      View All Transactions
+    </a>
+  </section>
+
+  <!-- GAME HISTORY -->
+  <section class="card">
+    <h2 class="section-title"><span>03.</span> Verified Game History</h2>
+    <div id="gameHistory">
+      <div class="empty">Loading game history...</div>
+    </div>
+    <a href="game-history.html" class="btn btn-outline full"
+       style="display:block;text-align:center;text-decoration:none;margin-top:12px">
+      View All Game History
+    </a>
+  </section>
+
+  <!-- GAME SELECTION -->
+  <section class="card">
+    <h2 class="section-title"><span>04.</span> Tournament Games</h2>
+    <div class="grid">
+      <a class="game" href="br-match.html">
+        <div class="game-icon">🎯</div>
+        <strong>BR MATCH</strong>
+        <small>Solo • Duo • Squad</small>
+      </a>
+      <a class="game" href="clash-squad.html">
+        <div class="game-icon">⚔️</div>
+        <strong>CLASH SQUAD</strong>
+        <small>4 vs 4 Battle</small>
+      </a>
+      <a class="game" href="free-fire-cup.html" style="grid-column:1/-1">
+        <div class="game-icon">🏆</div>
+        <strong>FREE FIRE WORLD CUP</strong>
+        <small>Team Knockout Tournament</small>
+      </a>
     </div>
   </section>
+
 </div>
 
-<div class="history-links">
-  <a class="history-link" href="transaction-history.html">
-    <i class="fa-regular fa-clipboard"></i>
-    <span><strong>Transaction History</strong><small>Deposit & Withdraw Records</small></span>
-    <i class="fa-solid fa-chevron-right arrow"></i>
-  </a>
-  <a class="history-link" href="game-history.html">
-    <i class="fa-solid fa-trophy" style="color:#ffc94e!important"></i>
-    <span><strong>Game History</strong><small>Matches, Result, Kills & Prizes</small></span>
-    <i class="fa-solid fa-chevron-right arrow"></i>
-  </a>
-</div>
-
-<section class="card card-pad">
-  <div class="section-head">
-    <h2 class="section-title"><i class="fa-solid fa-arrow-right-arrow-left"></i> Recent Transactions</h2>
-    <button class="view-all" type="button" onclick="location.href='transaction-history.html'">View All <i class="fa-solid fa-chevron-right"></i></button>
-  </div>
-  <div class="transaction-list" id="transactionList"><div class="empty">Loading transactions...</div></div>
-</section>
-
-<section class="card card-pad">
-  <div class="section-head">
-    <h2 class="section-title"><i class="fa-solid fa-gamepad"></i> Recent Game History</h2>
-    <button class="view-all" type="button" onclick="location.href='game-history.html'">View All <i class="fa-solid fa-chevron-right"></i></button>
-  </div>
-  <div id="gameHistoryList"><div class="empty">Loading game history...</div></div>
-</section>
-
-<div class="game-heading">
-  <h2><i class="fa-solid fa-gamepad"></i> Choose Your Game</h2>
-  <span>SELECT MODE</span>
-</div>
-
-<div class="game-grid">
-  <article class="game-card">
-    <div class="game-art br">
-      <div class="art-label">FREE FIRE</div>
-      <i class="fa-solid fa-crosshairs"></i>
-      <div class="art-bottom">BR MATCH</div>
-    </div>
-    <div class="game-info">
-      <div class="game-title">BR MATCH</div>
-      <div class="game-desc">Solo, Duo & Squad battle tournaments.</div>
-      <div class="game-foot">
-        <span class="game-type">FREE & PAID</span>
-        <button class="play" type="button" onclick="openGame('br-match.html')">PLAY <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-    </div>
-  </article>
-
-  <article class="game-card">
-    <div class="game-art clash">
-      <div class="art-label">FREE FIRE</div>
-      <i class="fa-solid fa-shield-halved"></i>
-      <div class="art-bottom">CLASH SQUAD</div>
-    </div>
-    <div class="game-info">
-      <div class="game-title">CLASH SQUAD</div>
-      <div class="game-desc">Fast 4 vs 4 team battle competition.</div>
-      <div class="game-foot">
-        <span class="game-type">4 VS 4</span>
-        <button class="play" type="button" onclick="openGame('clash-squad.html')">PLAY <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-    </div>
-  </article>
-
-  <article class="game-card">
-    <div class="game-art cup">
-      <div class="art-label">FREE FIRE WORLD CUP</div>
-      <i class="fa-solid fa-trophy"></i>
-      <div class="art-bottom">WORLD CUP</div>
-    </div>
-    <div class="game-info">
-      <div class="game-title">FREE FIRE WORLD CUP 🏆</div>
-      <div class="game-desc">Team knockout championship. Round 1, Round 2, Super 8, Semi Final and Grand Final.</div>
-      <div class="game-foot">
-        <span class="game-type">TEAM TOURNAMENT</span>
-        <button class="play" type="button" onclick="openGame('free-fire-cup.html')">PLAY <i class="fa-solid fa-arrow-right"></i></button>
-      </div>
-    </div>
-  </article>
-</div>
-</div>
-
-<!-- DEPOSIT / WITHDRAW MODAL -->
-<div class="modal" id="moneyModal">
+<!-- DEPOSIT MODAL -->
+<div class="modal" id="depositModal">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 id="moneyTitle">Deposit Request</h3>
-      <button class="close-modal" type="button" onclick="closeMoneyModal()"><i class="fa-solid fa-xmark"></i></button>
+      <h3 style="margin:0">Deposit Request</h3>
+      <button class="close" onclick="closeModal('depositModal')">✕</button>
     </div>
-    <form id="moneyForm">
-      <div class="modal-field">
-        <label for="moneyAmount">Amount (৳)</label>
-        <input id="moneyAmount" type="number" min="1" step="0.01" placeholder="Enter amount" required>
+    <div class="notice">
+      Submit your payment details. Admin will verify your transaction before adding funds to your Tournament Wallet.
+    </div>
+    <form id="depositForm">
+      <div class="field">
+        <label>Deposit Amount</label>
+        <input id="depositAmount" type="number" min="1" step="0.01" required placeholder="Enter amount">
       </div>
-      <div class="modal-field">
-        <label for="moneyMethod">Payment Method</label>
-        <input id="moneyMethod" maxlength="40" placeholder="e.g. bKash / Nagad / Binance" required>
+      <div class="field">
+        <label>Payment Method</label>
+        <select id="depositMethod" required>
+          <option value="">Select payment method</option>
+          <option value="bKash">bKash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Rocket">Rocket</option>
+          <option value="Binance">Binance</option>
+          <option value="RedotPay">RedotPay</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
-      <div class="modal-field">
-        <label for="moneyReference">Transaction Reference</label>
-        <input id="moneyReference" maxlength="100" placeholder="Enter transaction reference" required>
+      <div class="field">
+        <label>Transaction ID / Reference</label>
+        <input id="depositReference" type="text" maxlength="120" required placeholder="Enter transaction reference">
       </div>
-      <button class="modal-submit" id="moneySubmit" type="submit">Submit Request</button>
+      <button class="btn btn-green full" id="depositSubmit">Submit Deposit Request</button>
     </form>
-    <p class="modal-note">Your request will remain pending until it is reviewed by the Admin. Never enter your PIN, password or OTP.</p>
+  </div>
+</div>
+
+<!-- WITHDRAW MODAL -->
+<div class="modal" id="withdrawModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 style="margin:0">Withdraw Request</h3>
+      <button class="close" onclick="closeModal('withdrawModal')">✕</button>
+    </div>
+    <div class="notice">
+      Withdrawals require Admin approval. Never enter your PIN, password, OTP or card details.
+    </div>
+    <form id="withdrawForm">
+      <div class="field">
+        <label>Withdraw Amount</label>
+        <input id="withdrawAmount" type="number" min="1" step="0.01" required placeholder="Enter amount">
+      </div>
+      <div class="field">
+        <label>Payment Method</label>
+        <select id="withdrawMethod" required>
+          <option value="">Select payment method</option>
+          <option value="bKash">bKash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Rocket">Rocket</option>
+          <option value="Binance">Binance</option>
+          <option value="RedotPay">RedotPay</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Payment Account / Wallet Address</label>
+        <input id="withdrawAccount" type="text" maxlength="160" required placeholder="Enter your receiving account">
+      </div>
+      <button class="btn btn-pink full" id="withdrawSubmit">Submit Withdraw Request</button>
+    </form>
   </div>
 </div>
 
 <script>
-'use strict';
+"use strict";
 
-const API_BASE='https://freetube-backend-a222.onrender.com/api';
-const TOKEN_KEY='freetube_access_token';
-const $=id=>document.getElementById(id);
+const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY = "freetube_access_token";
 
-let currentUID='';
-let moneyType='deposit';
+let currentUser = null;
 
 function getToken(){
-  try{
-    return localStorage.getItem(TOKEN_KEY)||sessionStorage.getItem(TOKEN_KEY)||'';
-  }catch(e){return ''}
+  return sessionStorage.getItem(TOKEN_KEY) ||
+         localStorage.getItem(TOKEN_KEY) || "";
+}
+
+function showMessage(message,type="success"){
+  const box=document.getElementById("message");
+  box.textContent=message;
+  box.className="show "+type;
+  window.scrollTo({top:0,behavior:"smooth"});
+  setTimeout(()=>box.classList.remove("show"),5000);
+}
+
+function unwrap(data){
+  if(!data || typeof data!=="object") return {};
+  return data.data && typeof data.data==="object"
+    ? {...data,...data.data}
+    : data;
+}
+
+async function apiRequest(path,options={}){
+  const token=getToken();
+  const headers={
+    "Content-Type":"application/json",
+    ...(options.headers||{})
+  };
+  if(token) headers.Authorization="Bearer "+token;
+
+  const response=await fetch(API_BASE_URL+path,{
+    ...options,
+    headers,
+    credentials:"include",
+    cache:"no-store"
+  });
+
+  const text=await response.text();
+  let data={};
+  try{data=text?JSON.parse(text):{}}
+  catch{data={message:text}}
+
+  if(response.status===401){
+    showMessage("Your session has expired. Please log in again.","error");
+    throw new Error("Unauthorized");
+  }
+
+  if(!response.ok){
+    throw new Error(data.message||data.error||"Request failed");
+  }
+  return unwrap(data);
 }
 
 function money(value){
-  const n=Number(value||0);
-  return '৳ '+n.toLocaleString('en-BD',{
-    minimumFractionDigits:2,maximumFractionDigits:2
+  const amount=Number(value||0);
+  return "৳ "+amount.toLocaleString("en-BD",{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
   });
-}
-
-function showStatus(message,type=''){
-  const el=$('status');
-  el.style.display='block';
-  el.textContent=message;
-  el.style.color=type==='error'?'#ffaaaa':type==='success'?'#9cf0c0':'#fff';
-}
-
-async function api(path,options={}){
-  const headers={...(options.headers||{})};
-  const token=getToken();
-  if(token)headers.Authorization='Bearer '+token;
-  if(options.body&&!headers['Content-Type'])headers['Content-Type']='application/json';
-
-  let response;
-  try{
-    response=await fetch(API_BASE+path,{
-      ...options,headers,credentials:'omit',cache:'no-store'
-    });
-  }catch(error){
-    throw new Error('Cannot connect to server. Please check your internet connection.');
-  }
-
-  const raw=await response.text();
-  let data={};
-  try{data=raw?JSON.parse(raw):{}}catch(e){data={message:raw}}
-
-  if(response.status===401)throw new Error('Login session expired. Please log in to the Social App again.');
-  if(!response.ok)throw new Error(data.error||data.message||('Request failed: '+response.status));
-  return data;
 }
 
 function getArray(data,...keys){
   for(const key of keys){
-    if(Array.isArray(data?.[key]))return data[key];
+    if(Array.isArray(data[key])) return data[key];
   }
-  if(Array.isArray(data?.data))return data.data;
   return [];
 }
 
 function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g,char=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[char]));
+  return String(value??"").replace(/[&<>"']/g,char=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[char]);
 }
 
-/* PROFILE */
-async function loadProfile(){
-  const me=await api('/auth/me');
-  const user=me.user||me.profile||me.data?.user||{};
+function statusClass(status){
+  const value=String(status||"pending").toLowerCase();
+  if(["approved","verified","completed","success"].includes(value)) return "approved";
+  if(["rejected","failed","cancelled"].includes(value)) return "rejected";
+  return "pending";
+}
 
-  $('displayName').textContent=
-    user.display_name||user.full_name||user.name||user.username||'Player';
-  $('username').textContent=user.username?'@'+user.username:'Social Account';
+function openModal(id){
+  document.getElementById(id).classList.add("show");
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove("show");
+}
+
+async function loadSocialProfile(){
+  const data=await apiRequest("/auth/me");
+  currentUser=data.user||data.profile||data;
+  const user=currentUser;
+
+  document.getElementById("userName").textContent=
+    user.full_name||user.name||user.username||"Player";
+
+  document.getElementById("userUsername").textContent=
+    "@"+(user.username||"");
+
+  document.getElementById("avatar").src=
+    user.avatar_url||user.profile_picture||user.avatar||
+    "https://placehold.co/150x150/201e32/ffffff?text=Player";
 
   if(user.username){
     try{
-      const result=await api('/profile/'+encodeURIComponent(user.username));
-      const p=result.profile||result.data?.profile||{};
-      $('displayName').textContent=
-        p.display_name||p.full_name||user.display_name||user.username;
-      const avatar=p.avatar_url||p.profile_picture||p.avatar;
-      if(avatar)$('avatar').src=avatar;
+      const profile=await apiRequest(
+        "/profile/"+encodeURIComponent(user.username)
+      );
+      const p=profile.profile||profile.user||profile;
+      document.getElementById("userName").textContent=
+        p.full_name||p.name||p.username||user.username;
+      document.getElementById("avatar").src=
+        p.avatar_url||p.profile_picture||p.avatar||
+        document.getElementById("avatar").src;
     }catch(error){
-      console.warn('Social profile details:',error);
+      console.warn("Social profile details:",error.message);
     }
   }
-
-  const tournament=await api('/tournament/profile');
-  const p=tournament.profile||tournament.tournamentProfile||tournament.data?.profile||{};
-  const ffName=p.ff_name||p.free_fire_name||'';
-  const ffUid=p.ff_uid||p.free_fire_uid||'';
-
-  $('gameName').textContent=ffName||'Not added';
-  $('gameUid').textContent=ffUid||'Not added';
-  $('ffName').value=ffName;
-  $('ffUid').value=ffUid;
-  currentUID=ffUid;
-
-  showStatus('Social App account connected successfully.','success');
 }
 
-/* EDIT GAME DETAILS */
-function editGameDetails(){
-  const form=$('profileForm');
-  form.style.display=form.style.display==='none'?'block':'none';
-  if(form.style.display==='block'){
-    $('ffName').focus();
-    form.scrollIntoView({behavior:'smooth',block:'center'});
-  }
+async function loadGameProfile(){
+  const data=await apiRequest("/tournament/profile");
+  const profile=data.profile||data.tournamentProfile||data;
+  document.getElementById("gameName").value=
+    profile.game_name||profile.gameName||profile.ign||"";
+  document.getElementById("gameUid").value=
+    profile.game_uid||profile.gameUid||profile.uid||"";
 }
 
-$('profileForm').addEventListener('submit',async event=>{
-  event.preventDefault();
+async function saveGameProfile(){
+  const gameName=document.getElementById("gameName").value.trim();
+  const gameUid=document.getElementById("gameUid").value.trim();
 
-  const ffName=$('ffName').value.trim();
-  const ffUid=$('ffUid').value.trim();
-
-  if(!ffName){
-    showStatus('Please enter your Free Fire Game Name.','error');
-    return;
-  }
-  if(!/^[0-9]{5,20}$/.test(ffUid)){
-    showStatus('Free Fire UID must contain 5 to 20 digits.','error');
+  if(!gameName||!gameUid){
+    showMessage("Please enter your Free Fire Game Name and UID.","error");
     return;
   }
 
-  const btn=$('saveBtn');
-  btn.disabled=true;
-  btn.textContent='Saving...';
+  const button=document.getElementById("saveProfileBtn");
+  button.disabled=true;
+  button.textContent="Saving...";
 
   try{
-    await api('/tournament/profile',{
-      method:'PUT',
-      body:JSON.stringify({ff_name:ffName,ff_uid:ffUid})
+    await apiRequest("/tournament/profile",{
+      method:"PUT",
+      body:JSON.stringify({
+        game_name:gameName,
+        game_uid:gameUid
+      })
     });
-
-    $('gameName').textContent=ffName;
-    $('gameUid').textContent=ffUid;
-    currentUID=ffUid;
-    $('profileForm').style.display='none';
-    showStatus('Free Fire details saved successfully.','success');
+    showMessage("Free Fire details saved successfully.");
   }catch(error){
-    showStatus(error.message,'error');
+    showMessage(error.message,"error");
   }finally{
-    btn.disabled=false;
-    btn.textContent='Save Game Details';
-  }
-});
-
-function copyUID(){
-  if(!currentUID){
-    showStatus('No Free Fire UID available.','error');
-    return;
-  }
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(currentUID)
-      .then(()=>showStatus('Free Fire UID copied.','success'))
-      .catch(()=>showStatus('Could not copy UID.','error'));
-  }else{
-    showStatus('Copy is not supported in this browser.','error');
+    button.disabled=false;
+    button.textContent="Save Free Fire Details";
   }
 }
 
-/* WALLET */
 async function loadWallet(){
-  const data=await api('/tournament/wallet');
-  const wallet=data.wallet||data.data?.wallet||data.data||data;
-  const balance=wallet.balance??wallet.available_balance??wallet.wallet_balance??0;
-  $('walletBalance').textContent=money(balance);
-}
-
-/* TRANSACTIONS */
-function statusClass(status){
-  const s=String(status||'pending').toLowerCase();
-  if(['approved','success','completed'].includes(s))return 'approved';
-  if(['rejected','failed'].includes(s))return 'rejected';
-  return 'pending';
-}
-
-function formatDate(value){
-  if(!value)return '';
-  const d=new Date(value);
-  if(Number.isNaN(d.getTime()))return String(value);
-  return d.toLocaleString('en-GB',{
-    day:'2-digit',month:'short',year:'numeric',
-    hour:'2-digit',minute:'2-digit'
-  });
+  const data=await apiRequest("/tournament/wallet");
+  const wallet=data.wallet||data;
+  const balance=wallet.balance??wallet.available_balance??wallet.amount??0;
+  document.getElementById("walletBalance").textContent=money(balance);
 }
 
 async function loadTransactions(){
-  const box=$('transactionList');
-  try{
-    const data=await api('/tournament/transactions');
-    const list=getArray(data,'transactions','items','records');
+  const data=await apiRequest("/tournament/transactions");
+  const rows=getArray(data,"transactions","items","history");
+  const container=document.getElementById("transactions");
 
-    if(!list.length){
-      box.innerHTML='<div class="empty">No transactions yet.</div>';
-      return;
-    }
-
-    box.innerHTML=list.slice(0,3).map(item=>{
-      const type=String(item.type||item.transaction_type||'deposit').toLowerCase();
-      const isWithdraw=type.includes('withdraw');
-      const status=item.status||'pending';
-      const reference=item.transaction_reference||item.reference||item.reference_id||item.id||'';
-      const date=item.created_at||item.createdAt||item.date||'';
-
-      return `
-        <div class="transaction">
-          <div class="transaction-icon ${isWithdraw?'withdraw':'deposit'}">
-            <i class="fa-solid ${isWithdraw?'fa-arrow-up':'fa-arrow-down'}"></i>
-          </div>
-          <div style="min-width:0">
-            <div class="transaction-name">${isWithdraw?'Withdraw':'Deposit'}</div>
-            <div class="transaction-ref">TRX: ${escapeHTML(String(reference))}</div>
-          </div>
-          <div class="transaction-amount">${money(item.amount??0)}</div>
-          <div class="transaction-date">
-            ${escapeHTML(formatDate(date))}<br>
-            <span class="badge-status ${statusClass(status)}">${escapeHTML(String(status))}</span>
-          </div>
-        </div>`;
-    }).join('');
-  }catch(error){
-    console.error('Transactions:',error);
-    box.innerHTML='<div class="empty">Transaction history could not be loaded.</div>';
+  if(!rows.length){
+    container.innerHTML='<div class="empty">No transactions found.</div>';
+    return;
   }
+
+  container.innerHTML=rows.slice(0,5).map(item=>{
+    const type=escapeHTML(item.type||item.transaction_type||"Transaction");
+    const status=item.status||"pending";
+    const amount=money(item.amount);
+    const date=item.created_at||item.createdAt||item.date||"";
+    return `
+      <div class="list-item">
+        <div>
+          <strong>${type}</strong>
+          <div class="muted">${escapeHTML(item.method||item.payment_method||"")} ${date?"• "+escapeHTML(date):""}</div>
+          <span class="status ${statusClass(status)}">${escapeHTML(status)}</span>
+        </div>
+        <strong>${amount}</strong>
+      </div>`;
+  }).join("");
 }
 
-/* GAME HISTORY */
 async function loadGameHistory(){
-  const box=$('gameHistoryList');
-  try{
-    const data=await api('/tournament/game-history');
-    const list=getArray(data,'history','game_history','records','items');
+  const data=await apiRequest("/tournament/game-history");
+  const rows=getArray(data,"history","game_history","items");
+  const container=document.getElementById("gameHistory");
 
-    if(!list.length){
-      box.innerHTML='<div class="empty">No verified game history yet.</div>';
-      return;
-    }
-
-    box.innerHTML=list.slice(0,2).map(item=>{
-      const title=item.tournament_name||item.match_name||item.title||'Tournament Match';
-      const mode=item.game_mode||item.mode||'Free Fire';
-      const rank=item.rank??item.position??'-';
-      const kills=item.kills??0;
-      const result=item.result||item.status||'Completed';
-      const prize=item.prize_amount??item.prize??0;
-      const date=item.created_at||item.match_date||item.date||'';
-
-      return `
-        <div class="game-history-row">
-          <div class="game-thumb">FF</div>
-          <div class="game-match">
-            <strong>${escapeHTML(String(title))}</strong>
-            <small>${escapeHTML(String(mode))}</small>
-          </div>
-          <div class="game-stat">
-            <small>Rank</small>
-            <strong>${escapeHTML(String(rank))}</strong>
-          </div>
-          <div class="game-stat">
-            <small>Kills</small>
-            <strong>${escapeHTML(String(kills))}</strong>
-          </div>
-          <div class="game-stat">
-            <small>Result</small>
-            <strong class="${String(result).toLowerCase()==='win'?'win':''}">${escapeHTML(String(result))}</strong>
-          </div>
-          <div class="game-stat">
-            <small>Prize</small>
-            <strong class="prize">${money(prize)}</strong>
-          </div>
-          <div class="game-stat">
-            <small>Date</small>
-            <strong>${escapeHTML(formatDate(date).split(',')[0]||'-')}</strong>
-          </div>
-        </div>`;
-    }).join('');
-  }catch(error){
-    console.error('Game history:',error);
-    box.innerHTML='<div class="empty">Game history could not be loaded.</div>';
+  if(!rows.length){
+    container.innerHTML='<div class="empty">No verified game history yet.</div>';
+    return;
   }
+
+  container.innerHTML=rows.slice(0,5).map(item=>{
+    const title=item.tournament_name||item.game_name||
+      item.title||"Tournament Match";
+    const result=item.result||item.position||item.status||"Verified";
+    const prize=Number(item.prize_amount??item.prize??0);
+    const date=item.created_at||item.match_date||item.date||"";
+    return `
+      <div class="list-item">
+        <div>
+          <strong>${escapeHTML(title)}</strong>
+          <div class="muted">${escapeHTML(date)}</div>
+          <span class="status verified">${escapeHTML(result)}</span>
+        </div>
+        <strong style="color:var(--green)">${money(prize)}</strong>
+      </div>`;
+  }).join("");
 }
 
-/* DEPOSIT / WITHDRAW */
-function openMoneyModal(type){
-  moneyType=type;
-  $('moneyTitle').textContent=type==='deposit'?'Deposit Request':'Withdraw Request';
-  $('moneySubmit').textContent=type==='deposit'?'Submit Deposit Request':'Submit Withdraw Request';
-  $('moneyForm').reset();
-  $('moneyModal').classList.add('show');
-}
-function closeMoneyModal(){
-  $('moneyModal').classList.remove('show');
-}
-
-$('moneyModal').addEventListener('click',event=>{
-  if(event.target===$('moneyModal'))closeMoneyModal();
-});
-
-$('moneyForm').addEventListener('submit',async event=>{
+document.getElementById("depositForm").addEventListener("submit",async event=>{
   event.preventDefault();
 
-  const amount=Number($('moneyAmount').value);
-  const method=$('moneyMethod').value.trim();
-  const reference=$('moneyReference').value.trim();
+  const amount=Number(document.getElementById("depositAmount").value);
+  const method=document.getElementById("depositMethod").value;
+  const reference=document.getElementById("depositReference").value.trim();
 
-  if(!Number.isFinite(amount)||amount<=0){
-    showStatus('Enter a valid amount.','error');
-    return;
-  }
-  if(!method||!reference){
-    showStatus('Enter payment method and transaction reference.','error');
+  if(!Number.isFinite(amount)||amount<=0||!method||!reference){
+    showMessage("Please enter valid deposit details.","error");
     return;
   }
 
-  const btn=$('moneySubmit');
-  btn.disabled=true;
-  btn.textContent='Submitting...';
+  const button=document.getElementById("depositSubmit");
+  button.disabled=true;
+  button.textContent="Submitting...";
 
   try{
-    const endpoint=moneyType==='deposit'
-      ?'/tournament/deposits'
-      :'/tournament/withdrawals';
-
-    await api(endpoint,{
-      method:'POST',
+    await apiRequest("/tournament/deposits",{
+      method:"POST",
       body:JSON.stringify({
         amount,
-        payment_method:method,
+        method,
+        reference,
         transaction_reference:reference
       })
     });
-
-    closeMoneyModal();
-    showStatus('Your request has been submitted. It is waiting for Admin review.','success');
-    await Promise.all([loadWallet(),loadTransactions()]);
+    closeModal("depositModal");
+    event.target.reset();
+    showMessage("Deposit request submitted. Waiting for Admin verification.");
+    await Promise.allSettled([loadTransactions(),loadWallet()]);
   }catch(error){
-    showStatus(error.message,'error');
+    showMessage(error.message,"error");
   }finally{
-    btn.disabled=false;
-    btn.textContent=moneyType==='deposit'
-      ?'Submit Deposit Request'
-      :'Submit Withdraw Request';
+    button.disabled=false;
+    button.textContent="Submit Deposit Request";
   }
 });
 
-/* GAME NAVIGATION */
-function openGame(page){
-  location.href=page;
-}
+document.getElementById("withdrawForm").addEventListener("submit",async event=>{
+  event.preventDefault();
 
-/* INITIAL LOAD */
-async function init(){
+  const amount=Number(document.getElementById("withdrawAmount").value);
+  const method=document.getElementById("withdrawMethod").value;
+  const account=document.getElementById("withdrawAccount").value.trim();
+
+  if(!Number.isFinite(amount)||amount<=0||!method||!account){
+    showMessage("Please enter valid withdrawal details.","error");
+    return;
+  }
+
+  const button=document.getElementById("withdrawSubmit");
+  button.disabled=true;
+  button.textContent="Submitting...";
+
+  try{
+    await apiRequest("/tournament/withdrawals",{
+      method:"POST",
+      body:JSON.stringify({
+        amount,
+        method,
+        account,
+        account_details:account
+      })
+    });
+    closeModal("withdrawModal");
+    event.target.reset();
+    showMessage("Withdrawal request submitted. Waiting for Admin approval.");
+    await Promise.allSettled([loadTransactions(),loadWallet()]);
+  }catch(error){
+    showMessage(error.message,"error");
+  }finally{
+    button.disabled=false;
+    button.textContent="Submit Withdraw Request";
+  }
+});
+
+async function initializePage(){
   if(!getToken()){
-    $('displayName').textContent='Not connected';
-    $('username').textContent='Login required';
-    showStatus('Please log in to the Social App first.','error');
+    showMessage("Please log in to access your Tournament Profile.","error");
     return;
   }
 
   try{
-    await loadProfile();
-  }catch(error){
-    console.error(error);
-    showStatus(error.message,'error');
-  }
+    await loadSocialProfile();
+    const results=await Promise.allSettled([
+      loadGameProfile(),
+      loadWallet(),
+      loadTransactions(),
+      loadGameHistory()
+    ]);
 
-  await Promise.allSettled([
-    loadWallet(),
-    loadTransactions(),
-    loadGameHistory()
-  ]);
+    const failed=results.filter(result=>result.status==="rejected");
+    if(failed.length){
+      console.warn("Some profile sections could not load:",failed);
+    }
+  }catch(error){
+    showMessage(error.message||"Unable to load your profile.","error");
+  }
 }
 
-init();
+initializePage();
 </script>
 </body>
 </html>
