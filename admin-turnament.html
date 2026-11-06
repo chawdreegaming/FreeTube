@@ -1,1257 +1,1162 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#090d19">
-<title>Tournament Admin | Boys vs Girls</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d1b">
+<title>Tournament Admin - Boys vs Girls</title>
 
 <style>
 :root{
-  --bg:#090d19;
-  --panel:#111827;
-  --panel2:#172235;
-  --line:#26344b;
-  --text:#f3f6ff;
-  --muted:#91a0b9;
-  --blue:#3987ff;
-  --cyan:#21d4fd;
-  --pink:#ff4f9a;
-  --green:#20c997;
-  --yellow:#ffbf47;
-  --red:#ff5d70;
-  --radius:17px;
+  color-scheme:dark;
+  --bg:#080d1b;--card:#111c31;--card2:#0d1729;
+  --line:#293a58;--text:#f3f6ff;--muted:#9baec9;
+  --blue:#568dff;--purple:#9672ff;--green:#27c997;
+  --red:#ff647f;--yellow:#ffc65b;
 }
 *{box-sizing:border-box}
 body{
-  margin:0;background:var(--bg);color:var(--text);
-  font-family:Arial,Helvetica,sans-serif;
+  margin:0;min-height:100vh;
+  background:radial-gradient(circle at 10% 0%,#25245a 0,transparent 34%),
+  radial-gradient(circle at 100% 20%,#123c65 0,transparent 30%),var(--bg);
+  color:var(--text);font:15px/1.55 system-ui,sans-serif;
 }
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-.hidden{display:none!important}
-.app{max-width:1450px;margin:auto;padding:18px}
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:15px;flex-wrap:wrap;margin-bottom:20px;
-}
+.container{max-width:1200px;margin:auto;padding:20px 14px 45px}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:20px}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{
-  width:46px;height:46px;border-radius:14px;
-  display:grid;place-items:center;font-size:22px;font-weight:900;
-  background:linear-gradient(135deg,#2585ff,#ed4c9c);
-}
-.brand h1{font-size:19px;margin:0}
-.brand p{font-size:11px;color:var(--muted);margin:5px 0 0}
-.top-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.admin-pill{
-  background:#17243a;border:1px solid var(--line);
-  border-radius:30px;padding:9px 13px;font-size:12px;color:#cbd7ef;
-}
-.btn{
-  border:0;border-radius:10px;padding:11px 15px;
-  color:white;font-weight:700;background:var(--blue);
-}
-.btn:hover{filter:brightness(1.12)}
-.btn.secondary{background:#26344b}
-.btn.success{background:#138b68}
-.btn.danger{background:#a93249}
-.btn.warning{background:#a66c13}
-.btn.small{padding:7px 10px;font-size:11px}
-.btn.full{width:100%}
-.nav{
-  display:flex;gap:8px;overflow-x:auto;padding:5px 0 14px;
-  scrollbar-width:thin;
-}
-.nav button{
-  white-space:nowrap;border:1px solid var(--line);
-  background:#111827;color:#aab8d0;padding:11px 15px;
-  border-radius:11px;font-size:12px;font-weight:700;
-}
-.nav button.active{
-  color:white;border-color:#3987ff;
-  background:linear-gradient(135deg,#1764c5,#263e70);
-}
-.panel{
-  background:var(--panel);border:1px solid var(--line);
-  border-radius:var(--radius);padding:18px;margin-bottom:16px;
-}
-.panel h2{font-size:17px;margin:0 0 6px}
-.panel h3{font-size:14px;margin:0 0 13px}
-.sub{font-size:12px;color:var(--muted);line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}
-.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
-.stat{
-  background:linear-gradient(145deg,#17243a,#101827);
-  border:1px solid var(--line);border-radius:15px;padding:17px;
-}
-.stat .label{font-size:11px;color:var(--muted)}
-.stat .value{font-size:25px;font-weight:800;margin-top:9px}
-.stat .hint{font-size:10px;color:#7e91ae;margin-top:5px}
-.stat.blue .value{color:#63a6ff}
-.stat.pink .value{color:#ff79b2}
-.stat.green .value{color:#39d8a9}
-.stat.yellow .value{color:#ffc65e}
-.section-head{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;flex-wrap:wrap;margin-bottom:15px;
-}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field.full{grid-column:1/-1}
-.field label{font-size:11px;color:#b5c3da;font-weight:700}
-.field input,.field select,.field textarea,
-.search-input{
-  width:100%;background:#0b1321;color:white;
-  border:1px solid #30415c;border-radius:10px;
-  padding:12px;outline:none;min-width:0;
-}
-.field textarea{min-height:90px;resize:vertical}
-.field input:focus,.field select:focus,.field textarea:focus{
-  border-color:var(--blue)
-}
-.field small{font-size:10px;color:var(--muted);line-height:1.5}
-.checkline{
-  display:flex;align-items:center;gap:9px;
-  font-size:12px;color:#c6d3e8;
-}
-.checkline input{accent-color:var(--blue)}
-.table-wrap{overflow-x:auto}
-table{width:100%;border-collapse:collapse;min-width:650px}
-th,td{
-  padding:12px 10px;text-align:left;border-bottom:1px solid #26344b;
-  font-size:11px;vertical-align:middle;
-}
-th{color:#8fa2c0;font-size:10px;text-transform:uppercase}
-td{color:#dce5f5}
-.empty{text-align:center;color:var(--muted);padding:28px;font-size:12px}
-.badge{
-  display:inline-block;border-radius:30px;padding:5px 9px;
-  font-size:10px;font-weight:800;background:#25334a;color:#b9c9e5;
-}
-.badge.live{background:#123d35;color:#4de0ae}
-.badge.pending{background:#4b3516;color:#ffd17a}
-.badge.cancelled,.badge.rejected,.badge.eliminated{background:#48202b;color:#ff91a1}
-.badge.completed,.badge.champion{background:#273b68;color:#9ec2ff}
-.badge.registered{background:#24364e;color:#b7d3ff}
-.badge.qualified{background:#124536;color:#57e0b1}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-.notice{
-  border:1px solid #344d76;background:#14243c;
-  border-radius:12px;padding:12px;color:#b8d5ff;
-  font-size:11px;line-height:1.6;margin:12px 0;
-}
-.notice.warn{border-color:#70531d;background:#302613;color:#ffdb91}
-.notice.danger{border-color:#70303b;background:#321820;color:#ffadb7}
-.toast{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  z-index:1000;background:#17243a;border:1px solid #3b5276;
-  border-radius:12px;padding:12px 18px;font-size:12px;
-  box-shadow:0 10px 40px #0008;max-width:90%;text-align:center;
-}
-.loading{text-align:center;padding:25px;color:var(--muted);font-size:12px}
-.method-card{
-  border:1px solid var(--line);border-radius:14px;
-  padding:15px;background:#101a2a;margin-bottom:12px;
-}
-.method-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.method-top strong{font-size:13px}
-.method-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:13px}
-.method-fields .field.full{grid-column:1/-1}
-.round-card{
-  border:1px solid var(--line);border-radius:14px;
-  padding:15px;margin-bottom:12px;background:#101a2a;
-}
-.round-head{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
-.round-head strong{font-size:13px}
-.team-choice{
-  display:flex;align-items:center;gap:9px;
-  border:1px solid #2a3b55;background:#0c1524;
-  border-radius:10px;padding:10px;margin-top:7px;font-size:11px;
-}
-.team-choice input{accent-color:var(--green)}
-.player-row{
-  display:grid;grid-template-columns:1.2fr 1fr;gap:8px;
-  border:1px solid #2a3b55;padding:10px;border-radius:10px;margin-top:8px;
-}
-.player-row .field input{padding:10px;font-size:12px}
-.team-card{
-  background:#111e30;border:1px solid var(--line);
-  border-radius:13px;padding:13px;margin-bottom:10px;
-}
-.team-card h4{margin:0 0 8px;font-size:13px}
-.team-card p{font-size:11px;color:var(--muted);margin:5px 0}
-.login-box{max-width:430px;margin:12vh auto}
-.footer{text-align:center;color:#60718c;font-size:10px;padding:20px}
-@media(max-width:850px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:560px){
-  .app{padding:12px}
-  .panel{padding:14px}
-  .grid,.grid.two,.form-grid{grid-template-columns:1fr}
-  .field.full{grid-column:auto}
-  .method-fields{grid-template-columns:1fr}
-  .method-fields .field.full{grid-column:auto}
-  .brand h1{font-size:16px}
-  .stat .value{font-size:22px}
+.logo{width:54px;height:54px;display:grid;place-items:center;border-radius:17px;background:linear-gradient(135deg,#4c8cff,#9b70ff);font-size:19px;font-weight:950;box-shadow:0 8px 30px #4b8dff33}
+h1{font-size:clamp(24px,5vw,34px);margin:0}
+h2{font-size:20px;margin:0 0 12px}
+h3{font-size:16px;margin:0 0 7px}
+p{overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+button,input,select,textarea{font:inherit}
+button{border:0;border-radius:10px;padding:10px 14px;background:var(--blue);color:white;font-weight:750;cursor:pointer}
+button:hover:not(:disabled){filter:brightness(1.12)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.secondary{background:#263854}
+button.success{background:#12664e}
+button.danger{background:#a72e49}
+button.purple{background:#6246b4}
+input,select,textarea{width:100%;padding:11px 12px;color:white;background:#091426;border:1px solid #30415f;border-radius:10px;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+textarea{min-height:85px;resize:vertical}
+label{display:block;margin-bottom:6px;color:#cbd8ec;font-size:12px;font-weight:650}
+.card{padding:17px;margin:15px 0;border:1px solid var(--line);border-radius:18px;background:linear-gradient(150deg,#14243c,#0d1729)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat{padding:16px;border:1px solid var(--line);border-radius:15px;background:#0e1a2e;min-width:0}
+.stat-icon{font-size:23px}
+.stat-value{font-size:26px;font-weight:900;margin-top:4px;overflow-wrap:anywhere}
+.stat-label{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{min-width:0;flex:1}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;padding:7px;margin:20px 0;border:1px solid var(--line);border-radius:13px;background:#0b1628}
+.tab{background:transparent;color:var(--muted)}
+.tab.active{background:linear-gradient(135deg,#376dd1,#7050c7);color:white}
+.panel{display:none}
+.panel.active{display:block}
+.list{display:grid;gap:11px}
+.item{padding:15px;border:1px solid var(--line);border-radius:14px;background:#0a1628;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:#263854;font-size:11px;font-weight:750}
+.pill.green{background:#12513f;color:#b7ffe4}
+.pill.red{background:#592536;color:#ffd2dc}
+.pill.yellow{background:#59461d;color:#ffe6a8}
+.pill.blue{background:#203e70;color:#c8dcff}
+.empty{padding:23px;border:1px dashed #354865;border-radius:13px;text-align:center;color:var(--muted)}
+.notice{display:none;padding:12px 14px;border-radius:11px;margin:12px 0;background:#512432;color:#ffd5dc;overflow-wrap:anywhere}
+.notice.success{background:#103d32;color:#b9ffe5}
+.notice.info{background:#18314e;color:#d9eaff}
+.hero{padding:22px;border:1px solid #59489b;border-radius:18px;background:linear-gradient(120deg,#292052,#142a4b,#102039)}
+.hero h2{font-size:24px}
+.hero-icon{font-size:36px;margin-bottom:8px}
+.section-title{margin:22px 0 10px}
+footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:var(--muted);font-size:12px}
+.hidden{display:none!important}
+.transaction-amount{font-size:23px;font-weight:900;color:#fff;margin:8px 0}
+.transaction-meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}
+.transaction-meta div{background:#101e33;padding:9px;border-radius:9px;min-width:0;overflow-wrap:anywhere}
+.transaction-meta span{display:block;color:var(--muted);font-size:11px}
+.transaction-meta strong{font-size:13px;overflow-wrap:anywhere}
+.note-box{margin-top:10px;padding:10px;border-radius:9px;background:#172943;color:#d9eaff;font-size:12px;overflow-wrap:anywhere}
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.filter-row .field{min-width:150px}
+.knockout-stage{padding:12px;border:1px solid var(--line);border-radius:12px;background:#101e33}
+.knockout-stage strong{display:block;font-size:20px}
+.knockout-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.help{padding:11px;border:1px solid #354b70;border-radius:10px;background:#101e33;color:#cbd8ec;font-size:12px}
+@media(max-width:750px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){
+  .container{padding:13px 10px 30px}
+  .grid{grid-template-columns:1fr}
+  .stat{padding:12px}
+  .stat-value{font-size:21px}
+  button{padding:9px 11px}
+  .transaction-meta{grid-template-columns:1fr}
+  .knockout-flow{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 </style>
 </head>
 
 <body>
-<div id="loginScreen" class="app hidden">
-  <div class="panel login-box">
-    <div class="brand">
-      <div class="logo">🏆</div>
-      <div>
-        <h1>Tournament Admin</h1>
-        <p>BOYS VS GIRLS ESPORTS</p>
-      </div>
+<main class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">BvG</div>
+    <div>
+      <div class="muted small">BOYS VS GIRLS 💙💗</div>
+      <h1>Tournament Admin</h1>
+      <div class="muted small">eSports Control Center</div>
     </div>
-    <div class="notice warn">Please login to your Admin account from the main app first.</div>
-    <button class="btn full" onclick="location.href='index.html'">Back to Login</button>
   </div>
-</div>
+  <div class="actions">
+    <a href="admin-app-management.html"><button class="secondary" type="button">← App Management</button></a>
+    <button id="refreshAll" type="button">↻ Refresh</button>
+  </div>
+</header>
 
-<div id="app" class="app hidden">
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">🏆</div>
-      <div>
-        <h1>TOURNAMENT ADMIN</h1>
-        <p>BOYS VS GIRLS · ESPORTS CONTROL CENTER</p>
-      </div>
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+<section class="card">
+  <div class="row">
+    <div>
+      <h3>Admin Connection</h3>
+      <div id="connection" class="muted small">Checking admin access...</div>
     </div>
-    <div class="top-actions">
-      <span class="admin-pill" id="adminName">Admin</span>
-      <button class="btn secondary small" onclick="loadAll()">↻ Refresh</button>
-      <button class="btn danger small" onclick="logout()">Logout</button>
+    <span class="pill yellow" id="adminBadge">Checking...</span>
+  </div>
+  <p class="muted small">Tournament administration requires a verified Admin account.</p>
+</section>
+
+<section class="hero">
+  <div class="hero-icon">🏆</div>
+  <h2>Tournament Control Center</h2>
+  <p class="muted">Create Free Fire tournaments, register teams, manage knockout stages and tournament payments.</p>
+  <div class="actions">
+    <button onclick="showTab('create')">＋ Create Tournament</button>
+    <button class="secondary" onclick="showTab('teams')">Manage Teams</button>
+    <button class="secondary" onclick="showTab('knockout')">🏁 Knockout</button>
+    <button class="secondary" onclick="showTab('deposits')">💰 Deposit Requests</button>
+    <button class="secondary" onclick="showTab('withdrawals')">💸 Withdraw Requests</button>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat"><div class="stat-icon">🏆</div><div class="stat-value" id="totalCount">—</div><div class="stat-label">Total Tournaments</div></div>
+  <div class="stat"><div class="stat-icon">🟢</div><div class="stat-value" id="liveCount">—</div><div class="stat-label">Live Tournaments</div></div>
+  <div class="stat"><div class="stat-icon">👥</div><div class="stat-value" id="teamCount">—</div><div class="stat-label">Registered Teams</div></div>
+  <div class="stat"><div class="stat-icon">🏁</div><div class="stat-value" id="completedCount">—</div><div class="stat-label">Completed</div></div>
+</section>
+
+<h2 class="section-title">💰 Tournament Wallet Overview</h2>
+<p class="muted small">Figures are calculated from the tournament transaction records returned by the server. This wallet is separate from the Social App Wallet.</p>
+<section class="stats">
+  <div class="stat"><div class="stat-icon">📥</div><div class="stat-value" id="pendingDepositCount">—</div><div class="stat-label">Pending Deposits</div></div>
+  <div class="stat"><div class="stat-icon">📤</div><div class="stat-value" id="pendingWithdrawCount">—</div><div class="stat-label">Pending Withdrawals</div></div>
+  <div class="stat"><div class="stat-icon">✅</div><div class="stat-value" id="approvedDepositTotal">—</div><div class="stat-label">Approved Deposits (Loaded)</div></div>
+  <div class="stat"><div class="stat-icon">💸</div><div class="stat-value" id="completedWithdrawTotal">—</div><div class="stat-label">Completed Withdrawals (Loaded)</div></div>
+</section>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="dashboard">Dashboard</button>
+  <button class="tab" data-tab="create">Create Tournament</button>
+  <button class="tab" data-tab="tournaments">Tournaments</button>
+  <button class="tab" data-tab="teams">Team Registration</button>
+  <button class="tab" data-tab="knockout">🏁 Knockout</button>
+  <button class="tab" data-tab="deposits">📥 Deposits</button>
+  <button class="tab" data-tab="withdrawals">📤 Withdrawals</button>
+</nav>
+
+<section class="panel active" id="dashboard">
+  <div class="card">
+    <div class="row">
+      <div><h2>Welcome Admin</h2><p class="muted small">Manage your eSports tournaments and payments.</p></div>
+      <span class="pill green">Tournament Panel</span>
     </div>
-  </header>
-
-  <nav class="nav" id="nav">
-    <button class="active" data-tab="dashboard">Dashboard</button>
-    <button data-tab="create">Create Tournament</button>
-    <button data-tab="tournaments">Tournaments</button>
-    <button data-tab="teams">Teams</button>
-    <button data-tab="knockout">Knockout</button>
-    <button data-tab="payments">Payment Settings</button>
-    <button data-tab="deposits">Deposits</button>
-    <button data-tab="withdrawals">Withdrawals</button>
-  </nav>
-
-  <!-- DASHBOARD -->
-  <section id="tab-dashboard" class="tab">
-    <div class="section-head">
-      <div>
-        <h2>Dashboard Overview</h2>
-        <div class="sub">Tournament operations and wallet overview</div>
-      </div>
-      <button class="btn small" onclick="loadDashboard()">Refresh Stats</button>
-    </div>
-
     <div class="grid">
-      <div class="stat blue"><div class="label">TOTAL TOURNAMENTS</div><div class="value" id="statTournaments">0</div><div class="hint">All tournament records</div></div>
-      <div class="stat green"><div class="label">LIVE TOURNAMENTS</div><div class="value" id="statLive">0</div><div class="hint">Currently live</div></div>
-      <div class="stat pink"><div class="label">REGISTERED TEAMS</div><div class="value" id="statTeams">0</div><div class="hint">Team registrations</div></div>
-      <div class="stat yellow"><div class="label">PENDING REQUESTS</div><div class="value" id="statPending">0</div><div class="hint">Deposit + withdrawal</div></div>
+      <button onclick="showTab('create')">🏆 Create Tournament</button>
+      <button class="secondary" onclick="showTab('tournaments')">📋 View Tournaments</button>
+      <button class="secondary" onclick="showTab('teams')">👥 Register Team</button>
+      <button class="secondary" onclick="showTab('knockout')">🏁 Knockout Management</button>
+      <button class="secondary" onclick="showTab('deposits')">📥 Review Deposits</button>
+      <button class="secondary" onclick="showTab('withdrawals')">📤 Review Withdrawals</button>
+      <button class="secondary" onclick="refreshData()">↻ Refresh All Data</button>
     </div>
-
-    <div class="grid two" style="margin-top:13px">
-      <div class="stat"><div class="label">PENDING DEPOSITS</div><div class="value" id="statDeposits">0</div></div>
-      <div class="stat"><div class="label">PENDING WITHDRAWALS</div><div class="value" id="statWithdrawals">0</div></div>
+  </div>
+  <div class="card">
+    <h2>Recent Tournaments</h2>
+    <div id="recentTournaments" class="list"><div class="empty">Loading tournaments...</div></div>
+  </div>
+  <div class="card">
+    <div class="row">
+      <h2>Pending Payment Requests</h2>
+      <button class="secondary" onclick="refreshTransactions()">↻ Refresh</button>
     </div>
+    <div id="dashboardPending" class="list"><div class="empty">Loading payment requests...</div></div>
+  </div>
+</section>
 
-    <div class="panel" style="margin-top:16px">
-      <div class="section-head">
-        <div><h3>Recent Tournament Requests</h3><div class="sub">Latest pending payment requests</div></div>
-        <button class="btn secondary small" onclick="switchTab('deposits')">Review Deposits</button>
-      </div>
-      <div id="recentRequests" class="empty">Loading...</div>
-    </div>
-  </section>
+<!-- CREATE TOURNAMENT -->
+<section class="panel" id="create">
+  <div class="card">
+    <h2>＋ Create New Tournament</h2>
+    <p class="muted small">Tournament Type and Game Mode are separate settings.</p>
 
-  <!-- CREATE -->
-  <section id="tab-create" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Create Tournament</h2><div class="sub">Create a new esports tournament</div></div>
-      </div>
-
-      <form id="createForm">
-        <div class="form-grid">
-          <div class="field full">
-            <label>Tournament Name *</label>
-            <input id="title" required maxlength="120" placeholder="Example: Friday Night Championship">
-          </div>
-
-          <div class="field">
-            <label>Tournament Type *</label>
-            <select id="tournamentType" required>
-              <option value="BR">BR</option>
-              <option value="Clash Squad">Clash Squad</option>
-              <option value="Free Fire Cup">Free Fire Cup</option>
-            </select>
-            <small>BR, Clash Squad and Free Fire Cup are separate tournament types.</small>
-          </div>
-
-          <div class="field">
-            <label>Game Mode *</label>
-            <select id="mode" required>
-              <option value="Solo">Solo</option>
-              <option value="Duo">Duo</option>
-              <option value="Squad" selected>Squad</option>
-            </select>
-            <small>Game Mode is independent from Tournament Type.</small>
-          </div>
-
-          <div class="field">
-            <label>Map Name</label>
-            <select id="mapName">
-              <option>Bermuda</option><option>Purgatory</option>
-              <option>Kalahari</option><option>Alpine</option>
-              <option>Nexterra</option><option>Random</option>
-            </select>
-          </div>
-
-          <div class="field">
-            <label>Maximum Players / Teams *</label>
-            <input id="maxPlayers" type="number" min="1" max="1000" value="13" required>
-            <small id="maxHelp">For Free Fire Cup, maximum is fixed at 13 teams.</small>
-          </div>
-
-          <div class="field">
-            <label>Entry Fee</label>
-            <input id="entryFee" type="number" min="0" step="0.01" value="0">
-          </div>
-
-          <div class="field">
-            <label>Prize Pool</label>
-            <input id="prizePool" type="number" min="0" step="0.01" value="0">
-          </div>
-
-          <div class="field">
-            <label>Prize Calculation</label>
-            <select id="prizeMode">
-              <option value="fixed">Fixed Prize</option>
-              <option value="dynamic">Dynamic Prize</option>
-            </select>
-          </div>
-
-          <div class="field" id="percentageField">
-            <label>Dynamic Prize Percentage (%)</label>
-            <input id="prizePercentage" type="number" min="0" max="100" value="0">
-          </div>
-
-          <div class="field">
-            <label>Match Date & Time</label>
-            <input id="scheduledAt" type="datetime-local">
-          </div>
-
-          <div class="field">
-            <label>Banner Image URL</label>
-            <input id="bannerUrl" type="url" placeholder="https://example.com/banner.jpg">
-          </div>
-
-          <div class="field full">
-            <label>Description</label>
-            <textarea id="description" maxlength="2000" placeholder="Tournament rules and details..."></textarea>
-          </div>
-        </div>
-
-        <div id="cupNotice" class="notice hidden">
-          <strong>FREE FIRE CUP KNOCKOUT FORMAT</strong><br>
-          Round 1: 13 → 10 teams<br>
-          Round 2: 10 → 8 teams<br>
-          Quarter Final: 8 → 4 teams<br>
-          Semi Final: 4 → 2 teams<br>
-          Grand Final: 2 → 1 Champion
-        </div>
-
-        <div class="notice">
-          Tournament Wallet is separate from the Social App Wallet. Tournament deposits and withdrawals are reviewed by Admin.
-        </div>
-        <button class="btn full" type="submit" id="createBtn">＋ Create Tournament</button>
-      </form>
-    </div>
-  </section>
-
-  <!-- TOURNAMENTS -->
-  <section id="tab-tournaments" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Manage Tournaments</h2><div class="sub">View and update tournament status</div></div>
-        <button class="btn small" onclick="loadTournaments()">Refresh</button>
-      </div>
-      <div class="form-grid" style="margin-bottom:14px">
+    <form id="createForm">
+      <div class="toolbar">
         <div class="field">
-          <label>Search</label>
-          <input id="tournamentSearch" placeholder="Search tournament..." oninput="renderTournaments()">
+          <label for="title">Tournament Name *</label>
+          <input id="title" maxlength="120" required placeholder="Friday Squad Championship">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="tournamentType">Tournament Type *</label>
+          <select id="tournamentType" required>
+            <option value="BR">BR</option>
+            <option value="Clash Squad">Clash Squad</option>
+            <option value="Free Fire Cup">Free Fire Cup</option>
+          </select>
         </div>
         <div class="field">
-          <label>Status</label>
-          <select id="tournamentFilter" onchange="renderTournaments()">
-            <option value="all">All Status</option>
-            <option value="upcoming">Upcoming</option>
-            <option value="live">Live</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
+          <label for="mode">Game Mode *</label>
+          <select id="mode">
+            <option>Solo</option>
+            <option>Duo</option>
+            <option selected>Squad</option>
           </select>
         </div>
       </div>
-      <div id="tournamentList" class="loading">Loading tournaments...</div>
-    </div>
-  </section>
 
-  <!-- TEAMS -->
-  <section id="tab-teams" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Team Registration</h2><div class="sub">Register and manage tournament teams</div></div>
-        <button class="btn small" onclick="loadTeams()">Refresh</button>
+      <div class="help" id="typeHelp">
+        BR tournaments support Solo, Duo or Squad modes.
       </div>
 
-      <div class="form-grid">
-        <div class="field full">
-          <label>Select Tournament</label>
-          <select id="teamTournament" onchange="loadTeams()">
-            <option value="">Select tournament</option>
+      <div class="toolbar">
+        <div class="field"><label for="map">Map *</label>
+          <select id="map">
+            <option>Bermuda</option><option>Purgatory</option>
+            <option>Kalahari</option><option>Alpine</option><option>NexTerra</option>
           </select>
         </div>
-        <div class="field full">
-          <label>Team Name *</label>
-          <input id="teamName" maxlength="80" placeholder="Enter team name">
+      </div>
+
+      <div class="toolbar">
+        <div class="field"><label for="entry">Entry Fee</label><input id="entry" type="number" min="0" step="0.01" value="0" required></div>
+        <div class="field"><label for="prize">Fixed Prize Pool</label><input id="prize" type="number" min="0" step="0.01" value="0" required></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field"><label for="prizeMode">Prize Calculation</label>
+          <select id="prizeMode"><option value="fixed">Fixed Prize</option><option value="dynamic">Dynamic Prize</option></select>
         </div>
+        <div class="field"><label for="prizePercent">Dynamic Prize Percentage</label><input id="prizePercent" type="number" min="0" max="100" step="0.01" value="0"></div>
       </div>
 
-      <h3 style="margin-top:18px">Player Details</h3>
-      <div id="playerInputs"></div>
-      <button class="btn secondary small" type="button" onclick="resetPlayers()">Reset Players</button>
-      <button class="btn full" style="margin-top:13px" onclick="registerTeam()">＋ Register Team</button>
-      <div class="notice">Each team must have exactly 4 players. Every player must have a valid Free Fire UID (5–20 digits).</div>
-    </div>
-
-    <div class="panel">
-      <div class="section-head"><div><h3>Registered Teams</h3><div class="sub">Team roster and qualification status</div></div></div>
-      <div id="teamList" class="loading">Select a tournament.</div>
-    </div>
-  </section>
-
-  <!-- KNOCKOUT -->
-  <section id="tab-knockout" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Free Fire Cup Knockout</h2><div class="sub">Manage team qualification round by round</div></div>
-        <button class="btn small" onclick="loadKnockout()">Refresh</button>
+      <div class="toolbar">
+        <div class="field">
+          <label for="maxPlayers">Maximum Teams / Players *</label>
+          <input id="maxPlayers" type="number" min="1" value="100" required>
+          <div id="maxPlayersHelp" class="muted small">Set the maximum number of entries.</div>
+        </div>
+        <div class="field"><label for="matchDate">Match Date & Time</label><input id="matchDate" type="datetime-local"></div>
       </div>
 
+      <div class="toolbar"><div class="field"><label for="banner">Banner Image URL (HTTPS)</label><input id="banner" type="url" placeholder="https://..."></div></div>
+      <div class="field"><label for="description">Tournament Description</label><textarea id="description" maxlength="2000" placeholder="Tournament rules and information"></textarea></div>
+
+      <div class="help">
+        <strong>Free Fire Cup:</strong> Maximum 13 teams. Knockout progression: 13 → 10 → 8 → 4 → 2 → 1 Champion.
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="createButton">Create Tournament</button>
+        <button type="reset" class="secondary">Reset Form</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- TOURNAMENT LIST -->
+<section class="panel" id="tournaments">
+  <div class="card">
+    <div class="row"><div><h2>🏆 Tournament List</h2><p class="muted small">Manage all created tournaments.</p></div><button id="loadTournaments">↻ Refresh</button></div>
+    <div class="toolbar">
+      <div class="field"><label for="tournamentSearch">Search Tournament</label><input id="tournamentSearch" placeholder="Search by tournament name"></div>
+      <div class="field"><label for="statusFilter">Filter Status</label>
+        <select id="statusFilter"><option value="all">All Tournaments</option><option value="upcoming">Upcoming</option><option value="live">Live</option><option value="completed">Completed</option><option value="cancelled">Cancelled</option></select>
+      </div>
+    </div>
+    <span class="pill blue" id="tournamentCount">0 Tournaments</span>
+  </div>
+  <div id="tournamentsList" class="list"><div class="empty">Click Refresh to load tournaments.</div></div>
+</section>
+
+<!-- TEAM REGISTRATION -->
+<section class="panel" id="teams">
+  <div class="card">
+    <h2>👥 Admin Team Registration</h2>
+    <p class="muted small">Each team must contain exactly four main players. No substitutes.</p>
+    <div class="field"><label for="teamTournament">Select Tournament *</label><select id="teamTournament"><option value="">Load tournaments first</option></select></div>
+    <div class="field" style="margin-top:12px"><label for="teamName">Team Name *</label><input id="teamName" maxlength="80" placeholder="Enter team name"></div>
+    <h3 class="section-title">Four Main Players</h3>
+    <div class="grid">
+      <div class="field"><label for="p1name">Player 1 Name *</label><input id="p1name" maxlength="80"></div>
+      <div class="field"><label for="p1uid">Player 1 Free Fire UID *</label><input id="p1uid" inputmode="numeric" maxlength="20"></div>
+      <div class="field"><label for="p2name">Player 2 Name *</label><input id="p2name" maxlength="80"></div>
+      <div class="field"><label for="p2uid">Player 2 Free Fire UID *</label><input id="p2uid" inputmode="numeric" maxlength="20"></div>
+      <div class="field"><label for="p3name">Player 3 Name *</label><input id="p3name" maxlength="80"></div>
+      <div class="field"><label for="p3uid">Player 3 Free Fire UID *</label><input id="p3uid" inputmode="numeric" maxlength="20"></div>
+      <div class="field"><label for="p4name">Player 4 Name *</label><input id="p4name" maxlength="80"></div>
+      <div class="field"><label for="p4uid">Player 4 Free Fire UID *</label><input id="p4uid" inputmode="numeric" maxlength="20"></div>
+    </div>
+    <div class="help">There are exactly 4 player slots. Substitute players are not supported.</div>
+    <div class="actions">
+      <button id="createTeamButton">＋ Create & Register Team</button>
+      <button class="secondary" id="loadTeamsButton">↻ Load Registered Teams</button>
+    </div>
+  </div>
+  <div class="card"><h2>Registered Teams</h2><div id="teamsList" class="list"><div class="empty">Select a tournament and load teams.</div></div></div>
+</section>
+
+<!-- KNOCKOUT MANAGEMENT -->
+<section class="panel" id="knockout">
+  <div class="card">
+    <h2>🏁 Free Fire Cup — Knockout Management</h2>
+    <p class="muted small">Manage the Free Fire Cup elimination progression.</p>
+
+    <div class="field">
+      <label for="knockoutTournament">Select Free Fire Cup *</label>
+      <select id="knockoutTournament"><option value="">Load tournaments first</option></select>
+    </div>
+
+    <div class="help" style="margin-top:12px">
+      <strong>Official stage progression</strong><br>
+      13 Teams → 10 Teams → 8 Teams → 4 Teams → 2 Teams → 1 Champion
+    </div>
+
+    <div class="knockout-flow" style="margin-top:14px">
+      <div class="knockout-stage"><span class="muted small">Starting Teams</span><strong>13</strong></div>
+      <div class="knockout-stage"><span class="muted small">Stage 1</span><strong>10</strong></div>
+      <div class="knockout-stage"><span class="muted small">Stage 2</span><strong>8</strong></div>
+      <div class="knockout-stage"><span class="muted small">Semi Final</span><strong>4</strong></div>
+      <div class="knockout-stage"><span class="muted small">Final</span><strong>2</strong></div>
+      <div class="knockout-stage"><span class="muted small">Champion</span><strong>1 🏆</strong></div>
+    </div>
+
+    <div class="actions">
+      <button id="loadKnockoutButton">↻ Load Knockout Data</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Knockout Stage Control</h2>
+    <div id="knockoutInfo" class="empty">Select a Free Fire Cup tournament to load its knockout information.</div>
+    <div id="knockoutControls" class="hidden">
       <div class="field">
-        <label>Select Free Fire Cup Tournament</label>
-        <select id="knockoutTournament" onchange="loadKnockout()">
-          <option value="">Select Free Fire Cup</option>
+        <label for="knockoutStage">Current Stage</label>
+        <select id="knockoutStage">
+          <option value="13_to_10">13 Teams → 10 Teams</option>
+          <option value="10_to_8">10 Teams → 8 Teams</option>
+          <option value="8_to_4">8 Teams → 4 Teams</option>
+          <option value="4_to_2">4 Teams → 2 Teams</option>
+          <option value="2_to_1">2 Teams → Champion</option>
         </select>
       </div>
-
-      <div class="notice">
-        <strong>Knockout Progression</strong><br>
-        13 Teams → 10 Teams → 8 Teams → 4 Teams → 2 Teams → 1 Champion.
-        Select exactly the required number of qualified teams in each round.
+      <div class="field" style="margin-top:12px">
+        <label for="qualifiedTeams">Qualified Team IDs (comma separated)</label>
+        <textarea id="qualifiedTeams" placeholder="Example: 12, 15, 18, 20"></textarea>
       </div>
-      <div id="knockoutProgress" class="grid" style="margin-bottom:15px"></div>
-      <div id="roundList"><div class="empty">Select a Free Fire Cup tournament.</div></div>
+      <div class="field" style="margin-top:12px">
+        <label for="knockoutNote">Stage Note</label>
+        <input id="knockoutNote" maxlength="500" placeholder="Optional stage information">
+      </div>
+      <div class="actions">
+        <button class="success" id="saveKnockoutButton">Save Stage Results</button>
+      </div>
     </div>
-  </section>
-
-  <!-- PAYMENT SETTINGS -->
-  <section id="tab-payments" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Tournament Payment Settings</h2><div class="sub">Configure payment destinations for Tournament Wallet only</div></div>
-        <button class="btn small" onclick="loadPaymentMethods()">Refresh</button>
-      </div>
-      <div class="notice warn">
-        These settings are separate from the Social App payment settings. Never request or store card number, CVV, PIN or OTP.
-      </div>
-      <div id="paymentMethods"><div class="loading">Loading payment methods...</div></div>
+    <div class="help" style="margin-top:12px">
+      Team qualification results must be saved on the backend. This page expects the knockout API described below; it will not create fake local results.
     </div>
-  </section>
+  </div>
 
-  <!-- DEPOSITS -->
-  <section id="tab-deposits" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Tournament Deposits</h2><div class="sub">Review deposit requests and transaction references</div></div>
-        <button class="btn small" onclick="loadTransactions('deposit')">Refresh</button>
-      </div>
-      <div id="depositList" class="loading">Loading deposits...</div>
+  <div class="card">
+    <h2>Knockout History</h2>
+    <div id="knockoutHistory" class="list"><div class="empty">Load a tournament to view its knockout history.</div></div>
+  </div>
+</section>
+
+<!-- DEPOSIT MANAGEMENT -->
+<section class="panel" id="deposits">
+  <div class="card">
+    <div class="row">
+      <div><h2>📥 Deposit Management</h2><p class="muted small">Review and manually approve or reject Tournament Wallet deposit requests.</p></div>
+      <span class="pill blue">Tournament Wallet</span>
     </div>
-  </section>
-
-  <!-- WITHDRAWALS -->
-  <section id="tab-withdrawals" class="tab hidden">
-    <div class="panel">
-      <div class="section-head">
-        <div><h2>Tournament Withdrawals</h2><div class="sub">Review withdrawal requests before payout</div></div>
-        <button class="btn small" onclick="loadTransactions('withdrawal')">Refresh</button>
+    <div class="filter-row">
+      <div class="field"><label for="depositStatus">Deposit Status</label>
+        <select id="depositStatus">
+          <option value="pending">Pending</option><option value="approved">Approved</option>
+          <option value="rejected">Rejected</option><option value="all">All Records</option>
+        </select>
       </div>
-      <div id="withdrawalList" class="loading">Loading withdrawals...</div>
+      <button id="refreshDeposits">↻ Refresh Deposits</button>
     </div>
-  </section>
+  </div>
+  <div id="depositsList" class="list"><div class="empty">Loading deposit requests...</div></div>
+</section>
 
-  <div class="footer">BOYS VS GIRLS ESPORTS · TOURNAMENT ADMIN PANEL</div>
-</div>
+<!-- WITHDRAW MANAGEMENT -->
+<section class="panel" id="withdrawals">
+  <div class="card">
+    <div class="row">
+      <div><h2>📤 Withdrawal Management</h2><p class="muted small">Review withdrawal requests and manually approve or reject them.</p></div>
+      <span class="pill blue">Tournament Wallet</span>
+    </div>
+    <div class="filter-row">
+      <div class="field"><label for="withdrawStatus">Withdrawal Status</label>
+        <select id="withdrawStatus">
+          <option value="pending">Pending</option><option value="completed">Completed</option>
+          <option value="rejected">Rejected</option><option value="all">All Records</option>
+        </select>
+      </div>
+      <button id="refreshWithdrawals">↻ Refresh Withdrawals</button>
+    </div>
+  </div>
+  <div id="withdrawalsList" class="list"><div class="empty">Loading withdrawal requests...</div></div>
+</section>
 
-<div id="toast" class="toast hidden"></div>
+<footer>
+  BOYS VS GIRLS 💙💗 — Tournament Administration<br>
+  Tournament Wallet is separate from the Social App Wallet. Deposit and withdrawal approvals affect Tournament Wallet only.
+</footer>
+</main>
 
 <script>
+(function(){
 "use strict";
 
-/* =========================================================
-   CONFIGURATION
-========================================================= */
-const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
-const TOKEN_KEY = "freetube_access_token";
+const API="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const $=id=>document.getElementById(id);
 
-const PAYMENT_METHODS = [
-  {code:"bkash",name:"bKash",region:"Bangladesh",currency:"BDT"},
-  {code:"nagad",name:"Nagad",region:"Bangladesh",currency:"BDT"},
-  {code:"rocket",name:"Rocket",region:"Bangladesh",currency:"BDT"},
-  {code:"upi",name:"UPI",region:"India",currency:"INR"},
-  {code:"phonepe",name:"PhonePe",region:"India",currency:"INR"},
-  {code:"google_pay",name:"Google Pay",region:"India",currency:"INR"},
-  {code:"paytm",name:"Paytm",region:"India",currency:"INR"},
-  {code:"binance",name:"Binance",region:"International",currency:"USDT"},
-  {code:"redotpay",name:"RedotPay",region:"International",currency:"USDT"}
-];
+let adminVerified=false;
+let tournamentsData=[];
+let selectedTeams=[];
+let transactionsData=[];
+let knockoutData=null;
 
-const CUP_ROUNDS = [
-  {round_number:1,name:"Round 1",from:13,to:10},
-  {round_number:2,name:"Round 2",from:10,to:8},
-  {round_number:3,name:"Quarter Final",from:8,to:4},
-  {round_number:4,name:"Semi Final",from:4,to:2},
-  {round_number:5,name:"Grand Final",from:2,to:1}
-];
-
-let tournaments = [];
-let currentTeams = [];
-let paymentMethods = [];
-let currentRounds = [];
-let currentAdmin = null;
-
-/* =========================================================
-   COMMON HELPERS
-========================================================= */
 function getToken(){
-  return localStorage.getItem(TOKEN_KEY) || "";
+  return(localStorage.getItem(TOKEN_KEY)||"").trim();
 }
 
-function escapeHTML(value){
-  return String(value ?? "").replace(/[&<>"']/g, ch => ({
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[ch]));
+  })[c]);
 }
 
-function money(value,currency=""){
-  const n = Number(value || 0);
-  return (currency ? currency+" " : "") + n.toLocaleString(undefined,{maximumFractionDigits:2});
+function money(amount,currency){
+  const n=Number(amount||0);
+  const value=Number.isFinite(n)?n.toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2}):"0.00";
+  return esc(currency||"")+(currency?" ":"")+value;
 }
 
-function showToast(message){
-  const el=document.getElementById("toast");
-  el.textContent=message;
-  el.classList.remove("hidden");
-  clearTimeout(showToast.timer);
-  showToast.timer=setTimeout(()=>el.classList.add("hidden"),3200);
+function formatDate(value){
+  if(!value)return "—";
+  const d=new Date(value);
+  return Number.isNaN(d.getTime())?String(value):d.toLocaleString();
+}
+
+function notify(message,type){
+  const n=$("notice");
+  n.textContent=message;
+  n.className="notice"+(type?" "+type:"");
+  n.style.display="block";
+  n.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function empty(root,message){
+  $(root).innerHTML="";
+  const d=document.createElement("div");
+  d.className="empty";
+  d.textContent=message;
+  $(root).appendChild(d);
 }
 
 async function api(path,options={}){
-  const token=getToken();
-  const headers={...(options.headers||{})};
-  if(token) headers.Authorization="Bearer "+token;
-  if(options.body && !(options.body instanceof FormData)){
-    headers["Content-Type"]="application/json";
+  const t=getToken();
+  if(!t)throw new Error("Login token missing. Please log in to the main app.");
+
+  let response;
+  try{
+    response=await fetch(API+path,{
+      ...options,
+      headers:{
+        ...(options.headers||{}),
+        Authorization:"Bearer "+t,
+        ...(options.body?{"Content-Type":"application/json"}:{})
+      },
+      cache:"no-store",
+      credentials:"omit"
+    });
+  }catch(error){
+    console.error("Tournament API network error:",error);
+    throw new Error("Cannot connect to the backend. Check internet or Render service.");
   }
 
-  const response=await fetch(API_BASE_URL+path,{
-    ...options,headers,credentials:"include",cache:"no-store"
-  });
+  const contentType=response.headers.get("content-type")||"";
+  const data=contentType.includes("application/json")
+    ?await response.json().catch(()=>({}))
+    :{error:(await response.text().catch(()=>"")).slice(0,300)};
 
-  let data={};
-  try{data=await response.json()}catch(e){}
-
-  if(response.status===401){
-    logout();
-    throw new Error("Session expired. Please login again.");
-  }
   if(!response.ok){
-    throw new Error(data.error || data.message || "Request failed ("+response.status+")");
+    const err=new Error(data.error||data.message||("HTTP "+response.status));
+    err.status=response.status;
+    throw err;
   }
   return data;
 }
 
-function setLoading(id,message="Loading..."){
-  const el=document.getElementById(id);
-  if(el) el.innerHTML='<div class="loading">'+escapeHTML(message)+'</div>';
-}
-
-function statusBadge(status){
-  const s=String(status||"").toLowerCase();
-  return '<span class="badge '+escapeHTML(s)+'">'+escapeHTML(s.toUpperCase())+'</span>';
-}
-
-function switchTab(name){
-  document.querySelectorAll(".tab").forEach(el=>el.classList.add("hidden"));
-  document.querySelectorAll(".nav button").forEach(el=>el.classList.toggle("active",el.dataset.tab===name));
-  const target=document.getElementById("tab-"+name);
-  if(target) target.classList.remove("hidden");
-
-  if(name==="dashboard") loadDashboard();
-  if(name==="tournaments") loadTournaments();
-  if(name==="teams") loadTeams();
-  if(name==="knockout") loadKnockout();
-  if(name==="payments") loadPaymentMethods();
-  if(name==="deposits") loadTransactions("deposit");
-  if(name==="withdrawals") loadTransactions("withdrawal");
-}
-
-document.getElementById("nav").addEventListener("click",e=>{
-  const btn=e.target.closest("button[data-tab]");
-  if(btn) switchTab(btn.dataset.tab);
-});
-
-function logout(){
-  localStorage.removeItem(TOKEN_KEY);
-  document.getElementById("app").classList.add("hidden");
-  document.getElementById("loginScreen").classList.remove("hidden");
-}
-
-/* =========================================================
-   AUTHENTICATION
-========================================================= */
+/* ADMIN VERIFICATION */
 async function verifyAdmin(){
+  adminVerified=false;
+  $("adminBadge").textContent="Checking...";
+  $("adminBadge").className="pill yellow";
+
   if(!getToken()){
-    document.getElementById("loginScreen").classList.remove("hidden");
+    $("connection").textContent="Please log in to the main app first.";
+    $("adminBadge").textContent="Not Logged In";
+    $("adminBadge").className="pill red";
     return false;
   }
+
   try{
-    const me=await api("/auth/me");
-    const user=me.user || me.profile || me;
-    if(String(user.role||"").toLowerCase()!=="admin"){
-      throw new Error("Admin access required.");
-    }
-    currentAdmin=user;
-    document.getElementById("adminName").textContent=user.username ? "@"+user.username : "Admin";
-    document.getElementById("app").classList.remove("hidden");
-    await loadAll();
+    await api("/auth/me");
+    await api("/admin/dashboard");
+    adminVerified=true;
+    $("adminBadge").textContent="Admin Verified";
+    $("adminBadge").className="pill green";
+    $("connection").textContent="Backend verified your Admin permissions.";
     return true;
-  }catch(err){
-    showToast(err.message);
-    document.getElementById("loginScreen").classList.remove("hidden");
+  }catch(e){
+    $("adminBadge").textContent="Not Verified";
+    $("adminBadge").className="pill red";
+    $("connection").textContent=
+      e.status===401?"Login expired. Please log in again.":
+      e.status===403?"This account does not have Admin permission.":
+      "Admin verification failed: "+e.message;
+    notify("Admin verification failed: "+e.message);
     return false;
   }
 }
 
-async function loadAll(){
-  await Promise.allSettled([
-    loadDashboard(),loadTournaments(),loadPaymentMethods()
-  ]);
+/* TABS */
+function showTab(name){
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===name));
+  document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.tab===name));
+  window.scrollTo({top:0,behavior:"smooth"});
 }
+window.showTab=showTab;
 
-/* =========================================================
-   DASHBOARD
-========================================================= */
-async function loadDashboard(){
-  try{
-    const [tData,dData,wData,teamData]=await Promise.allSettled([
-      api("/tournament/tournaments"),
-      api("/admin/tournament/transactions?status=pending"),
-      api("/admin/tournament/transactions?status=pending"),
-      Promise.resolve({teams:[]})
-    ]);
+document.querySelectorAll("[data-tab]").forEach(button=>{
+  button.addEventListener("click",()=>showTab(button.dataset.tab));
+});
 
-    if(tData.status==="fulfilled"){
-      tournaments=tData.value.tournaments || [];
-    }
-
-    const pending=dData.status==="fulfilled" ? (dData.value.transactions||[]) : [];
-    const deposits=pending.filter(x=>x.type==="deposit");
-    const withdrawals=pending.filter(x=>x.type==="withdrawal");
-
-    document.getElementById("statTournaments").textContent=tournaments.length;
-    document.getElementById("statLive").textContent=tournaments.filter(x=>x.status==="live").length;
-    document.getElementById("statPending").textContent=pending.length;
-    document.getElementById("statDeposits").textContent=deposits.length;
-    document.getElementById("statWithdrawals").textContent=withdrawals.length;
-
-    const teamCount=tournaments.reduce((sum,t)=>sum+Number(t.team_count||0),0);
-    document.getElementById("statTeams").textContent=teamCount;
-
-    const recent=pending.slice(0,6);
-    document.getElementById("recentRequests").innerHTML=recent.length
-      ? recent.map(x=>`
-        <div class="team-card">
-          <div class="section-head">
-            <strong>${escapeHTML(x.username||x.user_id||"User")}</strong>
-            ${statusBadge(x.status)}
-          </div>
-          <p>${escapeHTML(x.type)} · ${money(x.amount,x.currency)} · ${escapeHTML(x.payment_method||"")}</p>
-        </div>`).join("")
-      : '<div class="empty">No pending requests.</div>';
-  }catch(err){
-    showToast(err.message);
-  }
-}
-
-/* =========================================================
-   TOURNAMENT CREATE
-========================================================= */
-const typeSelect=document.getElementById("tournamentType");
-const maxPlayersInput=document.getElementById("maxPlayers");
-
+/* TOURNAMENT TYPE CONTROLS */
 function updateTournamentType(){
-  const isCup=typeSelect.value==="Free Fire Cup";
-  document.getElementById("cupNotice").classList.toggle("hidden",!isCup);
-  document.getElementById("maxHelp").textContent=isCup
-    ?"Free Fire Cup starts with exactly 13 teams."
-    :"Set the maximum registration count for this tournament.";
+  const type=$("tournamentType").value;
+  const max=$("maxPlayers");
+  const help=$("typeHelp");
+  const maxHelp=$("maxPlayersHelp");
 
-  if(isCup){
-    maxPlayersInput.value=13;
-    maxPlayersInput.readOnly=true;
+  if(type==="Free Fire Cup"){
+    max.value="13";
+    max.max="13";
+    max.min="13";
+    max.readOnly=true;
+    help.textContent="Free Fire Cup selected. Maximum 13 teams. Knockout progression: 13 → 10 → 8 → 4 → 2 → 1 Champion.";
+    maxHelp.textContent="Free Fire Cup is limited to exactly 13 teams.";
   }else{
-    maxPlayersInput.readOnly=false;
-    if(Number(maxPlayersInput.value)===13) maxPlayersInput.value=50;
+    max.removeAttribute("max");
+    max.min="1";
+    max.readOnly=false;
+    if(!max.value||Number(max.value)===13)max.value="100";
+    help.textContent=type==="Clash Squad"
+      ?"Clash Squad tournament selected. Choose the Game Mode separately."
+      :"BR tournament selected. Choose Solo, Duo or Squad separately.";
+    maxHelp.textContent="Set the maximum number of entries for this tournament.";
   }
 }
+$("tournamentType").addEventListener("change",updateTournamentType);
+$("createForm").addEventListener("reset",()=>setTimeout(updateTournamentType,0));
 
-typeSelect.addEventListener("change",updateTournamentType);
-document.getElementById("prizeMode").addEventListener("change",()=>{
-  document.getElementById("percentageField").classList.toggle(
-    "hidden",document.getElementById("prizeMode").value!=="dynamic"
-  );
-});
-
-document.getElementById("createForm").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const btn=document.getElementById("createBtn");
-  const tournamentType=typeSelect.value;
-  const maxPlayers=Number(maxPlayersInput.value);
-
-  if(tournamentType==="Free Fire Cup" && maxPlayers!==13){
-    showToast("Free Fire Cup must start with 13 teams.");
-    return;
-  }
-
-  const payload={
-    title:document.getElementById("title").value.trim(),
-    tournament_type:tournamentType,
-    mode:document.getElementById("mode").value,
-    map_name:document.getElementById("mapName").value,
-    max_players:maxPlayers,
-    entry_fee:Number(document.getElementById("entryFee").value||0),
-    prize_pool:Number(document.getElementById("prizePool").value||0),
-    prize_mode:document.getElementById("prizeMode").value,
-    prize_percentage:Number(document.getElementById("prizePercentage").value||0),
-    scheduled_at:document.getElementById("scheduledAt").value
-      ? new Date(document.getElementById("scheduledAt").value).toISOString() : null,
-    banner_url:document.getElementById("bannerUrl").value.trim(),
-    description:document.getElementById("description").value.trim()
-  };
-
-  if(!payload.title){showToast("Enter tournament name.");return}
-  if(payload.entry_fee<0 || payload.prize_pool<0){showToast("Invalid amount.");return}
-
-  btn.disabled=true;btn.textContent="Creating...";
-  try{
-    await api("/tournament/tournaments",{
-      method:"POST",body:JSON.stringify(payload)
-    });
-    showToast("Tournament created successfully.");
-    e.target.reset();
-    updateTournamentType();
-    await loadTournaments();
-    switchTab("tournaments");
-  }catch(err){showToast(err.message)}
-  finally{btn.disabled=false;btn.textContent="＋ Create Tournament"}
-});
-
-/* =========================================================
-   TOURNAMENT LIST & STATUS
-========================================================= */
+/* TOURNAMENTS */
 async function loadTournaments(){
-  setLoading("tournamentList");
+  if(!adminVerified){notify("Admin access is not verified.");return;}
+  empty("tournamentsList","Loading tournaments...");
+  empty("recentTournaments","Loading tournaments...");
   try{
     const data=await api("/tournament/tournaments");
-    tournaments=data.tournaments||[];
-    renderTournaments();
-    fillTournamentSelectors();
-  }catch(err){
-    document.getElementById("tournamentList").innerHTML='<div class="empty">'+escapeHTML(err.message)+'</div>';
+    tournamentsData=Array.isArray(data.tournaments)?data.tournaments:[];
+    renderTournamentList();
+    updateStats();
+    updateTournamentSelect();
+  }catch(e){
+    empty("tournamentsList","Could not load tournaments: "+e.message);
+    empty("recentTournaments","Could not load tournaments.");
+    notify("Tournament loading failed: "+e.message);
   }
 }
 
-function renderTournaments(){
-  const search=(document.getElementById("tournamentSearch").value||"").toLowerCase();
-  const filter=document.getElementById("tournamentFilter").value;
+function updateStats(){
+  $("totalCount").textContent=tournamentsData.length;
+  $("liveCount").textContent=tournamentsData.filter(t=>String(t.status).toLowerCase()==="live").length;
+  $("completedCount").textContent=tournamentsData.filter(t=>String(t.status).toLowerCase()==="completed").length;
+  $("teamCount").textContent=tournamentsData.reduce((sum,t)=>sum+Number(t.registered_count||0),0);
+  $("tournamentCount").textContent=tournamentsData.length+" Tournaments";
+}
 
-  const rows=tournaments.filter(t=>{
-    const matches=(t.title||"").toLowerCase().includes(search);
-    return matches && (filter==="all" || t.status===filter);
+function updateTournamentSelect(){
+  const select=$("teamTournament");
+  const previous=select.value;
+  select.innerHTML='<option value="">Select tournament</option>';
+  tournamentsData.forEach(t=>{
+    const option=document.createElement("option");
+    option.value=t.id;
+    option.textContent=(t.title||"Tournament")+" · "+(t.tournament_type||"Type not set")+" · "+(t.mode||"")+" · "+(t.status||"");
+    select.appendChild(option);
+  });
+  if(tournamentsData.some(t=>String(t.id)===previous))select.value=previous;
+
+  const ko=$("knockoutTournament");
+  const old=ko.value;
+  ko.innerHTML='<option value="">Select Free Fire Cup</option>';
+  tournamentsData.filter(t=>String(t.tournament_type||"").toLowerCase()==="free fire cup")
+    .forEach(t=>{
+      const option=document.createElement("option");
+      option.value=t.id;
+      option.textContent=(t.title||"Free Fire Cup")+" · ID "+t.id;
+      ko.appendChild(option);
+    });
+  if([...ko.options].some(o=>o.value===old))ko.value=old;
+}
+
+function statusClass(status){
+  status=String(status||"upcoming").toLowerCase();
+  if(status==="live"||status==="approved"||status==="completed")return "green";
+  if(status==="cancelled"||status==="rejected")return "red";
+  return "yellow";
+}
+
+function renderTournamentList(){
+  const root=$("tournamentsList");
+  root.innerHTML="";
+  const q=$("tournamentSearch").value.trim().toLowerCase();
+  const filter=$("statusFilter").value;
+
+  const filtered=tournamentsData.filter(t=>{
+    const title=String(t.title||"").toLowerCase();
+    const status=String(t.status||"upcoming").toLowerCase();
+    return title.includes(q)&&(filter==="all"||status===filter);
   });
 
-  if(!rows.length){
-    document.getElementById("tournamentList").innerHTML='<div class="empty">No tournaments found.</div>';
-    return;
+  if(!filtered.length){empty("tournamentsList","No matching tournaments found.");}
+  else filtered.forEach(t=>{
+    const el=document.createElement("article");
+    el.className="item";
+    const fee=Number(t.entry_fee||0);
+    const prize=Number(t.prize_pool||0);
+    const type=t.tournament_type||"Not set";
+    el.innerHTML=
+      '<div class="row"><div><h3>'+esc(t.title)+'</h3>'+
+      '<div class="muted small">Tournament ID: '+esc(t.id)+' · '+esc(type)+' · '+esc(t.mode)+' · '+esc(t.map_name||"")+'</div></div>'+
+      '<span class="pill '+statusClass(t.status)+'">'+esc(t.status||"upcoming")+'</span></div>'+
+      '<p class="muted small">'+esc(t.description||"No description")+'</p>'+
+      '<div class="grid">'+
+      '<div class="muted small">Entry Fee: <strong>'+(fee===0?"FREE":esc(fee.toLocaleString()))+'</strong></div>'+
+      '<div class="muted small">Prize Pool: <strong>'+esc(prize.toLocaleString())+'</strong></div>'+
+      '<div class="muted small">Registered: <strong>'+esc(t.registered_count??0)+' / '+esc(t.max_players??"—")+'</strong></div>'+
+      '<div class="muted small">Match Time: <strong>'+esc(formatDate(t.scheduled_at))+'</strong></div></div>'+
+      '<div class="actions">'+
+      '<button class="secondary" data-team="'+esc(t.id)+'">Manage Teams</button>'+
+      (String(type).toLowerCase()==="free fire cup"?'<button class="purple" data-knockout="'+esc(t.id)+'">Knockout</button>':'')+
+      '<button class="success" data-live="'+esc(t.id)+'">Set Live</button>'+
+      '<button class="purple" data-complete="'+esc(t.id)+'">Complete</button>'+
+      '<button class="danger" data-cancel="'+esc(t.id)+'">Cancel</button></div>';
+    root.appendChild(el);
+  });
+
+  bindTournamentActions(root);
+
+  const recent=$("recentTournaments");
+  recent.innerHTML="";
+  tournamentsData.slice(0,5).forEach(t=>{
+    const el=document.createElement("article");
+    el.className="item";
+    el.innerHTML='<div class="row"><strong>'+esc(t.title)+'</strong><span class="pill '+statusClass(t.status)+'">'+esc(t.status||"upcoming")+'</span></div>'+
+      '<div class="muted small">'+esc(t.tournament_type||"Type not set")+' · ID: '+esc(t.id)+' · '+esc(t.mode)+' · '+esc(t.map_name||"")+'</div>';
+    recent.appendChild(el);
+  });
+  if(!tournamentsData.length)empty("recentTournaments","No tournaments created yet.");
+}
+
+function bindTournamentActions(root){
+  root.querySelectorAll("[data-team]").forEach(b=>b.onclick=()=>{
+    $("teamTournament").value=b.dataset.team;showTab("teams");loadTeams();
+  });
+  root.querySelectorAll("[data-knockout]").forEach(b=>b.onclick=()=>{
+    $("knockoutTournament").value=b.dataset.knockout;showTab("knockout");loadKnockout();
+  });
+  root.querySelectorAll("[data-live]").forEach(b=>b.onclick=()=>changeStatus(b.dataset.live,"live"));
+  root.querySelectorAll("[data-complete]").forEach(b=>b.onclick=()=>changeStatus(b.dataset.complete,"completed"));
+  root.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>changeStatus(b.dataset.cancel,"cancelled"));
+}
+
+/* CREATE TOURNAMENT */
+$("createForm").addEventListener("submit",async function(e){
+  e.preventDefault();
+  if(!adminVerified){notify("Admin access is not verified.");return;}
+
+  const entry=Number($("entry").value);
+  const prize=Number($("prize").value);
+  const max=Number($("maxPlayers").value);
+  const percent=Number($("prizePercent").value);
+  const tournamentType=$("tournamentType").value;
+
+  if(!Number.isFinite(entry)||entry<0||!Number.isFinite(prize)||prize<0||
+     !Number.isInteger(max)||max<1||!Number.isFinite(percent)||percent<0||percent>100){
+    notify("Please enter valid tournament values.");return;
   }
 
-  document.getElementById("tournamentList").innerHTML=`
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th>Tournament</th><th>Type</th><th>Mode</th><th>Entry</th>
-        <th>Prize</th><th>Teams/Players</th><th>Status</th><th>Actions</th>
-      </tr></thead>
-      <tbody>${rows.map(t=>`
-        <tr>
-          <td><strong>${escapeHTML(t.title)}</strong><br><small>${escapeHTML(t.map_name||"")}</small></td>
-          <td>${escapeHTML(t.tournament_type||"BR")}</td>
-          <td>${escapeHTML(t.mode||"")}</td>
-          <td>${money(t.entry_fee)}</td>
-          <td>${money(t.prize_pool)}</td>
-          <td>${escapeHTML(t.registered_count ?? t.team_count ?? "—")} / ${escapeHTML(t.max_players)}</td>
-          <td>${statusBadge(t.status)}</td>
-          <td><div class="actions">
-            <button class="btn small secondary" onclick="selectTournament('${t.id}')">Manage</button>
-            ${t.status!=="live"?`<button class="btn small success" onclick="changeTournamentStatus('${t.id}','live')">Set Live</button>`:""}
-            ${t.status!=="completed"?`<button class="btn small" onclick="changeTournamentStatus('${t.id}','completed')">Complete</button>`:""}
-            ${t.status!=="cancelled"?`<button class="btn small danger" onclick="changeTournamentStatus('${t.id}','cancelled')">Cancel</button>`:""}
-          </div></td>
-        </tr>`).join("")}
-      </tbody>
-    </table></div>`;
-}
+  if(tournamentType==="Free Fire Cup"&&max!==13){
+    notify("Free Fire Cup must have exactly 13 teams.");return;
+  }
 
-function fillTournamentSelectors(){
-  const teamSelect=document.getElementById("teamTournament");
-  const cupSelect=document.getElementById("knockoutTournament");
+  const dateValue=$("matchDate").value;
+  const payload={
+    title:$("title").value.trim(),
+    description:$("description").value.trim(),
+    tournament_type:tournamentType,
+    mode:$("mode").value,
+    map_name:$("map").value,
+    entry_fee:entry,
+    prize_pool:prize,
+    prize_mode:$("prizeMode").value,
+    prize_percentage:percent,
+    max_players:max,
+    scheduled_at:dateValue?new Date(dateValue).toISOString():null,
+    banner_url:$("banner").value.trim()
+  };
 
-  const oldTeam=teamSelect.value,oldCup=cupSelect.value;
-  teamSelect.innerHTML='<option value="">Select tournament</option>'+
-    tournaments.map(t=>`<option value="${escapeHTML(t.id)}">${escapeHTML(t.title)} · ${escapeHTML(t.tournament_type||"BR")}</option>`).join("");
+  if(!payload.title){notify("Tournament name is required.");return;}
+  if(payload.banner_url&&!/^https:\/\//i.test(payload.banner_url)){notify("Banner URL must use HTTPS.");return;}
 
-  const cups=tournaments.filter(t=>t.tournament_type==="Free Fire Cup");
-  cupSelect.innerHTML='<option value="">Select Free Fire Cup</option>'+
-    cups.map(t=>`<option value="${escapeHTML(t.id)}">${escapeHTML(t.title)}</option>`).join("");
-
-  if(tournaments.some(t=>String(t.id)===oldTeam)) teamSelect.value=oldTeam;
-  if(cups.some(t=>String(t.id)===oldCup)) cupSelect.value=oldCup;
-}
-
-async function changeTournamentStatus(id,status){
-  if(!confirm("Change tournament status to "+status+"?"))return;
+  const btn=$("createButton");
+  btn.disabled=true;btn.textContent="Creating...";
   try{
-    await api("/tournament/tournaments/"+encodeURIComponent(id),{
-      method:"PATCH",body:JSON.stringify({status})
-    });
-    showToast("Tournament status updated.");
+    await api("/tournament/tournaments",{method:"POST",body:JSON.stringify(payload)});
+    $("createForm").reset();
+    $("entry").value="0";$("prize").value="0";$("prizePercent").value="0";$("maxPlayers").value="100";
+    updateTournamentType();
+    notify("Tournament created successfully!","success");
+    await loadTournaments();showTab("tournaments");
+  }catch(e){
+    notify("Could not create tournament: "+e.message+
+      (e.status===400?" (The backend may not yet support Tournament Type.)":""));
+  }
+  finally{btn.disabled=false;btn.textContent="Create Tournament";}
+});
+
+/* STATUS UPDATE */
+async function changeStatus(id,status){
+  if(!adminVerified)return notify("Admin access is not verified.");
+  if(!confirm("Change tournament #"+id+" status to "+status+"?"))return;
+  try{
+    await api("/tournament/tournaments/"+encodeURIComponent(id),{method:"PATCH",body:JSON.stringify({status})});
+    notify("Tournament status updated successfully.","success");
     await loadTournaments();
-  }catch(err){showToast(err.message)}
+  }catch(e){notify("Could not update tournament: "+e.message);}
 }
 
-function selectTournament(id){
-  document.getElementById("teamTournament").value=String(id);
-  switchTab("teams");
-  loadTeams();
-}
+/* TEAM REGISTRATION */
+async function createTeam(){
+  if(!adminVerified){notify("Admin access is not verified.");return;}
+  const tournamentId=$("teamTournament").value;
+  const teamName=$("teamName").value.trim();
+  const players=[1,2,3,4].map(i=>({name:$("p"+i+"name").value.trim(),uid:$("p"+i+"uid").value.trim()}));
 
-/* =========================================================
-   TEAM REGISTRATION
-========================================================= */
-function resetPlayers(){
-  const box=document.getElementById("playerInputs");
-  box.innerHTML="";
-  for(let i=1;i<=4;i++){
-    box.insertAdjacentHTML("beforeend",`
-      <div class="player-row">
-        <div class="field">
-          <label>Player ${i} Name</label>
-          <input id="playerName${i}" maxlength="60" placeholder="Player name">
-        </div>
-        <div class="field">
-          <label>Free Fire UID</label>
-          <input id="playerUid${i}" inputmode="numeric" maxlength="20" placeholder="5–20 digit UID">
-        </div>
-      </div>`);
+  if(!tournamentId)return notify("Please select a tournament.");
+  if(!teamName)return notify("Please enter a team name.");
+  if(players.some(p=>!p.name||!/^[0-9]{5,20}$/.test(p.uid))){
+    return notify("Enter all four player names and numeric UIDs (5–20 digits).");
   }
-}
 
-function getPlayerPayload(){
-  const players=[];
-  for(let i=1;i<=4;i++){
-    const name=document.getElementById("playerName"+i).value.trim();
-    const uid=document.getElementById("playerUid"+i).value.trim();
-    if(!name || !/^\d{5,20}$/.test(uid)){
-      throw new Error("Player "+i+": enter name and valid 5–20 digit UID.");
-    }
-    players.push({name,uid});
-  }
-  const uids=players.map(p=>p.uid);
-  if(new Set(uids).size!==uids.length) throw new Error("Duplicate player UID is not allowed.");
-  return players;
-}
-
-async function registerTeam(){
-  const tournamentId=document.getElementById("teamTournament").value;
-  const teamName=document.getElementById("teamName").value.trim();
-  if(!tournamentId){showToast("Select a tournament.");return}
-  if(!teamName){showToast("Enter team name.");return}
-
+  const btn=$("createTeamButton");
+  btn.disabled=true;btn.textContent="Registering...";
   try{
-    const players=getPlayerPayload();
     await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams",{
       method:"POST",body:JSON.stringify({team_name:teamName,players})
     });
-    showToast("Team registered successfully.");
-    document.getElementById("teamName").value="";
-    resetPlayers();
-    await loadTeams();
-    await loadDashboard();
-  }catch(err){showToast(err.message)}
+    $("teamName").value="";
+    [1,2,3,4].forEach(i=>{$("p"+i+"name").value="";$("p"+i+"uid").value="";});
+    notify("Team registered successfully!","success");
+    await loadTeams();await loadTournaments();
+  }catch(e){notify("Could not register team: "+e.message);}
+  finally{btn.disabled=false;btn.textContent="＋ Create & Register Team";}
 }
 
 async function loadTeams(){
-  const tournamentId=document.getElementById("teamTournament").value;
-  if(!tournamentId){
-    document.getElementById("teamList").innerHTML='<div class="empty">Select a tournament to view teams.</div>';
-    return;
-  }
-  setLoading("teamList");
+  if(!adminVerified){notify("Admin access is not verified.");return;}
+  const id=$("teamTournament").value;
+  if(!id)return empty("teamsList","Select a tournament first.");
+  empty("teamsList","Loading registered teams...");
   try{
-    const data=await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams");
-    currentTeams=data.teams||[];
+    const d=await api("/tournament/admin/tournaments/"+encodeURIComponent(id)+"/teams");
+    selectedTeams=Array.isArray(d.teams)?d.teams:[];
     renderTeams();
-  }catch(err){
-    document.getElementById("teamList").innerHTML='<div class="empty">'+escapeHTML(err.message)+'</div>';
-  }
+  }catch(e){empty("teamsList","Could not load teams: "+e.message);}
 }
 
 function renderTeams(){
-  const box=document.getElementById("teamList");
-  if(!currentTeams.length){
-    box.innerHTML='<div class="empty">No registered teams yet.</div>';
-    return;
-  }
-
-  box.innerHTML=currentTeams.map(team=>`
-    <div class="team-card">
-      <div class="section-head">
-        <div>
-          <h4>${escapeHTML(team.team_name)}</h4>
-          <p>Team ID: ${escapeHTML(team.id)}</p>
-        </div>
-        ${statusBadge(team.status||"registered")}
-      </div>
-      <div class="sub">
-        ${(team.players||[]).map((p,i)=>`
-          <div style="padding:6px 0;border-top:1px solid #26344b">
-            Player ${i+1}: ${escapeHTML(p.name)} · UID ${escapeHTML(p.uid)}
-          </div>`).join("")}
-      </div>
-      <div class="actions" style="margin-top:10px">
-        <button class="btn secondary small" onclick="editTeam('${team.id}')">Edit Roster</button>
-      </div>
-    </div>`).join("");
+  const root=$("teamsList");root.innerHTML="";
+  if(!selectedTeams.length)return empty("teamsList","No teams registered for this tournament.");
+  selectedTeams.forEach(team=>{
+    const el=document.createElement("article");el.className="item";
+    const players=Array.isArray(team.players)?team.players:[];
+    el.innerHTML='<div class="row"><h3>'+esc(team.team_name||"Unnamed Team")+'</h3>'+
+      '<span class="pill '+(team.roster_locked?"red":"green")+'">'+(team.roster_locked?"Roster Locked":"Roster Editable")+'</span></div>'+
+      '<div class="muted small">Team ID: '+esc(team.id)+' · Status: '+esc(team.status||"registered")+'</div>'+
+      '<div style="margin-top:10px">'+players.map((p,i)=>'<div class="muted small">Player '+(i+1)+': '+esc(p.name)+' · UID: '+esc(p.uid)+'</div>').join("")+'</div>';
+    if(!team.roster_locked){
+      const b=document.createElement("button");b.className="secondary";b.textContent="Edit 4 Players";b.style.marginTop="12px";b.onclick=()=>editRoster(team);el.appendChild(b);
+    }
+    root.appendChild(el);
+  });
 }
 
-async function editTeam(teamId){
-  const team=currentTeams.find(t=>String(t.id)===String(teamId));
-  if(!team)return;
-  const newName=prompt("Team name:",team.team_name);
-  if(newName===null)return;
+async function editRoster(team){
+  if(!adminVerified)return;
+  const tournamentId=$("teamTournament").value;
+  const current=Array.isArray(team.players)?team.players:[];
   const players=[];
   for(let i=0;i<4;i++){
-    const old=(team.players||[])[i]||{};
-    const name=prompt("Player "+(i+1)+" name:",old.name||"");
+    const old=current[i]||{};
+    const name=prompt("Player "+(i+1)+" Name",old.name||"");
     if(name===null)return;
-    const uid=prompt("Player "+(i+1)+" UID:",old.uid||"");
+    const uid=prompt("Player "+(i+1)+" Free Fire UID",old.uid||"");
     if(uid===null)return;
     players.push({name:name.trim(),uid:uid.trim()});
   }
-  if(players.some(p=>!p.name||!/^\d{5,20}$/.test(p.uid))){
-    showToast("Invalid player details.");return;
-  }
-  if(new Set(players.map(p=>p.uid)).size!==4){
-    showToast("Duplicate UID is not allowed.");return;
-  }
+  if(players.some(p=>!p.name||!/^[0-9]{5,20}$/.test(p.uid)))return notify("Invalid player name or UID.");
+  if(!confirm("Save updated team roster?"))return;
   try{
-    await api("/tournament/admin/tournaments/"+encodeURIComponent(document.getElementById("teamTournament").value)+"/teams/"+encodeURIComponent(teamId),{
-      method:"PATCH",body:JSON.stringify({team_name:newName.trim(),players})
+    await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams/"+encodeURIComponent(team.id),{
+      method:"PATCH",body:JSON.stringify({players})
     });
-    showToast("Team roster updated.");
-    await loadTeams();
-  }catch(err){showToast(err.message)}
+    notify("Team roster updated successfully.","success");await loadTeams();
+  }catch(e){notify("Roster update failed: "+e.message);}
 }
 
-/* =========================================================
-   FREE FIRE CUP KNOCKOUT
-========================================================= */
+/* KNOCKOUT MANAGEMENT
+   Backend endpoints to be implemented in the next server.js update:
+   GET  /tournament/admin/tournaments/:id/knockout
+   POST /tournament/admin/tournaments/:id/knockout
+*/
+const knockoutStages={
+  "13_to_10":{label:"13 Teams → 10 Teams",from:13,to:10},
+  "10_to_8":{label:"10 Teams → 8 Teams",from:10,to:8},
+  "8_to_4":{label:"8 Teams → 4 Teams",from:8,to:4},
+  "4_to_2":{label:"4 Teams → 2 Teams",from:4,to:2},
+  "2_to_1":{label:"2 Teams → Champion",from:2,to:1}
+};
+
 async function loadKnockout(){
-  const tournamentId=document.getElementById("knockoutTournament").value;
-  if(!tournamentId){
-    document.getElementById("roundList").innerHTML='<div class="empty">Select a Free Fire Cup tournament.</div>';
-    document.getElementById("knockoutProgress").innerHTML="";
-    return;
+  if(!adminVerified)return notify("Admin access is not verified.");
+  const id=$("knockoutTournament").value;
+  if(!id)return notify("Select a Free Fire Cup tournament first.");
+
+  const tournament=tournamentsData.find(t=>String(t.id)===String(id));
+  if(tournament&&String(tournament.tournament_type||"").toLowerCase()!=="free fire cup"){
+    return notify("Knockout progression is available only for Free Fire Cup.");
   }
 
-  const tournament=tournaments.find(t=>String(t.id)===String(tournamentId));
-  if(tournament && tournament.tournament_type!=="Free Fire Cup"){
-    document.getElementById("roundList").innerHTML='<div class="notice warn">Knockout management is only for Free Fire Cup.</div>';
-    return;
-  }
-
-  setLoading("roundList");
-  try{
-    const [roundData,teamData]=await Promise.all([
-      api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/rounds"),
-      api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams")
-    ]);
-    currentRounds=roundData.rounds||[];
-    currentTeams=teamData.teams||[];
-    renderKnockout();
-  }catch(err){
-    document.getElementById("roundList").innerHTML='<div class="empty">'+escapeHTML(err.message)+'</div>';
-  }
-}
-
-function renderKnockout(){
-  const progress=document.getElementById("knockoutProgress");
-  const rounds=currentRounds.length?currentRounds:CUP_ROUNDS;
-  progress.innerHTML=rounds.map((r,i)=>`
-    <div class="stat">
-      <div class="label">${escapeHTML(r.round_name||r.name)}</div>
-      <div class="value" style="font-size:19px">${Number(r.expected_teams??r.from)} → ${Number(r.target_teams??r.to)}</div>
-      <div class="hint">${escapeHTML(r.status||"Not started")}</div>
-    </div>`).join("");
-
-  const box=document.getElementById("roundList");
-  box.innerHTML=rounds.map((r,i)=>{
-    const roundNo=Number(r.round_number||i+1);
-    const from=Number(r.expected_teams??r.from);
-    const to=Number(r.target_teams??r.to);
-    const eligible=currentTeams.filter(t=>{
-      const currentRound=Number(t.current_round||t.round_number||1);
-      return currentRound===roundNo && !["eliminated","champion"].includes(t.status);
-    });
-    const selected=(r.qualified_team_ids||[]);
-    return `
-      <div class="round-card">
-        <div class="round-head">
-          <strong>${escapeHTML(r.round_name||r.name)}</strong>
-          <span class="badge">${from} → ${to} TEAMS</span>
-        </div>
-        <p class="sub">Select exactly ${to} qualified teams. Available teams: ${eligible.length}.</p>
-        <div id="roundChoices${roundNo}">
-          ${eligible.map(team=>`
-            <label class="team-choice">
-              <input type="checkbox" value="${escapeHTML(team.id)}"
-                ${selected.includes(String(team.id))?"checked":""}
-                onchange="checkRoundCount(${roundNo},${to})">
-              <span>${escapeHTML(team.team_name)}</span>
-              <span style="margin-left:auto">${statusBadge(team.status||"registered")}</span>
-            </label>`).join("")}
-        </div>
-        <div class="sub" id="roundCount${roundNo}" style="margin:10px 0">Selected: ${selected.length} / ${to}</div>
-        <button class="btn success small" onclick="saveRound(${roundNo},${to})">Save Qualified Teams</button>
-      </div>`;
-  }).join("");
-
-  const champion=currentTeams.find(t=>t.status==="champion");
-  if(champion){
-    box.insertAdjacentHTML("beforeend",`
-      <div class="panel" style="text-align:center;border-color:#5879bd">
-        <div style="font-size:38px">🏆</div>
-        <h2>FREE FIRE CUP CHAMPION</h2>
-        <h3 style="color:#8ebaff">${escapeHTML(champion.team_name)}</h3>
-      </div>`);
-  }
-}
-
-function checkRoundCount(roundNo,target){
-  const checked=document.querySelectorAll("#roundChoices"+roundNo+" input:checked").length;
-  const el=document.getElementById("roundCount"+roundNo);
-  if(el)el.textContent="Selected: "+checked+" / "+target;
-}
-
-async function saveRound(roundNo,target){
-  const tournamentId=document.getElementById("knockoutTournament").value;
-  const selected=[...document.querySelectorAll("#roundChoices"+roundNo+" input:checked")].map(x=>x.value);
-
-  if(selected.length!==target){
-    showToast("Select exactly "+target+" teams.");
-    return;
-  }
-  if(!confirm("Confirm qualified teams for this round? This will mark other teams eliminated."))return;
+  $("knockoutInfo").textContent="Loading knockout data...";
+  $("knockoutControls").classList.add("hidden");
+  empty("knockoutHistory","Loading knockout history...");
 
   try{
-    await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/rounds/"+roundNo,{
-      method:"PATCH",body:JSON.stringify({qualified_team_ids:selected})
+    const data=await api("/tournament/admin/tournaments/"+encodeURIComponent(id)+"/knockout");
+    knockoutData=data;
+    $("knockoutControls").classList.remove("hidden");
+    $("knockoutInfo").textContent="Knockout data loaded from server.";
+    renderKnockoutHistory();
+    if(data.current_stage)$("knockoutStage").value=data.current_stage;
+  }catch(e){
+    knockoutData=null;
+    $("knockoutInfo").textContent="Knockout API is not available yet: "+e.message;
+    empty("knockoutHistory","Knockout history is unavailable until the backend API is added.");
+    notify("Knockout backend is not ready. The server.js update is required.");
+  }
+}
+
+function renderKnockoutHistory(){
+  const root=$("knockoutHistory");
+  root.innerHTML="";
+  const records=Array.isArray(knockoutData?.stages)?knockoutData.stages:[];
+  if(!records.length)return empty("knockoutHistory","No knockout stages have been saved yet.");
+  records.forEach(stage=>{
+    const el=document.createElement("article");
+    el.className="item";
+    el.innerHTML='<div class="row"><strong>'+esc(knockoutStages[stage.stage]?.label||stage.stage||"Knockout Stage")+'</strong>'+
+      '<span class="pill green">Saved</span></div>'+
+      '<div class="muted small">Qualified Teams: '+esc(Array.isArray(stage.qualified_team_ids)?stage.qualified_team_ids.join(", "):"—")+'</div>'+
+      '<div class="muted small">Updated: '+esc(formatDate(stage.updated_at||stage.created_at))+'</div>'+
+      (stage.note?'<div class="note-box">'+esc(stage.note)+'</div>':'');
+    root.appendChild(el);
+  });
+}
+
+async function saveKnockout(){
+  if(!adminVerified)return notify("Admin access is not verified.");
+  const id=$("knockoutTournament").value;
+  if(!id)return notify("Select a tournament first.");
+
+  const stageKey=$("knockoutStage").value;
+  const stage=knockoutStages[stageKey];
+  const raw=$("qualifiedTeams").value.trim();
+  const ids=raw?raw.split(",").map(x=>x.trim()).filter(Boolean):[];
+
+  if(ids.length!==stage.to){
+    return notify("This stage requires exactly "+stage.to+" qualified team IDs.");
+  }
+  if(ids.some(x=>!/^[0-9]+$/.test(x))){
+    return notify("Team IDs must be numeric.");
+  }
+  if(new Set(ids).size!==ids.length){
+    return notify("Duplicate Team IDs are not allowed.");
+  }
+
+  const btn=$("saveKnockoutButton");
+  btn.disabled=true;btn.textContent="Saving...";
+  try{
+    const data=await api("/tournament/admin/tournaments/"+encodeURIComponent(id)+"/knockout",{
+      method:"POST",
+      body:JSON.stringify({
+        stage:stageKey,
+        qualified_team_ids:ids,
+        note:$("knockoutNote").value.trim()
+      })
     });
-    showToast("Round result saved.");
+    knockoutData=data;
+    $("qualifiedTeams").value="";
+    $("knockoutNote").value="";
+    notify("Knockout stage results saved successfully.","success");
     await loadKnockout();
-    await loadTeams();
-  }catch(err){showToast(err.message)}
-}
-
-/* =========================================================
-   TOURNAMENT PAYMENT METHODS
-========================================================= */
-async function loadPaymentMethods(){
-  setLoading("paymentMethods");
-  try{
-    const data=await api("/admin/tournament/payment-methods");
-    paymentMethods=data.payment_methods||data.methods||[];
-    renderPaymentMethods();
-  }catch(err){
-    document.getElementById("paymentMethods").innerHTML=
-      '<div class="notice warn">'+escapeHTML(err.message)+'<br>Payment settings API will be connected in the next server.js update.</div>'+
-      PAYMENT_METHODS.map(method=>paymentMethodFallback(method)).join("");
+  }catch(e){
+    notify("Could not save knockout results: "+e.message+
+      ". Make sure the server.js knockout API has been installed.");
+  }finally{
+    btn.disabled=false;btn.textContent="Save Stage Results";
   }
 }
 
-function paymentMethodFallback(method){
-  return `
-    <div class="method-card">
-      <div class="method-top"><strong>${escapeHTML(method.name)}</strong><span class="badge">Not configured</span></div>
-      <div class="sub">${escapeHTML(method.region)} · ${escapeHTML(method.currency)}</div>
-    </div>`;
+/* TRANSACTION MANAGEMENT */
+async function loadTransactions(status="all"){
+  if(!adminVerified){notify("Admin access is not verified.");return [];}
+  const data=await api("/admin/tournament/transactions?status="+encodeURIComponent(status));
+  return Array.isArray(data.transactions)?data.transactions:[];
 }
 
-function renderPaymentMethods(){
-  const source=paymentMethods.length?paymentMethods:PAYMENT_METHODS;
-  document.getElementById("paymentMethods").innerHTML=source.map((m,i)=>`
-    <div class="method-card" data-method-id="${escapeHTML(m.id||"")}" data-method-code="${escapeHTML(m.code||m.method_code||"")}">
-      <div class="method-top">
-        <strong>${escapeHTML(m.name)}</strong>
-        <label class="checkline">
-          <input type="checkbox" class="method-enabled" ${m.enabled?"checked":""}>
-          Enabled
-        </label>
-      </div>
-      <div class="sub">${escapeHTML(m.region||"")} · ${escapeHTML(m.currency||"")}</div>
-      <div class="method-fields">
-        <div class="field">
-          <label>Account Holder / Name</label>
-          <input class="method-account-name" value="${escapeHTML(m.account_name||"")}" placeholder="Account holder name">
-        </div>
-        <div class="field">
-          <label>Account Number / Wallet Address</label>
-          <input class="method-account-details" value="${escapeHTML(m.account_details||"")}" placeholder="Payment destination">
-        </div>
-        <div class="field full">
-          <label>Instructions for Users</label>
-          <textarea class="method-instructions" placeholder="Deposit instructions...">${escapeHTML(m.instructions||"")}</textarea>
-        </div>
-        <div class="field full">
-          <label>QR Image URL (Optional)</label>
-          <input class="method-qr" value="${escapeHTML(m.qr_image_url||"")}" placeholder="https://...">
-        </div>
-      </div>
-      <button class="btn small" style="margin-top:12px" onclick="savePaymentMethod(this)">Save ${escapeHTML(m.name)}</button>
-    </div>`).join("");
+function transactionStatusClass(status){
+  const s=String(status||"pending").toLowerCase();
+  if(s==="approved"||s==="completed")return "green";
+  if(s==="rejected")return "red";
+  return "yellow";
 }
 
-async function savePaymentMethod(button){
-  const card=button.closest(".method-card");
-  const code=card.dataset.methodCode;
-  const id=card.dataset.methodId;
-  const payload={
-    code,
-    enabled:card.querySelector(".method-enabled").checked,
-    account_name:card.querySelector(".method-account-name").value.trim(),
-    account_details:card.querySelector(".method-account-details").value.trim(),
-    instructions:card.querySelector(".method-instructions").value.trim(),
-    qr_image_url:card.querySelector(".method-qr").value.trim()
-  };
-  if(!payload.code && !id){showToast("Payment method identifier missing.");return}
-  button.disabled=true;
-  try{
-    await api("/admin/tournament/payment-methods",{
-      method:"PUT",body:JSON.stringify(payload)
-    });
-    showToast("Payment method saved.");
-    await loadPaymentMethods();
-  }catch(err){showToast(err.message)}
-  finally{button.disabled=false}
-}
+function transactionCard(tx,type){
+  const el=document.createElement("article");
+  el.className="item";
+  const isPending=String(tx.status).toLowerCase()==="pending";
+  const amount=money(tx.amount,tx.currency);
+  const username=tx.username||("User #"+(tx.user_id??"unknown"));
+  const created=formatDate(tx.created_at);
+  const isDeposit=type==="deposit";
 
-/* =========================================================
-   DEPOSIT & WITHDRAWAL REVIEW
-========================================================= */
-async function loadTransactions(type){
-  const target=type==="deposit"?"depositList":"withdrawalList";
-  setLoading(target);
-  try{
-    const data=await api("/admin/tournament/transactions?status=pending");
-    const all=data.transactions||[];
-    const rows=all.filter(x=>x.type===type);
-    renderTransactions(target,rows,type);
-  }catch(err){
-    document.getElementById(target).innerHTML='<div class="empty">'+escapeHTML(err.message)+'</div>';
-  }
-}
-
-function renderTransactions(target,rows,type){
-  if(!rows.length){
-    document.getElementById(target).innerHTML='<div class="empty">No pending '+type+' requests.</div>';
-    return;
+  let details='';
+  if(isDeposit){
+    details=
+      '<div><span>Payment Method</span><strong>'+esc(tx.payment_method||"—")+'</strong></div>'+
+      '<div><span>Transaction Reference</span><strong>'+esc(tx.transaction_ref||"—")+'</strong></div>';
+  }else{
+    details=
+      '<div><span>Payment Method</span><strong>'+esc(tx.payment_method||"—")+'</strong></div>'+
+      '<div><span>Withdrawal Destination</span><strong>'+esc(tx.destination||"—")+'</strong></div>'+
+      '<div><span>Transaction Reference</span><strong>'+esc(tx.transaction_ref||"—")+'</strong></div>';
   }
 
-  document.getElementById(target).innerHTML=`
-    <div class="table-wrap"><table>
-      <thead><tr>
-        <th>User</th><th>Amount</th><th>Method</th><th>Reference</th>
-        <th>Destination</th><th>Date</th><th>Action</th>
-      </tr></thead>
-      <tbody>${rows.map(x=>`
-        <tr>
-          <td>${escapeHTML(x.username||x.user_id)}</td>
-          <td><strong>${money(x.amount,x.currency)}</strong></td>
-          <td>${escapeHTML(x.payment_method||"—")}</td>
-          <td>${escapeHTML(x.transaction_ref||"—")}</td>
-          <td>${escapeHTML(x.destination||"—")}</td>
-          <td>${x.created_at?new Date(x.created_at).toLocaleString():"—"}</td>
-          <td><div class="actions">
-            <button class="btn success small" onclick="reviewTransaction('${x.id}','approve','${type}')">Approve</button>
-            <button class="btn danger small" onclick="reviewTransaction('${x.id}','reject','${type}')">Reject</button>
-          </div></td>
-        </tr>`).join("")}
-      </tbody>
-    </table></div>`;
+  el.innerHTML=
+    '<div class="row"><div><h3>'+esc(username)+'</h3>'+
+    '<div class="muted small">Request ID: '+esc(tx.id)+' · User ID: '+esc(tx.user_id??"—")+'</div></div>'+
+    '<span class="pill '+transactionStatusClass(tx.status)+'">'+esc(tx.status||"pending")+'</span></div>'+
+    '<div class="transaction-amount">'+amount+'</div>'+
+    '<div class="transaction-meta">'+details+
+    '<div><span>Submitted</span><strong>'+esc(created)+'</strong></div>'+
+    '<div><span>Request Type</span><strong>'+(isDeposit?"Deposit":"Withdrawal")+'</strong></div>'+
+    '</div>'+
+    (tx.admin_note?'<div class="note-box"><strong>Admin Note:</strong> '+esc(tx.admin_note)+'</div>':'')+
+    (isPending?
+      '<div class="actions">'+
+      '<button class="success" data-approve="'+esc(tx.id)+'" data-type="'+type+'">✓ Approve</button>'+
+      '<button class="danger" data-reject="'+esc(tx.id)+'" data-type="'+type+'">✕ Reject</button>'+
+      '</div>':
+      '<div class="muted small" style="margin-top:12px">This request has already been reviewed.</div>');
+  return el;
+}
+
+function bindTransactionActions(root){
+  root.querySelectorAll("[data-approve]").forEach(btn=>{
+    btn.onclick=()=>reviewTransaction(btn.dataset.approve,"approve",btn.dataset.type);
+  });
+  root.querySelectorAll("[data-reject]").forEach(btn=>{
+    btn.onclick=()=>reviewTransaction(btn.dataset.reject,"reject",btn.dataset.type);
+  });
 }
 
 async function reviewTransaction(id,action,type){
-  const note=prompt("Admin note (optional):","")||"";
-  const verb=action==="approve"?"approve":"reject";
-  if(!confirm("Are you sure you want to "+verb+" this "+type+" request?"))return;
+  if(!adminVerified){notify("Admin access is not verified.");return;}
+
+  const tx=transactionsData.find(x=>String(x.id)===String(id));
+  if(!tx){notify("Transaction record not found. Refresh and try again.");return;}
+
+  const label=type==="deposit"?"Deposit":"Withdrawal";
+  const confirmation=action==="approve"
+    ?"Approve this "+label.toLowerCase()+" request? The Tournament Wallet balance will be updated."
+    :"Reject this "+label.toLowerCase()+" request? The wallet balance will not change.";
+
+  if(!confirm(confirmation))return;
+
+  let note=prompt("Admin note (optional):","");
+  if(note===null)return;
+  note=note.trim().slice(0,1000);
 
   try{
     await api("/admin/tournament/transactions/"+encodeURIComponent(id),{
       method:"PATCH",
       body:JSON.stringify({action,admin_note:note})
     });
-    showToast("Request "+(action==="approve"?"approved":"rejected")+".");
-    await loadTransactions(type);
-    await loadDashboard();
-  }catch(err){showToast(err.message)}
+    notify(label+" request "+(action==="approve"?"approved":"rejected")+" successfully.","success");
+    await refreshTransactions();
+  }catch(e){
+    notify("Could not "+action+" request: "+e.message);
+    if(e.status===409)notify("This request has already been reviewed. Refreshing records.");
+    await refreshTransactions();
+  }
 }
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-resetPlayers();
-updateTournamentType();
-verifyAdmin();
+function updateFinancialStats(){
+  const deposits=transactionsData.filter(t=>t.type==="deposit");
+  const withdrawals=transactionsData.filter(t=>t.type==="withdrawal");
+
+  $("pendingDepositCount").textContent=deposits.filter(t=>t.status==="pending").length;
+  $("pendingWithdrawCount").textContent=withdrawals.filter(t=>t.status==="pending").length;
+
+  const approved=deposits.filter(t=>t.status==="approved")
+    .reduce((s,t)=>s+Number(t.amount||0),0);
+  const completed=withdrawals.filter(t=>t.status==="completed")
+    .reduce((s,t)=>s+Number(t.amount||0),0);
+
+  $("approvedDepositTotal").textContent=approved.toLocaleString(undefined,{maximumFractionDigits:2});
+  $("completedWithdrawTotal").textContent=completed.toLocaleString(undefined,{maximumFractionDigits:2});
+}
+
+async function refreshTransactions(){
+  if(!adminVerified)return;
+  try{
+    transactionsData=await loadTransactions("all");
+    updateFinancialStats();
+    renderDepositList();
+    renderWithdrawalList();
+    renderDashboardPending();
+  }catch(e){
+    empty("depositsList","Could not load deposit requests: "+e.message);
+    empty("withdrawalsList","Could not load withdrawal requests: "+e.message);
+    empty("dashboardPending","Could not load payment requests.");
+    notify("Transaction loading failed: "+e.message);
+  }
+}
+
+function renderFilteredTransactions(type,status,rootId){
+  const root=$(rootId);root.innerHTML="";
+  const records=transactionsData.filter(t=>
+    t.type===type&&(status==="all"||String(t.status).toLowerCase()===status)
+  );
+  if(!records.length){
+    empty(rootId,"No "+(type==="deposit"?"deposit":"withdrawal")+" requests found for this filter.");
+    return;
+  }
+  records.forEach(tx=>root.appendChild(transactionCard(tx,type)));
+  bindTransactionActions(root);
+}
+
+function renderDepositList(){
+  renderFilteredTransactions("deposit",$("depositStatus").value,"depositsList");
+}
+
+function renderWithdrawalList(){
+  renderFilteredTransactions("withdrawal",$("withdrawStatus").value,"withdrawalsList");
+}
+
+function renderDashboardPending(){
+  const root=$("dashboardPending");root.innerHTML="";
+  const pending=transactionsData.filter(t=>t.status==="pending");
+  if(!pending.length)return empty("dashboardPending","There are no pending payment requests.");
+  pending.slice(0,6).forEach(tx=>{
+    const type=tx.type==="deposit"?"deposit":"withdrawal";
+    root.appendChild(transactionCard(tx,type));
+  });
+  bindTransactionActions(root);
+}
+
+/* EVENTS */
+$("loadTournaments").onclick=loadTournaments;
+$("createTeamButton").onclick=createTeam;
+$("loadTeamsButton").onclick=loadTeams;
+$("teamTournament").onchange=loadTeams;
+$("tournamentSearch").oninput=renderTournamentList;
+$("statusFilter").onchange=renderTournamentList;
+
+$("depositStatus").onchange=renderDepositList;
+$("withdrawStatus").onchange=renderWithdrawalList;
+$("refreshDeposits").onclick=refreshTransactions;
+$("refreshWithdrawals").onclick=refreshTransactions;
+
+$("loadKnockoutButton").onclick=loadKnockout;
+$("knockoutTournament").onchange=loadKnockout;
+$("saveKnockoutButton").onclick=saveKnockout;
+
+async function refreshData(){
+  if(!(await verifyAdmin()))return;
+  await Promise.all([loadTournaments(),refreshTransactions()]);
+}
+
+$("refreshAll").onclick=refreshData;
+
+async function initialize(){
+  updateTournamentType();
+  if(!(await verifyAdmin()))return;
+  await Promise.all([loadTournaments(),refreshTransactions()]);
+}
+
+initialize();
+
+})();
 </script>
 </body>
 </html>
