@@ -8,161 +8,435 @@
 <title>BOYS VS GIRLS — Tournaments</title>
 
 <style>
-:root {
+:root{
   --bg:#0b0d1b;
   --panel:#15182b;
-  --panel2:#1c2038;
+  --panel2:#1d223b;
   --text:#f5f6ff;
   --muted:#9da5c2;
   --blue:#3988ff;
+  --purple:#7957ff;
   --pink:#ff4d9d;
   --green:#22c985;
   --border:rgba(255,255,255,.09);
 }
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
+
 button{font:inherit;cursor:pointer}
 a{color:inherit;text-decoration:none}
+
 .header{
-  position:sticky;top:0;z-index:10;
-  background:rgba(13,15,31,.96);
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:rgba(13,15,31,.97);
+  backdrop-filter:blur(12px);
   border-bottom:1px solid var(--border);
   padding:15px 5%;
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
   gap:12px;
 }
-.brand{font-size:18px;font-weight:900}
+
+.brand{
+  font-size:20px;
+  font-weight:900;
+  white-space:nowrap;
+}
+
 .brand span:first-child{color:#58a0ff}
 .brand span:last-child{color:#ff68ad}
-.header a{
-  background:linear-gradient(100deg,var(--blue),#7758ff);
-  padding:10px 15px;border-radius:10px;font-size:13px;font-weight:bold;
+
+.home-btn{
+  background:linear-gradient(100deg,var(--blue),var(--purple));
+  padding:11px 17px;
+  border-radius:12px;
+  font-size:14px;
+  font-weight:bold;
 }
-.container{width:min(1100px,92%);margin:auto}
+
+.container{
+  width:min(1100px,92%);
+  margin:auto;
+}
+
 .hero{
-  margin:24px auto;
+  margin:25px auto 35px;
   padding:35px 22px;
   border:1px solid var(--border);
-  border-radius:20px;
+  border-radius:22px;
   background:
     radial-gradient(circle at 15% 20%,rgba(57,136,255,.28),transparent 40%),
     radial-gradient(circle at 90% 80%,rgba(255,77,157,.2),transparent 38%),
     var(--panel);
   text-align:center;
 }
-.hero h1{font-size:clamp(26px,5vw,42px);margin:0 0 12px}
+
+.hero h1{
+  font-size:clamp(27px,5vw,42px);
+  margin:0 0 12px;
+}
+
 .hero h1 span{color:#62a5ff}
-.hero p{color:var(--muted);line-height:1.6;margin:0}
+
+.hero p{
+  color:var(--muted);
+  line-height:1.6;
+  margin:0;
+}
+
 .section-title{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:10px;margin:28px 0 16px;flex-wrap:wrap;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin:25px 0 17px;
+  flex-wrap:wrap;
 }
-.section-title h2{font-size:21px;margin:0}
-.count{font-size:12px;color:var(--muted)}
+
+.section-title h2{
+  font-size:25px;
+  margin:0;
+}
+
+.count{
+  font-size:13px;
+  color:var(--muted);
+}
+
 .filters{
-  display:flex;gap:9px;overflow-x:auto;padding-bottom:5px;
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding-bottom:7px;
+  scrollbar-width:none;
 }
+
+.filters::-webkit-scrollbar{display:none}
+
 .filter{
-  border:1px solid var(--border);background:var(--panel);
-  color:var(--muted);padding:10px 16px;border-radius:30px;
-  white-space:nowrap;font-size:13px;
+  border:1px solid var(--border);
+  background:var(--panel);
+  color:var(--muted);
+  padding:11px 19px;
+  border-radius:30px;
+  white-space:nowrap;
+  font-size:14px;
+  transition:.2s;
 }
+
 .filter.active{
-  color:white;background:var(--blue);border-color:var(--blue);
+  color:white;
+  background:var(--blue);
+  border-color:var(--blue);
 }
+
 .grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:16px;margin:18px 0 40px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(270px,340px));
+  justify-content:center;
+  gap:18px;
+  margin:22px 0 45px;
 }
+
 .card{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:17px;overflow:hidden;min-width:0;
-  transition:transform .2s,border-color .2s;
+  background:linear-gradient(160deg,#191d34,#131629);
+  border:1px solid rgba(103,143,255,.25);
+  border-radius:19px;
+  overflow:hidden;
+  min-width:0;
+  transition:transform .2s,border-color .2s,box-shadow .2s;
+  cursor:pointer;
+  box-shadow:0 8px 25px rgba(0,0,0,.18);
 }
-.card:hover{transform:translateY(-3px);border-color:#477ee9}
+
+.card:hover{
+  transform:translateY(-4px);
+  border-color:#548cff;
+  box-shadow:0 12px 30px rgba(42,105,255,.13);
+}
+
 .banner{
-  height:145px;background:linear-gradient(135deg,#1b4c9b,#7c286d);
-  position:relative;overflow:hidden;
+  height:125px;
+  background:linear-gradient(135deg,#1b4c9b,#7c286d);
+  position:relative;
+  overflow:hidden;
 }
-.banner img{width:100%;height:100%;object-fit:cover}
+
+.banner img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
 .banner-placeholder{
-  height:100%;display:grid;place-items:center;
-  font-size:43px;font-weight:900;color:rgba(255,255,255,.85);
+  height:100%;
+  display:grid;
+  place-items:center;
+  font-size:48px;
+  font-weight:900;
+  color:rgba(255,255,255,.88);
+  letter-spacing:2px;
 }
+
 .status{
-  position:absolute;top:12px;left:12px;
-  border-radius:20px;padding:6px 10px;
-  font-size:10px;font-weight:900;text-transform:uppercase;
-  background:#29314b;color:white;
+  position:absolute;
+  top:12px;
+  left:12px;
+  border-radius:20px;
+  padding:7px 12px;
+  font-size:10px;
+  font-weight:900;
+  text-transform:uppercase;
+  background:#29314b;
+  color:white;
 }
+
 .status.live{background:#b52249}
 .status.upcoming{background:#174e9c}
 .status.completed{background:#23664b}
+.status.cancelled{background:#6c3441}
+
 .card-body{padding:16px}
+
 .type{
-  font-size:10px;letter-spacing:1px;color:#75aaff;
-  font-weight:bold;text-transform:uppercase;
+  font-size:11px;
+  letter-spacing:1.3px;
+  color:#75aaff;
+  font-weight:bold;
+  text-transform:uppercase;
 }
-.card h3{font-size:17px;margin:9px 0;line-height:1.35}
+
+.card h3{
+  font-size:19px;
+  margin:8px 0;
+  line-height:1.35;
+}
+
 .description{
-  color:var(--muted);font-size:12px;line-height:1.5;
-  min-height:36px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.55;
+  margin:8px 0 14px;
 }
+
 .info{
-  display:grid;grid-template-columns:1fr 1fr;gap:9px;
-  margin:15px 0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin:13px 0 15px;
 }
+
 .info-item{
-  background:var(--panel2);padding:10px;border-radius:9px;
+  background:var(--panel2);
+  padding:10px 11px;
+  border-radius:11px;
+  min-width:0;
 }
-.info-item small{display:block;color:var(--muted);font-size:10px;margin-bottom:5px}
-.info-item strong{font-size:13px;overflow-wrap:anywhere}
+
+.info-item small{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:6px;
+}
+
+.info-item strong{
+  font-size:14px;
+  overflow-wrap:anywhere;
+  line-height:1.4;
+}
+
 .card-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:10px;border-top:1px solid var(--border);padding-top:13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-top:1px solid var(--border);
+  padding-top:13px;
 }
-.card-footer small{color:var(--muted);font-size:11px}
+
+.card-footer small{
+  color:var(--muted);
+  font-size:11px;
+}
+
 .details-btn{
-  border:0;border-radius:9px;padding:10px 13px;
-  color:white;background:linear-gradient(100deg,var(--blue),#7555ff);
-  font-weight:bold;font-size:12px;
+  border:0;
+  border-radius:10px;
+  padding:10px 16px;
+  color:white;
+  background:linear-gradient(100deg,var(--blue),var(--purple));
+  font-weight:bold;
+  font-size:12px;
+  transition:.2s;
 }
+
+.details-btn:hover{filter:brightness(1.12)}
+
 .empty,.loading,.error{
-  grid-column:1/-1;text-align:center;padding:38px 15px;
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:15px;color:var(--muted);line-height:1.7;
+  grid-column:1/-1;
+  text-align:center;
+  padding:38px 15px;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:15px;
+  color:var(--muted);
+  line-height:1.7;
 }
+
 .retry{
-  margin-top:12px;background:var(--blue);border:0;
-  color:white;padding:10px 18px;border-radius:9px;
+  margin-top:12px;
+  background:var(--blue);
+  border:0;
+  color:white;
+  padding:10px 18px;
+  border-radius:9px;
 }
+
+/* Details popup */
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:100;
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(7px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.modal.show{display:flex}
+
+.modal-box{
+  width:min(470px,100%);
+  max-height:88vh;
+  overflow-y:auto;
+  background:#171b31;
+  border:1px solid rgba(105,145,255,.35);
+  border-radius:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+  animation:modalIn .2s ease;
+}
+
+@keyframes modalIn{
+  from{transform:translateY(15px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+
+.modal-banner{
+  height:145px;
+  position:relative;
+  background:linear-gradient(135deg,#1b4c9b,#7c286d);
+}
+
+.modal-banner img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.modal-banner .banner-placeholder{font-size:55px}
+
+.close-modal{
+  position:absolute;
+  right:12px;
+  top:12px;
+  width:35px;
+  height:35px;
+  border:0;
+  border-radius:50%;
+  background:rgba(0,0,0,.55);
+  color:white;
+  font-size:22px;
+}
+
+.modal-content{padding:19px}
+
+.modal-content h2{
+  margin:8px 0;
+  font-size:23px;
+}
+
+.modal-description{
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.65;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+}
+
+.modal-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  margin:17px 0;
+}
+
+.modal-info .info-item{padding:12px}
+
+.modal-note{
+  background:rgba(57,136,255,.09);
+  border:1px solid rgba(57,136,255,.2);
+  border-radius:11px;
+  padding:12px;
+  color:#b9c9ed;
+  font-size:12px;
+  line-height:1.6;
+}
+
 .footer{
-  text-align:center;color:var(--muted);font-size:12px;
-  padding:25px 10px;border-top:1px solid var(--border);
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  padding:25px 10px;
+  border-top:1px solid var(--border);
 }
-@media(max-width:800px){
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media(max-width:520px){
+
+@media(max-width:600px){
   .header{padding:13px 4%}
-  .brand{font-size:15px}
-  .header a{font-size:11px;padding:9px 11px}
-  .hero{padding:27px 15px}
-  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-  .banner{height:105px}
-  .card-body{padding:11px}
-  .card h3{font-size:14px}
-  .description{font-size:11px}
-  .info{gap:6px}
-  .info-item{padding:8px}
-  .info-item strong{font-size:11px}
-  .details-btn{padding:9px 8px;font-size:10px}
+  .brand{font-size:16px}
+  .home-btn{font-size:12px;padding:10px 12px}
+
+  .container{width:92%}
+
+  .hero{
+    padding:27px 15px;
+    margin:20px auto 29px;
+  }
+
+  .section-title h2{font-size:23px}
+
+  /* মোবাইলে কার্ড পুরো প্রস্থে থাকবে */
+  .grid{
+    grid-template-columns:minmax(0,1fr);
+    justify-content:stretch;
+    gap:15px;
+  }
+
+  .card{width:100%}
+  .banner{height:135px}
+  .card-body{padding:15px}
+  .card h3{font-size:18px}
+  .description{font-size:13px}
+  .info{gap:9px}
+  .info-item{padding:10px 12px}
+  .info-item strong{font-size:14px}
+  .details-btn{padding:10px 15px;font-size:12px}
 }
+
 </style>
 </head>
 
@@ -172,7 +446,7 @@ a{color:inherit;text-decoration:none}
   <div class="brand">
     <span>BOYS</span> VS <span>GIRLS 💙💗</span>
   </div>
-  <a href="index.html">← Home</a>
+  <a class="home-btn" href="index.html">← Home</a>
 </header>
 
 <main class="container">
@@ -206,24 +480,49 @@ a{color:inherit;text-decoration:none}
   BOYS VS GIRLS 💙💗 eSports Tournament
 </footer>
 
+<!-- Tournament Details Popup -->
+<div class="modal" id="detailsModal">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-banner" id="modalBanner">
+      <div class="banner-placeholder">BG</div>
+      <button class="close-modal" id="closeModal" aria-label="Close">×</button>
+    </div>
+
+    <div class="modal-content">
+      <div class="type" id="modalType">TOURNAMENT</div>
+      <h2 id="modalTitle">Tournament Name</h2>
+      <div class="modal-description" id="modalDescription"></div>
+
+      <div class="modal-info" id="modalInfo"></div>
+
+      <div class="modal-note">
+        Tournament joining will be available after the secure Join system is connected to the server.
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 "use strict";
 
-/*
-  GitHub Pages frontend থেকে Render backend ব্যবহার করা হবে।
-  API origin এবং endpoint আলাদা রাখা হয়েছে।
-*/
 const API_BASE = "https://freetube-backend-a222.onrender.com";
 const API_URL = `${API_BASE}/api/tournament/tournaments`;
 
 const grid = document.getElementById("tournamentGrid");
 const countLabel = document.getElementById("tournamentCount");
 
+const detailsModal = document.getElementById("detailsModal");
+const modalBanner = document.getElementById("modalBanner");
+const modalType = document.getElementById("modalType");
+const modalTitle = document.getElementById("modalTitle");
+const modalDescription = document.getElementById("modalDescription");
+const modalInfo = document.getElementById("modalInfo");
+
 let tournaments = [];
 let activeFilter = "all";
 
-function escapeHTML(value) {
-  return String(value ?? "").replace(/[&<>"']/g, char => ({
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g,char=>({
     "&":"&amp;",
     "<":"&lt;",
     ">":"&gt;",
@@ -232,102 +531,133 @@ function escapeHTML(value) {
   })[char]);
 }
 
-function money(value) {
+function money(value){
   const number = Number(value);
-  if (!Number.isFinite(number)) return "৳0";
+  if(!Number.isFinite(number)) return "৳0";
   return "৳" + number.toLocaleString("en-BD");
 }
 
-function getStatus(item) {
+function getId(item){
+  return item.id ?? item.tournament_id ?? item.tournamentId ?? "";
+}
+
+function getStatus(item){
   const status = String(item.status || "upcoming").toLowerCase();
-  if (status === "live") return "live";
-  if (status === "completed") return "completed";
-  if (status === "cancelled") return "cancelled";
+
+  if(status === "live") return "live";
+  if(status === "completed") return "completed";
+  if(status === "cancelled") return "cancelled";
+
   return "upcoming";
 }
 
-function getType(item) {
+function getType(item){
   return item.tournament_type ||
     item.type ||
     item.game_type ||
     "Tournament";
 }
 
-function getMode(item) {
+function getMode(item){
   return item.mode || item.game_mode || "Squad";
 }
 
-function getBanner(item) {
+function getBanner(item){
   return item.banner_url ||
     item.banner ||
     item.image_url ||
     "";
 }
 
-function getDate(item) {
-  const value = item.scheduled_at || item.start_at || item.date;
-  if (!value) return "Not scheduled";
+function getDate(item){
+  const value = item.scheduled_at ||
+    item.start_at ||
+    item.date ||
+    item.start_time;
+
+  if(!value) return "Not scheduled";
 
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Not scheduled";
 
-  return date.toLocaleString("en-BD", {
+  if(Number.isNaN(date.getTime())) return "Not scheduled";
+
+  return date.toLocaleString("en-BD",{
     dateStyle:"medium",
     timeStyle:"short"
   });
 }
 
-function renderCard(item) {
-  const id = item.id;
+function getInfoHTML(item){
+  return `
+    <div class="info-item">
+      <small>Game Mode</small>
+      <strong>${escapeHTML(getMode(item))}</strong>
+    </div>
+
+    <div class="info-item">
+      <small>Entry Fee</small>
+      <strong>${money(item.entry_fee)}</strong>
+    </div>
+
+    <div class="info-item">
+      <small>Prize Pool</small>
+      <strong>${money(item.prize_pool)}</strong>
+    </div>
+
+    <div class="info-item">
+      <small>Start Time</small>
+      <strong>${escapeHTML(getDate(item))}</strong>
+    </div>
+  `;
+}
+
+function renderCard(item,index){
+  const id = getId(item);
   const title = item.title || item.name || "Untitled Tournament";
   const status = getStatus(item);
   const banner = getBanner(item);
-  const description = item.description || "Join this tournament and compete with other players.";
-  const entryFee = money(item.entry_fee);
-  const prizePool = money(item.prize_pool);
-  const mode = getMode(item);
-  const type = getType(item);
-  const date = getDate(item);
+  const description = item.description ||
+    "Join this tournament and compete with other players.";
 
   const imageHTML = banner
-    ? `<img src="${escapeHTML(banner)}" alt="${escapeHTML(title)}" loading="lazy" onerror="this.remove()">`
+    ? `<img src="${escapeHTML(banner)}"
+         alt="${escapeHTML(title)}"
+         loading="lazy"
+         onerror="this.style.display='none'">`
     : `<div class="banner-placeholder">BG</div>`;
 
   return `
-    <article class="card">
+    <article class="card"
+      data-index="${index}"
+      tabindex="0"
+      role="button"
+      aria-label="View ${escapeHTML(title)} details">
+
       <div class="banner">
         ${imageHTML}
-        <span class="status ${status}">${escapeHTML(status)}</span>
+        <span class="status ${status}">
+          ${escapeHTML(status)}
+        </span>
       </div>
 
       <div class="card-body">
-        <div class="type">${escapeHTML(type)}</div>
+        <div class="type">${escapeHTML(getType(item))}</div>
+
         <h3>${escapeHTML(title)}</h3>
-        <div class="description">${escapeHTML(description)}</div>
+
+        <div class="description">
+          ${escapeHTML(description)}
+        </div>
 
         <div class="info">
-          <div class="info-item">
-            <small>Game Mode</small>
-            <strong>${escapeHTML(mode)}</strong>
-          </div>
-          <div class="info-item">
-            <small>Entry Fee</small>
-            <strong>${entryFee}</strong>
-          </div>
-          <div class="info-item">
-            <small>Prize Pool</small>
-            <strong>${prizePool}</strong>
-          </div>
-          <div class="info-item">
-            <small>Start Time</small>
-            <strong>${escapeHTML(date)}</strong>
-          </div>
+          ${getInfoHTML(item)}
         </div>
 
         <div class="card-footer">
           <small>${escapeHTML(status.toUpperCase())}</small>
-          <button class="details-btn" data-id="${escapeHTML(id)}">
-            View Details
+
+          <button class="details-btn" type="button">
+            View Details →
           </button>
         </div>
       </div>
@@ -335,14 +665,14 @@ function renderCard(item) {
   `;
 }
 
-function renderTournaments() {
+function renderTournaments(){
   const filtered = activeFilter === "all"
     ? tournaments
-    : tournaments.filter(item => getStatus(item) === activeFilter);
+    : tournaments.filter(item=>getStatus(item) === activeFilter);
 
   countLabel.textContent = `${filtered.length} Tournament(s)`;
 
-  if (!filtered.length) {
+  if(!filtered.length){
     grid.innerHTML = `
       <div class="empty">
         No ${activeFilter === "all" ? "" : activeFilter + " "}tournaments found.
@@ -351,11 +681,87 @@ function renderTournaments() {
     return;
   }
 
-  grid.innerHTML = filtered.map(renderCard).join("");
+  grid.innerHTML = filtered
+    .map(item=>renderCard(item,tournaments.indexOf(item)))
+    .join("");
 }
 
-function showError(message) {
+function openDetails(item){
+  if(!item) return;
+
+  const title = item.title || item.name || "Untitled Tournament";
+  const banner = getBanner(item);
+
+  modalType.textContent = String(getType(item)).toUpperCase();
+  modalTitle.textContent = title;
+
+  modalDescription.textContent = item.description ||
+    "Join this tournament and compete with other players.";
+
+  modalInfo.innerHTML = getInfoHTML(item);
+
+  modalBanner.innerHTML = `
+    ${
+      banner
+        ? `<img src="${escapeHTML(banner)}" alt="${escapeHTML(title)}">`
+        : `<div class="banner-placeholder">BG</div>`
+    }
+    <button class="close-modal" id="closeModalInside" aria-label="Close">×</button>
+  `;
+
+  document.getElementById("closeModalInside")
+    .addEventListener("click",closeDetails);
+
+  detailsModal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
+
+function closeDetails(){
+  detailsModal.classList.remove("show");
+  document.body.style.overflow = "";
+}
+
+document.getElementById("closeModal")
+  .addEventListener("click",closeDetails);
+
+detailsModal.addEventListener("click",event=>{
+  if(event.target === detailsModal) closeDetails();
+});
+
+document.addEventListener("keydown",event=>{
+  if(event.key === "Escape") closeDetails();
+});
+
+/* Card এবং View Details — দুটোতেই Details Popup খুলবে */
+grid.addEventListener("click",event=>{
+  const card = event.target.closest(".card");
+  if(!card) return;
+
+  const index = Number(card.dataset.index);
+
+  if(!Number.isInteger(index)) return;
+
+  openDetails(tournaments[index]);
+});
+
+grid.addEventListener("keydown",event=>{
+  if(event.key !== "Enter" && event.key !== " ") return;
+
+  const card = event.target.closest(".card");
+  if(!card) return;
+
+  event.preventDefault();
+
+  const index = Number(card.dataset.index);
+
+  if(Number.isInteger(index)){
+    openDetails(tournaments[index]);
+  }
+});
+
+function showError(message){
   countLabel.textContent = "Unable to load";
+
   grid.innerHTML = `
     <div class="error">
       ${escapeHTML(message)}
@@ -365,15 +771,18 @@ function showError(message) {
   `;
 
   document.getElementById("retryButton")
-    ?.addEventListener("click", loadTournaments);
+    ?.addEventListener("click",loadTournaments);
 }
 
-async function loadTournaments() {
-  grid.innerHTML = `<div class="loading">Loading tournaments...</div>`;
+async function loadTournaments(){
+  grid.innerHTML = `
+    <div class="loading">Loading tournaments...</div>
+  `;
+
   countLabel.textContent = "Loading...";
 
-  try {
-    const response = await fetch(API_URL, {
+  try{
+    const response = await fetch(API_URL,{
       method:"GET",
       headers:{
         "Accept":"application/json"
@@ -382,36 +791,29 @@ async function loadTournaments() {
       cache:"no-store"
     });
 
-    if (!response.ok) {
+    if(!response.ok){
       throw new Error(`Server response: ${response.status}`);
     }
 
     const result = await response.json();
 
-    /*
-      Supports common API response shapes:
-      { tournaments: [] }
-      { data: [] }
-      { data: { tournaments: [] } }
-      []
-    */
     let list = [];
 
-    if (Array.isArray(result)) {
+    if(Array.isArray(result)){
       list = result;
-    } else if (Array.isArray(result.tournaments)) {
+    }else if(Array.isArray(result.tournaments)){
       list = result.tournaments;
-    } else if (Array.isArray(result.data)) {
+    }else if(Array.isArray(result.data)){
       list = result.data;
-    } else if (Array.isArray(result.data?.tournaments)) {
+    }else if(Array.isArray(result.data?.tournaments)){
       list = result.data.tournaments;
     }
 
     tournaments = list;
     renderTournaments();
 
-  } catch (error) {
-    console.error("Tournament loading error:", error);
+  }catch(error){
+    console.error("Tournament loading error:",error);
 
     showError(
       "Could not connect to the tournament server. Please check your internet connection or try again."
@@ -419,27 +821,17 @@ async function loadTournaments() {
   }
 }
 
-document.querySelectorAll(".filter").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".filter").forEach(item => {
+document.querySelectorAll(".filter").forEach(button=>{
+  button.addEventListener("click",()=>{
+    document.querySelectorAll(".filter").forEach(item=>{
       item.classList.remove("active");
     });
 
     button.classList.add("active");
     activeFilter = button.dataset.filter;
+
     renderTournaments();
   });
-});
-
-grid.addEventListener("click", event => {
-  const button = event.target.closest(".details-btn");
-  if (!button) return;
-
-  const id = button.dataset.id;
-  if (!id) return;
-
-  window.location.href =
-    `tournament-details.html?id=${encodeURIComponent(id)}`;
 });
 
 loadTournaments();
