@@ -2397,7 +2397,7 @@ app.post("/api/tournament/deposits", requireAuth, async (req, res, next) => {
         (user_id,type,amount,payment_method,transaction_ref,status)
       VALUES($1,'deposit',$2,$3,$4,'pending')
       RETURNING id::text AS id,type,amount::float8 AS amount,status,created_at
-    `, [String(req.user.id),selected.name,reference]);
+    `, [String(req.user.id),amount,selected.name,reference]);
     await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'tournament_deposit',$2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Tournament deposit request from ${req.user.username}.`]);
     res.status(201).json({ message:"Deposit submitted for Admin review.", transaction:r.rows[0] });
   } catch (e) { next(e); }
