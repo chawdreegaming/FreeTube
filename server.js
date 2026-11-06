@@ -574,6 +574,56 @@ async function initializeDatabase() {
     );
   }
 
+
+  // Tournament wallet and match history: additive schema; never alters Social App data.
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ft_tournament_wallets (
+      user_id TEXT PRIMARY KEY,
+      balance NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (balance >= 0),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE TABLE IF NOT EXISTS ft_tournament_transactions (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      type VARCHAR(20) NOT NULL CHECK (type IN ('deposit','withdrawal','entry_fee','prize')),
+      amount NUMERIC(14,2) NOT NULL CHECK (amount > 0),
+      currency VARCHAR(8) NOT NULL DEFAULT 'BDT',
+      payment_method VARCHAR(80) NOT NULL DEFAULT '',
+      transaction_ref VARCHAR(160) NOT NULL DEFAULT '',
+      destination VARCHAR(180) NOT NULL DEFAULT '',
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending','approved','rejected','completed')),
+      admin_note VARCHAR(500) NOT NULL DEFAULT '',
+      reviewed_by TEXT,
+      reviewed_at TIMESTAMPTZ,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS ft_tournament_tx_user_idx
+      ON ft_tournament_transactions(user_id, created_at DESC);
+    CREATE INDEX IF NOT EXISTS ft_tournament_tx_status_idx
+      ON ft_tournament_transactions(status, created_at DESC);
+    CREATE TABLE IF NOT EXISTS ft_tournament_game_history (
+      id BIGSERIAL PRIMARY KEY,
+      user_id TEXT NOT NULL,
+      tournament_id BIGINT REFERENCES ft_tournaments(id) ON DELETE SET NULL,
+      match_name VARCHAR(140) NOT NULL,
+      game_mode VARCHAR(40) NOT NULL DEFAULT '',
+      played_at TIMESTAMPTZ,
+      player_or_team VARCHAR(120) NOT NULL DEFAULT '',
+      rank INTEGER,
+      kills INTEGER NOT NULL DEFAULT 0 CHECK (kills >= 0),
+      result VARCHAR(120) NOT NULL DEFAULT '',
+      prize_amount NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK (prize_amount >= 0),
+      status VARCHAR(20) NOT NULL DEFAULT 'pending'
+        CHECK (status IN ('pending','verified','rejected')),
+      verified_by TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS ft_tournament_history_user_idx
+      ON ft_tournament_game_history(user_id, played_at DESC);
+  `);
+
   const adminEmail = cleanText(process.env.ADMIN_EMAIL, 255).toLowerCase();
   if (adminEmail) {
     const result = await pool.query(
@@ -2254,6 +2304,206 @@ app.delete("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (
     if (!result.rowCount) return res.status(404).json({ error: "Tournament not found." });
     res.json({ message: "Tournament cancelled. Existing records were preserved." });
   } catch (e) { next(e); }
+});
+
+
+
+// ============================================================
+// TOURNAMENT WALLET, MANUAL PAYMENTS & VERIFIED GAME HISTORY
+// All money movements are isolated from the Social App wallet.
+// ============================================================
+app.get("/api/tournament/wallet", requireAuth, async (req, res, next) => {
+  try {
+    await pool.query(
+      "INSERT INTO ft_tournament_wallets(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING",
+      [String(req.user.id)]
+    );
+    const r = await pool.query(
+      "SELECT balance::float8 AS balance, updated_at FROM ft_tournament_wallets WHERE user_id=$1",
+      [String(req.user.id)]
+    );
+    res.json({ wallet: r.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.get("/api/tournament/transactions", requireAuth, async (req, res, next) => {
+  try {
+    const r = await pool.query(`
+      SELECT id::text AS id,type,amount::float8 AS amount,currency,
+             payment_method,transaction_ref,destination,status,admin_note,created_at,updated_at
+      FROM ft_tournament_transactions WHERE user_id=$1
+      ORDER BY created_at DESC LIMIT 100
+    `, [String(req.user.id)]);
+    res.json({ transactions: r.rows });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/tournament/deposits", requireAuth, async (req, res, next) => {
+  try {
+    const amount = Number(req.body.amount);
+    const method = cleanText(req.body.payment_method,80);
+    const reference = cleanText(req.body.transaction_ref,160);
+    if (!Number.isFinite(amount) || amount < 10 || amount > 10000000 || !method || !reference) {
+      return res.status(400).json({ error: "Enter a valid amount, payment method and transaction reference." });
+    }
+    const r = await pool.query(`
+      INSERT INTO ft_tournament_transactions
+        (user_id,type,amount,payment_method,transaction_ref,status)
+      VALUES($1,'deposit',$2,$3,$4,'pending')
+      RETURNING id::text AS id,type,amount::float8 AS amount,status,created_at
+    `, [String(req.user.id),amount,method,reference]);
+    res.status(201).json({ message:"Deposit submitted for Admin review.", transaction:r.rows[0] });
+  } catch (e) { next(e); }
+});
+
+app.post("/api/tournament/withdrawals", requireAuth, async (req, res, next) => {
+  const client = await pool.connect();
+  try {
+    const amount = Number(req.body.amount);
+    const method = cleanText(req.body.payment_method,80);
+    const destination = cleanText(req.body.destination,180);
+    if (!Number.isFinite(amount) || amount < 10 || amount > 10000000 || !method || !destination) {
+      return res.status(400).json({ error: "Enter a valid amount, withdrawal method and receiving account." });
+    }
+    await client.query("BEGIN");
+    await client.query("INSERT INTO ft_tournament_wallets(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING",[String(req.user.id)]);
+    const w = await client.query("SELECT balance FROM ft_tournament_wallets WHERE user_id=$1 FOR UPDATE",[String(req.user.id)]);
+    const pending = await client.query(
+      "SELECT COALESCE(SUM(amount),0)::numeric AS amount FROM ft_tournament_transactions WHERE user_id=$1 AND type='withdrawal' AND status='pending'",
+      [String(req.user.id)]
+    );
+    if (Number(w.rows[0].balance) - Number(pending.rows[0].amount) < amount) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ error:"Insufficient available Tournament Wallet balance." });
+    }
+    const r = await client.query(`
+      INSERT INTO ft_tournament_transactions(user_id,type,amount,payment_method,destination,status)
+      VALUES($1,'withdrawal',$2,$3,$4,'pending')
+      RETURNING id::text AS id,type,amount::float8 AS amount,status,created_at
+    `,[String(req.user.id),amount,method,destination]);
+    await client.query("COMMIT");
+    res.status(201).json({message:"Withdrawal request submitted for Admin review.",transaction:r.rows[0]});
+  } catch(e) {
+    await client.query("ROLLBACK").catch(()=>{});
+    next(e);
+  } finally { client.release(); }
+});
+
+// Admin payment queue. Approvals are idempotent and balance updates are atomic.
+app.get("/api/admin/tournament/transactions", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const status = cleanText(req.query.status || "pending",20);
+    if (!["pending","approved","rejected","completed","all"].includes(status))
+      return res.status(400).json({error:"Invalid status filter."});
+    const r = await pool.query(`
+      SELECT t.id::text AS id,t.user_id,u.username,t.type,t.amount::float8 AS amount,
+        t.currency,t.payment_method,t.transaction_ref,t.destination,t.status,t.admin_note,t.created_at
+      FROM ft_tournament_transactions t LEFT JOIN users u ON u.id::text=t.user_id
+      WHERE ($1='all' OR t.status=$1) ORDER BY t.created_at ASC LIMIT 300
+    `,[status]);
+    res.json({transactions:r.rows});
+  } catch(e) { next(e); }
+});
+
+app.patch("/api/admin/tournament/transactions/:id", requireAuth, requireAdmin, async (req,res,next) => {
+  const client = await pool.connect();
+  try {
+    const id = Number.parseInt(req.params.id,10);
+    const action = cleanText(req.body.action,20);
+    const note = cleanText(req.body.admin_note,500);
+    if (!Number.isSafeInteger(id) || id < 1 || !["approve","reject"].includes(action))
+      return res.status(400).json({error:"Invalid transaction review request."});
+    await client.query("BEGIN");
+    const q = await client.query("SELECT * FROM ft_tournament_transactions WHERE id=$1 FOR UPDATE",[id]);
+    if (!q.rowCount) { await client.query("ROLLBACK"); return res.status(404).json({error:"Transaction not found."}); }
+    const tx = q.rows[0];
+    if (tx.status !== "pending") { await client.query("ROLLBACK"); return res.status(409).json({error:"This request has already been reviewed."}); }
+    await client.query("INSERT INTO ft_tournament_wallets(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING",[tx.user_id]);
+    if (action === "approve" && tx.type === "deposit") {
+      await client.query("UPDATE ft_tournament_wallets SET balance=balance+$2,updated_at=NOW() WHERE user_id=$1",[tx.user_id,tx.amount]);
+    }
+    if (action === "approve" && tx.type === "withdrawal") {
+      const w = await client.query("SELECT balance FROM ft_tournament_wallets WHERE user_id=$1 FOR UPDATE",[tx.user_id]);
+      const pendingOthers = await client.query(
+        "SELECT COALESCE(SUM(amount),0)::numeric AS amount FROM ft_tournament_transactions WHERE user_id=$1 AND type='withdrawal' AND status='pending' AND id<>$2",
+        [tx.user_id,id]
+      );
+      if (Number(w.rows[0].balance) - Number(pendingOthers.rows[0].amount) < Number(tx.amount)) {
+        await client.query("ROLLBACK");
+        return res.status(409).json({error:"Wallet balance is no longer sufficient; request was not approved."});
+      }
+      await client.query("UPDATE ft_tournament_wallets SET balance=balance-$2,updated_at=NOW() WHERE user_id=$1",[tx.user_id,tx.amount]);
+    }
+    const status = action === "reject" ? "rejected" : (tx.type === "withdrawal" ? "completed" : "approved");
+    const updated = await client.query(`
+      UPDATE ft_tournament_transactions SET status=$1,admin_note=$2,reviewed_by=$3,
+        reviewed_at=NOW(),updated_at=NOW() WHERE id=$4
+      RETURNING id::text AS id,type,amount::float8 AS amount,status,admin_note,reviewed_at
+    `,[status,note,String(req.user.id),id]);
+    await client.query("COMMIT");
+    res.json({message:`Transaction ${status}.`,transaction:updated.rows[0]});
+  } catch(e) {
+    await client.query("ROLLBACK").catch(()=>{});
+    next(e);
+  } finally { client.release(); }
+});
+
+app.get("/api/tournament/game-history", requireAuth, async (req,res,next) => {
+  try {
+    const r = await pool.query(`
+      SELECT h.id::text AS id,h.match_name,h.game_mode,h.played_at,h.player_or_team,
+        h.rank,h.kills,h.result,h.prize_amount::float8 AS prize_amount,h.status
+      FROM ft_tournament_game_history h
+      WHERE h.user_id=$1 AND h.status='verified'
+      ORDER BY h.played_at DESC NULLS LAST,h.created_at DESC LIMIT 100
+    `,[String(req.user.id)]);
+    res.json({history:r.rows});
+  } catch(e) { next(e); }
+});
+
+app.get("/api/admin/tournament/game-history", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const status=cleanText(req.query.status || "pending",20);
+    if (!["pending","verified","rejected","all"].includes(status))
+      return res.status(400).json({error:"Invalid status filter."});
+    const r=await pool.query(`
+      SELECT h.id::text AS id,h.user_id,u.username,h.match_name,h.game_mode,h.played_at,
+        h.player_or_team,h.rank,h.kills,h.result,h.prize_amount::float8 AS prize_amount,h.status
+      FROM ft_tournament_game_history h LEFT JOIN users u ON u.id::text=h.user_id
+      WHERE ($1='all' OR h.status=$1) ORDER BY h.created_at DESC LIMIT 300
+    `,[status]);
+    res.json({history:r.rows});
+  } catch(e) { next(e); }
+});
+
+app.post("/api/admin/tournament/game-history", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const userId=cleanText(req.body.user_id,100);
+    const matchName=cleanText(req.body.match_name,140);
+    const gameMode=cleanText(req.body.game_mode,40);
+    const playerOrTeam=cleanText(req.body.player_or_team,120);
+    const result=cleanText(req.body.result,120);
+    const rank=req.body.rank===null || req.body.rank==="" || req.body.rank===undefined ? null : Number(req.body.rank);
+    const kills=Number(req.body.kills ?? 0);
+    const prize=Number(req.body.prize_amount ?? 0);
+    const playedAt=req.body.played_at ? new Date(req.body.played_at) : new Date();
+    if (!userId || !matchName || !playerOrTeam || (rank!==null && (!Number.isInteger(rank)||rank<1)) ||
+        !Number.isInteger(kills)||kills<0||!Number.isFinite(prize)||prize<0||Number.isNaN(playedAt.getTime()))
+      return res.status(400).json({error:"Invalid game history details."});
+    const r=await pool.query(`
+      INSERT INTO ft_tournament_game_history
+        (user_id,tournament_id,match_name,game_mode,played_at,player_or_team,rank,kills,result,prize_amount,status,verified_by)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'verified',$11)
+      RETURNING id::text AS id,user_id,match_name,game_mode,played_at,player_or_team,rank,kills,result,prize_amount::float8 AS prize_amount,status
+    `,[userId,req.body.tournament_id ? Number(req.body.tournament_id) : null,matchName,gameMode,playedAt,playerOrTeam,rank,kills,result,prize,String(req.user.id)]);
+    if (prize > 0) {
+      await pool.query("INSERT INTO ft_tournament_wallets(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING",[userId]);
+      await pool.query("UPDATE ft_tournament_wallets SET balance=balance+$2,updated_at=NOW() WHERE user_id=$1",[userId,prize]);
+      await pool.query(`INSERT INTO ft_tournament_transactions(user_id,type,amount,status,admin_note,reviewed_by,reviewed_at)
+        VALUES($1,'prize',$2,'completed','Tournament prize credited',$3,NOW())`,[userId,prize,String(req.user.id)]);
+    }
+    res.status(201).json({history:r.rows[0]});
+  } catch(e) { next(e); }
 });
 
 
