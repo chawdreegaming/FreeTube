@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,85 +84,34 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
 .knockout-stage strong{display:block;font-size:20px}
 .help{padding:11px;border:1px solid #354b70;border-radius:10px;background:#101e33;color:#cbd8ec;font-size:12px}
 .back-button{margin:0 0 14px;background:#263854}
-
-/* DASHBOARD: THREE COLUMN GRID */
-.dashboard-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:13px;
-  margin-top:18px;
-}
+.dashboard-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px;margin-top:18px}
 .dashboard-card{
-  min-width:0;
-  min-height:125px;
-  padding:15px 10px;
-  text-align:center;
-  border:1px solid #354b70;
-  border-radius:17px;
+  min-width:0;min-height:125px;padding:15px 10px;text-align:center;
+  border:1px solid #354b70;border-radius:17px;
   background:linear-gradient(145deg,#172c4b,#101b30);
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
 }
 .dashboard-card .dash-icon{font-size:29px}
 .dashboard-card strong{font-size:14px;line-height:1.3}
 .dashboard-card span:last-child{font-size:11px;line-height:1.4;color:#a9bbd5;font-weight:500}
 .dashboard-card:hover{border-color:#568dff;background:linear-gradient(145deg,#203c67,#172744)}
-
-.payment-method{
-  padding:15px;
-  margin:12px 0;
-  border:1px solid var(--line);
-  border-radius:14px;
-  background:#0a1628;
-}
-.payment-method-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:12px;
-}
+.payment-method{padding:15px;margin:12px 0;border:1px solid var(--line);border-radius:14px;background:#0a1628}
+.payment-method-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
 .payment-method-head strong{font-size:16px}
-.payment-enabled{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:12px;
-  color:#cbd8ec;
-}
+.payment-enabled{display:flex;align-items:center;gap:8px;font-size:12px;color:#cbd8ec}
 .payment-enabled input{width:18px;height:18px}
-.payment-grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:12px;
-}
-
+.payment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 @media(max-width:750px){
   .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .dashboard-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 }
-
 @media(max-width:480px){
   .container{padding:13px 10px 30px}
-
-  .dashboard-grid{
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    gap:8px;
-    margin-top:15px;
-  }
-  .dashboard-card{
-    min-height:112px;
-    padding:9px 5px;
-    border-radius:12px;
-    gap:6px;
-  }
+  .dashboard-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:15px}
+  .dashboard-card{min-height:112px;padding:9px 5px;border-radius:12px;gap:6px}
   .dashboard-card .dash-icon{font-size:23px}
   .dashboard-card strong{font-size:11px;line-height:1.25}
   .dashboard-card span:last-child{font-size:9px;line-height:1.3}
-
   .grid,.payment-grid{grid-template-columns:1fr}
   .stat{padding:12px}
   .stat-value{font-size:21px}
@@ -192,136 +142,64 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
 
 <div id="notice" class="notice" role="status" aria-live="polite"></div>
 
-<!-- DASHBOARD -->
 <section class="panel active" id="dashboard">
-
-  <!-- DASHBOARD MENU CARDS -->
   <div class="dashboard-grid">
-
-    <button class="dashboard-card" onclick="showTab('create')">
-      <span class="dash-icon">🏆</span>
-      <strong>Create Tournament</strong>
-      <span>Create a new tournament</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('tournaments')">
-      <span class="dash-icon">📋</span>
-      <strong>Tournaments</strong>
-      <span>View and manage tournaments</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('teams')">
-      <span class="dash-icon">👥</span>
-      <strong>Team Registration</strong>
-      <span>Register and manage teams</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('knockout')">
-      <span class="dash-icon">🏁</span>
-      <strong>Knockout Management</strong>
-      <span>Manage Free Fire Cup stages</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('deposits')">
-      <span class="dash-icon">📥</span>
-      <strong>Deposit Requests</strong>
-      <span>Review Tournament Wallet deposits</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('withdrawals')">
-      <span class="dash-icon">📤</span>
-      <strong>Withdrawal Requests</strong>
-      <span>Review withdrawal requests</span>
-    </button>
-
-    <button class="dashboard-card" onclick="showTab('paymentSettings')">
-      <span class="dash-icon">💳</span>
-      <strong>Deposit Payment Settings</strong>
-      <span>Set payment numbers and account IDs</span>
-    </button>
-
-    <button class="dashboard-card" onclick="refreshData()">
-      <span class="dash-icon">🔄</span>
-      <strong>Refresh All Data</strong>
-      <span>Reload tournament and wallet data</span>
-    </button>
-
+    <button class="dashboard-card" onclick="showTab('create')"><span class="dash-icon">🏆</span><strong>Create Tournament</strong><span>Create a new tournament</span></button>
+    <button class="dashboard-card" onclick="showTab('tournaments')"><span class="dash-icon">📋</span><strong>Tournaments</strong><span>View and manage tournaments</span></button>
+    <button class="dashboard-card" onclick="showTab('teams')"><span class="dash-icon">👥</span><strong>Team Registration</strong><span>Register and manage teams</span></button>
+    <button class="dashboard-card" onclick="showTab('knockout')"><span class="dash-icon">🏁</span><strong>Knockout Management</strong><span>Manage Free Fire Cup stages</span></button>
+    <button class="dashboard-card" onclick="showTab('deposits')"><span class="dash-icon">📥</span><strong>Deposit Requests</strong><span>Review Tournament Wallet deposits</span></button>
+    <button class="dashboard-card" onclick="showTab('withdrawals')"><span class="dash-icon">📤</span><strong>Withdrawal Requests</strong><span>Review withdrawal requests</span></button>
+    <button class="dashboard-card" onclick="showTab('paymentSettings')"><span class="dash-icon">💳</span><strong>Deposit Payment Settings</strong><span>Set payment numbers and account IDs</span></button>
+    <button class="dashboard-card" onclick="refreshData()"><span class="dash-icon">🔄</span><strong>Refresh All Data</strong><span>Reload tournament and wallet data</span></button>
   </div>
 
-  <!-- TOURNAMENT CONTROL CENTER — BOTTOM -->
   <div class="card" style="margin-top:25px">
-
     <div class="row">
-      <div>
-        <h2>🏆 Tournament Control Center</h2>
-        <p class="muted small">
-          Select a section to manage your eSports tournament system.
-        </p>
-      </div>
+      <div><h2>🏆 Tournament Control Center</h2><p class="muted small">Select a section to manage your eSports tournament system.</p></div>
       <span class="pill green">Admin Panel</span>
     </div>
-
     <div class="row" style="margin-top:18px">
-      <div>
-        <h3>Admin Connection</h3>
-        <div id="connection" class="muted small">
-          Checking admin access...
-        </div>
-      </div>
-
+      <div><h3>Admin Connection</h3><div id="connection" class="muted small">Checking admin access...</div></div>
       <span class="pill yellow" id="adminBadge">Checking...</span>
     </div>
-
   </div>
-
 </section>
 
-<!-- CREATE TOURNAMENT -->
 <section class="panel" id="create">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
     <h2>＋ Create New Tournament</h2>
     <p class="muted small">Tournament Type and Game Mode are separate settings.</p>
-
     <form id="createForm">
-      <div class="toolbar">
-        <div class="field">
-          <label for="title">Tournament Name *</label>
-          <input id="title" maxlength="120" required placeholder="Friday Squad Championship">
-        </div>
-      </div>
+      <div class="toolbar"><div class="field">
+        <label for="title">Tournament Name *</label>
+        <input id="title" maxlength="120" required placeholder="Friday Squad Championship">
+      </div></div>
 
       <div class="toolbar">
         <div class="field">
           <label for="tournamentType">Tournament Type *</label>
           <select id="tournamentType" required>
-            <option value="BR">BR</option>
-            <option value="Clash Squad">Clash Squad</option>
-            <option value="Free Fire Cup">Free Fire Cup</option>
+            <option value="br-match">BR</option>
+            <option value="clash-squad">Clash Squad</option>
+            <option value="free-fire-cup">Free Fire Cup</option>
           </select>
         </div>
         <div class="field">
           <label for="mode">Game Mode *</label>
-          <select id="mode">
-            <option>Solo</option>
-            <option>Duo</option>
-            <option selected>Squad</option>
-          </select>
+          <select id="mode"><option>Solo</option><option>Duo</option><option selected>Squad</option></select>
         </div>
       </div>
 
-      <div class="help" id="typeHelp">
-        BR tournaments support Solo, Duo or Squad modes.
-      </div>
+      <div class="help" id="typeHelp">BR tournaments support Solo, Duo or Squad modes.</div>
 
-      <div class="toolbar">
-        <div class="field"><label for="map">Map *</label>
-          <select id="map">
-            <option>Bermuda</option><option>Purgatory</option>
-            <option>Kalahari</option><option>Alpine</option><option>NexTerra</option>
-          </select>
-        </div>
-      </div>
+      <div class="toolbar"><div class="field">
+        <label for="map">Map *</label>
+        <select id="map">
+          <option>Bermuda</option><option>Purgatory</option><option>Kalahari</option><option>Alpine</option><option>NexTerra</option>
+        </select>
+      </div></div>
 
       <div class="toolbar">
         <div class="field"><label for="entry">Entry Fee</label><input id="entry" type="number" min="0" step="0.01" value="0" required></div>
@@ -347,10 +225,7 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
       <div class="toolbar"><div class="field"><label for="banner">Banner Image URL (HTTPS)</label><input id="banner" type="url" placeholder="https://..."></div></div>
       <div class="field"><label for="description">Tournament Description</label><textarea id="description" maxlength="2000" placeholder="Tournament rules and information"></textarea></div>
 
-      <div class="help">
-        <strong>Free Fire Cup:</strong> Maximum 13 teams. Knockout progression: 13 → 10 → 8 → 4 → 2 → 1 Champion.
-      </div>
-
+      <div class="help"><strong>Free Fire Cup:</strong> Maximum 13 teams. Knockout progression: 13 → 10 → 8 → 4 → 2 → 1 Champion.</div>
       <div class="actions">
         <button type="submit" id="createButton">Create Tournament</button>
         <button type="reset" class="secondary">Reset Form</button>
@@ -359,7 +234,6 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   </div>
 </section>
 
-<!-- TOURNAMENT LIST -->
 <section class="panel" id="tournaments">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
@@ -375,13 +249,16 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   <div id="tournamentsList" class="list"><div class="empty">Click Refresh to load tournaments.</div></div>
 </section>
 
-<!-- TEAM REGISTRATION -->
 <section class="panel" id="teams">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
     <h2>👥 Admin Team Registration</h2>
-    <p class="muted small">Each team must contain exactly four main players. No substitutes.</p>
+    <p class="muted small">Register a team under an existing user account. The Captain User ID is required by the backend.</p>
     <div class="field"><label for="teamTournament">Select Tournament *</label><select id="teamTournament"><option value="">Load tournaments first</option></select></div>
+    <div class="field" style="margin-top:12px">
+      <label for="captainUserId">Captain User ID *</label>
+      <input id="captainUserId" type="number" min="1" step="1" required placeholder="Enter the captain's account User ID">
+    </div>
     <div class="field" style="margin-top:12px"><label for="teamName">Team Name *</label><input id="teamName" maxlength="80" placeholder="Enter team name"></div>
     <h3 class="section-title">Four Main Players</h3>
     <div class="grid">
@@ -403,23 +280,13 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   <div class="card"><h2>Registered Teams</h2><div id="teamsList" class="list"><div class="empty">Select a tournament and load teams.</div></div></div>
 </section>
 
-<!-- KNOCKOUT MANAGEMENT -->
 <section class="panel" id="knockout">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
     <h2>🏁 Free Fire Cup — Knockout Management</h2>
     <p class="muted small">Manage the Free Fire Cup elimination progression.</p>
-
-    <div class="field">
-      <label for="knockoutTournament">Select Free Fire Cup *</label>
-      <select id="knockoutTournament"><option value="">Load tournaments first</option></select>
-    </div>
-
-    <div class="help" style="margin-top:12px">
-      <strong>Official stage progression</strong><br>
-      13 Teams → 10 Teams → 8 Teams → 4 Teams → 2 Teams → 1 Champion
-    </div>
-
+    <div class="field"><label for="knockoutTournament">Select Free Fire Cup *</label><select id="knockoutTournament"><option value="">Load tournaments first</option></select></div>
+    <div class="help" style="margin-top:12px"><strong>Official stage progression</strong><br>13 Teams → 10 Teams → 8 Teams → 4 Teams → 2 Teams → 1 Champion</div>
     <div class="knockout-flow" style="margin-top:14px">
       <div class="knockout-stage"><span class="muted small">Starting Teams</span><strong>13</strong></div>
       <div class="knockout-stage"><span class="muted small">Stage 1</span><strong>10</strong></div>
@@ -428,10 +295,7 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
       <div class="knockout-stage"><span class="muted small">Final</span><strong>2</strong></div>
       <div class="knockout-stage"><span class="muted small">Champion</span><strong>1 🏆</strong></div>
     </div>
-
-    <div class="actions">
-      <button id="loadKnockoutButton">↻ Load Knockout Data</button>
-    </div>
+    <div class="actions"><button id="loadKnockoutButton">↻ Load Knockout Data</button></div>
   </div>
 
   <div class="card">
@@ -441,11 +305,11 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
       <div class="field">
         <label for="knockoutStage">Current Stage</label>
         <select id="knockoutStage">
-          <option value="13_to_10">13 Teams → 10 Teams</option>
-          <option value="10_to_8">10 Teams → 8 Teams</option>
-          <option value="8_to_4">8 Teams → 4 Teams</option>
-          <option value="4_to_2">4 Teams → 2 Teams</option>
-          <option value="2_to_1">2 Teams → Champion</option>
+          <option value="1">13 Teams → 10 Teams</option>
+          <option value="2">10 Teams → 8 Teams</option>
+          <option value="3">8 Teams → 4 Teams</option>
+          <option value="4">4 Teams → 2 Teams</option>
+          <option value="5">2 Teams → Champion</option>
         </select>
       </div>
       <div class="field" style="margin-top:12px">
@@ -456,35 +320,20 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
         <label for="knockoutNote">Stage Note</label>
         <input id="knockoutNote" maxlength="500" placeholder="Optional stage information">
       </div>
-      <div class="actions">
-        <button class="success" id="saveKnockoutButton">Save Stage Results</button>
-      </div>
+      <div class="actions"><button class="success" id="saveKnockoutButton">Save Stage Results</button></div>
     </div>
-    <div class="help" style="margin-top:12px">
-      Team qualification results must be saved on the backend. This page expects the knockout API; it will not create fake local results.
-    </div>
+    <div class="help" style="margin-top:12px">Knockout results are saved through the backend. No fake local results are created.</div>
   </div>
-
-  <div class="card">
-    <h2>Knockout History</h2>
-    <div id="knockoutHistory" class="list"><div class="empty">Load a tournament to view its knockout history.</div></div>
-  </div>
+  <div class="card"><h2>Knockout History</h2><div id="knockoutHistory" class="list"><div class="empty">Load a tournament to view its knockout history.</div></div></div>
 </section>
 
-<!-- DEPOSIT MANAGEMENT -->
 <section class="panel" id="deposits">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
-    <div class="row">
-      <div><h2>📥 Deposit Management</h2><p class="muted small">Review and manually approve or reject Tournament Wallet deposit requests.</p></div>
-      <span class="pill blue">Tournament Wallet</span>
-    </div>
+    <div class="row"><div><h2>📥 Deposit Management</h2><p class="muted small">Review and manually approve or reject Tournament Wallet deposit requests.</p></div><span class="pill blue">Tournament Wallet</span></div>
     <div class="filter-row">
       <div class="field"><label for="depositStatus">Deposit Status</label>
-        <select id="depositStatus">
-          <option value="pending">Pending</option><option value="approved">Approved</option>
-          <option value="rejected">Rejected</option><option value="all">All Records</option>
-        </select>
+        <select id="depositStatus"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="all">All Records</option></select>
       </div>
       <button id="refreshDeposits">↻ Refresh Deposits</button>
     </div>
@@ -492,20 +341,13 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   <div id="depositsList" class="list"><div class="empty">Loading deposit requests...</div></div>
 </section>
 
-<!-- WITHDRAW MANAGEMENT -->
 <section class="panel" id="withdrawals">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
   <div class="card">
-    <div class="row">
-      <div><h2>📤 Withdrawal Management</h2><p class="muted small">Review withdrawal requests and manually approve or reject them.</p></div>
-      <span class="pill blue">Tournament Wallet</span>
-    </div>
+    <div class="row"><div><h2>📤 Withdrawal Management</h2><p class="muted small">Review withdrawal requests and manually approve or reject them.</p></div><span class="pill blue">Tournament Wallet</span></div>
     <div class="filter-row">
       <div class="field"><label for="withdrawStatus">Withdrawal Status</label>
-        <select id="withdrawStatus">
-          <option value="pending">Pending</option><option value="completed">Completed</option>
-          <option value="rejected">Rejected</option><option value="all">All Records</option>
-        </select>
+        <select id="withdrawStatus"><option value="pending">Pending</option><option value="completed">Completed</option><option value="rejected">Rejected</option><option value="all">All Records</option></select>
       </div>
       <button id="refreshWithdrawals">↻ Refresh Withdrawals</button>
     </div>
@@ -513,133 +355,39 @@ footer{border-top:1px solid var(--line);margin-top:28px;padding-top:15px;color:v
   <div id="withdrawalsList" class="list"><div class="empty">Loading withdrawal requests...</div></div>
 </section>
 
-<!-- DEPOSIT PAYMENT SETTINGS -->
 <section class="panel" id="paymentSettings">
   <button class="back-button" onclick="showTab('dashboard')">← Back to Dashboard</button>
-
   <div class="card">
     <h2>💳 Deposit Payment Settings</h2>
-    <p class="muted small">
-      Configure the payment accounts where Tournament Wallet users should send deposits.
-      These settings are separate from the Social App Wallet.
-    </p>
-
-    <div class="help">
-      Enter the correct payment number or account ID. Users should only see enabled payment methods.
-      Never enter or request a card PIN, CVV, password or OTP.
-    </div>
-
-    <div id="paymentSettingsStatus" class="notice info" style="display:block">
-      Loading payment settings...
-    </div>
+    <p class="muted small">Configure payment accounts for Tournament Wallet deposits. These settings are separate from the Social App Wallet.</p>
+    <div class="help">Users should only see enabled payment methods. Never enter or request a card PIN, CVV, password or OTP.</div>
+    <div id="paymentSettingsStatus" class="notice info" style="display:block">Loading payment settings...</div>
 
     <form id="paymentSettingsForm">
-
       <div class="payment-method">
-        <div class="payment-method-head">
-          <strong>🩷 bKash</strong>
-          <label class="payment-enabled">
-            <input type="checkbox" id="bkashEnabled">
-            Enable
-          </label>
-        </div>
-        <div class="payment-grid">
-          <div class="field">
-            <label for="bkashNumber">bKash Number</label>
-            <input id="bkashNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX">
-          </div>
-          <div class="field">
-            <label for="bkashAccountName">Account Name (Optional)</label>
-            <input id="bkashAccountName" maxlength="100" placeholder="Account holder name">
-          </div>
-        </div>
+        <div class="payment-method-head"><strong>🩷 bKash</strong><label class="payment-enabled"><input type="checkbox" id="bkashEnabled"> Enable</label></div>
+        <div class="payment-grid"><div class="field"><label for="bkashNumber">bKash Number</label><input id="bkashNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX"></div></div>
       </div>
-
       <div class="payment-method">
-        <div class="payment-method-head">
-          <strong>🟠 Nagad</strong>
-          <label class="payment-enabled">
-            <input type="checkbox" id="nagadEnabled">
-            Enable
-          </label>
-        </div>
-        <div class="payment-grid">
-          <div class="field">
-            <label for="nagadNumber">Nagad Number</label>
-            <input id="nagadNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX">
-          </div>
-          <div class="field">
-            <label for="nagadAccountName">Account Name (Optional)</label>
-            <input id="nagadAccountName" maxlength="100" placeholder="Account holder name">
-          </div>
-        </div>
+        <div class="payment-method-head"><strong>🟠 Nagad</strong><label class="payment-enabled"><input type="checkbox" id="nagadEnabled"> Enable</label></div>
+        <div class="payment-grid"><div class="field"><label for="nagadNumber">Nagad Number</label><input id="nagadNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX"></div></div>
       </div>
-
       <div class="payment-method">
-        <div class="payment-method-head">
-          <strong>🚀 Rocket</strong>
-          <label class="payment-enabled">
-            <input type="checkbox" id="rocketEnabled">
-            Enable
-          </label>
-        </div>
-        <div class="payment-grid">
-          <div class="field">
-            <label for="rocketNumber">Rocket Number</label>
-            <input id="rocketNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX">
-          </div>
-          <div class="field">
-            <label for="rocketAccountName">Account Name (Optional)</label>
-            <input id="rocketAccountName" maxlength="100" placeholder="Account holder name">
-          </div>
-        </div>
+        <div class="payment-method-head"><strong>🚀 Rocket</strong><label class="payment-enabled"><input type="checkbox" id="rocketEnabled"> Enable</label></div>
+        <div class="payment-grid"><div class="field"><label for="rocketNumber">Rocket Number</label><input id="rocketNumber" type="tel" maxlength="30" placeholder="01XXXXXXXXX"></div></div>
       </div>
-
       <div class="payment-method">
-        <div class="payment-method-head">
-          <strong>🟡 Binance</strong>
-          <label class="payment-enabled">
-            <input type="checkbox" id="binanceEnabled">
-            Enable
-          </label>
-        </div>
-        <div class="payment-grid">
-          <div class="field">
-            <label for="binanceId">Binance Pay ID / Account ID</label>
-            <input id="binanceId" maxlength="120" placeholder="Enter Binance Pay ID">
-          </div>
-          <div class="field">
-            <label for="binanceAccountName">Account Name (Optional)</label>
-            <input id="binanceAccountName" maxlength="100" placeholder="Account holder name">
-          </div>
-        </div>
+        <div class="payment-method-head"><strong>🟡 Binance</strong><label class="payment-enabled"><input type="checkbox" id="binanceEnabled"> Enable</label></div>
+        <div class="payment-grid"><div class="field"><label for="binanceId">Binance Pay ID / Account ID</label><input id="binanceId" maxlength="120" placeholder="Enter Binance Pay ID"></div></div>
       </div>
-
       <div class="payment-method">
-        <div class="payment-method-head">
-          <strong>🔵 RedotPay</strong>
-          <label class="payment-enabled">
-            <input type="checkbox" id="redotpayEnabled">
-            Enable
-          </label>
-        </div>
-        <div class="payment-grid">
-          <div class="field">
-            <label for="redotpayId">RedotPay Account / Payment ID</label>
-            <input id="redotpayId" maxlength="120" placeholder="Enter RedotPay account ID">
-          </div>
-          <div class="field">
-            <label for="redotpayAccountName">Account Name (Optional)</label>
-            <input id="redotpayAccountName" maxlength="100" placeholder="Account holder name">
-          </div>
-        </div>
+        <div class="payment-method-head"><strong>🔵 RedotPay</strong><label class="payment-enabled"><input type="checkbox" id="redotpayEnabled"> Enable</label></div>
+        <div class="payment-grid"><div class="field"><label for="redotpayId">RedotPay Account / Payment ID</label><input id="redotpayId" maxlength="120" placeholder="Enter RedotPay account ID"></div></div>
       </div>
-
       <div class="field">
         <label for="paymentInstructions">Payment Instructions (Optional)</label>
-        <textarea id="paymentInstructions" maxlength="1000" placeholder="Example: Send the exact amount and enter your transaction reference after payment."></textarea>
+        <textarea id="paymentInstructions" maxlength="1000" placeholder="Send the exact amount and enter your transaction reference after payment."></textarea>
       </div>
-
       <div class="actions">
         <button type="submit" id="savePaymentSettings">Save Payment Settings</button>
         <button type="button" class="secondary" id="reloadPaymentSettings">↻ Reload Settings</button>
@@ -780,34 +528,24 @@ async function verifyAdmin(){
   }
 }
 
-/* SINGLE-PANEL NAVIGATION */
+/* NAVIGATION */
 function showTab(name){
-  const allowed=[
-    "dashboard","create","tournaments","teams","knockout",
-    "deposits","withdrawals","paymentSettings"
-  ];
+  const allowed=["dashboard","create","tournaments","teams","knockout","deposits","withdrawals","paymentSettings"];
   if(!allowed.includes(name))name="dashboard";
-
-  document.querySelectorAll(".panel").forEach(p=>{
-    p.classList.toggle("active",p.id===name);
-  });
-
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id===name));
   window.scrollTo({top:0,behavior:"smooth"});
-
-  if(name==="paymentSettings"&&adminVerified){
-    loadPaymentSettings();
-  }
+  if(name==="paymentSettings"&&adminVerified)loadPaymentSettings();
 }
 window.showTab=showTab;
 
-/* TOURNAMENT TYPE CONTROLS */
+/* TOURNAMENT TYPE */
 function updateTournamentType(){
   const type=$("tournamentType").value;
   const max=$("maxPlayers");
   const help=$("typeHelp");
   const maxHelp=$("maxPlayersHelp");
 
-  if(type==="Free Fire Cup"){
+  if(type==="free-fire-cup"){
     max.value="13";
     max.max="13";
     max.min="13";
@@ -819,7 +557,7 @@ function updateTournamentType(){
     max.min="1";
     max.readOnly=false;
     if(!max.value||Number(max.value)===13)max.value="100";
-    help.textContent=type==="Clash Squad"
+    help.textContent=type==="clash-squad"
       ?"Clash Squad tournament selected. Choose the Game Mode separately."
       :"BR tournament selected. Choose Solo, Duo or Squad separately.";
     maxHelp.textContent="Set the maximum number of entries for this tournament.";
@@ -858,7 +596,7 @@ function updateTournamentSelect(){
   const ko=$("knockoutTournament");
   const old=ko.value;
   ko.innerHTML='<option value="">Select Free Fire Cup</option>';
-  tournamentsData.filter(t=>String(t.tournament_type||"").toLowerCase()==="free fire cup")
+  tournamentsData.filter(t=>String(t.tournament_type||"").toLowerCase()==="free-fire-cup")
     .forEach(t=>{
       const option=document.createElement("option");
       option.value=t.id;
@@ -880,17 +618,16 @@ function renderTournamentList(){
   root.innerHTML="";
   const q=$("tournamentSearch").value.trim().toLowerCase();
   const filter=$("statusFilter").value;
-
   const filtered=tournamentsData.filter(t=>{
     const title=String(t.title||"").toLowerCase();
     const status=String(t.status||"upcoming").toLowerCase();
     return title.includes(q)&&(filter==="all"||status===filter);
   });
-
   $("tournamentCount").textContent=filtered.length+" Tournaments";
 
-  if(!filtered.length){empty("tournamentsList","No matching tournaments found.");}
-  else filtered.forEach(t=>{
+  if(!filtered.length){empty("tournamentsList","No matching tournaments found.");return;}
+
+  filtered.forEach(t=>{
     const el=document.createElement("article");
     el.className="item";
     const fee=Number(t.entry_fee||0);
@@ -908,13 +645,12 @@ function renderTournamentList(){
       '<div class="muted small">Match Time: <strong>'+esc(formatDate(t.scheduled_at))+'</strong></div></div>'+
       '<div class="actions">'+
       '<button class="secondary" data-team="'+esc(t.id)+'">Manage Teams</button>'+
-      (String(type).toLowerCase()==="free fire cup"?'<button class="purple" data-knockout="'+esc(t.id)+'">Knockout</button>':'')+
+      (String(type).toLowerCase()==="free-fire-cup"?'<button class="purple" data-knockout="'+esc(t.id)+'">Knockout</button>':'')+
       '<button class="success" data-live="'+esc(t.id)+'">Set Live</button>'+
       '<button class="purple" data-complete="'+esc(t.id)+'">Complete</button>'+
       '<button class="danger" data-cancel="'+esc(t.id)+'">Cancel</button></div>';
     root.appendChild(el);
   });
-
   bindTournamentActions(root);
 }
 
@@ -949,8 +685,7 @@ $("createForm").addEventListener("submit",async function(e){
      !Number.isInteger(max)||max<1||!Number.isFinite(percent)||percent<0||percent>100){
     notify("Please enter valid tournament values.");return;
   }
-
-  if(tournamentType==="Free Fire Cup"&&max!==13){
+  if(tournamentType==="free-fire-cup"&&max!==13){
     notify("Free Fire Cup must have exactly 13 teams.");return;
   }
 
@@ -984,10 +719,10 @@ $("createForm").addEventListener("submit",async function(e){
     await loadTournaments();
     showTab("tournaments");
   }catch(e){
-    notify("Could not create tournament: "+e.message+
-      (e.status===400?" (The backend may not yet support Tournament Type.)":""));
+    notify("Could not create tournament: "+e.message);
+  }finally{
+    btn.disabled=false;btn.textContent="Create Tournament";
   }
-  finally{btn.disabled=false;btn.textContent="Create Tournament";}
 });
 
 /* STATUS UPDATE */
@@ -1005,10 +740,12 @@ async function changeStatus(id,status){
 async function createTeam(){
   if(!adminVerified){notify("Admin access is not verified.");return;}
   const tournamentId=$("teamTournament").value;
+  const captainUserId=Number($("captainUserId").value);
   const teamName=$("teamName").value.trim();
   const players=[1,2,3,4].map(i=>({name:$("p"+i+"name").value.trim(),uid:$("p"+i+"uid").value.trim()}));
 
   if(!tournamentId)return notify("Please select a tournament.");
+  if(!Number.isInteger(captainUserId)||captainUserId<1)return notify("Enter a valid Captain User ID.");
   if(!teamName)return notify("Please enter a team name.");
   if(players.some(p=>!p.name||!/^[0-9]{5,20}$/.test(p.uid))){
     return notify("Enter all four player names and numeric UIDs (5–20 digits).");
@@ -1018,8 +755,10 @@ async function createTeam(){
   btn.disabled=true;btn.textContent="Registering...";
   try{
     await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams",{
-      method:"POST",body:JSON.stringify({team_name:teamName,players})
+      method:"POST",
+      body:JSON.stringify({user_id:captainUserId,team_name:teamName,players})
     });
+    $("captainUserId").value="";
     $("teamName").value="";
     [1,2,3,4].forEach(i=>{$("p"+i+"name").value="";$("p"+i+"uid").value="";});
     notify("Team registered successfully!","success");
@@ -1048,47 +787,20 @@ function renderTeams(){
     const el=document.createElement("article");el.className="item";
     const players=Array.isArray(team.players)?team.players:[];
     el.innerHTML='<div class="row"><h3>'+esc(team.team_name||"Unnamed Team")+'</h3>'+
-      '<span class="pill '+(team.roster_locked?"red":"green")+'">'+(team.roster_locked?"Roster Locked":"Roster Editable")+'</span></div>'+
-      '<div class="muted small">Team ID: '+esc(team.id)+' · Status: '+esc(team.status||"registered")+'</div>'+
+      '<span class="pill '+(team.roster_locked?"red":"green")+'">'+(team.roster_locked?"Roster Locked":"Registered")+'</span></div>'+
+      '<div class="muted small">Team ID: '+esc(team.id)+' · Captain User ID: '+esc(team.user_id??team.captain_user_id??"—")+' · Status: '+esc(team.status||"registered")+'</div>'+
       '<div style="margin-top:10px">'+players.map((p,i)=>'<div class="muted small">Player '+(i+1)+': '+esc(p.name)+' · UID: '+esc(p.uid)+'</div>').join("")+'</div>';
-    if(!team.roster_locked){
-      const b=document.createElement("button");b.className="secondary";b.textContent="Edit 4 Players";b.style.marginTop="12px";b.onclick=()=>editRoster(team);el.appendChild(b);
-    }
     root.appendChild(el);
   });
 }
 
-async function editRoster(team){
-  if(!adminVerified)return;
-  const tournamentId=$("teamTournament").value;
-  const current=Array.isArray(team.players)?team.players:[];
-  const players=[];
-  for(let i=0;i<4;i++){
-    const old=current[i]||{};
-    const name=prompt("Player "+(i+1)+" Name",old.name||"");
-    if(name===null)return;
-    const uid=prompt("Player "+(i+1)+" Free Fire UID",old.uid||"");
-    if(uid===null)return;
-    players.push({name:name.trim(),uid:uid.trim()});
-  }
-  if(players.some(p=>!p.name||!/^[0-9]{5,20}$/.test(p.uid)))return notify("Invalid player name or UID.");
-  if(!confirm("Save updated team roster?"))return;
-  try{
-    await api("/tournament/admin/tournaments/"+encodeURIComponent(tournamentId)+"/teams/"+encodeURIComponent(team.id),{
-      method:"PATCH",body:JSON.stringify({players})
-    });
-    notify("Team roster updated successfully.","success");
-    await loadTeams();
-  }catch(e){notify("Roster update failed: "+e.message);}
-}
-
 /* KNOCKOUT MANAGEMENT */
 const knockoutStages={
-  "13_to_10":{label:"13 Teams → 10 Teams",from:13,to:10},
-  "10_to_8":{label:"10 Teams → 8 Teams",from:10,to:8},
-  "8_to_4":{label:"8 Teams → 4 Teams",from:8,to:4},
-  "4_to_2":{label:"4 Teams → 2 Teams",from:4,to:2},
-  "2_to_1":{label:"2 Teams → Champion",from:2,to:1}
+  1:{label:"13 Teams → 10 Teams",from:13,to:10},
+  2:{label:"10 Teams → 8 Teams",from:10,to:8},
+  3:{label:"8 Teams → 4 Teams",from:8,to:4},
+  4:{label:"4 Teams → 2 Teams",from:4,to:2},
+  5:{label:"2 Teams → Champion",from:2,to:1}
 };
 
 async function loadKnockout(){
@@ -1097,7 +809,7 @@ async function loadKnockout(){
   if(!id)return notify("Select a Free Fire Cup tournament first.");
 
   const tournament=tournamentsData.find(t=>String(t.id)===String(id));
-  if(tournament&&String(tournament.tournament_type||"").toLowerCase()!=="free fire cup"){
+  if(tournament&&String(tournament.tournament_type||"").toLowerCase()!=="free-fire-cup"){
     return notify("Knockout progression is available only for Free Fire Cup.");
   }
 
@@ -1111,28 +823,32 @@ async function loadKnockout(){
     $("knockoutControls").classList.remove("hidden");
     $("knockoutInfo").textContent="Knockout data loaded from server.";
     renderKnockoutHistory();
-    if(data.current_stage)$("knockoutStage").value=data.current_stage;
+    if(data.current_round!==undefined)$("knockoutStage").value=String(data.current_round);
+    else if(data.round_number!==undefined)$("knockoutStage").value=String(data.round_number);
   }catch(e){
     knockoutData=null;
-    $("knockoutInfo").textContent="Knockout API is not available yet: "+e.message;
-    empty("knockoutHistory","Knockout history is unavailable until the backend API is added.");
-    notify("Knockout backend is not ready. The server.js update is required.");
+    $("knockoutInfo").textContent="Could not load knockout data: "+e.message;
+    empty("knockoutHistory","Knockout history is unavailable.");
+    notify("Knockout data loading failed: "+e.message);
   }
 }
 
 function renderKnockoutHistory(){
   const root=$("knockoutHistory");
   root.innerHTML="";
-  const records=Array.isArray(knockoutData?.stages)?knockoutData.stages:[];
+  const records=Array.isArray(knockoutData?.stages)?knockoutData.stages:
+    Array.isArray(knockoutData?.rounds)?knockoutData.rounds:[];
   if(!records.length)return empty("knockoutHistory","No knockout stages have been saved yet.");
-  records.forEach(stage=>{
+  records.forEach(record=>{
+    const round=Number(record.round_number??record.round);
+    const stage=knockoutStages[round];
+    const teams=Array.isArray(record.teams)?record.teams:[];
     const el=document.createElement("article");
     el.className="item";
-    el.innerHTML='<div class="row"><strong>'+esc(knockoutStages[stage.stage]?.label||stage.stage||"Knockout Stage")+'</strong>'+
-      '<span class="pill green">Saved</span></div>'+
-      '<div class="muted small">Qualified Teams: '+esc(Array.isArray(stage.qualified_team_ids)?stage.qualified_team_ids.join(", "):"—")+'</div>'+
-      '<div class="muted small">Updated: '+esc(formatDate(stage.updated_at||stage.created_at))+'</div>'+
-      (stage.note?'<div class="note-box">'+esc(stage.note)+'</div>':'');
+    el.innerHTML='<div class="row"><strong>'+esc(stage?.label||("Round "+round))+'</strong><span class="pill green">Saved</span></div>'+
+      '<div class="muted small">Qualified Teams: '+esc(teams.map(t=>typeof t==="object"?(t.id??t.team_id??""):t).join(", ")||"—")+'</div>'+
+      '<div class="muted small">Updated: '+esc(formatDate(record.updated_at||record.created_at))+'</div>'+
+      (record.note?'<div class="note-box">'+esc(record.note)+'</div>':'');
     root.appendChild(el);
   });
 }
@@ -1142,15 +858,14 @@ async function saveKnockout(){
   const id=$("knockoutTournament").value;
   if(!id)return notify("Select a tournament first.");
 
-  const stageKey=$("knockoutStage").value;
-  const stage=knockoutStages[stageKey];
+  const roundNumber=Number($("knockoutStage").value);
+  const stage=knockoutStages[roundNumber];
   const raw=$("qualifiedTeams").value.trim();
   const ids=raw?raw.split(",").map(x=>x.trim()).filter(Boolean):[];
 
-  if(ids.length!==stage.to){
-    return notify("This stage requires exactly "+stage.to+" qualified team IDs.");
-  }
-  if(ids.some(x=>!/^[0-9]+$/.test(x)))return notify("Team IDs must be numeric.");
+  if(!stage)return notify("Select a valid knockout round.");
+  if(ids.length!==stage.to)return notify("This round requires exactly "+stage.to+" qualified team IDs.");
+  if(ids.some(x=>!/^[0-9]+$/.test(x)||Number(x)<1))return notify("Team IDs must be positive numeric IDs.");
   if(new Set(ids).size!==ids.length)return notify("Duplicate Team IDs are not allowed.");
 
   const btn=$("saveKnockoutButton");
@@ -1159,8 +874,8 @@ async function saveKnockout(){
     const data=await api("/tournament/admin/tournaments/"+encodeURIComponent(id)+"/knockout",{
       method:"POST",
       body:JSON.stringify({
-        stage:stageKey,
-        qualified_team_ids:ids,
+        round_number:roundNumber,
+        teams:ids.map(Number),
         note:$("knockoutNote").value.trim()
       })
     });
@@ -1170,8 +885,7 @@ async function saveKnockout(){
     notify("Knockout stage results saved successfully.","success");
     await loadKnockout();
   }catch(e){
-    notify("Could not save knockout results: "+e.message+
-      ". Make sure the server.js knockout API has been installed.");
+    notify("Could not save knockout results: "+e.message);
   }finally{
     btn.disabled=false;btn.textContent="Save Stage Results";
   }
@@ -1222,27 +936,18 @@ function transactionCard(tx,type){
     '<div><span>Request Type</span><strong>'+(isDeposit?"Deposit":"Withdrawal")+'</strong></div>'+
     '</div>'+
     (tx.admin_note?'<div class="note-box"><strong>Admin Note:</strong> '+esc(tx.admin_note)+'</div>':'')+
-    (isPending?
-      '<div class="actions">'+
-      '<button class="success" data-approve="'+esc(tx.id)+'" data-type="'+type+'">✓ Approve</button>'+
-      '<button class="danger" data-reject="'+esc(tx.id)+'" data-type="'+type+'">✕ Reject</button>'+
-      '</div>':
+    (isPending?'<div class="actions"><button class="success" data-approve="'+esc(tx.id)+'" data-type="'+type+'">✓ Approve</button><button class="danger" data-reject="'+esc(tx.id)+'" data-type="'+type+'">✕ Reject</button></div>':
       '<div class="muted small" style="margin-top:12px">This request has already been reviewed.</div>');
   return el;
 }
 
 function bindTransactionActions(root){
-  root.querySelectorAll("[data-approve]").forEach(btn=>{
-    btn.onclick=()=>reviewTransaction(btn.dataset.approve,"approve",btn.dataset.type);
-  });
-  root.querySelectorAll("[data-reject]").forEach(btn=>{
-    btn.onclick=()=>reviewTransaction(btn.dataset.reject,"reject",btn.dataset.type);
-  });
+  root.querySelectorAll("[data-approve]").forEach(btn=>btn.onclick=()=>reviewTransaction(btn.dataset.approve,"approve",btn.dataset.type));
+  root.querySelectorAll("[data-reject]").forEach(btn=>btn.onclick=()=>reviewTransaction(btn.dataset.reject,"reject",btn.dataset.type));
 }
 
 async function reviewTransaction(id,action,type){
   if(!adminVerified){notify("Admin access is not verified.");return;}
-
   const tx=transactionsData.find(x=>String(x.id)===String(id));
   if(!tx){notify("Transaction record not found. Refresh and try again.");return;}
 
@@ -1250,7 +955,6 @@ async function reviewTransaction(id,action,type){
   const confirmation=action==="approve"
     ?"Approve this "+label.toLowerCase()+" request? The Tournament Wallet balance will be updated."
     :"Reject this "+label.toLowerCase()+" request? The wallet balance will not change.";
-
   if(!confirm(confirmation))return;
 
   let note=prompt("Admin note (optional):","");
@@ -1259,14 +963,12 @@ async function reviewTransaction(id,action,type){
 
   try{
     await api("/admin/tournament/transactions/"+encodeURIComponent(id),{
-      method:"PATCH",
-      body:JSON.stringify({action,admin_note:note})
+      method:"PATCH",body:JSON.stringify({action,admin_note:note})
     });
     notify(label+" request "+(action==="approve"?"approved":"rejected")+" successfully.","success");
     await refreshTransactions();
   }catch(e){
     notify("Could not "+action+" request: "+e.message);
-    if(e.status===409)notify("This request has already been reviewed. Refreshing records.");
     await refreshTransactions();
   }
 }
@@ -1297,50 +999,41 @@ function renderFilteredTransactions(type,status,rootId){
   bindTransactionActions(root);
 }
 
-function renderDepositList(){
-  renderFilteredTransactions("deposit",$("depositStatus").value,"depositsList");
-}
+function renderDepositList(){renderFilteredTransactions("deposit",$("depositStatus").value,"depositsList");}
+function renderWithdrawalList(){renderFilteredTransactions("withdrawal",$("withdrawStatus").value,"withdrawalsList");}
 
-function renderWithdrawalList(){
-  renderFilteredTransactions("withdrawal",$("withdrawStatus").value,"withdrawalsList");
-}
-
-/* PAYMENT SETTINGS */
-const paymentMethods=["bkash","nagad","rocket","binance","redotpay"];
+/* PAYMENT SETTINGS: BACKEND ARRAY FORMAT */
+const paymentMethods=[
+  {code:"bkash",name:"bKash",enabledId:"bkashEnabled",accountId:"bkashNumber"},
+  {code:"nagad",name:"Nagad",enabledId:"nagadEnabled",accountId:"nagadNumber"},
+  {code:"rocket",name:"Rocket",enabledId:"rocketEnabled",accountId:"rocketNumber"},
+  {code:"binance",name:"Binance",enabledId:"binanceEnabled",accountId:"binanceId"},
+  {code:"redotpay",name:"RedotPay",enabledId:"redotpayEnabled",accountId:"redotpayId"}
+];
 
 function setPaymentForm(data){
-  const methods=data.methods||data.payment_methods||{};
-  paymentMethods.forEach(method=>{
-    const item=methods[method]||{};
-    $(method+"Enabled").checked=!!item.enabled;
-
-    const numberField=method==="binance"?"binanceId":
-      method==="redotpay"?"redotpayId":method+"Number";
-
-    $(numberField).value=item.account||item.number||item.account_id||"";
-    $(method+"AccountName").value=item.account_name||item.name||"";
+  const methods=Array.isArray(data.methods)?data.methods:[];
+  paymentMethods.forEach(config=>{
+    const item=methods.find(m=>String(m.code||"").toLowerCase()===config.code)||{};
+    $(config.enabledId).checked=!!item.enabled;
+    $(config.accountId).value=item.account||"";
   });
 
-  $("paymentInstructions").value=data.instructions||"";
+  const instructions=methods.find(m=>m.instructions)?.instructions||data.instructions||"";
+  $("paymentInstructions").value=instructions;
 }
 
 function collectPaymentForm(){
-  const methods={};
-
-  paymentMethods.forEach(method=>{
-    const numberField=method==="binance"?"binanceId":
-      method==="redotpay"?"redotpayId":method+"Number";
-
-    methods[method]={
-      enabled:$(method+"Enabled").checked,
-      account:$(numberField).value.trim(),
-      account_name:$(method+"AccountName").value.trim()
-    };
-  });
+  const instructions=$("paymentInstructions").value.trim();
 
   return {
-    methods,
-    instructions:$("paymentInstructions").value.trim()
+    methods:paymentMethods.map(config=>({
+      code:config.code,
+      name:config.name,
+      enabled:$(config.enabledId).checked,
+      account:$(config.accountId).value.trim(),
+      instructions
+    }))
   };
 }
 
@@ -1349,37 +1042,25 @@ async function loadPaymentSettings(){
     paymentMessage("Admin access is not verified.","");
     return;
   }
-
   paymentMessage("Loading payment settings from server...","info");
-
   try{
     const data=await api("/admin/tournament/payment-settings");
     setPaymentForm(data);
     paymentMessage("Payment settings loaded from server.","success");
   }catch(e){
-    if(e.status===404||e.status===405){
-      paymentMessage(
-        "Payment Settings API is not installed yet. Add GET /admin/tournament/payment-settings to server.js before settings can be loaded or saved.",
-        ""
-      );
-    }else{
-      paymentMessage("Could not load payment settings: "+e.message,"");
-    }
+    paymentMessage("Could not load payment settings: "+e.message,"");
   }
 }
 
 async function savePaymentSettings(event){
   event.preventDefault();
-
   if(!adminVerified){
     paymentMessage("Admin access is not verified.","");
     return;
   }
 
   const payload=collectPaymentForm();
-
-  for(const method of paymentMethods){
-    const item=payload.methods[method];
+  for(const item of payload.methods){
     if(item.enabled&&!item.account){
       paymentMessage("Enter the account number or ID for every enabled payment method.","");
       return;
@@ -1387,28 +1068,16 @@ async function savePaymentSettings(event){
   }
 
   const button=$("savePaymentSettings");
-  button.disabled=true;
-  button.textContent="Saving...";
-
+  button.disabled=true;button.textContent="Saving...";
   try{
     await api("/admin/tournament/payment-settings",{
-      method:"PUT",
-      body:JSON.stringify(payload)
+      method:"PUT",body:JSON.stringify(payload)
     });
-
     paymentMessage("Payment settings saved successfully on the server.","success");
   }catch(e){
-    if(e.status===404||e.status===405){
-      paymentMessage(
-        "Could not save: the payment settings API is not installed in server.js yet. No settings were saved.",
-        ""
-      );
-    }else{
-      paymentMessage("Could not save payment settings: "+e.message,"");
-    }
+    paymentMessage("Could not save payment settings: "+e.message,"");
   }finally{
-    button.disabled=false;
-    button.textContent="Save Payment Settings";
+    button.disabled=false;button.textContent="Save Payment Settings";
   }
 }
 
@@ -1436,7 +1105,6 @@ async function refreshData(){
   if(!(await verifyAdmin()))return;
   await Promise.all([loadTournaments(),refreshTransactions()]);
 }
-
 $("refreshAll").onclick=refreshData;
 
 async function initialize(){
@@ -1444,7 +1112,6 @@ async function initialize(){
   if(!(await verifyAdmin()))return;
   await Promise.all([loadTournaments(),refreshTransactions()]);
 }
-
 initialize();
 
 })();
