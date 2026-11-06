@@ -553,6 +553,44 @@ async function initializeDatabase() {
 
     CREATE INDEX IF NOT EXISTS ft_tournament_registrations_tournament_idx
       ON ft_tournament_registrations(tournament_id, created_at);
+
+    -- Tournament Admin/User connection: all additions are isolated to tournament tables.
+    ALTER TABLE ft_tournaments ADD COLUMN IF NOT EXISTS tournament_type VARCHAR(30) NOT NULL DEFAULT 'br-match';
+    ALTER TABLE ft_tournaments ADD COLUMN IF NOT EXISTS registration_open BOOLEAN NOT NULL DEFAULT TRUE;
+    ALTER TABLE ft_tournaments ADD COLUMN IF NOT EXISTS team_limit INTEGER;
+    CREATE TABLE IF NOT EXISTS ft_tournament_teams (
+      id BIGSERIAL PRIMARY KEY,
+      tournament_id BIGINT NOT NULL REFERENCES ft_tournaments(id) ON DELETE CASCADE,
+      captain_user_id TEXT NOT NULL,
+      team_name VARCHAR(100) NOT NULL,
+      players JSONB NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected','disqualified')),
+      admin_note VARCHAR(500) NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(tournament_id,captain_user_id)
+    );
+    CREATE INDEX IF NOT EXISTS ft_tournament_teams_list_idx ON ft_tournament_teams(tournament_id,status,created_at);
+    CREATE TABLE IF NOT EXISTS ft_tournament_knockout (
+      id BIGSERIAL PRIMARY KEY,
+      tournament_id BIGINT NOT NULL REFERENCES ft_tournaments(id) ON DELETE CASCADE,
+      round_number INTEGER NOT NULL CHECK(round_number BETWEEN 1 AND 6),
+      round_name VARCHAR(40) NOT NULL,
+      team_id BIGINT NOT NULL REFERENCES ft_tournament_teams(id) ON DELETE CASCADE,
+      position INTEGER NOT NULL DEFAULT 0,
+      score NUMERIC(12,2) NOT NULL DEFAULT 0,
+      qualified BOOLEAN NOT NULL DEFAULT FALSE,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(tournament_id,round_number,team_id)
+    );
+    CREATE INDEX IF NOT EXISTS ft_tournament_knockout_round_idx ON ft_tournament_knockout(tournament_id,round_number,position);
+    CREATE TABLE IF NOT EXISTS ft_tournament_payment_settings (
+      id SMALLINT PRIMARY KEY DEFAULT 1 CHECK(id=1),
+      methods JSONB NOT NULL DEFAULT '[{"code":"bkash","name":"bKash","enabled":false,"account":"","instructions":""},{"code":"nagad","name":"Nagad","enabled":false,"account":"","instructions":""},{"code":"rocket","name":"Rocket","enabled":false,"account":"","instructions":""},{"code":"binance","name":"Binance","enabled":false,"account":"","instructions":""},{"code":"redotpay","name":"RedotPay","enabled":false,"account":"","instructions":""}]'::jsonb,
+      updated_by TEXT,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    INSERT INTO ft_tournament_payment_settings(id) VALUES(1) ON CONFLICT(id) DO NOTHING;
   `);
 
   const defaultPaymentMethods = [
@@ -2122,7 +2160,7 @@ app.get("/api/tournament/tournaments", async (req, res, next) => {
   if (!tournamentDbReady(res)) return;
   try {
     const result = await pool.query(`
-      SELECT t.id::text AS id, t.title, t.description, t.mode,
+      SELECT t.id::text AS id, t.title, t.description, t.tournament_type, t.mode,
              t.map_name, t.entry_fee::float8 AS entry_fee,
              t.prize_pool::float8 AS prize_pool, t.prize_mode,
              t.prize_percentage::float8 AS prize_percentage,
@@ -2213,6 +2251,7 @@ app.post("/api/tournament/tournaments", requireAuth, requireAdmin, async (req, r
     const title = cleanText(req.body.title, 120);
     const description = cleanText(req.body.description, 2000);
     const mode = cleanText(req.body.mode, 20);
+    const tournamentType = normalizeTournamentType(req.body.tournament_type || req.body.type || "br-match");
     const mapName = cleanText(req.body.map_name || "Bermuda", 80);
     const entryFee = Number(req.body.entry_fee ?? 0);
     const prizePool = Number(req.body.prize_pool ?? 0);
@@ -2222,28 +2261,28 @@ app.post("/api/tournament/tournaments", requireAuth, requireAdmin, async (req, r
     const bannerUrl = cleanText(req.body.banner_url, 2000);
     const scheduledAt = req.body.scheduled_at ? new Date(req.body.scheduled_at) : null;
 
-    if (!title || !["Solo","Duo","Squad"].includes(mode) ||
+    if (!title || !tournamentType || !["Solo","Duo","Squad"].includes(mode) ||
         !Number.isFinite(entryFee) || entryFee < 0 ||
         !Number.isFinite(prizePool) || prizePool < 0 ||
         !["fixed","dynamic"].includes(prizeMode) ||
         !Number.isFinite(prizePercentage) || prizePercentage < 0 || prizePercentage > 100 ||
         !Number.isSafeInteger(maxPlayers) || maxPlayers < 1 ||
         (scheduledAt && Number.isNaN(scheduledAt.getTime())) ||
-        (bannerUrl && !/^https:\/\/\//i.test(bannerUrl))) {
+        (bannerUrl && !/^https:\/\//i.test(bannerUrl))) {
       return res.status(400).json({ error: "Please provide valid tournament details." });
     }
 
     const result = await pool.query(`
       INSERT INTO ft_tournaments
-        (title,description,mode,map_name,entry_fee,prize_pool,prize_mode,
-         prize_percentage,max_players,banner_url,scheduled_at,status,created_by)
-      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,'upcoming',$12)
-      RETURNING id::text AS id,title,description,mode,map_name,
+        (title,description,tournament_type,mode,map_name,entry_fee,prize_pool,prize_mode,
+         prize_percentage,max_players,team_limit,banner_url,scheduled_at,status,created_by)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,'upcoming',$14)
+      RETURNING id::text AS id,title,description,tournament_type,mode,map_name,
                 entry_fee::float8 AS entry_fee,prize_pool::float8 AS prize_pool,
                 prize_mode,prize_percentage::float8 AS prize_percentage,
                 max_players,banner_url,scheduled_at,status,created_at
-    `, [title,description,mode,mapName,entryFee,prizePool,prizeMode,
-        prizePercentage,maxPlayers,bannerUrl,scheduledAt,String(req.user.id)]);
+    `, [title,description,tournamentType,mode,mapName,entryFee,prizePool,prizeMode,
+        prizePercentage,maxPlayers,tournamentType === "free-fire-cup" ? 13 : maxPlayers,bannerUrl,scheduledAt,String(req.user.id)]);
     res.status(201).json({ message: "Tournament created.", tournament: result.rows[0] });
   } catch (e) { next(e); }
 });
@@ -2258,6 +2297,7 @@ app.patch("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (r
     const title = b.title === undefined ? old.title : cleanText(b.title,120);
     const description = b.description === undefined ? old.description : cleanText(b.description,2000);
     const mode = b.mode === undefined ? old.mode : cleanText(b.mode,20);
+    const tournamentType = b.tournament_type === undefined && b.type === undefined ? (old.tournament_type || "br-match") : normalizeTournamentType(b.tournament_type || b.type);
     const mapName = b.map_name === undefined ? old.map_name : cleanText(b.map_name,80);
     const entryFee = b.entry_fee === undefined ? Number(old.entry_fee) : Number(b.entry_fee);
     const prizePool = b.prize_pool === undefined ? Number(old.prize_pool) : Number(b.prize_pool);
@@ -2267,7 +2307,7 @@ app.patch("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (r
     const bannerUrl = b.banner_url === undefined ? old.banner_url : cleanText(b.banner_url,2000);
     const scheduledAt = b.scheduled_at === undefined ? old.scheduled_at : (b.scheduled_at ? new Date(b.scheduled_at) : null);
     const status = b.status === undefined ? old.status : cleanText(b.status,20);
-    if (!title || !["Solo","Duo","Squad"].includes(mode) ||
+    if (!title || !tournamentType || !["Solo","Duo","Squad"].includes(mode) ||
         !Number.isFinite(entryFee) || entryFee < 0 ||
         !Number.isFinite(prizePool) || prizePool < 0 ||
         !["fixed","dynamic"].includes(prizeMode) ||
@@ -2275,20 +2315,20 @@ app.patch("/api/tournament/tournaments/:id", requireAuth, requireAdmin, async (r
         !Number.isSafeInteger(maxPlayers) || maxPlayers < 1 ||
         !["upcoming","live","completed","cancelled"].includes(status) ||
         (scheduledAt && Number.isNaN(new Date(scheduledAt).getTime())) ||
-        (bannerUrl && !/^https:\/\/\//i.test(bannerUrl))) {
+        (bannerUrl && !/^https:\/\//i.test(bannerUrl))) {
       return res.status(400).json({ error: "Invalid tournament details." });
     }
     const updated = await pool.query(`
-      UPDATE ft_tournaments SET title=$1,description=$2,mode=$3,map_name=$4,
-        entry_fee=$5,prize_pool=$6,prize_mode=$7,prize_percentage=$8,
-        max_players=$9,banner_url=$10,scheduled_at=$11,status=$12,updated_at=NOW()
-      WHERE id=$13
-      RETURNING id::text AS id,title,description,mode,map_name,
+      UPDATE ft_tournaments SET title=$1,description=$2,tournament_type=$3,mode=$4,map_name=$5,
+        entry_fee=$6,prize_pool=$7,prize_mode=$8,prize_percentage=$9,
+        max_players=$10,team_limit=$11,banner_url=$12,scheduled_at=$13,status=$14,updated_at=NOW()
+      WHERE id=$15
+      RETURNING id::text AS id,title,description,tournament_type,mode,map_name,
         entry_fee::float8 AS entry_fee,prize_pool::float8 AS prize_pool,
         prize_mode,prize_percentage::float8 AS prize_percentage,max_players,
         banner_url,scheduled_at,status,created_at
-    `, [title,description,mode,mapName,entryFee,prizePool,prizeMode,
-        prizePercentage,maxPlayers,bannerUrl,scheduledAt,status,id]);
+    `, [title,description,tournamentType,mode,mapName,entryFee,prizePool,prizeMode,
+        prizePercentage,maxPlayers,tournamentType === "free-fire-cup" ? 13 : (old.team_limit || maxPlayers),bannerUrl,scheduledAt,status,id]);
     res.json({ tournament: updated.rows[0] });
   } catch (e) { next(e); }
 });
@@ -2346,12 +2386,19 @@ app.post("/api/tournament/deposits", requireAuth, async (req, res, next) => {
     if (!Number.isFinite(amount) || amount < 10 || amount > 10000000 || !method || !reference) {
       return res.status(400).json({ error: "Enter a valid amount, payment method and transaction reference." });
     }
+    const configured = await pool.query("SELECT methods FROM ft_tournament_payment_settings WHERE id=1");
+    const methods = configured.rows[0]?.methods || [];
+    const selected = methods.find(x => String(x.code).toLowerCase() === method.toLowerCase() || String(x.name).toLowerCase() === method.toLowerCase());
+    if (!selected || selected.enabled !== true) return res.status(400).json({error:"This Tournament Wallet payment method is not enabled by Admin."});
+    const duplicate = await pool.query("SELECT id FROM ft_tournament_transactions WHERE LOWER(payment_method)=LOWER($1) AND transaction_ref=$2 LIMIT 1",[selected.name,reference]);
+    if (duplicate.rowCount) return res.status(409).json({error:"This transaction reference has already been submitted."});
     const r = await pool.query(`
       INSERT INTO ft_tournament_transactions
         (user_id,type,amount,payment_method,transaction_ref,status)
       VALUES($1,'deposit',$2,$3,$4,'pending')
       RETURNING id::text AS id,type,amount::float8 AS amount,status,created_at
-    `, [String(req.user.id),amount,method,reference]);
+    `, [String(req.user.id),selected.name,reference]);
+    await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'tournament_deposit',$2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Tournament deposit request from ${req.user.username}.`]);
     res.status(201).json({ message:"Deposit submitted for Admin review.", transaction:r.rows[0] });
   } catch (e) { next(e); }
 });
@@ -2376,11 +2423,16 @@ app.post("/api/tournament/withdrawals", requireAuth, async (req, res, next) => {
       await client.query("ROLLBACK");
       return res.status(400).json({ error:"Insufficient available Tournament Wallet balance." });
     }
+    const configured = await client.query("SELECT methods FROM ft_tournament_payment_settings WHERE id=1");
+    const methods = configured.rows[0]?.methods || [];
+    const selected = methods.find(x => String(x.code).toLowerCase() === method.toLowerCase() || String(x.name).toLowerCase() === method.toLowerCase());
+    if (!selected || selected.enabled !== true) { await client.query("ROLLBACK"); return res.status(400).json({error:"This Tournament Wallet withdrawal method is not enabled by Admin."}); }
     const r = await client.query(`
       INSERT INTO ft_tournament_transactions(user_id,type,amount,payment_method,destination,status)
       VALUES($1,'withdrawal',$2,$3,$4,'pending')
       RETURNING id::text AS id,type,amount::float8 AS amount,status,created_at
-    `,[String(req.user.id),amount,method,destination]);
+    `,[String(req.user.id),amount,selected.name,destination]);
+    await client.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) SELECT id::text,$1,'tournament_withdrawal',$2 FROM users WHERE LOWER(role)='admin'`,[String(req.user.id),`Tournament withdrawal request from ${req.user.username}.`]);
     await client.query("COMMIT");
     res.status(201).json({message:"Withdrawal request submitted for Admin review.",transaction:r.rows[0]});
   } catch(e) {
@@ -2440,6 +2492,7 @@ app.patch("/api/admin/tournament/transactions/:id", requireAuth, requireAdmin, a
         reviewed_at=NOW(),updated_at=NOW() WHERE id=$4
       RETURNING id::text AS id,type,amount::float8 AS amount,status,admin_note,reviewed_at
     `,[status,note,String(req.user.id),id]);
+    await client.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) VALUES($1,$2,'tournament_transaction',$3)`,[tx.user_id,String(req.user.id),`Your Tournament Wallet ${tx.type} request was ${status}. ${note}`]);
     await client.query("COMMIT");
     res.json({message:`Transaction ${status}.`,transaction:updated.rows[0]});
   } catch(e) {
@@ -2506,6 +2559,151 @@ app.post("/api/admin/tournament/game-history", requireAuth, requireAdmin, async 
   } catch(e) { next(e); }
 });
 
+
+
+// ============================================================
+// TOURNAMENT ADMIN <-> USER CONNECTION FIX (additive routes)
+// ============================================================
+const TOURNAMENT_TYPES = ["br-match", "clash-squad", "free-fire-cup"];
+const TOURNAMENT_METHODS = ["bkash", "nagad", "rocket", "binance", "redotpay"];
+const CUP_ROUND_COUNTS = [13, 10, 8, 4, 2, 1];
+
+function normalizeTournamentType(value) {
+  const v = cleanText(value, 30).toLowerCase().replace(/_/g, "-");
+  return TOURNAMENT_TYPES.includes(v) ? v : "";
+}
+function teamPlayerCount(mode, type) {
+  return type === "free-fire-cup" || mode === "Squad" ? 4 : mode === "Duo" ? 2 : 1;
+}
+function validatePlayers(players, expected) {
+  if (!Array.isArray(players) || players.length !== expected) return "Exactly " + expected + " player(s) are required.";
+  const seen = new Set();
+  for (const p of players) {
+    const name = cleanText(p?.name || p?.free_fire_name, 80);
+    const uid = cleanText(p?.uid || p?.free_fire_uid, 20);
+    if (!name || !/^[0-9]{5,20}$/.test(uid)) return "Every player needs a Free Fire name and numeric UID (5–20 digits).";
+    if (seen.has(uid)) return "A player UID cannot be repeated in the same team.";
+    seen.add(uid);
+  }
+  return "";
+}
+
+// Public payment methods are read-only to users; credentials/secrets are never stored here.
+app.get("/api/tournament/payment-settings", async (req,res,next) => {
+  try {
+    const r = await pool.query("SELECT methods,updated_at FROM ft_tournament_payment_settings WHERE id=1");
+    res.json({ methods: r.rows[0]?.methods || [], updated_at: r.rows[0]?.updated_at || null });
+  } catch(e) { next(e); }
+});
+app.get("/api/admin/tournament/payment-settings", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const r = await pool.query("SELECT methods,updated_at FROM ft_tournament_payment_settings WHERE id=1");
+    res.json({ methods: r.rows[0]?.methods || [], updated_at: r.rows[0]?.updated_at || null });
+  } catch(e) { next(e); }
+});
+app.put("/api/admin/tournament/payment-settings", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    if (!Array.isArray(req.body.methods)) return res.status(400).json({error:"methods must be an array."});
+    const supplied = new Map();
+    for (const item of req.body.methods) {
+      const code = cleanText(item?.code,30).toLowerCase();
+      if (!TOURNAMENT_METHODS.includes(code) || supplied.has(code)) return res.status(400).json({error:"Only bKash, Nagad, Rocket, Binance and RedotPay can be configured."});
+      const account = cleanText(item.account || item.account_details,180);
+      const instructions = cleanText(item.instructions,500);
+      supplied.set(code,{code,name:({bkash:"bKash",nagad:"Nagad",rocket:"Rocket",binance:"Binance",redotpay:"RedotPay"})[code],enabled:Boolean(item.enabled) && Boolean(account),account,instructions});
+    }
+    const methods = TOURNAMENT_METHODS.map(code => supplied.get(code) || ({code,name:({bkash:"bKash",nagad:"Nagad",rocket:"Rocket",binance:"Binance",redotpay:"RedotPay"})[code],enabled:false,account:"",instructions:""}));
+    const r = await pool.query(`INSERT INTO ft_tournament_payment_settings(id,methods,updated_by,updated_at) VALUES(1,$1::jsonb,$2,NOW()) ON CONFLICT(id) DO UPDATE SET methods=EXCLUDED.methods,updated_by=EXCLUDED.updated_by,updated_at=NOW() RETURNING methods,updated_at`,[JSON.stringify(methods),String(req.user.id)]);
+    res.json({message:"Tournament payment settings saved.",methods:r.rows[0].methods,updated_at:r.rows[0].updated_at});
+  } catch(e) { next(e); }
+});
+
+// Admin tournament list alias used by the Admin dashboard.
+app.get("/api/admin/tournament/tournaments", requireAuth, requireAdmin, async (req,res,next) => {
+  try {
+    const r = await pool.query(`SELECT t.id::text AS id,t.title,t.description,t.tournament_type,t.mode,t.map_name,t.entry_fee::float8 AS entry_fee,t.prize_pool::float8 AS prize_pool,t.prize_mode,t.prize_percentage::float8 AS prize_percentage,t.max_players,t.team_limit,t.registration_open,t.banner_url,t.scheduled_at,t.status,COUNT(DISTINCT tm.id) FILTER(WHERE tm.status='approved')::int AS approved_teams,COUNT(DISTINCT tm.id)::int AS total_teams FROM ft_tournaments t LEFT JOIN ft_tournament_teams tm ON tm.tournament_id=t.id GROUP BY t.id ORDER BY t.created_at DESC`);
+    res.json({tournaments:r.rows});
+  } catch(e) { next(e); }
+});
+
+// Add/replace tournament type support while retaining old tournament fields and records.
+app.post("/api/tournament/teams/register", requireAuth, async (req,res,next) => {
+  try {
+    const tournamentId = Number.parseInt(req.body.tournament_id,10);
+    const teamName = cleanText(req.body.team_name,100) || req.user.username;
+    if (!Number.isSafeInteger(tournamentId) || tournamentId < 1) return res.status(400).json({error:"Valid tournament_id is required."});
+    const t = await pool.query("SELECT id,tournament_type,mode,team_limit,registration_open,status FROM ft_tournaments WHERE id=$1",[tournamentId]);
+    if (!t.rowCount) return res.status(404).json({error:"Tournament not found."});
+    const tournament = t.rows[0];
+    if (tournament.registration_open === false || tournament.status !== "upcoming") return res.status(409).json({error:"Registration is closed."});
+    const type = normalizeTournamentType(tournament.tournament_type) || "br-match";
+    const expected = teamPlayerCount(tournament.mode,type);
+    const players = req.body.players;
+    const problem = validatePlayers(players,expected);
+    if (problem) return res.status(400).json({error:problem});
+    if (type === "free-fire-cup") {
+      const count = await pool.query("SELECT COUNT(*)::int AS n FROM ft_tournament_teams WHERE tournament_id=$1 AND status<>'rejected'",[tournamentId]);
+      if (Number(count.rows[0].n) >= 13) return res.status(409).json({error:"Free Fire Cup is limited to exactly 13 registered teams."});
+    } else if (tournament.team_limit) {
+      const count = await pool.query("SELECT COUNT(*)::int AS n FROM ft_tournament_teams WHERE tournament_id=$1 AND status<>'rejected'",[tournamentId]);
+      if (Number(count.rows[0].n) >= Number(tournament.team_limit)) return res.status(409).json({error:"Tournament team limit has been reached."});
+    }
+    const normalized = players.map(p=>({name:cleanText(p.name||p.free_fire_name,80),uid:cleanText(p.uid||p.free_fire_uid,20)}));
+    const r = await pool.query(`INSERT INTO ft_tournament_teams(tournament_id,captain_user_id,team_name,players) VALUES($1,$2,$3,$4::jsonb) RETURNING id::text AS id,tournament_id::text AS tournament_id,team_name,players,status,created_at`,[tournamentId,String(req.user.id),teamName,JSON.stringify(normalized)]);
+    await pool.query(`INSERT INTO ft_tournament_registrations(tournament_id,user_id,status) VALUES($1,$2,'registered') ON CONFLICT(tournament_id,user_id) DO UPDATE SET status='registered'`,[tournamentId,String(req.user.id)]);
+    res.status(201).json({message:"Team registration submitted for Admin review.",team:r.rows[0]});
+  } catch(e) { if(e.code==='23505') return res.status(409).json({error:"You have already registered a team for this tournament, or a player UID conflicts."}); next(e); }
+});
+
+app.get("/api/tournament/my-teams", requireAuth, async (req,res,next) => {
+  try { const r=await pool.query(`SELECT tm.id::text AS id,tm.tournament_id::text AS tournament_id,tm.team_name,tm.players,tm.status,tm.admin_note,tm.created_at,t.title,t.tournament_type,t.mode FROM ft_tournament_teams tm JOIN ft_tournaments t ON t.id=tm.tournament_id WHERE tm.captain_user_id=$1 ORDER BY tm.created_at DESC`,[String(req.user.id)]); res.json({teams:r.rows}); }
+  catch(e){next(e);}
+});
+app.get("/api/admin/tournament/teams", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const status=cleanText(req.query.status||"all",20); if(!["all","pending","approved","rejected","disqualified"].includes(status)) return res.status(400).json({error:"Invalid team status."}); const r=await pool.query(`SELECT tm.id::text AS id,tm.tournament_id::text AS tournament_id,tm.captain_user_id,u.username,tm.team_name,tm.players,tm.status,tm.admin_note,tm.created_at,t.title,t.tournament_type,t.mode FROM ft_tournament_teams tm JOIN ft_tournaments t ON t.id=tm.tournament_id LEFT JOIN users u ON u.id::text=tm.captain_user_id WHERE ($1='all' OR tm.status=$1) ORDER BY tm.created_at DESC LIMIT 500`,[status]); res.json({teams:r.rows}); }
+  catch(e){next(e);}
+});
+app.get("/api/admin/tournament/tournaments/:id/teams", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.id,10); if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:"Invalid tournament ID."}); const r=await pool.query(`SELECT tm.id::text AS id,tm.tournament_id::text AS tournament_id,tm.captain_user_id,u.username,tm.team_name,tm.players,tm.status,tm.admin_note,tm.created_at FROM ft_tournament_teams tm LEFT JOIN users u ON u.id::text=tm.captain_user_id WHERE tm.tournament_id=$1 ORDER BY tm.created_at`,[id]); res.json({teams:r.rows}); }
+  catch(e){next(e);}
+});
+app.patch("/api/admin/tournament/teams/:teamId", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.teamId,10),status=cleanText(req.body.status||req.body.action,20).toLowerCase(),note=cleanText(req.body.admin_note,500); const nextStatus=({approve:"approved",reject:"rejected",disqualify:"disqualified",approved:"approved",rejected:"rejected",disqualified:"disqualified"})[status]; if(!Number.isSafeInteger(id)||id<1||!nextStatus)return res.status(400).json({error:"Choose approve, reject or disqualify."}); const r=await pool.query(`UPDATE ft_tournament_teams SET status=$1,admin_note=$2,updated_at=NOW() WHERE id=$3 RETURNING id::text AS id,tournament_id::text AS tournament_id,captain_user_id,team_name,players,status,admin_note`,[nextStatus,note,id]); if(!r.rowCount)return res.status(404).json({error:"Team registration not found."}); await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) VALUES($1,$2,'tournament', $3)`,[r.rows[0].captain_user_id,String(req.user.id),`Your team ${r.rows[0].team_name} registration was ${nextStatus}. ${note}`]); res.json({team:r.rows[0]}); }
+  catch(e){next(e);}
+});
+
+// Knockout setup and scoring. Free Fire Cup uses 13 -> 10 -> 8 -> 4 -> 2 -> 1.
+app.get("/api/admin/tournament/tournaments/:id/knockout", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.id,10); if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:"Invalid tournament ID."}); const r=await pool.query(`SELECT k.id::text AS id,k.round_number,k.round_name,k.team_id::text AS team_id,k.position,k.score,k.qualified,tm.team_name,tm.players FROM ft_tournament_knockout k JOIN ft_tournament_teams tm ON tm.id=k.team_id WHERE k.tournament_id=$1 ORDER BY k.round_number,k.position`,[id]); res.json({rounds:r.rows,expected_counts:CUP_ROUND_COUNTS}); }
+  catch(e){next(e);}
+});
+app.post("/api/admin/tournament/tournaments/:id/knockout", requireAuth, requireAdmin, async (req,res,next) => {
+  const client=await pool.connect();
+  try { const id=Number.parseInt(req.params.id,10),round=Number.parseInt(req.body.round_number,10); if(!Number.isSafeInteger(id)||id<1||!Number.isSafeInteger(round)||round<1||round>6)return res.status(400).json({error:"Invalid tournament or round."}); const t=await client.query("SELECT tournament_type FROM ft_tournaments WHERE id=$1",[id]); if(!t.rowCount)return res.status(404).json({error:"Tournament not found."}); const isCup=normalizeTournamentType(t.rows[0].tournament_type)==="free-fire-cup"; const teams=Array.isArray(req.body.teams)?req.body.teams:[]; if(!teams.length)return res.status(400).json({error:"Select teams for this round."}); const expected=isCup?CUP_ROUND_COUNTS[round-1]:teams.length; if(isCup&&teams.length!==expected)return res.status(400).json({error:`Round ${round} must contain ${expected} teams.`}); const ids=teams.map(x=>Number.parseInt(typeof x==="object"?x.team_id:x,10)); if(ids.some(x=>!Number.isSafeInteger(x)||x<1)||new Set(ids).size!==ids.length)return res.status(400).json({error:"Team IDs must be unique valid IDs."}); await client.query("BEGIN"); const valid=await client.query("SELECT id FROM ft_tournament_teams WHERE tournament_id=$1 AND id=ANY($2::bigint[]) AND status='approved'",[id,ids]); if(valid.rowCount!==ids.length){await client.query("ROLLBACK");return res.status(400).json({error:"Every selected team must be approved and belong to this tournament."});} for(let i=0;i<ids.length;i++){const x=typeof teams[i]==="object"?teams[i]:{}; await client.query(`INSERT INTO ft_tournament_knockout(tournament_id,round_number,round_name,team_id,position,score,qualified) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(tournament_id,round_number,team_id) DO UPDATE SET round_name=EXCLUDED.round_name,position=EXCLUDED.position,score=EXCLUDED.score,qualified=EXCLUDED.qualified,updated_at=NOW()`,[id,round,`Round ${round}`,ids[i],Number.parseInt(x.position,10)||i+1,Number(x.score)||0,Boolean(x.qualified)]);} await client.query("COMMIT"); const out=await pool.query("SELECT id::text AS id,round_number,round_name,team_id::text AS team_id,position,score::float8 AS score,qualified FROM ft_tournament_knockout WHERE tournament_id=$1 AND round_number=$2 ORDER BY position",[id,round]); res.json({message:"Knockout round saved.",rounds:out.rows}); }
+  catch(e){await client.query("ROLLBACK").catch(()=>{});next(e);} finally{client.release();}
+});
+
+// Compatibility aliases for the earlier Tournament Admin HTML route names.
+app.get("/api/tournament/admin/tournaments/:id/teams", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.id,10); if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:"Invalid tournament ID."}); const r=await pool.query(`SELECT tm.id::text AS id,tm.tournament_id::text AS tournament_id,tm.captain_user_id,u.username,tm.team_name,tm.players,tm.status,tm.admin_note,tm.created_at FROM ft_tournament_teams tm LEFT JOIN users u ON u.id::text=tm.captain_user_id WHERE tm.tournament_id=$1 ORDER BY tm.created_at DESC`,[id]); res.json({teams:r.rows}); } catch(e){next(e);}
+});
+app.post("/api/tournament/admin/tournaments/:id/teams", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.id,10); const userId=cleanText(req.body.user_id,100); const teamName=cleanText(req.body.team_name,100); const players=req.body.players; if(!Number.isSafeInteger(id)||id<1||!userId||!teamName||!Array.isArray(players))return res.status(400).json({error:"Tournament, captain user, team name and players are required."}); const t=await pool.query("SELECT tournament_type,mode FROM ft_tournaments WHERE id=$1",[id]); if(!t.rowCount)return res.status(404).json({error:"Tournament not found."}); const expected=teamPlayerCount(t.rows[0].mode,normalizeTournamentType(t.rows[0].tournament_type)); const problem=validatePlayers(players,expected); if(problem)return res.status(400).json({error:problem}); const u=await pool.query("SELECT id FROM users WHERE id::text=$1 AND account_status='active'",[userId]); if(!u.rowCount)return res.status(404).json({error:"Captain user not found."}); const normalized=players.map(p=>({name:cleanText(p.name||p.free_fire_name,80),uid:cleanText(p.uid||p.free_fire_uid,20)})); const r=await pool.query(`INSERT INTO ft_tournament_teams(tournament_id,captain_user_id,team_name,players,status) VALUES($1,$2,$3,$4::jsonb,'approved') RETURNING id::text AS id,tournament_id::text AS tournament_id,team_name,players,status,created_at`,[id,userId,teamName,JSON.stringify(normalized)]); await pool.query(`INSERT INTO ft_tournament_registrations(tournament_id,user_id,status) VALUES($1,$2,'registered') ON CONFLICT(tournament_id,user_id) DO UPDATE SET status='registered'`,[id,userId]); res.status(201).json({team:r.rows[0]}); } catch(e){if(e.code==='23505')return res.status(409).json({error:"Team already exists for this user."});next(e);}
+});
+app.get("/api/tournament/admin/tournaments/:id/knockout", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.id,10); if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:"Invalid tournament ID."}); const r=await pool.query(`SELECT k.id::text AS id,k.round_number,k.round_name,k.team_id::text AS team_id,k.position,k.score::float8 AS score,k.qualified,tm.team_name,tm.players FROM ft_tournament_knockout k JOIN ft_tournament_teams tm ON tm.id=k.team_id WHERE k.tournament_id=$1 ORDER BY k.round_number,k.position`,[id]); res.json({rounds:r.rows,expected_counts:CUP_ROUND_COUNTS}); } catch(e){next(e);}
+});
+app.post("/api/tournament/admin/tournaments/:id/knockout", requireAuth, requireAdmin, (req,res,next) => { req.url = `/api/admin/tournament/tournaments/${req.params.id}/knockout`; next(); });
+app.post("/api/tournament/tournaments/:id/register", requireAuth, (req,res,next) => { req.body.tournament_id=req.params.id; req.url="/api/tournament/teams/register"; next(); });
+app.patch("/api/admin/tournament/tournaments/:id/teams/:teamId", requireAuth, requireAdmin, async (req,res,next) => {
+  try { const id=Number.parseInt(req.params.teamId,10),status=cleanText(req.body.status||req.body.action,20).toLowerCase(),note=cleanText(req.body.admin_note,500); const mapped=({approve:"approved",reject:"rejected",disqualify:"disqualified",approved:"approved",rejected:"rejected",disqualified:"disqualified"})[status]; if(!Number.isSafeInteger(id)||id<1||!mapped)return res.status(400).json({error:"Invalid team review."}); const r=await pool.query(`UPDATE ft_tournament_teams SET status=$1,admin_note=$2,updated_at=NOW() WHERE id=$3 AND tournament_id=$4 RETURNING id::text AS id,captain_user_id,team_name,players,status,admin_note`,[mapped,note,id,Number.parseInt(req.params.id,10)]); if(!r.rowCount)return res.status(404).json({error:"Team not found."}); await pool.query(`INSERT INTO ft_notifications(recipient_id,actor_id,type,message) VALUES($1,$2,'tournament',$3)`,[r.rows[0].captain_user_id,String(req.user.id),`Your team ${r.rows[0].team_name} registration was ${mapped}. ${note}`]); res.json({team:r.rows[0]}); } catch(e){next(e);}
+});
+
+// Team registration listing for user-facing tournament detail pages.
+app.get("/api/tournament/tournaments/:id/teams", async (req,res,next)=>{
+  try { const id=Number.parseInt(req.params.id,10); if(!Number.isSafeInteger(id)||id<1)return res.status(400).json({error:"Invalid tournament ID."}); const r=await pool.query(`SELECT id::text AS id,team_name,players,status,created_at FROM ft_tournament_teams WHERE tournament_id=$1 AND status='approved' ORDER BY created_at`,[id]); res.json({teams:r.rows}); }
+  catch(e){next(e);}
+});
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found." });
