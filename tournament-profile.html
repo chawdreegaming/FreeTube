@@ -1,360 +1,975 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#11101c">
+<meta name="theme-color" content="#090b20">
 <title>Tournament Profile | BOYS VS GIRLS</title>
 
 <style>
-:root {
-  --bg:#0d0c16;
-  --panel:#171625;
-  --panel2:#201e32;
-  --border:#302d46;
-  --text:#f4f2ff;
-  --muted:#a5a1ba;
-  --blue:#3988ff;
-  --pink:#ed4d9a;
-  --green:#27cf91;
-  --red:#ff6175;
-  --gold:#ffc85a;
+:root{
+  --bg:#090b20;
+  --panel:#171832;
+  --border:#39366c;
+  --text:#f7f5ff;
+  --muted:#aaa9c7;
+  --blue:#398cff;
+  --pink:#ed3da5;
+  --green:#18d795;
+  --gold:#ffca55;
 }
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
-  background:var(--bg);
+  background:
+    radial-gradient(ellipse at 10% 0%,#381052 0%,transparent 38%),
+    radial-gradient(ellipse at 100% 30%,#102b61 0%,transparent 45%),
+    var(--bg);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
+
 button,input,select{font:inherit}
 button{cursor:pointer}
+
 .page{
   width:100%;
-  max-width:850px;
+  max-width:1100px;
   margin:auto;
-  padding:16px 14px 40px;
+  padding:12px;
 }
+
 .topbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:18px;
-}
-.brand{
-  font-weight:900;
-  font-size:17px;
-  letter-spacing:.3px;
-}
-.brand span:first-child{color:#56a0ff}
-.brand span:last-child{color:#ff6ab0}
-.back{
-  background:var(--panel2);
-  border:1px solid var(--border);
-  color:white;
+  gap:10px;
   padding:10px 14px;
-  border-radius:10px;
-}
-.card{
-  background:linear-gradient(145deg,#1b1930,#141321);
+  margin-bottom:12px;
+  background:linear-gradient(100deg,#17122e,#101c3d);
   border:1px solid var(--border);
-  border-radius:17px;
-  padding:18px;
-  margin-bottom:15px;
+  border-radius:14px;
 }
-.profile-head{
+
+.brand{
+  font-size:19px;
+  font-weight:900;
+}
+
+.brand span:first-child{color:#55a5ff}
+.brand span:last-child{color:#ff56bd}
+
+.top-actions{
+  display:flex;
+  gap:8px;
+}
+
+.icon-btn{
+  width:38px;
+  height:38px;
+  border:1px solid #4c477b;
+  border-radius:50%;
+  background:#211c40;
+  color:white;
+  font-size:18px;
+}
+
+.card{
+  background:linear-gradient(145deg,#211d43,#111831);
+  border:1px solid #454079;
+  border-radius:16px;
+  padding:13px;
+  margin-bottom:12px;
+  box-shadow:0 5px 18px #0004;
+}
+
+.profile-banner{
+  position:relative;
+  overflow:hidden;
   display:flex;
   align-items:center;
-  gap:15px;
+  gap:16px;
+  min-height:155px;
+  padding:17px;
+  background:
+    radial-gradient(circle at 85% 20%,#9b25b877,transparent 35%),
+    linear-gradient(110deg,#10255a,#25124c,#351044);
+  border-color:#a13fba;
 }
+
+.profile-banner:after{
+  content:"FREE FIRE";
+  position:absolute;
+  right:18px;
+  bottom:12px;
+  color:#ff55d0;
+  opacity:.16;
+  font-size:30px;
+  font-weight:900;
+  font-style:italic;
+  pointer-events:none;
+}
+
+.avatar-wrap{
+  position:relative;
+  flex-shrink:0;
+}
+
 .avatar{
-  width:76px;
-  height:76px;
-  border-radius:50%;
+  display:block;
+  width:100px;
+  height:100px;
   object-fit:cover;
-  border:3px solid var(--blue);
-  background:#29263d;
+  border-radius:50%;
+  border:3px solid #e94cff;
+  box-shadow:0 0 17px #d83fff;
+  background:#242347;
 }
+
+.verified-badge{
+  position:absolute;
+  right:-5px;
+  bottom:0;
+  background:#1689ff;
+  border:2px solid white;
+  width:27px;
+  height:27px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:14px;
+}
+
+.profile-info{
+  position:relative;
+  z-index:1;
+  min-width:0;
+}
+
 .name{
   font-size:21px;
-  font-weight:800;
+  font-weight:900;
   margin-bottom:5px;
+  overflow-wrap:anywhere;
 }
-.username{color:var(--muted);font-size:13px}
+
+.username{
+  color:#c1b9e5;
+  font-size:13px;
+}
+
+.player-tag{
+  display:inline-block;
+  margin-top:9px;
+  padding:5px 11px;
+  border:1px solid #b34bff;
+  border-radius:20px;
+  background:#7829a766;
+  font-size:11px;
+  font-weight:bold;
+}
+
+.social-linked{
+  margin-left:auto;
+  position:relative;
+  z-index:1;
+  padding:10px;
+  border:1px solid #8d65c7;
+  border-radius:12px;
+  background:#17143a;
+  font-size:11px;
+  text-align:center;
+}
+
+.social-linked strong{
+  display:block;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+
+.dashboard-grid .card{
+  margin:0;
+  min-width:0;
+}
+
 .section-title{
+  display:flex;
+  align-items:center;
+  gap:9px;
   font-size:16px;
   font-weight:800;
-  margin:0 0 15px;
+  margin:0 0 12px;
 }
-.section-title span{color:#65a7ff}
-.muted{color:var(--muted);font-size:13px;line-height:1.6}
-.field{margin-bottom:13px}
+
+.section-icon{
+  font-size:21px;
+}
+
+.section-title span{
+  color:#9e80ff;
+}
+
+.edit-btn{
+  margin-left:auto;
+  background:#302d50;
+  border:1px solid #5b5681;
+  color:white;
+  padding:6px 10px;
+  border-radius:9px;
+  font-size:11px;
+}
+
+.field{
+  margin-bottom:9px;
+}
+
 .field label{
   display:block;
   color:var(--muted);
-  font-size:12px;
-  margin-bottom:7px;
+  font-size:11px;
+  margin-bottom:5px;
 }
+
 .field input,.field select{
   width:100%;
-  padding:13px;
-  border-radius:10px;
-  border:1px solid var(--border);
-  background:#100f1b;
+  padding:11px;
+  border:1px solid #48446e;
+  border-radius:9px;
+  background:#10142b;
   color:white;
   outline:none;
+  font-size:13px;
 }
-.field input:focus,.field select:focus{border-color:var(--blue)}
+
+.field input:focus,.field select:focus{
+  border-color:var(--blue);
+}
+
 .btn{
   border:0;
   border-radius:10px;
-  padding:12px 16px;
+  padding:11px 13px;
   color:white;
   font-weight:800;
-  background:linear-gradient(100deg,#287aff,#7554ed);
+  font-size:12px;
+  background:linear-gradient(100deg,#287aff,#7850ed);
 }
-.btn-pink{background:linear-gradient(100deg,#e94391,#a747dc)}
-.btn-green{background:linear-gradient(100deg,#159b72,#27cf91)}
+
+.btn-green{
+  background:linear-gradient(100deg,#08a96c,#16d997);
+}
+
+.btn-pink{
+  background:linear-gradient(100deg,#e92b91,#b329d3);
+}
+
 .btn-outline{
-  background:transparent;
-  border:1px solid var(--border);
-  color:white;
+  background:#252344;
+  border:1px solid #514b80;
 }
-.btn:disabled{opacity:.55;cursor:not-allowed}
+
 .full{width:100%}
+
+.btn:disabled{
+  opacity:.55;
+  cursor:not-allowed;
+}
+
+/* Wallet */
+
 .wallet{
-  background:linear-gradient(120deg,#174b94,#492a83);
-  border:1px solid #4168b3;
+  background:
+    radial-gradient(circle at 10% 10%,#2277d755,transparent 40%),
+    linear-gradient(120deg,#123b79,#24205e,#431957);
+  border-color:#4776c8;
 }
-.wallet-label{color:#d4e3ff;font-size:13px}
+
+.wallet-label{
+  font-size:12px;
+  color:#d6e3ff;
+}
+
 .balance{
-  font-size:34px;
+  font-size:32px;
   font-weight:900;
-  margin:10px 0 17px;
+  color:#35efd0;
+  text-align:center;
+  margin:12px 0 15px;
 }
-.wallet-actions{display:flex;gap:10px}
-.wallet-actions button{flex:1}
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:11px;
-}
-.game{
-  display:block;
-  text-decoration:none;
-  color:white;
-  background:var(--panel2);
-  border:1px solid var(--border);
-  padding:17px 12px;
-  border-radius:13px;
-  transition:.2s;
-}
-.game:hover{border-color:var(--blue);transform:translateY(-2px)}
-.game-icon{font-size:27px;margin-bottom:9px}
-.game strong{display:block;font-size:14px}
-.game small{color:var(--muted);display:block;margin-top:5px}
-.list-item{
-  padding:12px 0;
-  border-bottom:1px solid var(--border);
+
+.wallet-actions{
   display:flex;
-  justify-content:space-between;
-  gap:12px;
-  font-size:13px;
+  gap:9px;
 }
-.list-item:last-child{border-bottom:0}
+
+.wallet-actions button{
+  flex:1;
+  padding:12px 5px;
+}
+
+.wallet-note{
+  color:#cbd3f2;
+  font-size:10px;
+  margin:10px 0 0;
+  text-align:center;
+}
+
+/* History */
+
+.history-card{
+  margin-top:12px;
+}
+
+.history-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+
+.view-all{
+  color:#8ebcff;
+  font-size:12px;
+  text-decoration:none;
+  white-space:nowrap;
+}
+
+.history-list{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.list-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:9px;
+  background:#121832;
+  border:1px solid #383b68;
+  border-radius:11px;
+  font-size:12px;
+  min-width:0;
+}
+
+.item-left{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+
+.transaction-icon{
+  width:32px;
+  height:32px;
+  flex-shrink:0;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:17px;
+  background:#087c58;
+}
+
+.transaction-icon.withdraw{
+  background:#9b236b;
+}
+
+.item-info{
+  min-width:0;
+}
+
+.item-info strong{
+  display:block;
+  font-size:12px;
+}
+
+.item-info small{
+  display:block;
+  font-size:10px;
+  color:var(--muted);
+  margin-top:3px;
+  overflow-wrap:anywhere;
+}
+
+.item-right{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-shrink:0;
+}
+
+.amount{
+  font-size:12px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
 .status{
   display:inline-block;
-  padding:5px 9px;
-  border-radius:20px;
-  font-size:11px;
-  background:#343047;
-  color:#ddd7f7;
+  padding:4px 7px;
+  border-radius:15px;
+  font-size:9px;
+  white-space:nowrap;
+  background:#39344f;
+  color:#eee;
 }
-.status.approved,.status.verified{background:#123e32;color:#5ff0b8}
-.status.pending{background:#493a1b;color:#ffd879}
-.status.rejected{background:#4a202b;color:#ff8294}
+
+.status.approved,.status.verified{
+  background:#104b39;
+  color:#65ffc2;
+}
+
+.status.pending{
+  background:#493817;
+  color:#ffdb77;
+}
+
+.status.rejected{
+  background:#50202d;
+  color:#ff8c9e;
+}
+
 .empty{
   text-align:center;
-  padding:20px 10px;
+  padding:18px 8px;
   color:var(--muted);
-  font-size:13px;
+  font-size:12px;
 }
+
+/* Game History */
+
+.game-history-item{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  align-items:center;
+  gap:10px;
+}
+
+.game-history-item .prize{
+  color:var(--gold);
+  font-weight:900;
+}
+
+/* Game Selection */
+
+.games-section{
+  margin-top:12px;
+}
+
+.games-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+
+.game{
+  overflow:hidden;
+  border:1px solid #6252a5;
+  border-radius:17px;
+  background:linear-gradient(145deg,#102d69,#32164d,#151b42);
+  color:white;
+  text-decoration:none;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  transition:.2s;
+}
+
+.game:nth-child(2){
+  background:linear-gradient(145deg,#18215b,#571b5c,#251643);
+  border-color:#bc4cb4;
+}
+
+.game:nth-child(3){
+  background:linear-gradient(145deg,#183f6b,#47234f,#19234e);
+  border-color:#36c2e7;
+}
+
+.game-art{
+  min-height:115px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:7px;
+  background:radial-gradient(circle,#9d4fff66,transparent 65%);
+  padding:10px;
+}
+
+.game-art .big-icon{
+  font-size:48px;
+  filter:drop-shadow(0 5px 8px #0009);
+}
+
+.game-art strong{
+  font-size:18px;
+  font-style:italic;
+  text-align:center;
+  text-shadow:0 3px 5px #000;
+}
+
+.game-content{
+  padding:11px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+}
+
+.game-content p{
+  font-size:11px;
+  line-height:1.5;
+  color:#e1ddf7;
+  margin:0 0 12px;
+  flex:1;
+}
+
+.game-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:5px;
+}
+
+.game-tag{
+  border:1px solid #ffc95d;
+  color:#ffdc87;
+  border-radius:20px;
+  padding:5px 7px;
+  font-size:9px;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+.play-btn{
+  border:0;
+  border-radius:20px;
+  padding:7px 11px;
+  background:linear-gradient(100deg,#08caff,#c42cff);
+  color:white;
+  font-weight:900;
+  font-size:11px;
+  white-space:nowrap;
+}
+
+/* Modal */
+
 .modal{
   display:none;
   position:fixed;
   inset:0;
-  background:#000b;
+  background:#000c;
   z-index:50;
   align-items:center;
   justify-content:center;
-  padding:16px;
+  padding:15px;
 }
+
 .modal.show{display:flex}
+
 .modal-box{
   width:100%;
   max-width:430px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:17px;
-  padding:20px;
   max-height:90vh;
   overflow:auto;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(145deg,#211d43,#111831);
+  border:1px solid #62549a;
 }
+
 .modal-head{
   display:flex;
-  justify-content:space-between;
   align-items:center;
-  margin-bottom:18px;
+  justify-content:space-between;
+  margin-bottom:15px;
 }
+
+.modal-head h3{
+  margin:0;
+  font-size:17px;
+}
+
 .close{
-  background:#302d42;
-  color:white;
+  width:33px;
+  height:33px;
   border:0;
   border-radius:8px;
-  width:34px;
-  height:34px;
+  background:#34304f;
+  color:white;
 }
+
 .notice{
-  background:#242139;
-  border:1px solid var(--border);
+  background:#25213e;
+  border:1px solid #49436f;
   padding:11px;
   border-radius:10px;
+  font-size:11px;
+  line-height:1.5;
   color:var(--muted);
-  font-size:12px;
-  line-height:1.6;
   margin-bottom:13px;
 }
+
 #message{
   display:none;
-  padding:12px;
+  padding:11px;
   border-radius:10px;
-  margin-bottom:14px;
-  font-size:13px;
+  margin-bottom:12px;
+  font-size:12px;
 }
+
 #message.show{display:block}
 #message.error{background:#49212d;color:#ff9aaa}
 #message.success{background:#123e32;color:#72f0bd}
-.loading{opacity:.6;pointer-events:none}
-@media(max-width:420px){
-  .page{padding:12px}
-  .card{padding:15px}
-  .balance{font-size:29px}
+
+@media(max-width:600px){
+
+  .page{padding:9px}
+
+  .topbar{padding:9px}
+
+  .brand{font-size:16px}
+
+  .profile-banner{
+    min-height:125px;
+    padding:12px;
+    gap:11px;
+  }
+
+  .avatar{
+    width:78px;
+    height:78px;
+  }
+
+  .name{font-size:18px}
+
+  .social-linked{
+    max-width:115px;
+    padding:7px;
+    font-size:9px;
+  }
+
+  .social-linked strong{font-size:10px}
+
+  .dashboard-grid{gap:8px}
+
+  .dashboard-grid .card{padding:10px}
+
+  .section-title{font-size:13px;gap:5px}
+
+  .balance{font-size:25px}
+
+  .btn{font-size:10px;padding:10px 5px}
+
+  .list-item{padding:8px 6px;gap:5px}
+
+  .item-right{gap:4px}
+
+  .amount{font-size:10px}
+
+  .status{font-size:8px;padding:4px 5px}
+
+  .games-grid{gap:7px}
+
+  .game-art{min-height:85px;padding:6px}
+
+  .game-art .big-icon{font-size:34px}
+
+  .game-art strong{font-size:12px}
+
+  .game-content{padding:8px 6px}
+
+  .game-content p{font-size:9px}
+
+  .game-tag{font-size:8px;padding:4px 5px}
+
+  .play-btn{font-size:9px;padding:6px 7px}
+}
+
+@media(max-width:370px){
+
+  .social-linked{display:none}
+
+  .dashboard-grid{grid-template-columns:1fr}
+
+  .games-grid{gap:5px}
+
+  .game-tag{font-size:7px}
+
+  .play-btn{font-size:8px}
 }
 </style>
 </head>
 
 <body>
+
 <div class="page">
 
-  <div class="topbar">
-    <div class="brand"><span>BOYS</span> VS <span>GIRLS 💗</span></div>
-    <button class="back" onclick="history.back()">← Back</button>
-  </div>
+  <!-- TOP BAR -->
+  <header class="topbar">
+    <div class="brand">
+      <span>BOYS</span> VS <span>GIRLS 💙💗</span>
+    </div>
+
+    <div class="top-actions">
+      <button class="icon-btn" aria-label="Notifications">♧</button>
+      <button class="icon-btn" aria-label="Settings">⚙</button>
+    </div>
+  </header>
 
   <div id="message"></div>
 
-  <!-- SOCIAL PROFILE -->
-  <section class="card">
-    <div class="profile-head">
-      <img id="avatar" class="avatar" src="" alt="Profile">
-      <div>
-        <div class="name" id="userName">Loading...</div>
-        <div class="username" id="userUsername">@username</div>
-        <div class="muted" style="margin-top:7px">Tournament Player</div>
+  <!-- PROFILE BANNER -->
+  <section class="card profile-banner">
+
+    <div class="avatar-wrap">
+      <img id="avatar" class="avatar"
+        src="https://placehold.co/150x150/201e32/ffffff?text=Player"
+        alt="Profile">
+
+      <div class="verified-badge">✓</div>
+    </div>
+
+    <div class="profile-info">
+      <div class="name" id="userName">Loading...</div>
+      <div class="username" id="userUsername">@username</div>
+
+      <div class="player-tag">🎮 Tournament Player</div>
+    </div>
+
+    <div class="social-linked">
+      <strong>🔗 Linked with Social App 🟢</strong>
+      Boys vs Girls Account
+    </div>
+
+  </section>
+
+  <!-- PROFILE AND WALLET -->
+  <div class="dashboard-grid">
+
+    <!-- FREE FIRE DETAILS -->
+    <section class="card">
+
+      <h2 class="section-title">
+        <span class="section-icon">🎮</span>
+        Free Fire Details
+
+        <button class="edit-btn"
+          onclick="toggleProfileEdit()">✎ Edit</button>
+      </h2>
+
+      <div class="field">
+        <label>Game Name</label>
+        <input id="gameName"
+          type="text"
+          maxlength="40"
+          placeholder="Enter Game Name"
+          readonly>
       </div>
-    </div>
-  </section>
 
-  <!-- FREE FIRE DETAILS -->
-  <section class="card">
-    <h2 class="section-title"><span>01.</span> Free Fire Details</h2>
-    <div class="field">
-      <label>Free Fire Game Name (IGN)</label>
-      <input id="gameName" type="text" maxlength="40" placeholder="Enter your Free Fire name">
-    </div>
-    <div class="field">
-      <label>Free Fire UID</label>
-      <input id="gameUid" type="text" inputmode="numeric" maxlength="30" placeholder="Enter your Free Fire UID">
-    </div>
-    <button class="btn full" id="saveProfileBtn" onclick="saveGameProfile()">Save Free Fire Details</button>
-  </section>
+      <div class="field">
+        <label>Game UID</label>
+        <input id="gameUid"
+          type="text"
+          maxlength="30"
+          placeholder="Enter Game UID"
+          readonly>
+      </div>
 
-  <!-- TOURNAMENT WALLET -->
-  <section class="card wallet">
-    <div class="wallet-label">TOURNAMENT WALLET BALANCE</div>
-    <div class="balance" id="walletBalance">৳ 0.00</div>
-    <div class="wallet-actions">
-      <button class="btn btn-green" onclick="openModal('depositModal')">＋ Deposit</button>
-      <button class="btn btn-pink" onclick="openModal('withdrawModal')">↗ Withdraw</button>
-    </div>
-    <p class="muted" style="color:#d4d9ff;margin:13px 0 0">
-      This wallet is separate from your Social App Wallet.
-    </p>
-  </section>
+      <button class="btn full"
+        id="saveProfileBtn"
+        style="display:none"
+        onclick="saveGameProfile()">
+        Save Changes
+      </button>
+
+    </section>
+
+    <!-- WALLET -->
+    <section class="card wallet">
+
+      <h2 class="section-title">
+        <span class="section-icon">👛</span>
+        Tournament Wallet
+      </h2>
+
+      <div class="balance" id="walletBalance">
+        ৳ 0.00
+      </div>
+
+      <div class="wallet-actions">
+        <button class="btn btn-green"
+          onclick="openModal('depositModal')">
+          ↓ Deposit
+        </button>
+
+        <button class="btn btn-pink"
+          onclick="openModal('withdrawModal')">
+          ↑ Withdraw
+        </button>
+      </div>
+
+      <p class="wallet-note">
+        Separate from your Social App Wallet
+      </p>
+
+    </section>
+
+  </div>
 
   <!-- TRANSACTION HISTORY -->
-  <section class="card">
-    <h2 class="section-title"><span>02.</span> Transaction History</h2>
-    <div id="transactions">
+  <section class="card history-card">
+
+    <div class="history-header">
+      <h2 class="section-title">
+        <span class="section-icon">📋</span>
+        Transaction History
+      </h2>
+
+      <a class="view-all" href="transaction-history.html">
+        View All ❯
+      </a>
+    </div>
+
+    <div id="transactions" class="history-list">
       <div class="empty">Loading transactions...</div>
     </div>
-    <a href="transaction-history.html" class="btn btn-outline full"
-       style="display:block;text-align:center;text-decoration:none;margin-top:12px">
-      View All Transactions
-    </a>
+
   </section>
 
   <!-- GAME HISTORY -->
-  <section class="card">
-    <h2 class="section-title"><span>03.</span> Verified Game History</h2>
-    <div id="gameHistory">
+  <section class="card history-card">
+
+    <div class="history-header">
+      <h2 class="section-title">
+        <span class="section-icon">🏆</span>
+        Game History
+      </h2>
+
+      <a class="view-all" href="game-history.html">
+        View All ❯
+      </a>
+    </div>
+
+    <div id="gameHistory" class="history-list">
       <div class="empty">Loading game history...</div>
     </div>
-    <a href="game-history.html" class="btn btn-outline full"
-       style="display:block;text-align:center;text-decoration:none;margin-top:12px">
-      View All Game History
-    </a>
+
   </section>
 
   <!-- GAME SELECTION -->
-  <section class="card">
-    <h2 class="section-title"><span>04.</span> Tournament Games</h2>
-    <div class="grid">
-      <a class="game" href="br-match.html">
-        <div class="game-icon">🎯</div>
-        <strong>BR MATCH</strong>
-        <small>Solo • Duo • Squad</small>
-      </a>
-      <a class="game" href="clash-squad.html">
-        <div class="game-icon">⚔️</div>
-        <strong>CLASH SQUAD</strong>
-        <small>4 vs 4 Battle</small>
-      </a>
-      <a class="game" href="free-fire-cup.html" style="grid-column:1/-1">
-        <div class="game-icon">🏆</div>
-        <strong>FREE FIRE WORLD CUP</strong>
-        <small>Team Knockout Tournament</small>
-      </a>
+  <section class="card games-section">
+
+    <div class="history-header">
+      <h2 class="section-title">
+        <span class="section-icon">🎮</span>
+        Choose Your Game
+      </h2>
+
+      <span class="view-all">SELECT MODE</span>
     </div>
+
+    <div class="games-grid">
+
+      <!-- BR MATCH -->
+      <a class="game" href="br-match.html">
+
+        <div class="game-art">
+          <div class="big-icon">🎯</div>
+          <strong>BR MATCH</strong>
+        </div>
+
+        <div class="game-content">
+          <p>Solo, Duo & Squad battle tournaments.</p>
+
+          <div class="game-bottom">
+            <span class="game-tag">FREE & PAID</span>
+            <button class="play-btn">PLAY ➜</button>
+          </div>
+        </div>
+
+      </a>
+
+      <!-- CLASH SQUAD -->
+      <a class="game" href="clash-squad.html">
+
+        <div class="game-art">
+          <div class="big-icon">⚔️</div>
+          <strong>CLASH SQUAD</strong>
+        </div>
+
+        <div class="game-content">
+          <p>Fast 4 vs 4 team battle competition.</p>
+
+          <div class="game-bottom">
+            <span class="game-tag">4 VS 4</span>
+            <button class="play-btn">PLAY ➜</button>
+          </div>
+        </div>
+
+      </a>
+
+      <!-- WORLD CUP -->
+      <a class="game" href="free-fire-cup.html">
+
+        <div class="game-art">
+          <div class="big-icon">🏆</div>
+          <strong>WORLD CUP</strong>
+        </div>
+
+        <div class="game-content">
+          <p>Team knockout championship. Round 1, Round 2, Super 8, Semi Final & Grand Final.</p>
+
+          <div class="game-bottom">
+            <span class="game-tag">TEAM TOURNAMENT</span>
+            <button class="play-btn">PLAY ➜</button>
+          </div>
+        </div>
+
+      </a>
+
+    </div>
+
   </section>
 
 </div>
 
 <!-- DEPOSIT MODAL -->
 <div class="modal" id="depositModal">
+
   <div class="modal-box">
+
     <div class="modal-head">
-      <h3 style="margin:0">Deposit Request</h3>
-      <button class="close" onclick="closeModal('depositModal')">✕</button>
+      <h3>Deposit Request</h3>
+      <button class="close"
+        onclick="closeModal('depositModal')">✕</button>
     </div>
+
     <div class="notice">
       Submit your payment details. Admin will verify your transaction before adding funds to your Tournament Wallet.
     </div>
+
     <form id="depositForm">
+
       <div class="field">
         <label>Deposit Amount</label>
-        <input id="depositAmount" type="number" min="1" step="0.01" required placeholder="Enter amount">
+        <input id="depositAmount"
+          type="number"
+          min="1"
+          step="0.01"
+          required
+          placeholder="Enter amount">
       </div>
+
       <div class="field">
         <label>Payment Method</label>
         <select id="depositMethod" required>
@@ -367,30 +982,52 @@ button{cursor:pointer}
           <option value="Other">Other</option>
         </select>
       </div>
+
       <div class="field">
         <label>Transaction ID / Reference</label>
-        <input id="depositReference" type="text" maxlength="120" required placeholder="Enter transaction reference">
+        <input id="depositReference"
+          type="text"
+          maxlength="120"
+          required
+          placeholder="Enter transaction reference">
       </div>
-      <button class="btn btn-green full" id="depositSubmit">Submit Deposit Request</button>
+
+      <button class="btn btn-green full"
+        id="depositSubmit">
+        Submit Deposit Request
+      </button>
+
     </form>
   </div>
 </div>
 
 <!-- WITHDRAW MODAL -->
 <div class="modal" id="withdrawModal">
+
   <div class="modal-box">
+
     <div class="modal-head">
-      <h3 style="margin:0">Withdraw Request</h3>
-      <button class="close" onclick="closeModal('withdrawModal')">✕</button>
+      <h3>Withdraw Request</h3>
+      <button class="close"
+        onclick="closeModal('withdrawModal')">✕</button>
     </div>
+
     <div class="notice">
       Withdrawals require Admin approval. Never enter your PIN, password, OTP or card details.
     </div>
+
     <form id="withdrawForm">
+
       <div class="field">
         <label>Withdraw Amount</label>
-        <input id="withdrawAmount" type="number" min="1" step="0.01" required placeholder="Enter amount">
+        <input id="withdrawAmount"
+          type="number"
+          min="1"
+          step="0.01"
+          required
+          placeholder="Enter amount">
       </div>
+
       <div class="field">
         <label>Payment Method</label>
         <select id="withdrawMethod" required>
@@ -403,11 +1040,21 @@ button{cursor:pointer}
           <option value="Other">Other</option>
         </select>
       </div>
+
       <div class="field">
         <label>Payment Account / Wallet Address</label>
-        <input id="withdrawAccount" type="text" maxlength="160" required placeholder="Enter your receiving account">
+        <input id="withdrawAccount"
+          type="text"
+          maxlength="160"
+          required
+          placeholder="Enter receiving account">
       </div>
-      <button class="btn btn-pink full" id="withdrawSubmit">Submit Withdraw Request</button>
+
+      <button class="btn btn-pink full"
+        id="withdrawSubmit">
+        Submit Withdraw Request
+      </button>
+
     </form>
   </div>
 </div>
@@ -415,38 +1062,64 @@ button{cursor:pointer}
 <script>
 "use strict";
 
-const API_BASE_URL = "https://freetube-backend-a222.onrender.com/api";
+/* API CONFIGURATION */
+
+const API_BASE_URL =
+  "https://freetube-backend-a222.onrender.com/api";
+
 const TOKEN_KEY = "freetube_access_token";
 
 let currentUser = null;
+
+/* TOKEN */
 
 function getToken(){
   return sessionStorage.getItem(TOKEN_KEY) ||
          localStorage.getItem(TOKEN_KEY) || "";
 }
 
+/* MESSAGE */
+
 function showMessage(message,type="success"){
   const box=document.getElementById("message");
+
   box.textContent=message;
   box.className="show "+type;
-  window.scrollTo({top:0,behavior:"smooth"});
-  setTimeout(()=>box.classList.remove("show"),5000);
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+  setTimeout(()=>{
+    box.classList.remove("show");
+  },5000);
 }
+
+/* API RESPONSE */
 
 function unwrap(data){
   if(!data || typeof data!=="object") return {};
+
   return data.data && typeof data.data==="object"
     ? {...data,...data.data}
     : data;
 }
 
+/* API REQUEST */
+
 async function apiRequest(path,options={}){
+
   const token=getToken();
+
   const headers={
     "Content-Type":"application/json",
     ...(options.headers||{})
   };
-  if(token) headers.Authorization="Bearer "+token;
+
+  if(token){
+    headers.Authorization="Bearer "+token;
+  }
 
   const response=await fetch(API_BASE_URL+path,{
     ...options,
@@ -455,291 +1128,651 @@ async function apiRequest(path,options={}){
     cache:"no-store"
   });
 
-  const text=await response.text();
+  const responseText=await response.text();
+
   let data={};
-  try{data=text?JSON.parse(text):{}}
-  catch{data={message:text}}
+
+  try{
+    data=responseText?JSON.parse(responseText):{};
+  }catch{
+    data={message:responseText};
+  }
 
   if(response.status===401){
-    showMessage("Your session has expired. Please log in again.","error");
+    showMessage(
+      "Your session has expired. Please log in again.",
+      "error"
+    );
+
     throw new Error("Unauthorized");
   }
 
   if(!response.ok){
-    throw new Error(data.message||data.error||"Request failed");
+    throw new Error(
+      data.message ||
+      data.error ||
+      "Request failed"
+    );
   }
+
   return unwrap(data);
 }
 
+/* MONEY */
+
 function money(value){
+
   const amount=Number(value||0);
+
   return "৳ "+amount.toLocaleString("en-BD",{
     minimumFractionDigits:2,
     maximumFractionDigits:2
   });
 }
 
+/* ARRAY */
+
 function getArray(data,...keys){
+
   for(const key of keys){
-    if(Array.isArray(data[key])) return data[key];
+    if(Array.isArray(data[key])){
+      return data[key];
+    }
   }
+
   return [];
 }
 
+/* HTML ESCAPE */
+
 function escapeHTML(value){
+
   return String(value??"").replace(/[&<>"']/g,char=>({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
   })[char]);
 }
 
+/* STATUS */
+
 function statusClass(status){
+
   const value=String(status||"pending").toLowerCase();
-  if(["approved","verified","completed","success"].includes(value)) return "approved";
-  if(["rejected","failed","cancelled"].includes(value)) return "rejected";
+
+  if([
+    "approved",
+    "verified",
+    "completed",
+    "success"
+  ].includes(value)){
+    return "approved";
+  }
+
+  if([
+    "rejected",
+    "failed",
+    "cancelled"
+  ].includes(value)){
+    return "rejected";
+  }
+
   return "pending";
 }
+
+/* MODAL */
 
 function openModal(id){
   document.getElementById(id).classList.add("show");
 }
+
 function closeModal(id){
   document.getElementById(id).classList.remove("show");
 }
 
+/* PROFILE EDIT */
+
+function toggleProfileEdit(){
+
+  const gameName=document.getElementById("gameName");
+  const gameUid=document.getElementById("gameUid");
+  const button=document.getElementById("saveProfileBtn");
+
+  const editing=!gameName.readOnly;
+
+  gameName.readOnly=editing;
+  gameUid.readOnly=editing;
+
+  button.style.display=editing?"none":"block";
+
+  if(!editing){
+    gameName.focus();
+  }
+}
+
+/* SOCIAL PROFILE */
+
 async function loadSocialProfile(){
+
   const data=await apiRequest("/auth/me");
+
   currentUser=data.user||data.profile||data;
+
   const user=currentUser;
 
   document.getElementById("userName").textContent=
-    user.full_name||user.name||user.username||"Player";
+    user.full_name||
+    user.name||
+    user.username||
+    "Player";
 
   document.getElementById("userUsername").textContent=
     "@"+(user.username||"");
 
   document.getElementById("avatar").src=
-    user.avatar_url||user.profile_picture||user.avatar||
+    user.avatar_url||
+    user.profile_picture||
+    user.avatar||
     "https://placehold.co/150x150/201e32/ffffff?text=Player";
 
   if(user.username){
+
     try{
+
       const profile=await apiRequest(
         "/profile/"+encodeURIComponent(user.username)
       );
+
       const p=profile.profile||profile.user||profile;
+
       document.getElementById("userName").textContent=
-        p.full_name||p.name||p.username||user.username;
+        p.full_name||
+        p.name||
+        p.username||
+        user.username;
+
       document.getElementById("avatar").src=
-        p.avatar_url||p.profile_picture||p.avatar||
+        p.avatar_url||
+        p.profile_picture||
+        p.avatar||
         document.getElementById("avatar").src;
+
     }catch(error){
-      console.warn("Social profile details:",error.message);
+
+      console.warn(
+        "Social profile details:",
+        error.message
+      );
     }
   }
 }
 
+/* FREE FIRE PROFILE */
+
 async function loadGameProfile(){
+
   const data=await apiRequest("/tournament/profile");
-  const profile=data.profile||data.tournamentProfile||data;
+
+  const profile=
+    data.profile||
+    data.tournamentProfile||
+    data;
+
   document.getElementById("gameName").value=
-    profile.game_name||profile.gameName||profile.ign||"";
+    profile.game_name||
+    profile.gameName||
+    profile.ign||
+    "";
+
   document.getElementById("gameUid").value=
-    profile.game_uid||profile.gameUid||profile.uid||"";
+    profile.game_uid||
+    profile.gameUid||
+    profile.uid||
+    "";
 }
 
+/* SAVE PROFILE */
+
 async function saveGameProfile(){
-  const gameName=document.getElementById("gameName").value.trim();
-  const gameUid=document.getElementById("gameUid").value.trim();
+
+  const gameName=
+    document.getElementById("gameName").value.trim();
+
+  const gameUid=
+    document.getElementById("gameUid").value.trim();
 
   if(!gameName||!gameUid){
-    showMessage("Please enter your Free Fire Game Name and UID.","error");
+
+    showMessage(
+      "Please enter your Free Fire Game Name and UID.",
+      "error"
+    );
+
     return;
   }
 
-  const button=document.getElementById("saveProfileBtn");
+  const button=
+    document.getElementById("saveProfileBtn");
+
   button.disabled=true;
   button.textContent="Saving...";
 
   try{
+
     await apiRequest("/tournament/profile",{
       method:"PUT",
+
       body:JSON.stringify({
         game_name:gameName,
         game_uid:gameUid
       })
     });
-    showMessage("Free Fire details saved successfully.");
+
+    document.getElementById("gameName").readOnly=true;
+    document.getElementById("gameUid").readOnly=true;
+
+    button.style.display="none";
+
+    showMessage(
+      "Free Fire details saved successfully."
+    );
+
   }catch(error){
+
     showMessage(error.message,"error");
+
   }finally{
+
     button.disabled=false;
-    button.textContent="Save Free Fire Details";
+    button.textContent="Save Changes";
   }
 }
+
+/* WALLET */
 
 async function loadWallet(){
+
   const data=await apiRequest("/tournament/wallet");
+
   const wallet=data.wallet||data;
-  const balance=wallet.balance??wallet.available_balance??wallet.amount??0;
-  document.getElementById("walletBalance").textContent=money(balance);
+
+  const balance=
+    wallet.balance??
+    wallet.available_balance??
+    wallet.amount??
+    0;
+
+  document.getElementById("walletBalance").textContent=
+    money(balance);
 }
+
+/* TRANSACTION HISTORY */
 
 async function loadTransactions(){
-  const data=await apiRequest("/tournament/transactions");
-  const rows=getArray(data,"transactions","items","history");
-  const container=document.getElementById("transactions");
+
+  const data=await apiRequest(
+    "/tournament/transactions"
+  );
+
+  const rows=getArray(
+    data,
+    "transactions",
+    "items",
+    "history"
+  );
+
+  const container=
+    document.getElementById("transactions");
 
   if(!rows.length){
-    container.innerHTML='<div class="empty">No transactions found.</div>';
+
+    container.innerHTML=
+      '<div class="empty">No transactions found.</div>';
+
     return;
   }
 
   container.innerHTML=rows.slice(0,5).map(item=>{
-    const type=escapeHTML(item.type||item.transaction_type||"Transaction");
+
+    const rawType=String(
+      item.type||
+      item.transaction_type||
+      "Transaction"
+    );
+
+    const isWithdraw=
+      rawType.toLowerCase().includes("withdraw");
+
+    const type=escapeHTML(rawType);
+
     const status=item.status||"pending";
+
     const amount=money(item.amount);
-    const date=item.created_at||item.createdAt||item.date||"";
+
+    const date=
+      item.created_at||
+      item.createdAt||
+      item.date||
+      "";
+
+    const reference=
+      item.transaction_id||
+      item.reference||
+      item.transaction_reference||
+      item.id||
+      "";
+
     return `
       <div class="list-item">
-        <div>
-          <strong>${type}</strong>
-          <div class="muted">${escapeHTML(item.method||item.payment_method||"")} ${date?"• "+escapeHTML(date):""}</div>
-          <span class="status ${statusClass(status)}">${escapeHTML(status)}</span>
+
+        <div class="item-left">
+
+          <div class="transaction-icon ${isWithdraw?"withdraw":""}">
+            ${isWithdraw?"↑":"↓"}
+          </div>
+
+          <div class="item-info">
+            <strong>${type}</strong>
+
+            <small>
+              ${reference?"TRX: "+escapeHTML(reference)+" • ":""}
+              ${escapeHTML(item.method||item.payment_method||"")}
+              ${date?" • "+escapeHTML(date):""}
+            </small>
+          </div>
+
         </div>
-        <strong>${amount}</strong>
-      </div>`;
+
+        <div class="item-right">
+
+          <strong class="amount">${amount}</strong>
+
+          <span class="status ${statusClass(status)}">
+            ${escapeHTML(status)}
+          </span>
+
+        </div>
+
+      </div>
+    `;
+
   }).join("");
 }
+
+/* GAME HISTORY */
 
 async function loadGameHistory(){
-  const data=await apiRequest("/tournament/game-history");
-  const rows=getArray(data,"history","game_history","items");
-  const container=document.getElementById("gameHistory");
+
+  const data=await apiRequest(
+    "/tournament/game-history"
+  );
+
+  const rows=getArray(
+    data,
+    "history",
+    "game_history",
+    "items"
+  );
+
+  const container=
+    document.getElementById("gameHistory");
 
   if(!rows.length){
-    container.innerHTML='<div class="empty">No verified game history yet.</div>';
+
+    container.innerHTML=
+      '<div class="empty">No verified game history yet.</div>';
+
     return;
   }
 
   container.innerHTML=rows.slice(0,5).map(item=>{
-    const title=item.tournament_name||item.game_name||
-      item.title||"Tournament Match";
-    const result=item.result||item.position||item.status||"Verified";
-    const prize=Number(item.prize_amount??item.prize??0);
-    const date=item.created_at||item.match_date||item.date||"";
+
+    const title=
+      item.tournament_name||
+      item.game_name||
+      item.title||
+      "Tournament Match";
+
+    const result=
+      item.result||
+      item.position||
+      item.status||
+      "Verified";
+
+    const prize=Number(
+      item.prize_amount??
+      item.prize??
+      0
+    );
+
+    const date=
+      item.created_at||
+      item.match_date||
+      item.date||
+      "";
+
     return `
-      <div class="list-item">
-        <div>
+      <div class="list-item game-history-item">
+
+        <div class="item-info">
           <strong>${escapeHTML(title)}</strong>
-          <div class="muted">${escapeHTML(date)}</div>
-          <span class="status verified">${escapeHTML(result)}</span>
+          <small>${escapeHTML(date)}</small>
+          <span class="status verified">
+            ${escapeHTML(result)}
+          </span>
         </div>
-        <strong style="color:var(--green)">${money(prize)}</strong>
-      </div>`;
+
+        <div class="item-info">
+          <small>Prize</small>
+          <strong class="prize">${money(prize)}</strong>
+        </div>
+
+      </div>
+    `;
+
   }).join("");
 }
 
-document.getElementById("depositForm").addEventListener("submit",async event=>{
+/* DEPOSIT FORM */
+
+document.getElementById("depositForm")
+.addEventListener("submit",async event=>{
+
   event.preventDefault();
 
-  const amount=Number(document.getElementById("depositAmount").value);
-  const method=document.getElementById("depositMethod").value;
-  const reference=document.getElementById("depositReference").value.trim();
+  const amount=Number(
+    document.getElementById("depositAmount").value
+  );
+
+  const method=
+    document.getElementById("depositMethod").value;
+
+  const reference=
+    document.getElementById("depositReference").value.trim();
 
   if(!Number.isFinite(amount)||amount<=0||!method||!reference){
-    showMessage("Please enter valid deposit details.","error");
+
+    showMessage(
+      "Please enter valid deposit details.",
+      "error"
+    );
+
     return;
   }
 
-  const button=document.getElementById("depositSubmit");
+  const button=
+    document.getElementById("depositSubmit");
+
   button.disabled=true;
   button.textContent="Submitting...";
 
   try{
+
     await apiRequest("/tournament/deposits",{
+
       method:"POST",
+
       body:JSON.stringify({
         amount,
         method,
         reference,
         transaction_reference:reference
       })
+
     });
+
     closeModal("depositModal");
+
     event.target.reset();
-    showMessage("Deposit request submitted. Waiting for Admin verification.");
-    await Promise.allSettled([loadTransactions(),loadWallet()]);
+
+    showMessage(
+      "Deposit request submitted. Waiting for Admin verification."
+    );
+
+    await Promise.allSettled([
+      loadTransactions(),
+      loadWallet()
+    ]);
+
   }catch(error){
+
     showMessage(error.message,"error");
+
   }finally{
+
     button.disabled=false;
     button.textContent="Submit Deposit Request";
   }
 });
 
-document.getElementById("withdrawForm").addEventListener("submit",async event=>{
+/* WITHDRAW FORM */
+
+document.getElementById("withdrawForm")
+.addEventListener("submit",async event=>{
+
   event.preventDefault();
 
-  const amount=Number(document.getElementById("withdrawAmount").value);
-  const method=document.getElementById("withdrawMethod").value;
-  const account=document.getElementById("withdrawAccount").value.trim();
+  const amount=Number(
+    document.getElementById("withdrawAmount").value
+  );
+
+  const method=
+    document.getElementById("withdrawMethod").value;
+
+  const account=
+    document.getElementById("withdrawAccount").value.trim();
 
   if(!Number.isFinite(amount)||amount<=0||!method||!account){
-    showMessage("Please enter valid withdrawal details.","error");
+
+    showMessage(
+      "Please enter valid withdrawal details.",
+      "error"
+    );
+
     return;
   }
 
-  const button=document.getElementById("withdrawSubmit");
+  const button=
+    document.getElementById("withdrawSubmit");
+
   button.disabled=true;
   button.textContent="Submitting...";
 
   try{
+
     await apiRequest("/tournament/withdrawals",{
+
       method:"POST",
+
       body:JSON.stringify({
         amount,
         method,
         account,
         account_details:account
       })
+
     });
+
     closeModal("withdrawModal");
+
     event.target.reset();
-    showMessage("Withdrawal request submitted. Waiting for Admin approval.");
-    await Promise.allSettled([loadTransactions(),loadWallet()]);
+
+    showMessage(
+      "Withdrawal request submitted. Waiting for Admin approval."
+    );
+
+    await Promise.allSettled([
+      loadTransactions(),
+      loadWallet()
+    ]);
+
   }catch(error){
+
     showMessage(error.message,"error");
+
   }finally{
+
     button.disabled=false;
     button.textContent="Submit Withdraw Request";
   }
 });
 
+/* INITIALIZE */
+
 async function initializePage(){
+
   if(!getToken()){
-    showMessage("Please log in to access your Tournament Profile.","error");
+
+    showMessage(
+      "Please log in to access your Tournament Profile.",
+      "error"
+    );
+
     return;
   }
 
   try{
+
     await loadSocialProfile();
+
     const results=await Promise.allSettled([
+
       loadGameProfile(),
       loadWallet(),
       loadTransactions(),
       loadGameHistory()
+
     ]);
 
-    const failed=results.filter(result=>result.status==="rejected");
+    const failed=results.filter(
+      result=>result.status==="rejected"
+    );
+
     if(failed.length){
-      console.warn("Some profile sections could not load:",failed);
+
+      console.warn(
+        "Some profile sections could not load:",
+        failed
+      );
+
     }
+
   }catch(error){
-    showMessage(error.message||"Unable to load your profile.","error");
+
+    showMessage(
+      error.message||"Unable to load your profile.",
+      "error"
+    );
   }
 }
 
+/* START */
+
 initializePage();
+
 </script>
+
 </body>
 </html>
