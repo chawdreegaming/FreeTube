@@ -2161,7 +2161,7 @@ app.get("/api/tournament/tournaments", async (req, res, next) => {
   try {
     const result = await pool.query(`
       SELECT t.id::text AS id, t.title, t.description, t.tournament_type, t.mode,
-             t.map_name, t.entry_fee::float8 AS entry_fee,
+             t.registration_open, t.team_limit, t.map_name, t.entry_fee::float8 AS entry_fee,
              t.prize_pool::float8 AS prize_pool, t.prize_mode,
              t.prize_percentage::float8 AS prize_percentage,
              t.max_players, t.banner_url, t.scheduled_at, t.status,
@@ -2185,8 +2185,8 @@ app.get("/api/tournament/tournaments/:id", async (req, res, next) => {
       return res.status(400).json({ error: "Invalid tournament ID." });
     }
     const result = await pool.query(`
-      SELECT t.id::text AS id, t.title, t.description, t.mode,
-             t.map_name, t.entry_fee::float8 AS entry_fee,
+      SELECT t.id::text AS id, t.title, t.description, t.tournament_type, t.mode,
+             t.registration_open, t.team_limit, t.map_name, t.entry_fee::float8 AS entry_fee,
              t.prize_pool::float8 AS prize_pool, t.prize_mode,
              t.prize_percentage::float8 AS prize_percentage,
              t.max_players, t.banner_url, t.scheduled_at, t.status,
@@ -2628,31 +2628,153 @@ app.get("/api/admin/tournament/tournaments", requireAuth, requireAdmin, async (r
 
 // Add/replace tournament type support while retaining old tournament fields and records.
 app.post("/api/tournament/teams/register", requireAuth, async (req,res,next) => {
+  const client = await pool.connect();
   try {
     const tournamentId = Number.parseInt(req.body.tournament_id,10);
     const teamName = cleanText(req.body.team_name,100) || req.user.username;
-    if (!Number.isSafeInteger(tournamentId) || tournamentId < 1) return res.status(400).json({error:"Valid tournament_id is required."});
-    const t = await pool.query("SELECT id,tournament_type,mode,team_limit,registration_open,status FROM ft_tournaments WHERE id=$1",[tournamentId]);
-    if (!t.rowCount) return res.status(404).json({error:"Tournament not found."});
+    if (!Number.isSafeInteger(tournamentId) || tournamentId < 1) {
+      return res.status(400).json({error:"Valid tournament_id is required."});
+    }
+
+    await client.query("BEGIN");
+    // Lock the tournament row so simultaneous joins cannot overbook the last slot.
+    const t = await client.query(
+      `SELECT id,tournament_type,mode,team_limit,max_players,registration_open,status,entry_fee,title,scheduled_at
+       FROM ft_tournaments WHERE id=$1 FOR UPDATE`,
+      [tournamentId]
+    );
+    if (!t.rowCount) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({error:"Tournament not found."});
+    }
     const tournament = t.rows[0];
-    if (tournament.registration_open === false || tournament.status !== "upcoming") return res.status(409).json({error:"Registration is closed."});
+    if (tournament.registration_open === false || tournament.status !== "upcoming") {
+      await client.query("ROLLBACK");
+      return res.status(409).json({error:"Registration is closed."});
+    }
+    if (tournament.scheduled_at && new Date(tournament.scheduled_at).getTime() <= Date.now()) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({error:"Tournament registration has closed because the start time has passed."});
+    }
+
     const type = normalizeTournamentType(tournament.tournament_type) || "br-match";
     const expected = teamPlayerCount(tournament.mode,type);
     const players = req.body.players;
     const problem = validatePlayers(players,expected);
-    if (problem) return res.status(400).json({error:problem});
-    if (type === "free-fire-cup") {
-      const count = await pool.query("SELECT COUNT(*)::int AS n FROM ft_tournament_teams WHERE tournament_id=$1 AND status<>'rejected'",[tournamentId]);
-      if (Number(count.rows[0].n) >= 13) return res.status(409).json({error:"Free Fire Cup is limited to exactly 13 registered teams."});
-    } else if (tournament.team_limit) {
-      const count = await pool.query("SELECT COUNT(*)::int AS n FROM ft_tournament_teams WHERE tournament_id=$1 AND status<>'rejected'",[tournamentId]);
-      if (Number(count.rows[0].n) >= Number(tournament.team_limit)) return res.status(409).json({error:"Tournament team limit has been reached."});
+    if (problem) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({error:problem});
     }
-    const normalized = players.map(p=>({name:cleanText(p.name||p.free_fire_name,80),uid:cleanText(p.uid||p.free_fire_uid,20)}));
-    const r = await pool.query(`INSERT INTO ft_tournament_teams(tournament_id,captain_user_id,team_name,players) VALUES($1,$2,$3,$4::jsonb) RETURNING id::text AS id,tournament_id::text AS tournament_id,team_name,players,status,created_at`,[tournamentId,String(req.user.id),teamName,JSON.stringify(normalized)]);
-    await pool.query(`INSERT INTO ft_tournament_registrations(tournament_id,user_id,status) VALUES($1,$2,'registered') ON CONFLICT(tournament_id,user_id) DO UPDATE SET status='registered'`,[tournamentId,String(req.user.id)]);
-    res.status(201).json({message:"Team registration submitted for Admin review.",team:r.rows[0]});
-  } catch(e) { if(e.code==='23505') return res.status(409).json({error:"You have already registered a team for this tournament, or a player UID conflicts."}); next(e); }
+
+    // Captain must use the Free Fire identity saved in their authenticated profile.
+    const profile = await client.query(
+      "SELECT free_fire_name,free_fire_uid FROM ft_tournament_profiles WHERE user_id=$1",
+      [String(req.user.id)]
+    );
+    if (!profile.rowCount || !profile.rows[0].free_fire_name || !profile.rows[0].free_fire_uid) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({error:"Save your Free Fire Name and UID in your Tournament Profile before joining."});
+    }
+    const captainName = cleanText(profile.rows[0].free_fire_name,80);
+    const captainUid = cleanText(profile.rows[0].free_fire_uid,20);
+    const submittedCaptain = players[0] || {};
+    if (cleanText(submittedCaptain.name || submittedCaptain.free_fire_name,80) !== captainName ||
+        cleanText(submittedCaptain.uid || submittedCaptain.free_fire_uid,20) !== captainUid) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({error:"The first player must be your saved Free Fire profile."});
+    }
+
+    const normalized = players.map(p=>({
+      name:cleanText(p.name || p.free_fire_name,80),
+      uid:cleanText(p.uid || p.free_fire_uid,20)
+    }));
+
+    const existing = await client.query(
+      "SELECT id FROM ft_tournament_teams WHERE tournament_id=$1 AND captain_user_id=$2 LIMIT 1",
+      [tournamentId,String(req.user.id)]
+    );
+    if (existing.rowCount) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({error:"You have already joined this tournament."});
+    }
+
+    const count = await client.query(
+      "SELECT COUNT(*)::int AS n FROM ft_tournament_teams WHERE tournament_id=$1 AND status IN ('approved','pending')",
+      [tournamentId]
+    );
+    const maxTeams = type === "free-fire-cup"
+      ? 13
+      : (Number(tournament.team_limit) > 0
+          ? Number(tournament.team_limit)
+          : Math.max(1,Math.floor(Number(tournament.max_players || expected) / expected)));
+    if (Number(count.rows[0].n) >= maxTeams) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({error:"All tournament slots are full."});
+    }
+
+    const fee = Number(tournament.entry_fee || 0);
+    if (!Number.isFinite(fee) || fee < 0) {
+      await client.query("ROLLBACK");
+      return res.status(409).json({error:"Tournament entry fee is invalid. Please contact Admin."});
+    }
+
+    // For Solo, Duo and Squad the captain is the payer. Teammates do not need wallets.
+    await client.query(
+      "INSERT INTO ft_tournament_wallets(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING",
+      [String(req.user.id)]
+    );
+    const wallet = await client.query(
+      "SELECT balance FROM ft_tournament_wallets WHERE user_id=$1 FOR UPDATE",
+      [String(req.user.id)]
+    );
+    if (Number(wallet.rows[0].balance) < fee) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({error:`Insufficient Tournament Wallet balance. Required: ৳${fee.toLocaleString("en-BD")}.`});
+    }
+
+    if (fee > 0) {
+      await client.query(
+        "UPDATE ft_tournament_wallets SET balance=balance-$2,updated_at=NOW() WHERE user_id=$1",
+        [String(req.user.id),fee]
+      );
+    }
+
+    const team = await client.query(
+      `INSERT INTO ft_tournament_teams(tournament_id,captain_user_id,team_name,players,status,admin_note,updated_at)
+       VALUES($1,$2,$3,$4::jsonb,'approved','',NOW())
+       RETURNING id::text AS id,tournament_id::text AS tournament_id,team_name,players,status,created_at`,
+      [tournamentId,String(req.user.id),teamName,JSON.stringify(normalized)]
+    );
+
+    await client.query(
+      `INSERT INTO ft_tournament_registrations(tournament_id,user_id,status)
+       VALUES($1,$2,'registered')
+       ON CONFLICT(tournament_id,user_id) DO UPDATE SET status='registered'`,
+      [tournamentId,String(req.user.id)]
+    );
+
+    if (fee > 0) {
+      await client.query(
+        `INSERT INTO ft_tournament_transactions(user_id,type,amount,status,admin_note,reviewed_at,updated_at)
+         VALUES($1,'entry_fee',$2,'completed',$3,NOW(),NOW())`,
+        [String(req.user.id),fee,`Entry fee for ${tournament.title} (Team #${team.rows[0].id})`]
+      );
+    }
+
+    await client.query("COMMIT");
+    res.status(201).json({
+      message:"Tournament joined successfully. No Admin approval is required.",
+      team:team.rows[0],
+      charged_amount:fee,
+      payer_user_id:String(req.user.id)
+    });
+  } catch(e) {
+    await client.query("ROLLBACK").catch(()=>{});
+    if (e.code === "23505") return res.status(409).json({error:"You have already joined this tournament."});
+    next(e);
+  } finally {
+    client.release();
+  }
 });
 
 app.get("/api/tournament/my-teams", requireAuth, async (req,res,next) => {
