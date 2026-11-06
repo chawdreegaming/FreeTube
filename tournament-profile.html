@@ -1,15 +1,16 @@
+
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#10132e">
-<title>Boys vs Girls - Tournament Profile</title>
+<title>BOYS VS GIRLS - Tournament Profile</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
-  --bg:#0c1029;
+  --bg:#090d25;
   --panel:#191a3b;
   --line:#7775d766;
   --blue:#168dff;
@@ -30,347 +31,363 @@ body{
 }
 button,input{font:inherit}
 button{cursor:pointer;color:inherit;border:0}
-.app{max-width:900px;margin:auto;padding-bottom:22px}
+.app{width:100%;max-width:1100px;margin:auto;padding-bottom:30px}
 
 /* HEADER */
 .topbar{
-  height:58px;padding:0 11px;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:8px;background:#100e29ef;
-  border-bottom:1px solid #ffffff20;
-  position:sticky;top:0;z-index:20;
-  backdrop-filter:blur(15px);
+  min-height:88px;padding:10px 16px;
+  display:grid;grid-template-columns:55px 1fr 100px;
+  align-items:center;gap:10px;
+  background:#100e29ef;border-bottom:1px solid #ffffff20;
+  position:sticky;top:0;z-index:20;backdrop-filter:blur(15px);
 }
-.top-left,.top-actions{display:flex;align-items:center;gap:7px}
+.top-actions,.top-left{display:flex;align-items:center;gap:9px}
 .icon-btn{
-  width:34px;height:34px;border-radius:50%;
-  display:grid;place-items:center;
-  background:#ffffff10;border:1px solid #ffffff35;
-  font-size:14px;
+  width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;background:#ffffff10;
+  border:1px solid #ffffff35;font-size:19px;
 }
 .brand{text-align:center;min-width:0}
 .brand-name{
-  font-size:17px;font-weight:1000;
+  font-size:27px;font-weight:1000;
   background:linear-gradient(90deg,#249aff,#bd55ff,#ff35b8);
   -webkit-background-clip:text;background-clip:text;color:transparent;
   white-space:nowrap;
 }
-.brand-sub{font-size:10px;color:#fff;margin-top:2px;font-weight:700}
+.brand-sub{font-size:17px;color:#fff;margin-top:3px;font-weight:700}
 
-/* COMMON CARDS */
+/* COMMON */
 .card{
-  margin:8px 10px;
-  border-radius:13px;
+  margin:10px;
+  border-radius:17px;
   background:linear-gradient(130deg,#211b43,#171a39 65%,#27163f);
-  border:1px solid #7775d766;
+  border:1px solid var(--line);
   box-shadow:0 4px 13px #0004,inset 0 0 12px #ffffff05;
   overflow:hidden;
 }
-.card-pad{padding:10px}
+.card-pad{padding:14px}
 .section-head{
   display:flex;align-items:center;justify-content:space-between;
-  gap:7px;margin-bottom:8px;
+  gap:9px;margin-bottom:10px;
 }
-.section-title{font-size:14px;font-weight:900}
-.section-title i{margin-right:5px;color:#c08aff}
-.section-sub{color:#9bbce9;font-size:9px;font-weight:900}
+.section-title{font-size:20px;font-weight:900}
+.section-title i{margin-right:7px;color:#c08aff}
+.section-sub{color:#9bbce9;font-size:13px;font-weight:900}
 .muted{color:var(--muted)}
-.small{font-size:11px}
+.small{font-size:13px}
 
 /* PROFILE BANNER */
 .profile-banner{
-  margin:9px 10px;
-  min-height:112px;padding:12px;
-  border-radius:16px;position:relative;overflow:hidden;
-  display:flex;align-items:center;justify-content:space-between;gap:9px;
+  margin:12px 10px;min-height:175px;padding:18px;
+  border-radius:20px;position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:space-between;gap:15px;
   background:
     radial-gradient(circle at 85% 45%,#a327a966,transparent 35%),
     radial-gradient(circle at 10% 70%,#1265bb88,transparent 38%),
     linear-gradient(115deg,#171b48,#27134a 55%,#47114e);
-  border:1px solid #c44fff77;
-  box-shadow:0 5px 17px #0005;
+  border:1px solid #c44fff77;box-shadow:0 5px 17px #0005;
 }
 .profile-banner:before{
-  content:"FREE FIRE";position:absolute;right:12px;bottom:8px;
-  font-size:23px;font-weight:1000;font-style:italic;
+  content:"FREE FIRE";position:absolute;right:20px;bottom:10px;
+  font-size:42px;font-weight:1000;font-style:italic;
   color:#f45bd1;opacity:.14;
 }
-.profile-main{display:flex;align-items:center;gap:11px;min-width:0;z-index:1}
+.profile-main{display:flex;align-items:center;gap:20px;min-width:0;z-index:1}
 .avatar-wrap{position:relative;flex-shrink:0}
 .avatar{
-  width:67px;height:67px;border-radius:50%;object-fit:cover;
-  border:3px solid #e94aff;
-  box-shadow:0 0 0 2px #168dff,0 0 14px #d72cff99;
+  width:135px;height:135px;border-radius:50%;object-fit:cover;
+  border:4px solid #e94aff;box-shadow:0 0 0 3px #168dff,0 0 18px #d72cff99;
   background:#29244b;
 }
 .crown{
-  position:absolute;top:-12px;left:20px;
-  color:#ffd34f;font-size:17px;text-shadow:0 2px 8px #ffb300;
+  position:absolute;top:-20px;left:45px;
+  color:#ffd34f;font-size:30px;text-shadow:0 2px 8px #ffb300;
 }
-.profile-name{font-size:17px;font-weight:1000;overflow-wrap:anywhere}
-.verified{color:#2da9ff;font-size:14px;margin-left:3px}
-.profile-username{font-size:12px;color:#d4c9ec;margin-top:3px}
+.profile-name{font-size:29px;font-weight:1000;overflow-wrap:anywhere}
+.verified{color:#2da9ff;font-size:23px;margin-left:7px}
+.profile-username{font-size:20px;color:#d4c9ec;margin-top:5px}
 .player-tag{
-  display:inline-flex;align-items:center;gap:5px;
-  margin-top:6px;padding:5px 9px;border-radius:30px;
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:9px;padding:7px 14px;border-radius:30px;
   background:#9c36dc44;border:1px solid #db65ff;
-  font-size:10px;font-weight:900;
+  font-size:15px;font-weight:900;
 }
 .connected{
-  z-index:1;max-width:190px;padding:8px 9px;
-  border-radius:11px;background:#101a39d9;
+  z-index:1;max-width:300px;padding:13px 15px;
+  border-radius:14px;background:#101a39d9;
   border:1px solid #249affaa;text-align:left;
 }
-.connected strong{display:block;font-size:10px}
-.connected small{display:block;color:#d6cde9;margin-top:3px;font-size:9px}
-.connected i{color:#20d58c;margin-right:3px}
+.connected strong{display:block;font-size:16px}
+.connected small{display:block;color:#d6cde9;margin-top:5px;font-size:13px}
+.connected i{color:#20d58c;margin-right:4px}
 
 /* DASHBOARD */
 .dashboard-grid{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:8px;margin:0 10px;
+  gap:10px;margin:0 10px;
 }
 .dashboard-grid .card{margin:0;min-width:0}
 .info-row{
-  display:flex;align-items:center;gap:7px;
-  min-height:43px;padding:6px 7px;margin-top:5px;
-  border:1px solid #7775d766;border-radius:10px;
-  background:#10152f99;
+  display:flex;align-items:center;gap:10px;
+  min-height:60px;padding:9px 11px;margin-top:7px;
+  border:1px solid var(--line);border-radius:13px;background:#10152f99;
 }
 .info-icon{
-  width:27px;height:27px;display:grid;place-items:center;
-  border-radius:8px;background:#8c58e833;color:#c49aff;
-  flex-shrink:0;font-size:12px;
+  width:38px;height:38px;display:grid;place-items:center;
+  border-radius:9px;background:#8c58e833;color:#c49aff;
+  flex-shrink:0;font-size:19px;
 }
 .info-content{min-width:0;flex:1}
-.info-label{font-size:10px;color:#c8c3dc}
-.info-value{font-size:12px;font-weight:900;margin-top:2px;overflow-wrap:anywhere}
+.info-label{font-size:14px;color:#c8c3dc}
+.info-value{font-size:17px;font-weight:900;margin-top:3px;overflow-wrap:anywhere}
 .edit-btn{
-  padding:5px 7px;border-radius:8px;
-  background:#ffffff14;border:1px solid #ffffff35;
-  font-size:9px;font-weight:800;
+  padding:8px 10px;border-radius:9px;background:#ffffff14;
+  border:1px solid #ffffff35;font-size:13px;font-weight:800;
 }
 .wallet-balance{
-  text-align:center;padding:7px 0 10px;
-  font-size:25px;font-weight:1000;
-  color:var(--cyan);text-shadow:0 0 15px #20dce455;
+  text-align:center;padding:8px 0 16px;
+  font-size:39px;font-weight:1000;color:var(--cyan);
+  text-shadow:0 0 15px #20dce455;
 }
-.wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.wallet-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .wallet-btn{
-  padding:9px 5px;border-radius:9px;font-weight:900;
-  font-size:11px;display:flex;align-items:center;
-  justify-content:center;gap:5px;
+  padding:13px 8px;border-radius:12px;font-weight:900;
+  font-size:17px;display:flex;align-items:center;
+  justify-content:center;gap:8px;
 }
 .deposit-btn{background:linear-gradient(110deg,#0dc66f,#008a62)}
 .withdraw-btn{background:linear-gradient(110deg,#ed269a,#b91478)}
 
-/* FORM */
-.modal-field{margin-bottom:9px}
-.modal-field label{display:block;font-size:11px;margin-bottom:5px;color:#d6d0e8}
+/* PROFILE FORM */
+.modal-field{margin-bottom:12px}
+.modal-field label{display:block;font-size:13px;margin-bottom:6px;color:#d6d0e8}
 .modal-field input{
-  width:100%;padding:10px;border-radius:9px;
+  width:100%;padding:12px;border-radius:10px;
   border:1px solid #ffffff35;background:#10152f;color:#fff;outline:none;
 }
 .modal-submit{
-  width:100%;padding:11px;border-radius:10px;
+  width:100%;padding:13px;border-radius:10px;
   background:linear-gradient(100deg,#168dff,#a22bca);font-weight:900;
 }
 
 /* HISTORY LINKS */
 .history-links{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:8px;margin:9px 10px;
+  gap:10px;margin:12px 10px;
 }
 .history-link{
-  min-width:0;padding:9px;border-radius:12px;
+  min-width:0;padding:15px;border-radius:15px;
   background:linear-gradient(120deg,#292052,#1b1b3e);
   border:1px solid #7775d777;
-  display:flex;align-items:center;gap:7px;
-  text-decoration:none;color:#fff;
+  display:flex;align-items:center;gap:12px;text-decoration:none;color:#fff;
 }
-.history-link i:first-child{font-size:19px;color:#c28bff}
+.history-link i:first-child{font-size:28px;color:#c28bff}
 .history-link span{min-width:0;flex:1}
-.history-link strong{display:block;font-size:11px}
-.history-link small{display:block;color:#c2bdd8;margin-top:3px;font-size:9px}
-.history-link .arrow{font-size:11px;color:#cbb9ef}
+.history-link strong{display:block;font-size:17px}
+.history-link small{display:block;color:#c2bdd8;margin-top:4px;font-size:13px}
+.history-link .arrow{font-size:16px;color:#cbb9ef}
 
 /* TRANSACTIONS */
-.transaction-list{display:grid;gap:5px}
+.transaction-list{display:grid;gap:6px}
 .transaction{
-  display:grid;grid-template-columns:30px minmax(0,1fr) auto auto;
-  align-items:center;gap:6px;padding:7px;
-  border:1px solid #7775d766;border-radius:10px;
+  display:grid;grid-template-columns:42px minmax(0,1fr) auto auto;
+  align-items:center;gap:10px;padding:9px;
+  border:1px solid var(--line);border-radius:13px;
   background:#10152e99;min-width:0;
 }
 .transaction-icon{
-  width:27px;height:27px;border-radius:50%;
-  display:grid;place-items:center;font-size:12px;
+  width:38px;height:38px;border-radius:50%;
+  display:grid;place-items:center;font-size:17px;
 }
 .transaction-icon.deposit{background:#079b66;color:#fff}
 .transaction-icon.withdraw{background:#b82483;color:#fff}
-.transaction-name{font-size:11px;font-weight:900}
-.transaction-ref{font-size:9px;color:#aaa5c4;margin-top:2px;overflow-wrap:anywhere}
-.transaction-amount{font-size:11px;font-weight:900;white-space:nowrap}
-.transaction-date{font-size:9px;color:#c6c1d8;text-align:right;white-space:nowrap}
+.transaction-name{font-size:16px;font-weight:900}
+.transaction-ref{font-size:12px;color:#aaa5c4;margin-top:3px;overflow-wrap:anywhere}
+.transaction-amount{font-size:17px;font-weight:900;white-space:nowrap}
+.transaction-date{font-size:13px;color:#c6c1d8;text-align:right;white-space:nowrap}
 .badge-status{
-  display:inline-block;padding:3px 6px;border-radius:20px;
-  font-size:8px;font-weight:900;white-space:nowrap;text-align:center;
+  display:inline-block;padding:5px 9px;border-radius:20px;
+  font-size:12px;font-weight:900;white-space:nowrap;text-align:center;
 }
 .approved{background:#08794f;color:#caffdf;border:1px solid #22d48a}
 .pending{background:#874915;color:#ffe1a5;border:1px solid #f6a52d}
 .rejected{background:#7b2437;color:#ffd1dc;border:1px solid #ef607d}
-.empty{padding:12px;text-align:center;color:#aaa5c4;font-size:10px}
+.empty{padding:18px;text-align:center;color:#aaa5c4;font-size:13px}
 
 /* GAME HISTORY */
 .game-history-row{
   display:grid;
-  grid-template-columns:38px minmax(0,1fr) 38px 38px;
-  align-items:center;gap:5px;padding:7px;
-  border-radius:10px;background:#10152e99;
-  border:1px solid #7775d766;overflow:hidden;
+  grid-template-columns:55px minmax(0,1fr) repeat(4,minmax(50px,auto)) auto;
+  align-items:center;gap:9px;padding:9px;
+  border-radius:12px;background:#10152e99;
+  border:1px solid var(--line);overflow:hidden;
 }
 .game-thumb{
-  width:35px;height:35px;border-radius:8px;
-  display:grid;place-items:center;
-  background:linear-gradient(135deg,#1479dc,#8b2fc7);
-  font-weight:1000;font-size:12px;
+  width:50px;height:50px;border-radius:9px;
+  display:grid;place-items:center;background:linear-gradient(135deg,#1479dc,#8b2fc7);
+  font-weight:1000;font-size:16px;
 }
 .game-match{min-width:0}
-.game-match strong{display:block;font-size:10px}
-.game-match small{display:block;color:#bcb6d0;font-size:9px;margin-top:3px}
-.game-stat{text-align:center;border-left:1px solid #ffffff20;padding-left:4px}
-.game-stat small{display:block;color:#c6c1d8;font-size:8px}
-.game-stat strong{display:block;margin-top:3px;font-size:10px}
+.game-match strong{display:block;font-size:15px}
+.game-match small{display:block;color:#bcb6d0;font-size:12px;margin-top:4px}
+.game-stat{text-align:center;border-left:1px solid #ffffff20;padding-left:8px}
+.game-stat small{display:block;color:#c6c1d8;font-size:12px}
+.game-stat strong{display:block;margin-top:4px;font-size:15px}
 .win{color:#1ee69b}
 .prize{color:#ffd24e}
-.view-all{color:#9ccaff;font-size:10px;font-weight:900;background:none;white-space:nowrap}
+.view-all{color:#9ccaff;font-size:14px;font-weight:900;background:none;white-space:nowrap}
 
 /* GAME CARDS */
 .game-heading{
   display:flex;align-items:center;justify-content:space-between;
-  gap:8px;margin:17px 11px 9px;
+  gap:8px;margin:22px 12px 12px;
 }
-.game-heading h2{font-size:17px;font-weight:1000}
-.game-heading h2 i{color:#c9baff;margin-right:5px}
-.game-heading span{font-size:9px;color:#9ccaff;font-weight:900;letter-spacing:.5px}
+.game-heading h2{font-size:27px;font-weight:1000}
+.game-heading h2 i{color:#c9baff;margin-right:7px}
+.game-heading span{font-size:14px;color:#9ccaff;font-weight:900;letter-spacing:.5px}
 .game-grid{
-  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:8px;margin:0 10px;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;margin:0 10px;
 }
 .game-card{
-  min-width:0;overflow:hidden;border-radius:14px;
+  min-width:0;overflow:hidden;border-radius:18px;
   background:linear-gradient(145deg,#22204a,#17172f);
-  border:1px solid #9d62ff88;
-  box-shadow:0 5px 14px #0005;
+  border:1px solid #9d62ff88;box-shadow:0 5px 14px #0005;
 }
 .game-art{
-  height:88px;position:relative;overflow:hidden;
+  height:155px;position:relative;overflow:hidden;
   display:flex;align-items:center;justify-content:center;
 }
 .game-art.br{background:radial-gradient(circle at 50% 60%,#7b2dff,#10284e 70%)}
 .game-art.clash{background:radial-gradient(circle at 50% 50%,#b3278c,#201344 70%)}
 .game-art.cup{background:radial-gradient(circle at 50% 50%,#c47a1b,#14234d 75%)}
 .game-art:before{
-  content:"";position:absolute;width:100px;height:100px;
+  content:"";position:absolute;width:150px;height:150px;
   border:1px solid #ffffff33;border-radius:50%;
-  box-shadow:0 0 0 10px #ffffff0b,0 0 0 20px #ffffff08;
+  box-shadow:0 0 0 15px #ffffff0b,0 0 0 30px #ffffff08;
 }
-.game-art i{position:relative;z-index:1;font-size:39px;color:#ffe08a;text-shadow:0 5px 18px #0009}
+.game-art i{position:relative;z-index:1;font-size:65px;color:#ffe08a;text-shadow:0 5px 18px #0009}
 .game-art .art-label{
-  position:absolute;z-index:2;top:6px;left:5px;right:5px;
-  text-align:center;font-size:8px;font-weight:1000;font-style:italic;
+  position:absolute;z-index:2;top:10px;left:5px;right:5px;
+  text-align:center;font-size:14px;font-weight:1000;font-style:italic;
   text-shadow:0 2px 5px #000;letter-spacing:.7px;
 }
 .game-art .art-bottom{
-  position:absolute;z-index:2;bottom:6px;left:4px;right:4px;
-  text-align:center;font-size:12px;font-weight:1000;font-style:italic;
+  position:absolute;z-index:2;bottom:9px;left:4px;right:4px;
+  text-align:center;font-size:22px;font-weight:1000;font-style:italic;
   text-shadow:0 3px 7px #000;
 }
-.game-info{padding:8px}
-.game-title{font-size:13px;font-weight:1000;margin-bottom:4px}
-.game-desc{font-size:10px;line-height:1.4;color:#d0cbe1;min-height:29px}
+.game-info{padding:13px}
+.game-title{font-size:19px;font-weight:1000;margin-bottom:7px}
+.game-desc{font-size:15px;line-height:1.5;color:#d0cbe1;min-height:66px}
 .game-foot{
-  border-top:1px solid #ffffff20;margin-top:7px;padding-top:7px;
-  display:flex;align-items:center;justify-content:space-between;gap:4px;
+  border-top:1px solid #ffffff20;margin-top:10px;padding-top:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
 }
 .game-type{
-  font-size:8px;font-weight:1000;color:#ffe17a;
-  border:1px solid #e8bd54;border-radius:20px;padding:4px 5px;
-  white-space:nowrap;
+  font-size:11px;font-weight:1000;color:#ffe17a;
+  border:1px solid #e8bd54;border-radius:20px;padding:7px 8px;white-space:nowrap;
 }
 .play{
-  padding:7px 8px;border-radius:20px;
+  padding:10px 13px;border-radius:22px;
   background:linear-gradient(100deg,#08a9ef,#a52bcb);
-  border:1px solid #65dfff;font-size:9px;font-weight:1000;
+  border:1px solid #65dfff;font-size:14px;font-weight:1000;
   white-space:nowrap;box-shadow:0 3px 8px #168cff55;
 }
-.play i{margin-left:3px}
-.cup-card{grid-column:1/-1}
-.cup-card .game-art{height:95px}
-.cup-card .game-art i{font-size:48px}
-.cup-card .game-desc{min-height:28px}
+.play i{margin-left:4px}
 
 /* MODAL */
 .modal{
   display:none;position:fixed;inset:0;z-index:50;
-  background:#050615d9;padding:14px;
-  align-items:center;justify-content:center;
+  background:#050615d9;padding:14px;align-items:center;justify-content:center;
 }
 .modal.show{display:flex}
 .modal-box{
-  width:100%;max-width:380px;padding:15px;
-  border-radius:15px;background:#1b1a3c;
-  border:1px solid #9c69ff88;box-shadow:0 20px 70px #0009;
+  width:100%;max-width:420px;padding:18px;border-radius:16px;
+  background:#1b1a3c;border:1px solid #9c69ff88;box-shadow:0 20px 70px #0009;
 }
-.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.modal-head h3{font-size:16px}
-.close-modal{background:#ffffff16;width:30px;height:30px;border-radius:50%}
-.modal-note{font-size:10px;line-height:1.5;color:#aaa5c4;margin-top:9px}
+.modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.modal-head h3{font-size:20px}
+.close-modal{background:#ffffff16;width:35px;height:35px;border-radius:50%}
+.modal-note{font-size:12px;line-height:1.5;color:#aaa5c4;margin-top:10px}
+#status{display:none;font-size:14px}
 
-/* SMALL SCREEN */
-@media(max-width:480px){
-  .topbar{height:55px}
-  .brand-name{font-size:15px}
-  .profile-banner{min-height:100px;padding:10px}
-  .avatar{width:59px;height:59px}
-  .profile-main{gap:9px}
-  .profile-name{font-size:15px}
-  .profile-username{font-size:10px}
-  .player-tag{font-size:9px;padding:4px 7px}
-  .connected{max-width:135px;padding:7px}
-  .connected strong{font-size:9px}
-  .connected small{font-size:8px}
-  .dashboard-grid{grid-template-columns:1fr 1fr;gap:6px}
-  .card-pad{padding:8px}
-  .section-title{font-size:12px}
-  .info-row{min-height:39px;padding:5px;gap:5px}
-  .info-icon{width:23px;height:23px;font-size:10px}
-  .info-label{font-size:9px}
-  .info-value{font-size:10px}
-  .wallet-balance{font-size:21px}
-  .wallet-btn{font-size:10px;padding:8px 3px}
-  .history-links{gap:6px}
-  .history-link{padding:8px 6px;gap:5px}
-  .history-link i:first-child{font-size:16px}
-  .history-link strong{font-size:10px}
-  .history-link small{font-size:8px}
-  .transaction{grid-template-columns:27px minmax(0,1fr) auto;gap:5px;padding:6px}
-  .transaction-icon{width:25px;height:25px}
+/* TABLET + MOBILE */
+@media(max-width:700px){
+  .topbar{min-height:62px;padding:7px 9px;grid-template-columns:38px 1fr 76px;gap:5px}
+  .icon-btn{width:35px;height:35px;font-size:14px}
+  .top-actions{gap:5px}
+  .brand-name{font-size:17px}
+  .brand-sub{font-size:11px}
+  .profile-banner{min-height:115px;padding:12px}
+  .profile-main{gap:11px}
+  .avatar{width:75px;height:75px}
+  .crown{font-size:18px;top:-12px;left:25px}
+  .profile-name{font-size:17px}
+  .verified{font-size:14px}
+  .profile-username{font-size:12px}
+  .player-tag{font-size:10px;padding:5px 8px}
+  .connected{max-width:155px;padding:8px}
+  .connected strong{font-size:10px}
+  .connected small{font-size:9px}
+  .profile-banner:before{font-size:24px}
+  .card{margin:7px}
+  .card-pad{padding:9px}
+  .section-title{font-size:13px}
+  .dashboard-grid{gap:7px;margin:0 7px}
+  .info-row{min-height:43px;padding:6px;gap:6px}
+  .info-icon{width:27px;height:27px;font-size:12px}
+  .info-label{font-size:10px}
+  .info-value{font-size:11px}
+  .edit-btn{font-size:10px;padding:6px}
+  .wallet-balance{font-size:23px;padding:8px 0 12px}
+  .wallet-btn{font-size:11px;padding:9px 3px;gap:5px}
+  .history-links{gap:7px;margin:8px 7px}
+  .history-link{padding:9px 7px;gap:6px}
+  .history-link i:first-child{font-size:18px}
+  .history-link strong{font-size:11px}
+  .history-link small{font-size:9px}
+  .history-link .arrow{font-size:10px}
+  .transaction{grid-template-columns:29px minmax(0,1fr) auto;gap:5px;padding:6px}
+  .transaction-icon{width:26px;height:26px;font-size:12px}
+  .transaction-name{font-size:11px}
+  .transaction-ref{font-size:9px}
+  .transaction-amount{font-size:11px}
   .transaction-date{display:none}
-  .transaction-amount{font-size:10px}
-  .game-heading h2{font-size:16px}
-  .game-grid{gap:7px;margin:0 8px}
-  .game-art{height:82px}
+  .badge-status{font-size:9px;padding:4px 6px}
+  .game-history-row{
+    grid-template-columns:35px minmax(0,1fr) 35px 35px;
+    gap:4px;padding:6px;
+  }
+  .game-thumb{width:32px;height:32px;font-size:11px}
+  .game-match strong{font-size:10px}
+  .game-match small{font-size:9px}
+  .game-stat{padding-left:4px}
+  .game-stat small{font-size:8px}
+  .game-stat strong{font-size:10px}
+  .game-heading{margin:15px 9px 9px}
+  .game-heading h2{font-size:17px}
+  .game-heading span{font-size:9px}
+  .game-grid{gap:7px;margin:0 7px}
+  .game-art{height:90px}
+  .game-art i{font-size:39px}
+  .game-art .art-label{font-size:9px;top:6px}
+  .game-art .art-bottom{font-size:12px;bottom:6px}
   .game-info{padding:7px}
-  .game-title{font-size:12px}
-  .game-desc{font-size:9px;min-height:27px}
+  .game-title{font-size:12px;margin-bottom:4px}
+  .game-desc{font-size:9px;min-height:45px}
+  .game-foot{margin-top:7px;padding-top:7px;gap:3px}
   .game-type{font-size:7px;padding:4px}
+  .play{font-size:9px;padding:7px 8px}
+}
+@media(max-width:370px){
+  .connected{max-width:115px}
+  .connected strong{font-size:8px}
+  .connected small{font-size:8px}
+  .profile-name{font-size:14px}
+  .avatar{width:65px;height:65px}
+  .game-type{font-size:6px;padding:4px 3px}
   .play{font-size:8px;padding:6px}
-  .game-art .art-bottom{font-size:11px}
-  .game-history-row{grid-template-columns:34px minmax(0,1fr) 34px 34px;gap:4px;padding:6px}
-  .game-thumb{width:32px;height:32px}
-  .game-stat strong{font-size:9px}
-  .game-stat small{font-size:7px}
 }
 </style>
 </head>
@@ -412,7 +429,7 @@ button{cursor:pointer;color:inherit;border:0}
   </div>
 </section>
 
-<div id="status" class="card card-pad" style="display:none;font-size:12px" role="status" aria-live="polite"></div>
+<div id="status" class="card card-pad" role="status" aria-live="polite"></div>
 
 <div class="dashboard-grid">
   <section class="card card-pad">
@@ -435,7 +452,7 @@ button{cursor:pointer;color:inherit;border:0}
       </div>
       <button class="edit-btn" type="button" onclick="copyUID()" aria-label="Copy UID"><i class="fa-regular fa-copy"></i></button>
     </div>
-    <form id="profileForm" style="display:none;margin-top:9px">
+    <form id="profileForm" style="display:none;margin-top:10px">
       <div class="modal-field">
         <label for="ffName">Free Fire Game Name</label>
         <input id="ffName" maxlength="40" placeholder="Enter Game Name" required>
@@ -527,11 +544,11 @@ button{cursor:pointer;color:inherit;border:0}
     </div>
   </article>
 
-  <article class="game-card cup-card">
+  <article class="game-card">
     <div class="game-art cup">
       <div class="art-label">FREE FIRE WORLD CUP</div>
       <i class="fa-solid fa-trophy"></i>
-      <div class="art-bottom">ONE CUP • ONE CHAMPION</div>
+      <div class="art-bottom">WORLD CUP</div>
     </div>
     <div class="game-info">
       <div class="game-title">FREE FIRE WORLD CUP 🏆</div>
@@ -589,7 +606,9 @@ function getToken(){
 
 function money(value){
   const n=Number(value||0);
-  return '৳ '+n.toLocaleString('en-BD',{minimumFractionDigits:2,maximumFractionDigits:2});
+  return '৳ '+n.toLocaleString('en-BD',{
+    minimumFractionDigits:2,maximumFractionDigits:2
+  });
 }
 
 function showStatus(message,type=''){
@@ -624,52 +643,53 @@ async function api(path,options={}){
 }
 
 function getArray(data,...keys){
-  for(const key of keys)if(Array.isArray(data?.[key]))return data[key];
+  for(const key of keys){
+    if(Array.isArray(data?.[key]))return data[key];
+  }
   if(Array.isArray(data?.data))return data.data;
   return [];
 }
 
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,char=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[char]));
+}
+
 /* PROFILE */
 async function loadProfile(){
-  if(!getToken()){
-    $('displayName').textContent='Not connected';
-    $('username').textContent='Login required';
-    showStatus('Social App login token was not found. Please log in again.','error');
-    return;
-  }
+  const me=await api('/auth/me');
+  const user=me.user||me.profile||me.data?.user||{};
 
-  try{
-    const me=await api('/auth/me');
-    const user=me.user||me.profile||me.data?.user||{};
+  $('displayName').textContent=
+    user.display_name||user.full_name||user.name||user.username||'Player';
+  $('username').textContent=user.username?'@'+user.username:'Social Account';
 
-    $('displayName').textContent=user.display_name||user.full_name||user.name||user.username||'Player';
-    $('username').textContent=user.username?'@'+user.username:'Social Account';
-
-    if(user.username){
-      try{
-        const result=await api('/profile/'+encodeURIComponent(user.username));
-        const p=result.profile||result.data?.profile||{};
-        $('displayName').textContent=p.display_name||p.full_name||user.display_name||user.username;
-        const avatar=p.avatar_url||p.profile_picture||p.avatar;
-        if(avatar)$('avatar').src=avatar;
-      }catch(e){console.warn('Could not load social profile details:',e)}
+  if(user.username){
+    try{
+      const result=await api('/profile/'+encodeURIComponent(user.username));
+      const p=result.profile||result.data?.profile||{};
+      $('displayName').textContent=
+        p.display_name||p.full_name||user.display_name||user.username;
+      const avatar=p.avatar_url||p.profile_picture||p.avatar;
+      if(avatar)$('avatar').src=avatar;
+    }catch(error){
+      console.warn('Social profile details:',error);
     }
-
-    const tournament=await api('/tournament/profile');
-    const p=tournament.profile||tournament.tournamentProfile||tournament.data?.profile||{};
-    const ffName=p.ff_name||p.free_fire_name||'';
-    const ffUid=p.ff_uid||p.free_fire_uid||'';
-
-    $('gameName').textContent=ffName||'Not added';
-    $('gameUid').textContent=ffUid||'Not added';
-    $('ffName').value=ffName;
-    $('ffUid').value=ffUid;
-    currentUID=ffUid;
-    showStatus('Social App account connected successfully.','success');
-  }catch(error){
-    console.error(error);
-    showStatus(error.message,'error');
   }
+
+  const tournament=await api('/tournament/profile');
+  const p=tournament.profile||tournament.tournamentProfile||tournament.data?.profile||{};
+  const ffName=p.ff_name||p.free_fire_name||'';
+  const ffUid=p.ff_uid||p.free_fire_uid||'';
+
+  $('gameName').textContent=ffName||'Not added';
+  $('gameUid').textContent=ffUid||'Not added';
+  $('ffName').value=ffName;
+  $('ffUid').value=ffUid;
+  currentUID=ffUid;
+
+  showStatus('Social App account connected successfully.','success');
 }
 
 /* EDIT GAME DETAILS */
@@ -684,12 +704,17 @@ function editGameDetails(){
 
 $('profileForm').addEventListener('submit',async event=>{
   event.preventDefault();
+
   const ffName=$('ffName').value.trim();
   const ffUid=$('ffUid').value.trim();
 
-  if(!ffName){showStatus('Please enter your Free Fire Game Name.','error');return}
+  if(!ffName){
+    showStatus('Please enter your Free Fire Game Name.','error');
+    return;
+  }
   if(!/^[0-9]{5,20}$/.test(ffUid)){
-    showStatus('Free Fire UID must contain 5 to 20 digits.','error');return;
+    showStatus('Free Fire UID must contain 5 to 20 digits.','error');
+    return;
   }
 
   const btn=$('saveBtn');
@@ -701,6 +726,7 @@ $('profileForm').addEventListener('submit',async event=>{
       method:'PUT',
       body:JSON.stringify({ff_name:ffName,ff_uid:ffUid})
     });
+
     $('gameName').textContent=ffName;
     $('gameUid').textContent=ffUid;
     currentUID=ffUid;
@@ -715,32 +741,32 @@ $('profileForm').addEventListener('submit',async event=>{
 });
 
 function copyUID(){
-  if(!currentUID){showStatus('No Free Fire UID available.','error');return}
+  if(!currentUID){
+    showStatus('No Free Fire UID available.','error');
+    return;
+  }
   if(navigator.clipboard){
     navigator.clipboard.writeText(currentUID)
       .then(()=>showStatus('Free Fire UID copied.','success'))
       .catch(()=>showStatus('Could not copy UID.','error'));
-  }else showStatus('Copy is not supported in this browser.','error');
+  }else{
+    showStatus('Copy is not supported in this browser.','error');
+  }
 }
 
 /* WALLET */
 async function loadWallet(){
-  try{
-    const data=await api('/tournament/wallet');
-    const wallet=data.wallet||data.data?.wallet||data.data||data;
-    const balance=wallet.balance??wallet.available_balance??wallet.wallet_balance??0;
-    $('walletBalance').textContent=money(balance);
-  }catch(error){
-    console.error('Wallet load:',error);
-    $('walletBalance').textContent='৳ 0.00';
-  }
+  const data=await api('/tournament/wallet');
+  const wallet=data.wallet||data.data?.wallet||data.data||data;
+  const balance=wallet.balance??wallet.available_balance??wallet.wallet_balance??0;
+  $('walletBalance').textContent=money(balance);
 }
 
 /* TRANSACTIONS */
 function statusClass(status){
   const s=String(status||'pending').toLowerCase();
-  if(s==='approved'||s==='success'||s==='completed')return 'approved';
-  if(s==='rejected'||s==='failed')return 'rejected';
+  if(['approved','success','completed'].includes(s))return 'approved';
+  if(['rejected','failed'].includes(s))return 'rejected';
   return 'pending';
 }
 
@@ -769,7 +795,6 @@ async function loadTransactions(){
       const type=String(item.type||item.transaction_type||'deposit').toLowerCase();
       const isWithdraw=type.includes('withdraw');
       const status=item.status||'pending';
-      const amount=item.amount??0;
       const reference=item.transaction_reference||item.reference||item.reference_id||item.id||'';
       const date=item.created_at||item.createdAt||item.date||'';
 
@@ -782,8 +807,9 @@ async function loadTransactions(){
             <div class="transaction-name">${isWithdraw?'Withdraw':'Deposit'}</div>
             <div class="transaction-ref">TRX: ${escapeHTML(String(reference))}</div>
           </div>
-          <div class="transaction-amount">${money(amount)}</div>
-          <div class="transaction-date">${escapeHTML(formatDate(date))}<br>
+          <div class="transaction-amount">${money(item.amount??0)}</div>
+          <div class="transaction-date">
+            ${escapeHTML(formatDate(date))}<br>
             <span class="badge-status ${statusClass(status)}">${escapeHTML(String(status))}</span>
           </div>
         </div>`;
@@ -813,6 +839,7 @@ async function loadGameHistory(){
       const kills=item.kills??0;
       const result=item.result||item.status||'Completed';
       const prize=item.prize_amount??item.prize??0;
+      const date=item.created_at||item.match_date||item.date||'';
 
       return `
         <div class="game-history-row">
@@ -837,6 +864,10 @@ async function loadGameHistory(){
             <small>Prize</small>
             <strong class="prize">${money(prize)}</strong>
           </div>
+          <div class="game-stat">
+            <small>Date</small>
+            <strong>${escapeHTML(formatDate(date).split(',')[0]||'-')}</strong>
+          </div>
         </div>`;
     }).join('');
   }catch(error){
@@ -853,7 +884,9 @@ function openMoneyModal(type){
   $('moneyForm').reset();
   $('moneyModal').classList.add('show');
 }
-function closeMoneyModal(){$('moneyModal').classList.remove('show')}
+function closeMoneyModal(){
+  $('moneyModal').classList.remove('show');
+}
 
 $('moneyModal').addEventListener('click',event=>{
   if(event.target===$('moneyModal'))closeMoneyModal();
@@ -861,12 +894,18 @@ $('moneyModal').addEventListener('click',event=>{
 
 $('moneyForm').addEventListener('submit',async event=>{
   event.preventDefault();
+
   const amount=Number($('moneyAmount').value);
   const method=$('moneyMethod').value.trim();
   const reference=$('moneyReference').value.trim();
 
   if(!Number.isFinite(amount)||amount<=0){
-    showStatus('Enter a valid amount.','error');return;
+    showStatus('Enter a valid amount.','error');
+    return;
+  }
+  if(!method||!reference){
+    showStatus('Enter payment method and transaction reference.','error');
+    return;
   }
 
   const btn=$('moneySubmit');
@@ -874,7 +913,10 @@ $('moneyForm').addEventListener('submit',async event=>{
   btn.textContent='Submitting...';
 
   try{
-    const endpoint=moneyType==='deposit'?'/tournament/deposits':'/tournament/withdrawals';
+    const endpoint=moneyType==='deposit'
+      ?'/tournament/deposits'
+      :'/tournament/withdrawals';
+
     await api(endpoint,{
       method:'POST',
       body:JSON.stringify({
@@ -891,19 +933,16 @@ $('moneyForm').addEventListener('submit',async event=>{
     showStatus(error.message,'error');
   }finally{
     btn.disabled=false;
-    btn.textContent=moneyType==='deposit'?'Submit Deposit Request':'Submit Withdraw Request';
+    btn.textContent=moneyType==='deposit'
+      ?'Submit Deposit Request'
+      :'Submit Withdraw Request';
   }
 });
 
-/* HTML ESCAPE */
-function escapeHTML(value){
-  return String(value).replace(/[&<>"']/g,char=>({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  }[char]));
-}
-
 /* GAME NAVIGATION */
-function openGame(page){location.href=page}
+function openGame(page){
+  location.href=page;
+}
 
 /* INITIAL LOAD */
 async function init(){
@@ -914,9 +953,20 @@ async function init(){
     return;
   }
 
-  await loadProfile();
-  await Promise.all([loadWallet(),loadTransactions(),loadGameHistory()]);
+  try{
+    await loadProfile();
+  }catch(error){
+    console.error(error);
+    showStatus(error.message,'error');
+  }
+
+  await Promise.allSettled([
+    loadWallet(),
+    loadTransactions(),
+    loadGameHistory()
+  ]);
 }
+
 init();
 </script>
 </body>
