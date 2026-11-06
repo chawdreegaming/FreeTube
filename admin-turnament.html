@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#080d1b">
+<title>Tournament Admin - Boys vs Girls</title>
+
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#080d1b;
+  --card:#111c31;
+  --card2:#0d1729;
+  --line:#293a58;
+  --text:#f3f6ff;
+  --muted:#9baec9;
+  --blue:#568dff;
+  --purple:#9672ff;
+  --green:#27c997;
+  --red:#ff647f;
+  --yellow:#ffc65b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 10% 0%,#25245a 0,transparent 34%),
+    radial-gradient(circle at 100% 20%,#123c65 0,transparent 30%),
+    var(--bg);
+  color:var(--text);
+  font:15px/1.55 system-ui,sans-serif;
+}
+.container{max-width:1200px;margin:auto;padding:20px 14px 45px}
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{
+  width:54px;height:54px;
+  display:grid;place-items:center;
+  border-radius:17px;
+  background:linear-gradient(135deg,#4c8cff,#9b70ff);
+  font-size:19px;font-weight:950;
+  box-shadow:0 8px 30px #4b8dff33;
+}
+h1{font-size:clamp(24px,5vw,34px);margin:0}
+h2{font-size:20px;margin:0 0 12px}
+h3{font-size:16px;margin:0 0 7px}
+p{overflow-wrap:anywhere}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+button,input,select,textarea{font:inherit}
+button{
+  border:0;border-radius:10px;
+  padding:10px 14px;
+  background:var(--blue);
+  color:white;font-weight:750;
+  cursor:pointer;
+}
+button:hover:not(:disabled){filter:brightness(1.12)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button.secondary{background:#263854}
+button.success{background:#12664e}
+button.danger{background:#a72e49}
+button.purple{background:#6246b4}
+input,select,textarea{
+  width:100%;
+  padding:11px 12px;
+  color:white;
+  background:#091426;
+  border:1px solid #30415f;
+  border-radius:10px;
+  outline:none;
+}
+input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+textarea{min-height:85px;resize:vertical}
+label{
+  display:block;
+  margin-bottom:6px;
+  color:#cbd8ec;
+  font-size:12px;
+  font-weight:650;
+}
+.card{
+  padding:17px;
+  margin:15px 0;
+  border:1px solid var(--line);
+  border-radius:18px;
+  background:linear-gradient(150deg,#14243c,#0d1729);
+}
+.row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.stat{
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:#0e1a2e;
+}
+.stat-icon{font-size:23px}
+.stat-value{font-size:28px;font-weight:900;margin-top:4px}
+.stat-label{font-size:12px;color:var(--muted)}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.field{min-width:0;flex:1}
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
+.tabs{
+  display:flex;gap:7px;flex-wrap:wrap;
+  padding:7px;
+  margin:20px 0;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:#0b1628;
+}
+.tab{
+  background:transparent;
+  color:var(--muted);
+}
+.tab.active{
+  background:linear-gradient(135deg,#376dd1,#7050c7);
+  color:white;
+}
+.panel{display:none}
+.panel.active{display:block}
+.list{display:grid;gap:11px}
+.item{
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:#0a1628;
+  overflow-wrap:anywhere;
+}
+.pill{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#263854;
+  font-size:11px;
+  font-weight:750;
+}
+.pill.green{background:#12513f;color:#b7ffe4}
+.pill.red{background:#592536;color:#ffd2dc}
+.pill.yellow{background:#59461d;color:#ffe6a8}
+.pill.blue{background:#203e70;color:#c8dcff}
+.empty{
+  padding:23px;
+  border:1px dashed #354865;
+  border-radius:13px;
+  text-align:center;
+  color:var(--muted);
+}
+.notice{
+  display:none;
+  padding:12px 14px;
+  border-radius:11px;
+  margin:12px 0;
+  background:#512432;
+  color:#ffd5dc;
+  overflow-wrap:anywhere;
+}
+.notice.success{background:#103d32;color:#b9ffe5}
+.notice.info{background:#18314e;color:#d9eaff}
+.hero{
+  padding:22px;
+  border:1px solid #59489b;
+  border-radius:18px;
+  background:linear-gradient(120deg,#292052,#142a4b,#102039);
+}
+.hero h2{font-size:24px}
+.hero-icon{font-size:36px;margin-bottom:8px}
+.section-title{margin:22px 0 10px}
+footer{
+  border-top:1px solid var(--line);
+  margin-top:28px;
+  padding-top:15px;
+  color:var(--muted);
+  font-size:12px;
+}
+.hidden{display:none!important}
+@media(max-width:750px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:480px){
+  .container{padding:13px 10px 30px}
+  .grid{grid-template-columns:1fr}
+  .stat{padding:12px}
+  .stat-value{font-size:23px}
+  button{padding:9px 11px}
+}
+</style>
+</head>
+
+<body>
+<main class="container">
+
+<header>
+  <div class="brand">
+    <div class="logo">BvG</div>
+    <div>
+      <div class="muted small">BOYS VS GIRLS 💙💗</div>
+      <h1>Tournament Admin</h1>
+      <div class="muted small">eSports Control Center</div>
+    </div>
+  </div>
+  <div class="actions">
+    <a href="admin-app-management.html">
+      <button class="secondary" type="button">← App Management</button>
+    </a>
+    <button id="refreshAll" type="button">↻ Refresh</button>
+  </div>
+</header>
+
+<div id="notice" class="notice" role="status" aria-live="polite"></div>
+
+<section class="card">
+  <div class="row">
+    <div>
+      <h3>Admin Connection</h3>
+      <div id="connection" class="muted small">Checking admin access...</div>
+    </div>
+    <span class="pill yellow" id="adminBadge">Checking...</span>
+  </div>
+  <p class="muted small">
+    Tournament administration requires a verified Admin account.
+  </p>
+</section>
+
+<section class="hero">
+  <div class="hero-icon">🏆</div>
+  <h2>Tournament Control Center</h2>
+  <p class="muted">
+    Create Free Fire tournaments, register teams and manage tournament status.
+  </p>
+  <div class="actions">
+    <button onclick="showTab('create')">＋ Create Tournament</button>
+    <button class="secondary" onclick="showTab('teams')">Manage Teams</button>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="stat">
+    <div class="stat-icon">🏆</div>
+    <div class="stat-value" id="totalCount">—</div>
+    <div class="stat-label">Total Tournaments</div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon">🟢</div>
+    <div class="stat-value" id="liveCount">—</div>
+    <div class="stat-label">Live Tournaments</div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon">👥</div>
+    <div class="stat-value" id="teamCount">—</div>
+    <div class="stat-label">Registered Teams</div>
+  </div>
+  <div class="stat">
+    <div class="stat-icon">🏁</div>
+    <div class="stat-value" id="completedCount">—</div>
+    <div class="stat-label">Completed</div>
+  </div>
+</section>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="dashboard">Dashboard</button>
+  <button class="tab" data-tab="create">Create Tournament</button>
+  <button class="tab" data-tab="tournaments">Tournaments</button>
+  <button class="tab" data-tab="teams">Team Registration</button>
+</nav>
+
+<!-- DASHBOARD -->
+
+<section class="panel active" id="dashboard">
+  <div class="card">
+    <div class="row">
+      <div>
+        <h2>Welcome Admin</h2>
+        <p class="muted small">
+          Manage your eSports tournaments from one place.
+        </p>
+      </div>
+      <span class="pill green">Tournament Panel</span>
+    </div>
+    <div class="grid">
+      <button onclick="showTab('create')">🏆 Create Tournament</button>
+      <button class="secondary" onclick="showTab('tournaments')">📋 View Tournaments</button>
+      <button class="secondary" onclick="showTab('teams')">👥 Register Team</button>
+      <button class="secondary" onclick="loadTournaments()">↻ Refresh Data</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Recent Tournaments</h2>
+    <div id="recentTournaments" class="list">
+      <div class="empty">Loading tournaments...</div>
+    </div>
+  </div>
+</section>
+
+<!-- CREATE TOURNAMENT -->
+
+<section class="panel" id="create">
+  <div class="card">
+    <h2>＋ Create New Tournament</h2>
+    <p class="muted small">
+      Enter tournament details and publish it to the tournament list.
+    </p>
+
+    <form id="createForm">
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="title">Tournament Name *</label>
+          <input id="title" maxlength="120" required
+          placeholder="Friday Squad Championship">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="mode">Game Mode *</label>
+          <select id="mode">
+            <option>Solo</option>
+            <option>Duo</option>
+            <option selected>Squad</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="map">Map *</label>
+          <select id="map">
+            <option>Bermuda</option>
+            <option>Purgatory</option>
+            <option>Kalahari</option>
+            <option>Alpine</option>
+            <option>NexTerra</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="entry">Entry Fee</label>
+          <input id="entry" type="number" min="0" step="0.01" value="0" required>
+        </div>
+
+        <div class="field">
+          <label for="prize">Fixed Prize Pool</label>
+          <input id="prize" type="number" min="0" step="0.01" value="0" required>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="prizeMode">Prize Calculation</label>
+          <select id="prizeMode">
+            <option value="fixed">Fixed Prize</option>
+            <option value="dynamic">Dynamic Prize</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="prizePercent">Dynamic Prize Percentage</label>
+          <input id="prizePercent" type="number" min="0" max="100"
+          step="0.01" value="0">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="maxPlayers">Maximum Players / Teams</label>
+          <input id="maxPlayers" type="number" min="1" value="100" required>
+        </div>
+
+        <div class="field">
+          <label for="matchDate">Match Date & Time</label>
+          <input id="matchDate" type="datetime-local">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="field">
+          <label for="banner">Banner Image URL (HTTPS)</label>
+          <input id="banner" type="url" placeholder="https://...">
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="description">Tournament Description</label>
+        <textarea id="description" maxlength="2000"
+        placeholder="Tournament rules and information"></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit" id="createButton">Create Tournament</button>
+        <button type="reset" class="secondary">Reset Form</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- TOURNAMENT LIST -->
+
+<section class="panel" id="tournaments">
+  <div class="card">
+    <div class="row">
+      <div>
+        <h2>🏆 Tournament List</h2>
+        <p class="muted small">Manage all created tournaments.</p>
+      </div>
+      <button id="loadTournaments">↻ Refresh</button>
+    </div>
+    <div class="toolbar">
+      <div class="field">
+        <label for="tournamentSearch">Search Tournament</label>
+        <input id="tournamentSearch" placeholder="Search by tournament name">
+      </div>
+      <div class="field">
+        <label for="statusFilter">Filter Status</label>
+        <select id="statusFilter">
+          <option value="all">All Tournaments</option>
+          <option value="upcoming">Upcoming</option>
+          <option value="live">Live</option>
+          <option value="completed">Completed</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <span class="pill blue" id="tournamentCount">0 Tournaments</span>
+    </div>
+  </div>
+
+  <div id="tournamentsList" class="list">
+    <div class="empty">Click Refresh to load tournaments.</div>
+  </div>
+</section>
+
+<!-- TEAM REGISTRATION -->
+
+<section class="panel" id="teams">
+  <div class="card">
+    <h2>👥 Admin Team Registration</h2>
+    <p class="muted small">
+      Admin can create and register teams. Each team must contain exactly
+      four main players. No substitutes.
+    </p>
+
+    <div class="field">
+      <label for="teamTournament">Select Tournament *</label>
+      <select id="teamTournament">
+        <option value="">Load tournaments first</option>
+      </select>
+    </div>
+
+    <div class="field" style="margin-top:12px">
+      <label for="teamName">Team Name *</label>
+      <input id="teamName" maxlength="80" placeholder="Enter team name">
+    </div>
+
+    <h3 class="section-title">Player Details</h3>
+
+    <div class="grid">
+      <div class="field">
+        <label for="p1name">Player 1 Name *</label>
+        <input id="p1name" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="p1uid">Player 1 Free Fire UID *</label>
+        <input id="p1uid" inputmode="numeric" maxlength="20">
+      </div>
+
+      <div class="field">
+        <label for="p2name">Player 2 Name *</label>
+        <input id="p2name" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="p2uid">Player 2 Free Fire UID *</label>
+        <input id="p2uid" inputmode="numeric" maxlength="20">
+      </div>
+
+      <div class="field">
+        <label for="p3name">Player 3 Name *</label>
+        <input id="p3name" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="p3uid">Player 3 Free Fire UID *</label>
+        <input id="p3uid" inputmode="numeric" maxlength="20">
+      </div>
+
+      <div class="field">
+        <label for="p4name">Player 4 Name *</label>
+        <input id="p4name" maxlength="80">
+      </div>
+      <div class="field">
+        <label for="p4uid">Player 4 Free Fire UID *</label>
+        <input id="p4uid" inputmode="numeric" maxlength="20">
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="createTeamButton">＋ Create & Register Team</button>
+      <button class="secondary" id="loadTeamsButton">↻ Load Registered Teams</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Registered Teams</h2>
+    <div id="teamsList" class="list">
+      <div class="empty">Select a tournament and load teams.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  BOYS VS GIRLS 💙💗 — Tournament Administration<br>
+  Tournament data is managed separately from the Social App Wallet.
+</footer>
+
+</main>
+
+<script>
+(function(){
+"use strict";
+
+const API="https://freetube-backend-a222.onrender.com/api";
+const TOKEN_KEY="freetube_access_token";
+const $=id=>document.getElementById(id);
+
+let adminVerified=false;
+let tournamentsData=[];
+let selectedTeams=[];
+
+function getToken(){
+  return(localStorage.getItem(TOKEN_KEY)||"").trim();
+}
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[c]);
+}
+
+function notify(message,type){
+  const n=$("notice");
+  n.textContent=message;
+  n.className="notice"+(type?" "+type:"");
+  n.style.display="block";
+  n.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function empty(root,message){
+  $(root).innerHTML="";
+  const d=document.createElement("div");
+  d.className="empty";
+  d.textContent=message;
+  $(root).appendChild(d);
+}
+
+async function api(path,options={}){
+  const t=getToken();
+
+  if(!t){
+    throw new Error("Login token missing. Please log in to the main app.");
+  }
+
+  let response;
+
+  try{
+    response=await fetch(API+path,{
+      ...options,
+      headers:{
+        ...(options.headers||{}),
+        Authorization:"Bearer "+t,
+        ...(options.body?{"Content-Type":"application/json"}:{})
+      },
+      cache:"no-store",
+      credentials:"omit"
+    });
+  }catch(error){
+    console.error("Tournament API network error:",error);
+    throw new Error("Cannot connect to the backend. Check internet or Render service.");
+  }
+
+  const contentType=response.headers.get("content-type")||"";
+
+  const data=contentType.includes("application/json")
+    ?await response.json().catch(()=>({}))
+    :{error:(await response.text().catch(()=>"")).slice(0,300)};
+
+  if(!response.ok){
+    const err=new Error(data.error||data.message||("HTTP "+response.status));
+    err.status=response.status;
+    throw err;
+  }
+
+  return data;
+}
+
+/* ADMIN VERIFICATION */
+
+async function verifyAdmin(){
+  adminVerified=false;
+
+  $("adminBadge").textContent="Checking...";
+  $("adminBadge").className="pill yellow";
+
+  if(!getToken()){
+    $("connection").textContent="Please log in to the main app first.";
+    $("adminBadge").textContent="Not Logged In";
+    $("adminBadge").className="pill red";
+    return false;
+  }
+
+  try{
+    await api("/auth/me");
+    await api("/admin/dashboard");
+
+    adminVerified=true;
+
+    $("adminBadge").textContent="Admin Verified";
+    $("adminBadge").className="pill green";
+    $("connection").textContent="Backend verified your Admin permissions.";
+
+    return true;
+
+  }catch(e){
+    $("adminBadge").textContent="Not Verified";
+    $("adminBadge").className="pill red";
+
+    $("connection").textContent=
+      e.status===401
+      ?"Login expired. Please log in again."
+      :e.status===403
+      ?"This account does not have Admin permission."
+      :"Admin verification failed: "+e.message;
+
+    notify("Admin verification failed: "+e.message);
+    return false;
+  }
+}
+
+/* TABS */
+
+function showTab(name){
+  document.querySelectorAll(".panel").forEach(p=>{
+    p.classList.toggle("active",p.id===name);
+  });
+
+  document.querySelectorAll(".tab").forEach(b=>{
+    b.classList.toggle("active",b.dataset.tab===name);
+  });
+
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+window.showTab=showTab;
+
+document.querySelectorAll("[data-tab]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    showTab(button.dataset.tab);
+  });
+});
+
+/* TOURNAMENTS */
+
+async function loadTournaments(){
+  if(!adminVerified){
+    notify("Admin access is not verified.");
+    return;
+  }
+
+  empty("tournamentsList","Loading tournaments...");
+  empty("recentTournaments","Loading tournaments...");
+
+  try{
+    const data=await api("/tournament/tournaments");
+
+    tournamentsData=Array.isArray(data.tournaments)
+      ?data.tournaments:[];
+
+    renderTournamentList();
+    updateStats();
+    updateTournamentSelect();
+
+  }catch(e){
+    empty("tournamentsList","Could not load tournaments: "+e.message);
+    empty("recentTournaments","Could not load tournaments.");
+    notify("Tournament loading failed: "+e.message);
+  }
+}
+
+function updateStats(){
+  $("totalCount").textContent=tournamentsData.length;
+
+  $("liveCount").textContent=
+    tournamentsData.filter(t=>String(t.status).toLowerCase()==="live").length;
+
+  $("completedCount").textContent=
+    tournamentsData.filter(t=>String(t.status).toLowerCase()==="completed").length;
+
+  const totalTeams=tournamentsData.reduce(
+    (sum,t)=>sum+Number(t.registered_count||0),0
+  );
+
+  $("teamCount").textContent=totalTeams;
+  $("tournamentCount").textContent=tournamentsData.length+" Tournaments";
+}
+
+function updateTournamentSelect(){
+  const select=$("teamTournament");
+  const previous=select.value;
+
+  select.innerHTML='<option value="">Select tournament</option>';
+
+  tournamentsData.forEach(t=>{
+    const option=document.createElement("option");
+    option.value=t.id;
+    option.textContent=
+      (t.title||"Tournament")+" · "+(t.mode||"")+" · "+(t.status||"");
+    select.appendChild(option);
+  });
+
+  if(tournamentsData.some(t=>String(t.id)===previous)){
+    select.value=previous;
+  }
+}
+
+function statusClass(status){
+  status=String(status||"upcoming").toLowerCase();
+
+  if(status==="live")return "green";
+  if(status==="completed")return "red";
+  if(status==="cancelled")return "red";
+
+  return "yellow";
+}
+
+function renderTournamentList(){
+  const root=$("tournamentsList");
+  root.innerHTML="";
+
+  const q=$("tournamentSearch").value.trim().toLowerCase();
+  const filter=$("statusFilter").value;
+
+  const filtered=tournamentsData.filter(t=>{
+    const title=String(t.title||"").toLowerCase();
+    const status=String(t.status||"upcoming").toLowerCase();
+
+    return title.includes(q)&&(filter==="all"||status===filter);
+  });
+
+  if(!filtered.length){
+    empty("tournamentsList","No matching tournaments found.");
+    return;
+  }
+
+  filtered.forEach(t=>{
+    const el=document.createElement("article");
+    el.className="item";
+
+    const fee=Number(t.entry_fee||0);
+    const prize=Number(t.prize_pool||0);
+
+    el.innerHTML=
+      '<div class="row">'+
+        '<div>'+
+          '<h3>'+esc(t.title)+'</h3>'+
+          '<div class="muted small">Tournament ID: '+esc(t.id)+
+          ' · '+esc(t.mode)+' · '+esc(t.map_name||"")+'</div>'+
+        '</div>'+
+        '<span class="pill '+statusClass(t.status)+'">'+
+          esc(t.status||"upcoming")+
+        '</span>'+
+      '</div>'+
+      '<p class="muted small">'+esc(t.description||"No description")+'</p>'+
+      '<div class="grid">'+
+        '<div class="muted small">Entry Fee: <strong>'+(
+          fee===0?"FREE":fee.toLocaleString()
+        )+'</strong></div>'+
+        '<div class="muted small">Prize Pool: <strong>'+
+          prize.toLocaleString()+'</strong></div>'+
+        '<div class="muted small">Registered: <strong>'+
+          esc(t.registered_count??0)+' / '+esc(t.max_players??"—")+
+        '</strong></div>'+
+        '<div class="muted small">Match Time: <strong>'+
+          esc(t.scheduled_at||"TBA")+'</strong></div>'+
+      '</div>'+
+      '<div class="actions">'+
+        '<button class="secondary" data-team="'+esc(t.id)+'">Manage Teams</button>'+
+        '<button class="success" data-live="'+esc(t.id)+'">Set Live</button>'+
+        '<button class="purple" data-complete="'+esc(t.id)+'">Complete</button>'+
+        '<button class="danger" data-cancel="'+esc(t.id)+'">Cancel</button>'+
+      '</div>';
+
+    root.appendChild(el);
+  });
+
+  bindTournamentActions(root);
+
+  const recent=$("recentTournaments");
+  recent.innerHTML="";
+
+  tournamentsData.slice(0,5).forEach(t=>{
+    const el=document.createElement("article");
+    el.className="item";
+    el.innerHTML=
+      '<div class="row">'+
+        '<strong>'+esc(t.title)+'</strong>'+
+        '<span class="pill '+statusClass(t.status)+'">'+
+        esc(t.status||"upcoming")+'</span>'+
+      '</div>'+
+      '<div class="muted small">ID: '+esc(t.id)+
+      ' · '+esc(t.mode)+' · '+esc(t.map_name||"")+'</div>';
+
+    recent.appendChild(el);
+  });
+
+  if(!tournamentsData.length){
+    empty("recentTournaments","No tournaments created yet.");
+  }
+}
+
+function bindTournamentActions(root){
+  root.querySelectorAll("[data-team]").forEach(b=>{
+    b.onclick=()=>{
+      $("teamTournament").value=b.dataset.team;
+      showTab("teams");
+      loadTeams();
+    };
+  });
+
+  root.querySelectorAll("[data-live]").forEach(b=>{
+    b.onclick=()=>changeStatus(b.dataset.live,"live");
+  });
+
+  root.querySelectorAll("[data-complete]").forEach(b=>{
+    b.onclick=()=>changeStatus(b.dataset.complete,"completed");
+  });
+
+  root.querySelectorAll("[data-cancel]").forEach(b=>{
+    b.onclick=()=>changeStatus(b.dataset.cancel,"cancelled");
+  });
+}
+
+/* CREATE TOURNAMENT */
+
+$("createForm").addEventListener("submit",async function(e){
+  e.preventDefault();
+
+  if(!adminVerified){
+    notify("Admin access is not verified.");
+    return;
+  }
+
+  const entry=Number($("entry").value);
+  const prize=Number($("prize").value);
+  const max=Number($("maxPlayers").value);
+  const percent=Number($("prizePercent").value);
+
+  if(!Number.isFinite(entry)||entry<0||
+     !Number.isFinite(prize)||prize<0||
+     !Number.isInteger(max)||max<1||
+     !Number.isFinite(percent)||percent<0||percent>100){
+    notify("Please enter valid tournament values.");
+    return;
+  }
+
+  const dateValue=$("matchDate").value;
+
+  const payload={
+    title:$("title").value.trim(),
+    description:$("description").value.trim(),
+    mode:$("mode").value,
+    map_name:$("map").value,
+    entry_fee:entry,
+    prize_pool:prize,
+    prize_mode:$("prizeMode").value,
+    prize_percentage:percent,
+    max_players:max,
+    scheduled_at:dateValue?new Date(dateValue).toISOString():null,
+    banner_url:$("banner").value.trim()
+  };
+
+  if(!payload.title){
+    notify("Tournament name is required.");
+    return;
+  }
+
+  if(payload.banner_url&&!/^https:\/\//i.test(payload.banner_url)){
+    notify("Banner URL must use HTTPS.");
+    return;
+  }
+
+  const btn=$("createButton");
+  btn.disabled=true;
+  btn.textContent="Creating...";
+
+  try{
+    await api("/tournament/tournaments",{
+      method:"POST",
+      body:JSON.stringify(payload)
+    });
+
+    $("createForm").reset();
+    $("entry").value="0";
+    $("prize").value="0";
+    $("prizePercent").value="0";
+    $("maxPlayers").value="100";
+
+    notify("Tournament created successfully!","success");
+
+    await loadTournaments();
+    showTab("tournaments");
+
+  }catch(e){
+    notify("Could not create tournament: "+e.message);
+  }finally{
+    btn.disabled=false;
+    btn.textContent="Create Tournament";
+  }
+});
+
+/* STATUS UPDATE */
+
+async function changeStatus(id,status){
+  if(!adminVerified)return notify("Admin access is not verified.");
+
+  if(!confirm("Change tournament #"+id+" status to "+status+"?")){
+    return;
+  }
+
+  try{
+    await api("/tournament/tournaments/"+encodeURIComponent(id),{
+      method:"PATCH",
+      body:JSON.stringify({status})
+    });
+
+    notify("Tournament status updated successfully.","success");
+    await loadTournaments();
+
+  }catch(e){
+    notify("Could not update tournament: "+e.message);
+  }
+}
+
+/* TEAM REGISTRATION */
+
+async function createTeam(){
+  if(!adminVerified){
+    notify("Admin access is not verified.");
+    return;
+  }
+
+  const tournamentId=$("teamTournament").value;
+  const teamName=$("teamName").value.trim();
+
+  const players=[1,2,3,4].map(i=>({
+    name:$("p"+i+"name").value.trim(),
+    uid:$("p"+i+"uid").value.trim()
+  }));
+
+  if(!tournamentId){
+    notify("Please select a tournament.");
+    return;
+  }
+
+  if(!teamName){
+    notify("Please enter a team name.");
+    return;
+  }
+
+  if(players.some(p=>
+    !p.name||!/^[0-9]{5,20}$/.test(p.uid)
+  )){
+    notify("Enter all four player names and numeric UIDs (5–20 digits).");
+    return;
+  }
+
+  const btn=$("createTeamButton");
+  btn.disabled=true;
+  btn.textContent="Registering...";
+
+  try{
+    await api(
+      "/tournament/admin/tournaments/"+
+      encodeURIComponent(tournamentId)+"/teams",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          team_name:teamName,
+          players
+        })
+      }
+    );
+
+    $("teamName").value="";
+
+    [1,2,3,4].forEach(i=>{
+      $("p"+i+"name").value="";
+      $("p"+i+"uid").value="";
+    });
+
+    notify("Team registered successfully!","success");
+
+    await loadTeams();
+    await loadTournaments();
+
+  }catch(e){
+    notify("Could not register team: "+e.message);
+  }finally{
+    btn.disabled=false;
+    btn.textContent="＋ Create & Register Team";
+  }
+}
+
+async function loadTeams(){
+  if(!adminVerified){
+    notify("Admin access is not verified.");
+    return;
+  }
+
+  const id=$("teamTournament").value;
+
+  if(!id){
+    return empty("teamsList","Select a tournament first.");
+  }
+
+  empty("teamsList","Loading registered teams...");
+
+  try{
+    const d=await api(
+      "/tournament/admin/tournaments/"+
+      encodeURIComponent(id)+"/teams"
+    );
+
+    selectedTeams=Array.isArray(d.teams)?d.teams:[];
+
+    renderTeams();
+
+  }catch(e){
+    empty("teamsList","Could not load teams: "+e.message);
+  }
+}
+
+function renderTeams(){
+  const root=$("teamsList");
+  root.innerHTML="";
+
+  if(!selectedTeams.length){
+    empty("teamsList","No teams registered for this tournament.");
+    return;
+  }
+
+  selectedTeams.forEach(team=>{
+    const el=document.createElement("article");
+    el.className="item";
+
+    const players=Array.isArray(team.players)?team.players:[];
+
+    el.innerHTML=
+      '<div class="row">'+
+        '<h3>'+esc(team.team_name||"Unnamed Team")+'</h3>'+
+        '<span class="pill '+(team.roster_locked?"red":"green")+'">'+
+        (team.roster_locked?"Roster Locked":"Roster Editable")+
+        '</span>'+
+      '</div>'+
+      '<div class="muted small">Team ID: '+esc(team.id)+
+      ' · Status: '+esc(team.status||"registered")+'</div>'+
+      '<div style="margin-top:10px">'+
+      players.map((p,i)=>
+        '<div class="muted small">Player '+(i+1)+': '+
+        esc(p.name)+' · UID: '+esc(p.uid)+'</div>'
+      ).join("")+
+      '</div>';
+
+    if(!team.roster_locked){
+      const b=document.createElement("button");
+      b.className="secondary";
+      b.textContent="Edit 4 Players";
+      b.style.marginTop="12px";
+      b.onclick=()=>editRoster(team);
+      el.appendChild(b);
+    }
+
+    root.appendChild(el);
+  });
+}
+
+/* EDIT TEAM ROSTER */
+
+async function editRoster(team){
+  if(!adminVerified)return;
+
+  const tournamentId=$("teamTournament").value;
+  const current=Array.isArray(team.players)?team.players:[];
+
+  const players=[];
+
+  for(let i=0;i<4;i++){
+    const old=current[i]||{};
+
+    const name=prompt(
+      "Player "+(i+1)+" Name",
+      old.name||""
+    );
+
+    if(name===null)return;
+
+    const uid=prompt(
+      "Player "+(i+1)+" Free Fire UID",
+      old.uid||""
+    );
+
+    if(uid===null)return;
+
+    players.push({
+      name:name.trim(),
+      uid:uid.trim()
+    });
+  }
+
+  if(players.some(p=>
+    !p.name||!/^[0-9]{5,20}$/.test(p.uid)
+  )){
+    notify("Invalid player name or UID.");
+    return;
+  }
+
+  if(!confirm("Save updated team roster?")){
+    return;
+  }
+
+  try{
+    await api(
+      "/tournament/admin/tournaments/"+
+      encodeURIComponent(tournamentId)+
+      "/teams/"+encodeURIComponent(team.id),
+      {
+        method:"PATCH",
+        body:JSON.stringify({players})
+      }
+    );
+
+    notify("Team roster updated successfully.","success");
+    await loadTeams();
+
+  }catch(e){
+    notify("Roster update failed: "+e.message);
+  }
+}
+
+/* EVENTS */
+
+$("loadTournaments").onclick=loadTournaments;
+$("createTeamButton").onclick=createTeam;
+$("loadTeamsButton").onclick=loadTeams;
+$("teamTournament").onchange=loadTeams;
+$("refreshAll").onclick=async()=>{
+  if(await verifyAdmin())await loadTournaments();
+};
+
+$("tournamentSearch").oninput=renderTournamentList;
+$("statusFilter").onchange=renderTournamentList;
+
+async function initialize(){
+  if(await verifyAdmin()){
+    await loadTournaments();
+  }
+}
+
+initialize();
+
+})();
+</script>
+
+</body>
+</html>
