@@ -481,12 +481,21 @@ async function apiRequest(path,options={}){
     response = await fetch(API_BASE_URL + path,{
       ...options,
       headers,
-      credentials:"include",
+
+      /* FIX:
+         Authentication uses Bearer Token.
+         Cookies are not required for these API requests.
+         This avoids credentialed-CORS mismatch.
+      */
+      credentials:"omit",
+
       cache:"no-store"
     });
   }catch(error){
+    console.error("Tournament API network/CORS error:",error);
+
     throw new Error(
-      "Cannot connect to the Backend. Check Render service status and FRONTEND_ORIGIN CORS settings."
+      "Backend connection failed. Please check your internet connection, Render service and FRONTEND_ORIGIN CORS settings."
     );
   }
 
@@ -583,11 +592,7 @@ document.querySelectorAll(".modal").forEach(modal=>{
   });
 });
 
-/* SOCIAL + TOURNAMENT PROFILE
-   This endpoint already returns:
-   username, display_name, avatar_url,
-   free_fire_name, free_fire_uid.
-*/
+/* SOCIAL + TOURNAMENT PROFILE */
 async function loadTournamentProfile(){
   const data = await apiRequest("/tournament/profile");
   const profile = data.profile || {};
@@ -705,10 +710,7 @@ async function saveGameProfile(){
   }
 }
 
-/* TOURNAMENT WALLET
-   This is the isolated ft_tournament_wallets table.
-   Social App wallet is never accessed.
-*/
+/* TOURNAMENT WALLET */
 async function loadWallet(){
   const data = await apiRequest("/tournament/wallet");
   const wallet = data.wallet || {};
