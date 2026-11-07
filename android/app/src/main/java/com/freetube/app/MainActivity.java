@@ -1,6 +1,8 @@
+
 package com.freetube.app;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
@@ -8,6 +10,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -21,6 +24,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -46,9 +50,8 @@ import java.util.Set;
 public class MainActivity extends Activity {
 
     private static final String HOME_URL =
-            "https://chawdreegaming.github.io/FreeTube/";
+            "https://boysgirls.online/";
 
-    // FreeTube REAL Native Ad Unit ID.
     private static final String NATIVE_AD_UNIT_ID =
             "ca-app-pub-2013650243814059/3524026549";
 
@@ -195,22 +198,16 @@ public class MainActivity extends Activity {
             }
         });
 
+        // Download files inside Android Download Manager.
         webView.setDownloadListener(
                 (url, userAgent, contentDisposition,
                  mimetype, contentLength) -> {
-                    try {
-                        startActivity(new Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(url)
-                        ));
-
-                    } catch (Exception e) {
-                        Toast.makeText(
-                                MainActivity.this,
-                                "Unable to open this download.",
-                                Toast.LENGTH_SHORT
-                        ).show();
-                    }
+                    downloadFile(
+                            url,
+                            userAgent,
+                            contentDisposition,
+                            mimetype
+                    );
                 }
         );
 
@@ -229,6 +226,18 @@ public class MainActivity extends Activity {
         );
     }
 
+    // Internal pages remain inside the app.
+    private boolean isInternalHost(String host) {
+        if (host == null) return false;
+
+        host = host.toLowerCase();
+
+        return host.equals("boysgirls.online")
+                || host.equals("www.boysgirls.online")
+                || host.equals("chawdreegaming.github.io")
+                || host.equals("freetube-backend-a222.onrender.com");
+    }
+
     private boolean isDiscoveryPage(String url) {
         if (url == null) return false;
 
@@ -240,8 +249,96 @@ public class MainActivity extends Activity {
         String path = uri.getPath() == null
                 ? "" : uri.getPath().toLowerCase();
 
-        return host.equals("chawdreegaming.github.io")
+        return (host.equals("boysgirls.online")
+                || host.equals("www.boysgirls.online")
+                || host.equals("chawdreegaming.github.io"))
                 && path.endsWith("/discover.html");
+    }
+
+    // Download files without opening Chrome.
+    private void downloadFile(
+            String url,
+            String userAgent,
+            String contentDisposition,
+            String mimeType) {
+
+        try {
+            Uri uri = Uri.parse(url);
+
+            if (!"https".equalsIgnoreCase(uri.getScheme())
+                    && !"http".equalsIgnoreCase(uri.getScheme())) {
+                Toast.makeText(
+                        this,
+                        "Unsupported download link.",
+                        Toast.LENGTH_SHORT
+                ).show();
+                return;
+            }
+
+            DownloadManager.Request request =
+                    new DownloadManager.Request(uri);
+
+            String fileName = URLUtil.guessFileName(
+                    url,
+                    contentDisposition,
+                    mimeType
+            );
+
+            request.setTitle(fileName);
+            request.setDescription("Downloading Boys Vs Girls file");
+            request.setMimeType(mimeType);
+
+            request.setNotificationVisibility(
+                    DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
+            );
+
+            request.setAllowedOverMetered(true);
+            request.setAllowedOverRoaming(true);
+
+            if (userAgent != null) {
+                request.addRequestHeader("User-Agent", userAgent);
+            }
+
+            String cookie = CookieManager.getInstance()
+                    .getCookie(url);
+
+            if (cookie != null && !cookie.isEmpty()) {
+                request.addRequestHeader("Cookie", cookie);
+            }
+
+            request.setDestinationInExternalPublicDir(
+                    Environment.DIRECTORY_DOWNLOADS,
+                    fileName
+            );
+
+            DownloadManager manager =
+                    (DownloadManager) getSystemService(
+                            DOWNLOAD_SERVICE
+                    );
+
+            if (manager == null) {
+                throw new IllegalStateException(
+                        "Download service unavailable"
+                );
+            }
+
+            manager.enqueue(request);
+
+            Toast.makeText(
+                    this,
+                    "Download started. Check your Downloads folder.",
+                    Toast.LENGTH_LONG
+            ).show();
+
+        } catch (Exception e) {
+            Log.e("BoysVsGirlsDownload", "Download failed", e);
+
+            Toast.makeText(
+                    this,
+                    "Unable to start download.",
+                    Toast.LENGTH_LONG
+            ).show();
+        }
     }
 
     private class NativeAdBridge {
@@ -300,7 +397,6 @@ public class MainActivity extends Activity {
 
         loadVersions.put(slotId, version);
 
-        // Holder prevents the Java callback initialization error.
         final AdLoader[] loaderHolder = new AdLoader[1];
 
         AdLoader loader = new AdLoader.Builder(
@@ -638,13 +734,8 @@ public class MainActivity extends Activity {
         String host = uri.getHost() == null
                 ? "" : uri.getHost().toLowerCase();
 
-        boolean allowedHost =
-                host.equals("chawdreegaming.github.io")
-                || host.equals(
-                        "freetube-backend-a222.onrender.com"
-                );
-
-        if (scheme.equals("https") && allowedHost) {
+        // Keep Boys Vs Girls and its backend inside WebView.
+        if (scheme.equals("https") && isInternalHost(host)) {
             return false;
         }
 
