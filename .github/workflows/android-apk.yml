@@ -1,5 +1,5 @@
 
-name: Build FreeTube Android APK
+name: Build Boys Vs Girls Android APK
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
       - ".github/workflows/android-apk.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -30,13 +30,30 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Build debug APK
+      - name: Build Debug APK
         run: gradle -p android assembleDebug
 
-      - name: Upload APK
+      - name: Prepare APK
+        run: |
+          mkdir -p release-apk
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-apk/BoysVsGirls.apk
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FreeTube-Android-debug-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
+          name: BoysVsGirls-Android-APK
+          path: release-apk/BoysVsGirls.apk
           retention-days: 14
+
+      - name: Publish APK to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: android-v${{ github.run_number }}
+          name: Boys Vs Girls Android v${{ github.run_number }}
+          body: |
+            Boys Vs Girls Android APK
+
+            Download: BoysVsGirls.apk
+          files: release-apk/BoysVsGirls.apk
+          draft: false
+          prerelease: false
