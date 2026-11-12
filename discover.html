@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,15 +17,12 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{min-height:100%;background:var(--bg);scroll-behavior:smooth}
 body{min-height:100vh;color:var(--text);font-family:Arial,Helvetica,sans-serif;background:radial-gradient(ellipse at 0% 0%,#173e81 0,transparent 38%),radial-gradient(ellipse at 100% 30%,#741c65 0,transparent 38%),linear-gradient(145deg,#101329,#24152f 55%,#101c3b);background-attachment:fixed}
-button{font:inherit;cursor:pointer;color:inherit}
+button,input,textarea{font:inherit}
+button{cursor:pointer;color:inherit}
 [hidden]{display:none!important}
 .app{max-width:650px;margin:auto;min-height:100dvh;padding-bottom:90px;background:#101329b8;border-inline:1px solid #ffffff08}
-
-/* Centered app header */
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:center;height:52px;min-height:52px;padding:6px 10px;background:linear-gradient(110deg,#102c54ee,#3a1a48ee,#641d4bee);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
 .brand{font-size:22px;font-weight:900;letter-spacing:-.7px;white-space:nowrap;text-align:center;background:var(--gradient);-webkit-background-clip:text;background-clip:text;color:transparent}
-
-/* Video cards */
 #results{padding:0 0 10px}
 .card{background:linear-gradient(145deg,#191c35f5,#24203af5);margin-bottom:11px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;box-shadow:0 6px 22px #0002}
 .card-head{display:flex;align-items:center;gap:10px;padding:13px 14px}
@@ -41,42 +39,51 @@ button{font:inherit;cursor:pointer;color:inherit}
 .stats{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:11px 14px;color:var(--muted);font-size:12px;border-top:1px solid var(--border)}
 .stats i{color:var(--blue)}
 .stats .comments-icon{color:var(--pink)}
-
-/* Android native ad bridge */
+.card-actions{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border)}
+.share-button{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:11px;border:1px solid #ffffff20;border-radius:10px;background:#ffffff09;color:#d9d8ff;font-size:13px;font-weight:800}
+.share-button:active{background:#862dff35}
+.share-button i{color:#9b8cff}
+.share-button:disabled{opacity:.5;cursor:wait}
 .native-ad-slot{display:none;width:100%;height:430px;min-height:430px;margin:10px 0 14px;padding:0;border:0;overflow:hidden;background:transparent;position:relative}
 .native-ad-slot.android-ad-enabled{display:block}
 .native-ad-label,.native-ad-placeholder{display:none!important}
-
-/* Adsterra banner */
 .adsterra-banner-slot{display:flex;justify-content:center;align-items:center;width:100%;min-height:60px;margin:0 auto 14px;padding:5px 0;overflow:hidden;background:#10132980}
 .adsterra-banner-frame{display:block;width:320px;max-width:100%;height:50px;border:0;overflow:hidden;background:transparent}
-
-/* Status messages */
 .state{text-align:center;padding:38px 18px;color:var(--muted);line-height:1.8;background:#191b3580;margin:0 10px 12px;border:1px solid var(--border);border-radius:16px}
 .state>i{font-size:25px;color:var(--cyan);margin-bottom:8px}
 .secondary{padding:10px 15px;border-radius:10px;background:linear-gradient(110deg,#168cff,#862dff,#ff248c);color:white;border:0;font-weight:700}
-
-/* Bottom navigation */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:30;width:100%;max-width:650px;display:flex;justify-content:space-around;align-items:center;padding:9px 3px calc(9px + env(safe-area-inset-bottom));background:linear-gradient(110deg,#121a35f5,#29172ff5,#351735f5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-top:1px solid var(--border)}
 .nav-item{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:0;color:#ffffffb8;font-size:11px}
 .nav-item i{font-size:21px}
 .nav-item.active{color:var(--pink)}
 .nav-item.active i{filter:drop-shadow(0 0 7px #ff248c77)}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:50;display:none;background:#202345f5;padding:12px 16px;border-radius:12px;border:1px solid var(--border);max-width:90%;font-size:13px;text-align:center;box-shadow:0 6px 22px #0004}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:150;display:none;background:#202345f5;padding:12px 16px;border-radius:12px;border:1px solid var(--border);max-width:90%;font-size:13px;text-align:center;box-shadow:0 6px 22px #0004}
 .toast.show{display:block}
+
+/* Share caption modal */
+.share-modal{display:none;position:fixed;inset:0;z-index:100;background:#080a18c9;align-items:center;justify-content:center;padding:18px}
+.share-modal.open{display:flex}
+.share-dialog{width:100%;max-width:460px;background:linear-gradient(145deg,#202343,#19172f);border:1px solid #ffffff25;border-radius:17px;padding:17px;box-shadow:0 15px 50px #0009}
+.share-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+.share-dialog-head h2{font-size:17px}
+.share-close{width:34px;height:34px;border:0;border-radius:50%;background:#ffffff12;font-size:17px}
+.share-hint{font-size:12px;line-height:1.6;color:var(--muted);margin-bottom:10px}
+.share-caption{display:block;width:100%;min-height:105px;resize:vertical;border:1px solid #ffffff25;border-radius:11px;background:#11142b;color:white;padding:12px;outline:none;font-size:14px;line-height:1.5}
+.share-caption:focus{border-color:var(--purple)}
+.share-dialog-actions{display:flex;gap:9px;margin-top:13px}
+.share-cancel,.share-submit{flex:1;padding:12px;border-radius:10px;font-size:13px;font-weight:800}
+.share-cancel{background:#ffffff0c;border:1px solid #ffffff20}
+.share-submit{background:var(--gradient);border:0;color:white}
+.share-submit:disabled{opacity:.5;cursor:wait}
 @media(max-width:360px){.topbar{height:48px;min-height:48px;padding:5px 8px}.brand{font-size:20px}.nav-item{font-size:10px}.nav-item i{font-size:20px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <div class="brand">Bᴏʏs♡Gɪʀʟs</div>
-  </header>
-
+  <header class="topbar"><div class="brand">Bᴏʏs♡Gɪʀʟs</div></header>
   <main id="results">
     <div class="state"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading videos...</div>
   </main>
-
   <nav class="bottom-nav" aria-label="Main navigation">
     <button class="nav-item" onclick="go('home.html')"><i class="fa-solid fa-house"></i><span>Home</span></button>
     <button class="nav-item active" onclick="go('discover.html')" aria-current="page"><i class="fa-solid fa-compass"></i><span>Pulse</span></button>
@@ -84,7 +91,23 @@ button{font:inherit;cursor:pointer;color:inherit}
     <button class="nav-item" onclick="go('profile.html')"><i class="fa-regular fa-user"></i><span>Profile</span></button>
   </nav>
 </div>
-<div id="toast" class="toast" role="status"></div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<div class="share-modal" id="shareModal" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="share-dialog">
+    <div class="share-dialog-head">
+      <h2 id="shareTitle"><i class="fa-solid fa-share-nodes"></i> Share to your profile</h2>
+      <button class="share-close" id="shareClose" type="button" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <p class="share-hint">Add a caption if you want. The original post and its media will remain with the original author.</p>
+    <textarea class="share-caption" id="shareCaption" maxlength="2000" placeholder="Write something about this post..."></textarea>
+    <div class="share-dialog-actions">
+      <button class="share-cancel" id="shareCancel" type="button">Cancel</button>
+      <button class="share-submit" id="shareSubmit" type="button"><i class="fa-solid fa-share"></i> Share now</button>
+    </div>
+  </div>
+</div>
 
 <script>
 "use strict";
@@ -97,24 +120,39 @@ let allVideos=[];
 let toastTimer=null;
 let videoObserver=null;
 let nativeAdRefreshTimer=null;
+let selectedSharePost=null;
 
 function go(page){location.href=page}
-function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
+function token(){try{return localStorage.getItem(TOKEN_KEY)||sessionStorage.getItem(TOKEN_KEY)||""}catch(_){return""}}
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function count(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,n):0}
-function showToast(message){const el=document.getElementById("toast");el.textContent=String(message||"Something went wrong.");el.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove("show"),2800)}
+function count(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0}
+function showToast(message){
+  const el=document.getElementById("toast");
+  el.textContent=String(message||"Something went wrong.");
+  el.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove("show"),2800);
+}
 
-async function api(path){
-  const headers={};
+async function api(path,options={}){
+  const headers={...(options.headers||{})};
   const accessToken=token();
   if(accessToken)headers.Authorization="Bearer "+accessToken;
+  if(options.body!==undefined&&!(options.body instanceof FormData))headers["Content-Type"]="application/json";
   let response;
-  try{response=await fetch(API_BASE+path,{headers,cache:"no-store"})}
-  catch(_){throw new Error("Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।")}
+  try{
+    response=await fetch(API_BASE+path,{...options,headers,cache:"no-store"});
+  }catch(_){
+    throw new Error("Backend-এ সংযোগ করা যাচ্ছে না। ইন্টারনেট পরীক্ষা করে আবার চেষ্টা করুন।");
+  }
   const raw=await response.text();
   let data={};
   try{data=raw?JSON.parse(raw):{}}catch(_){data={message:raw}}
-  if(response.status===401){try{localStorage.removeItem(TOKEN_KEY)}catch(_){}go("auth.html?mode=login");throw new Error("সেশন শেষ হয়েছে। আবার লগইন করুন।")}
+  if(response.status===401){
+    try{localStorage.removeItem(TOKEN_KEY);sessionStorage.removeItem(TOKEN_KEY)}catch(_){}
+    go("auth.html?mode=login");
+    throw new Error("সেশন শেষ হয়েছে। আবার লগইন করুন।");
+  }
   if(!response.ok)throw new Error(data.message||data.error||("API error "+response.status));
   return data;
 }
@@ -132,20 +170,22 @@ function normalize(post){
     profileUsername:String(post.username||post.author_username||post.profile_username||author.username||"").replace(/^@/,""),
     username:post.display_name||post.full_name||post.username||post.author_name||author.display_name||author.username||"Boys vs Girls User",
     avatar:post.avatar_url||post.avatar||post.profile_picture||author.avatar_url||FALLBACK_AVATAR,
-    content:post.content||post.text||"",src,type,
+    content:post.content||post.text||"",
+    src,type,
     likes:count(post.like_count??post.likes_count??post.likes),
     comments:count(post.comment_count??post.comments_count??post.comments),
     views:count(post.view_count??post.views_count??post.views),
+    shares:count(post.share_count??post.shares_count??post.shares),
     created:post.created_at||post.createdAt||post.time||""
   };
 }
 
 function timeAgo(value){
-  if(!value)return "Recently";
+  if(!value)return"Recently";
   const date=new Date(value);
   if(Number.isNaN(date.getTime()))return String(value);
   const minutes=Math.max(0,Math.floor((Date.now()-date.getTime())/60000));
-  if(minutes<1)return "Just now";
+  if(minutes<1)return"Just now";
   if(minutes<60)return minutes+"m ago";
   const hours=Math.floor(minutes/60);
   if(hours<24)return hours+"h ago";
@@ -154,11 +194,66 @@ function timeAgo(value){
   return date.toLocaleDateString();
 }
 
+/* Share modal */
+function openShare(postId){
+  const post=allVideos.find(item=>item.id===String(postId));
+  if(!post)return showToast("This post is no longer available.");
+  if(!token()){go("auth.html?mode=login");return}
+  selectedSharePost=post;
+  document.getElementById("shareCaption").value="";
+  document.getElementById("shareModal").classList.add("open");
+  setTimeout(()=>document.getElementById("shareCaption").focus(),80);
+}
+function closeShare(){
+  document.getElementById("shareModal").classList.remove("open");
+  selectedSharePost=null;
+}
+async function submitShare(){
+  if(!selectedSharePost)return;
+  const button=document.getElementById("shareSubmit");
+  const caption=document.getElementById("shareCaption").value.trim();
+  if(caption.length>2000)return showToast("Caption is too long.");
+  button.disabled=true;
+  button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Sharing...';
+  try{
+    const result=await api("/posts/"+encodeURIComponent(selectedSharePost.id)+"/share",{
+      method:"POST",
+      body:JSON.stringify({caption})
+    });
+    const updatedCount=count(result.share_count??result.shareCount??(selectedSharePost.shares+1));
+    selectedSharePost.shares=updatedCount;
+    const card=document.getElementById("video-"+CSS.escape(selectedSharePost.id));
+    if(card){
+      const shareStat=card.querySelector("[data-share-count]");
+      if(shareStat)shareStat.innerHTML='<i class="fa-solid fa-share"></i> '+updatedCount+' shares';
+    }
+    closeShare();
+    showToast("Post shared to your profile.");
+  }catch(error){
+    showToast("Share failed: "+error.message);
+  }finally{
+    button.disabled=false;
+    button.innerHTML='<i class="fa-solid fa-share"></i> Share now';
+  }
+}
+document.getElementById("shareClose").addEventListener("click",closeShare);
+document.getElementById("shareCancel").addEventListener("click",closeShare);
+document.getElementById("shareSubmit").addEventListener("click",submitShare);
+document.getElementById("shareModal").addEventListener("click",event=>{
+  if(event.target.id==="shareModal")closeShare();
+});
+document.addEventListener("keydown",event=>{
+  if(event.key==="Escape")closeShare();
+});
+
 /* Keep the existing Android Native Ads bridge. */
-function nativeAdsAvailable(){return !!(window.FreeTubeAds&&typeof window.FreeTubeAds.updateSlot==="function")}
+function nativeAdsAvailable(){return!!(window.FreeTubeAds&&typeof window.FreeTubeAds.updateSlot==="function")}
 function setupNativeAdSlots(){
   const slots=[...document.querySelectorAll(".native-ad-slot")];
-  if(!nativeAdsAvailable()){slots.forEach(slot=>{slot.classList.remove("android-ad-enabled");slot.hidden=true});return}
+  if(!nativeAdsAvailable()){
+    slots.forEach(slot=>{slot.classList.remove("android-ad-enabled");slot.hidden=true});
+    return;
+  }
   slots.forEach(slot=>{slot.hidden=false;slot.classList.add("android-ad-enabled")});
   window.updateNativeAdSlots=function(){
     if(!nativeAdsAvailable())return;
@@ -173,10 +268,12 @@ function setupNativeAdSlots(){
   clearTimeout(nativeAdRefreshTimer);
   nativeAdRefreshTimer=setTimeout(()=>{if(window.updateNativeAdSlots)window.updateNativeAdSlots()},350);
 }
-function makeAdSlot(index){return `<section class="native-ad-slot" id="native-ad-slot-${index}" aria-label="Sponsored content" hidden><div class="native-ad-label">ADVERTISEMENT</div><div class="native-ad-placeholder"><span>Advertisement</span></div></section>`}
-function makeAdsterraSlot(index){return `<section class="adsterra-banner-slot" aria-label="Advertisement"><iframe class="adsterra-banner-frame" title="Advertisement" width="320" height="50" loading="lazy" scrolling="no" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" data-adsterra-slot="${index}"></iframe></section>`}
-
-/* Each banner has an isolated iframe to prevent atOptions collisions. */
+function makeAdSlot(index){
+  return`<section class="native-ad-slot" id="native-ad-slot-${index}" aria-label="Sponsored content" hidden><div class="native-ad-label">ADVERTISEMENT</div><div class="native-ad-placeholder"><span>Advertisement</span></div></section>`;
+}
+function makeAdsterraSlot(index){
+  return`<section class="adsterra-banner-slot" aria-label="Advertisement"><iframe class="adsterra-banner-frame" title="Advertisement" width="320" height="50" loading="lazy" scrolling="no" frameborder="0" sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox" data-adsterra-slot="${index}"></iframe></section>`;
+}
 function initializeAdsterraBanners(){
   document.querySelectorAll("iframe[data-adsterra-slot]").forEach(frame=>{
     if(frame.dataset.loaded==="true")return;
@@ -189,15 +286,17 @@ function getProfileUrl(video){
   const params=new URLSearchParams();
   if(video.userId)params.set("userId",video.userId);
   if(video.profileUsername)params.set("username",video.profileUsername);
-  if(!video.userId&&!video.profileUsername)return "";
-  return "profile.html?"+params.toString();
+  if(!video.userId&&!video.profileUsername)return"";
+  return"profile.html?"+params.toString();
 }
 
 function render(){
   const root=document.getElementById("results");
   if(videoObserver){videoObserver.disconnect();videoObserver=null}
   if(nativeAdsAvailable()){
-    document.querySelectorAll(".native-ad-slot").forEach(slot=>{try{window.FreeTubeAds.updateSlot(slot.id,0,0,0,0,false)}catch(_){}});
+    document.querySelectorAll(".native-ad-slot").forEach(slot=>{
+      try{window.FreeTubeAds.updateSlot(slot.id,0,0,0,0,false)}catch(_){}
+    });
   }
   if(!allVideos.length){
     root.innerHTML=`<div class="state"><i class="fa-solid fa-video-slash"></i><br>No videos found.<br>Check back later for new videos.</div>`;
@@ -221,9 +320,13 @@ function render(){
         ${video.content?`<div class="content">${esc(video.content)}</div>`:""}
         ${media}
         <div class="stats">
-          <span><i class="fa-solid fa-heart"></i> ${video.likes} likes</span>
+          <span><i class="fa-solid fa-heart"></i> ${video.likes} reactions</span>
           <span><i class="fa-regular fa-eye"></i> ${video.views} views</span>
           <span><i class="fa-regular fa-comment comments-icon"></i> ${video.comments} comments</span>
+          <span data-share-count><i class="fa-solid fa-share"></i> ${video.shares} shares</span>
+        </div>
+        <div class="card-actions">
+          <button class="share-button" type="button" data-share-post="${esc(video.id)}"><i class="fa-solid fa-share-nodes"></i> Share to profile</button>
         </div>
       </article>`;
     const number=index+1;
@@ -231,6 +334,9 @@ function render(){
     if(number%2===0&&number<allVideos.length)html+=makeAdSlot(number/2);
   });
   root.innerHTML=html;
+  root.querySelectorAll("[data-share-post]").forEach(button=>{
+    button.addEventListener("click",()=>openShare(button.dataset.sharePost));
+  });
   initializeAdsterraBanners();
   setupVideoPlayback();
   setupNativeAdSlots();
@@ -240,7 +346,7 @@ function setupVideoPlayback(){
   if(videoObserver){videoObserver.disconnect();videoObserver=null}
   const feedVideos=[...document.querySelectorAll(".feed-video")];
   feedVideos.forEach(video=>{video.muted=true;video.playsInline=true;video.loop=true});
-  if(!("IntersectionObserver" in window)){
+  if(!("IntersectionObserver"in window)){
     feedVideos.forEach(video=>{const promise=video.play();if(promise&&promise.catch)promise.catch(()=>{})});
     return;
   }
@@ -261,7 +367,7 @@ async function loadVideos(){
   root.innerHTML=`<div class="state"><i class="fa-solid fa-spinner fa-spin"></i><br>Loading videos...</div>`;
   try{
     const data=await api("/posts");
-    const posts=Array.isArray(data)?data:(data.posts||data.items||[]);
+    const posts=Array.isArray(data)?data:(data.posts||data.items||data.data?.posts||[]);
     allVideos=posts.map(normalize).filter(post=>post.id&&post.src&&post.type==="video");
     render();
   }catch(error){
@@ -270,7 +376,6 @@ async function loadVideos(){
   }
 }
 
-/* Keep Android native ad positions updated. */
 window.addEventListener("scroll",()=>{if(window.updateNativeAdSlots)window.updateNativeAdSlots()},{passive:true});
 window.addEventListener("resize",()=>{if(window.updateNativeAdSlots)window.updateNativeAdSlots()});
 document.addEventListener("visibilitychange",()=>{
