@@ -10,12 +10,12 @@
 :root{--green:#35c7ff;--red:#f22e9b;--panel:rgba(25,23,48,.96);--border:rgba(255,255,255,.14);--muted:rgba(224,220,245,.76);--blue:#278bff;--pink:#f22e9b}
 *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Tahoma,sans-serif;-webkit-tap-highlight-color:transparent}
 html{min-height:100%;overscroll-behavior-y:contain}
-body{background:linear-gradient(135deg,#11172e,#251536,#40163b,#111329);background-attachment:fixed;color:#fff;min-height:100vh;overscroll-behavior-y:contain}
+body{background:linear-gradient(135deg,#11172e,#251536,#40163b,#111329);background-attachment:scroll;color:#fff;min-height:100vh;overscroll-behavior-y:contain}
 button,input,textarea{font:inherit}
 button{cursor:pointer;color:inherit;border:0}
 button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .app{max-width:650px;margin:auto;min-height:100dvh;padding-bottom:68px;background:#17132922;box-shadow:0 0 40px #0005}
-.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(15px);border-bottom:1px solid var(--border)}
+.topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(20,18,39,.97);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
 .brand{font-size:22px;font-weight:900;letter-spacing:-.6px;white-space:nowrap}
 .brand-boys,.brand-girls{background:linear-gradient(90deg,#278bff,#a33cff,#f22e9b);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
 .brand-vs{display:inline-block;margin:0 3px;font-size:.62em;font-weight:900;background:linear-gradient(90deg,#ff2d2d,#35c759);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;transform:rotate(-35deg);position:relative;top:-2px}
@@ -32,8 +32,9 @@ button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .tournament-card{display:block;width:100%;aspect-ratio:3.15/1;overflow:hidden;border-radius:16px;border:1px solid #f22e9b88;box-shadow:0 0 16px #a33cff35;background:#100d20}
 .tournament-card img{display:block;width:100%;height:100%;object-fit:cover}
 .tournament-card:active{transform:scale(.99);opacity:.92}
-.feed{padding-top:8px}
-.post-card{background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
+.feed{padding-top:8px;overflow-anchor:none}
+.post-media-container img{height:auto}
+.post-card{content-visibility:auto;contain-intrinsic-size:auto 560px;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
 .ad-banner-slot{width:100%;min-height:50px;margin:6px 0 10px;padding:4px 0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#171329aa;border-top:1px solid #ffffff0b;border-bottom:1px solid #ffffff0b}
 .ad-banner-label{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .ad-banner-slot iframe{max-width:100%;border:0}
@@ -76,7 +77,7 @@ button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .reaction-choice{width:42px;height:42px;flex:0 0 42px;border-radius:50%;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;touch-action:manipulation}
 .reaction-choice:active{background:#ffffff20;transform:scale(1.06)}
 .reaction-choice .emoji{font-size:23px;line-height:25px}.reaction-choice small{font-size:8px;color:#fff}
-.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:650px;display:flex;justify-content:space-around;align-items:center;height:60px;padding:4px 4px calc(4px + env(safe-area-inset-bottom));background:linear-gradient(110deg,rgba(22,20,48,.98),rgba(55,20,57,.98));backdrop-filter:blur(16px);border-top:1px solid var(--border)}
+.bottom-nav{position:fixed;z-index:25;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:650px;display:flex;justify-content:space-around;align-items:center;height:60px;padding:4px 4px calc(4px + env(safe-area-inset-bottom));background:linear-gradient(110deg,rgba(22,20,48,.98),rgba(55,20,57,.98));backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-top:1px solid var(--border)}
 .nav-item{background:none;color:#c3bfd2;display:flex;flex:1;min-width:0;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;position:relative;padding:2px 0;white-space:nowrap}
 .nav-item i{font-size:21px}.nav-item.active{color:var(--pink)}.nav-item.active i{filter:drop-shadow(0 0 7px #f22e9b55)}.nav-item .badge{top:0;right:calc(50% - 22px)}
 .modal{display:none;position:fixed;z-index:60;inset:0;background:#0009;backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;padding:10px}
@@ -156,6 +157,7 @@ const REACTIONS={love:{label:"Love",emoji:"❤️",className:"reaction-love"},an
 let videos=[],currentUser=null,activeCommentId=null,toastTimer=null;
 let loading=false,refreshInProgress=false;
 const pendingReactions=new Set(),viewRequestsInSession=new Set();
+let videoObserver=null,postViewObserver=null,adObserver=null;
 
 function token(){try{return localStorage.getItem(TOKEN_KEY)||""}catch(_){return ""}}
 function esc(value){return String(value??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -257,14 +259,29 @@ function reactionButtonHTML(v){
   const picker=Object.entries(REACTIONS).map(([name,item])=>'<button type="button" class="reaction-choice" aria-label="'+item.label+'" title="'+item.label+'" onclick="chooseReaction(event,\''+esc(v.id)+'\',\''+name+'\')"><span class="emoji">'+item.emoji+'</span><small>'+item.label+'</small></button>').join("");
   return '<div class="reaction-wrap" data-reaction-wrap="'+esc(v.id)+'"><button type="button" class="post-action-btn'+cls+'" data-like-button="'+esc(v.id)+'" aria-label="React; hold for reactions"><span>'+emoji+'</span> '+label+'</button><div class="reaction-picker">'+picker+'</div></div>';
 }
+function loadAdSlot(slot){
+  if(!slot||slot.dataset.loaded==="1")return;
+  slot.dataset.loaded="1";
+  const options=document.createElement("script");options.type="text/javascript";
+  options.text="atOptions = {'key':'ab837cf0ea9c26ae43b7bc4e05a0b5de','format':'iframe','height':50,'width':320,'params':{}};";
+  slot.appendChild(options);
+  const adScript=document.createElement("script");adScript.type="text/javascript";
+  adScript.src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";adScript.async=true;slot.appendChild(adScript);
+}
 function mountAdBanners(feed){
+  if(!feed)return;
+  if(!("IntersectionObserver" in window)){
+    feed.querySelectorAll("[data-adsterra-slot]").forEach(loadAdSlot);return;
+  }
+  if(adObserver)adObserver.disconnect();
+  adObserver=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      if(!entry.isIntersecting)return;
+      adObserver.unobserve(entry.target);loadAdSlot(entry.target);
+    });
+  },{rootMargin:"500px 0px",threshold:0});
   feed.querySelectorAll("[data-adsterra-slot]").forEach(slot=>{
-    if(slot.dataset.loaded==="1")return;slot.dataset.loaded="1";
-    const options=document.createElement("script");options.type="text/javascript";
-    options.text="atOptions = {'key':'ab837cf0ea9c26ae43b7bc4e05a0b5de','format':'iframe','height':50,'width':320,'params':{}};";
-    slot.appendChild(options);
-    const adScript=document.createElement("script");adScript.type="text/javascript";
-    adScript.src="https://bicea.org/22/ab837cf0ea9c26ae43b7bc4e05a0b5de";adScript.async=true;slot.appendChild(adScript);
+    if(slot.dataset.loaded!=="1")adObserver.observe(slot);
   });
 }
 
@@ -297,6 +314,9 @@ function togglePostText(id){
 
 function render(list=videos){
   const feed=document.getElementById("feed");
+  if(videoObserver){videoObserver.disconnect();videoObserver=null}
+  if(postViewObserver){postViewObserver.disconnect();postViewObserver=null}
+  if(adObserver){adObserver.disconnect();adObserver=null}
   if(!list.length){feed.innerHTML='<div class="empty-state">No posts yet. Be the first to share something!</div>';return}
   feed.innerHTML=list.map((v,index)=>{
     let media="";
@@ -366,29 +386,51 @@ async function reactToPost(id,reaction){
 }
 function setupVideoAutoplay(){
   const videosOnPage=Array.from(document.querySelectorAll("#feed video.post-video"));
+  if(videoObserver){videoObserver.disconnect();videoObserver=null}
   videosOnPage.forEach(video=>{
     video.loop=true;video.playsInline=true;video.muted=true;video.defaultMuted=true;
     const button=video.closest(".post-media-container")?.querySelector(".sound-toggle");
     if(button&&!button.dataset.bound){button.dataset.bound="1";button.addEventListener("click",event=>{
       event.preventDefault();event.stopPropagation();
-      if(video.muted){videosOnPage.forEach(other=>{if(other!==video){other.muted=true;const b=other.closest(".post-media-container")?.querySelector(".sound-toggle");if(b)b.innerHTML='<i class="fa-solid fa-volume-xmark"></i>'}});video.muted=false;video.play().catch(()=>toast("Tap the video to start playback."))}
-      else video.muted=true;
+      if(video.muted){
+        document.querySelectorAll("#feed video.post-video").forEach(other=>{
+          if(other!==video){other.muted=true;const b=other.closest(".post-media-container")?.querySelector(".sound-toggle");if(b)b.innerHTML='<i class="fa-solid fa-volume-xmark"></i>'}
+        });
+        video.muted=false;video.play().catch(()=>toast("Tap the video to start playback."));
+      }else video.muted=true;
       button.innerHTML=video.muted?'<i class="fa-solid fa-volume-xmark"></i>':'<i class="fa-solid fa-volume-high"></i>';
     })}
-    if(!video.dataset.boundPlay){video.dataset.boundPlay="1";video.addEventListener("play",()=>videosOnPage.forEach(other=>{if(other!==video&&!other.paused)other.pause()}))}
+    if(!video.dataset.boundPlay){video.dataset.boundPlay="1";video.addEventListener("play",()=>{
+      document.querySelectorAll("#feed video.post-video").forEach(other=>{if(other!==video&&!other.paused)other.pause()});
+    })}
   });
-  if("IntersectionObserver"in window){const observer=new IntersectionObserver(entries=>entries.forEach(entry=>{const video=entry.target;if(entry.isIntersecting&&entry.intersectionRatio>=.6)video.play().catch(()=>{});else video.pause()}),{threshold:[0,.6]});videosOnPage.forEach(video=>observer.observe(video))}
+  if("IntersectionObserver" in window){
+    videoObserver=new IntersectionObserver(entries=>entries.forEach(entry=>{
+      const video=entry.target;
+      if(document.hidden){video.pause();return}
+      if(entry.isIntersecting&&entry.intersectionRatio>=.6)video.play().catch(()=>{});
+      else video.pause();
+    }),{threshold:[0,.6]});
+    videosOnPage.forEach(video=>videoObserver.observe(video));
+  }
 }
 function setupPostViewObserver(){
-  if(!("IntersectionObserver"in window))return;
-  const observer=new IntersectionObserver(entries=>entries.forEach(async entry=>{
+  if(postViewObserver){postViewObserver.disconnect();postViewObserver=null}
+  if(!("IntersectionObserver" in window))return;
+  postViewObserver=new IntersectionObserver(entries=>entries.forEach(async entry=>{
     if(!entry.isIntersecting||entry.intersectionRatio<.5)return;
-    observer.unobserve(entry.target);const id=String(entry.target.dataset.id);
+    postViewObserver.unobserve(entry.target);const id=String(entry.target.dataset.id);
     if(viewRequestsInSession.has(id)||!token())return;viewRequestsInSession.add(id);
-    try{const data=await api("/posts/"+encodeURIComponent(id)+"/view",{method:"POST",body:JSON.stringify({})});const p=videos.find(v=>v.id===id);if(p&&data.view_count!==undefined){p.views=count(data.view_count);const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===id);const label=card?.querySelector(".view-count");if(label)label.innerHTML='<i class="fa-solid fa-eye"></i> '+p.views+' views'}}
-    catch(_){viewRequestsInSession.delete(id)}
+    try{
+      const data=await api("/posts/"+encodeURIComponent(id)+"/view",{method:"POST",body:JSON.stringify({})});
+      const p=videos.find(v=>v.id===id);
+      if(p&&data.view_count!==undefined){
+        p.views=count(data.view_count);const card=Array.from(document.querySelectorAll(".post-card")).find(el=>el.dataset.id===id);
+        const label=card?.querySelector(".view-count");if(label)label.innerHTML='<i class="fa-solid fa-eye"></i> '+p.views+' views';
+      }
+    }catch(_){viewRequestsInSession.delete(id)}
   }),{threshold:[.5]});
-  document.querySelectorAll("#feed .post-card").forEach(card=>observer.observe(card));
+  document.querySelectorAll("#feed .post-card").forEach(card=>postViewObserver.observe(card));
 }
 async function comments(id){
   if(!requireLogin())return;activeCommentId=String(id);document.getElementById("commentModal").classList.add("open");document.getElementById("commentList").innerHTML='<div class="loading">Loading comments...</div>';
