@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -16,8 +17,6 @@ button{color:inherit;cursor:pointer}
 button:disabled{opacity:.5;cursor:wait}
 a{color:inherit;text-decoration:none}
 .app{max-width:600px;margin:auto;min-height:100dvh;padding-bottom:82px}
-
-/* App name and settings are over the cover; no top bar or messenger icon */
 .cover{height:225px;position:relative;overflow:hidden;background:linear-gradient(125deg,#233d70,#49346f,#77344f)}
 .cover>img{width:100%;height:100%;object-fit:cover}
 .cover:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#100f20bb,transparent 40%,#100f2070);pointer-events:none}
@@ -25,8 +24,7 @@ a{color:inherit;text-decoration:none}
 .brand{display:flex;align-items:center;gap:8px;min-width:0;text-shadow:0 2px 8px #0009}
 .brand-logo{width:37px;height:37px;display:grid;place-items:center;flex-shrink:0;border-radius:12px;background:var(--gradient);color:#17142e;font-size:17px}
 .brand-title{font-size:17px;font-weight:900;white-space:nowrap}
-.boys{color:#60a5fa}.girls{color:#fb7185}
-.brand-hearts{font-size:15px}
+.boys{color:#60a5fa}.girls{color:#fb7185}.brand-hearts{font-size:15px}
 .settings-button{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;border:1px solid #ffffff45;border-radius:12px;background:#17142eaa;backdrop-filter:blur(12px);font-size:19px}
 .upload-cover{position:absolute;z-index:4;right:12px;bottom:12px;background:#100f20c9;border:1px solid var(--border);padding:9px 11px;border-radius:10px;font-size:11px;font-weight:bold}
 input[type=file]{display:none}
@@ -96,16 +94,14 @@ input[type=file]{display:none}
 .field input[type=date]{color-scheme:dark}.field textarea{min-height:85px;resize:vertical}
 .save{width:100%;padding:13px;border:0;border-radius:10px;background:var(--gradient);color:#17142e;font-weight:900}
 .toast{display:none;position:fixed;z-index:200;bottom:75px;left:50%;transform:translateX(-50%);background:#292546;border:1px solid var(--border);padding:11px 15px;border-radius:12px;font-size:12px;max-width:90%;text-align:center}
-@media(max-width:380px){
- .brand-title{font-size:14px}.brand-logo{width:32px;height:32px}
- .cover{height:195px}.name{font-size:21px}
- .panel{margin-left:8px;margin-right:8px;padding:10px}
- .details-grid{column-gap:10px;row-gap:8px}.detail-icon{width:27px;height:27px}
- .detail-copy strong{font-size:11px}
- .friend-card img,.friend-fallback{width:40px;height:40px}
- .friend-name{font-size:9px}.btn{font-size:10px;padding:9px 4px}
-}
 
+/* Share presentation */
+.share-attribution{display:flex;align-items:center;gap:7px;color:#cfc5ff;font-size:11px;font-weight:800;margin:0 0 9px;padding:8px 10px;background:#a78bfa13;border:1px solid #a78bfa25;border-radius:9px}
+.share-attribution i{color:var(--purple)}
+.share-caption{font-size:13px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;padding:9px 10px;margin-bottom:9px;background:#ffffff08;border-radius:9px}
+.remove-share-button{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:11px;padding:10px;border-radius:9px;border:1px solid #fb718555;background:#fb718511;color:#ff9aaa;font-size:11px;font-weight:800}
+.remove-share-button:disabled{opacity:.5}
+.post-original-label{font-size:10px;color:var(--muted);margin:8px 0 4px}
 .post-interactions{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
 .reaction-list{display:flex;flex-wrap:wrap;gap:7px}
 .reaction-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid #ffffff20;border-radius:24px;background:#ffffff08;color:var(--muted);font-size:12px;font-weight:800}
@@ -127,20 +123,25 @@ input[type=file]{display:none}
 .comment-text{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
 .comment-time{font-size:10px;color:var(--muted);margin-top:4px}
 .comments-empty{font-size:12px;color:var(--muted);padding:8px 0}
-
+@media(max-width:380px){
+ .brand-title{font-size:14px}.brand-logo{width:32px;height:32px}
+ .cover{height:195px}.name{font-size:21px}
+ .panel{margin-left:8px;margin-right:8px;padding:10px}
+ .details-grid{column-gap:10px;row-gap:8px}.detail-icon{width:27px;height:27px}
+ .detail-copy strong{font-size:11px}
+ .friend-card img,.friend-fallback{width:40px;height:40px}
+ .friend-name{font-size:9px}.btn{font-size:10px;padding:9px 4px}
+}
 </style>
 </head>
 <body>
 <div class="app">
-
 <section class="cover">
   <img id="coverPhoto" src="https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=800" alt="Cover photo">
   <div class="cover-top">
     <a class="brand" href="home.html" aria-label="Boys vs Girls home">
       <span class="brand-logo"><i class="fa-solid fa-users"></i></span>
-      <span>
-        <span class="brand-title"><span class="boys">Boys</span> vs <span class="girls">Girls</span> <span class="brand-hearts">💙💗</span></span>
-      </span>
+      <span><span class="brand-title"><span class="boys">Boys</span> vs <span class="girls">Girls</span> <span class="brand-hearts">💙💗</span></span></span>
     </a>
     <button class="settings-button" id="menuToggle" aria-label="Settings"><i class="fa-solid fa-bars"></i></button>
   </div>
@@ -268,7 +269,7 @@ function normalize(u={},p={},s={},l={}){
  const badgeExpiry=first(p.blue_badge_expires_at,p.blueBadgeExpiresAt,u.blue_badge_expires_at,u.blueBadgeExpiresAt,l.blue_badge_expires_at,"");
  const badgeExpiryTime=badgeExpiry?new Date(badgeExpiry).getTime():0;
  const badgeActive=badgeStatus==="verified"&&(!badgeExpiry||Number.isFinite(badgeExpiryTime)&&badgeExpiryTime>Date.now());
- return {
+ return{
   id:String(first(p.user_id,p.userId,p.id,u.user_id,u.userId,u.id)||""),
   name:String(first(p.display_name,p.full_name,p.fullName,u.display_name,u.full_name,u.fullName,u.name,p.username,u.username,l.name)||"User"),
   username:String(first(p.username,u.username,targetName)||"").replace(/^@/,""),
@@ -560,8 +561,14 @@ $("avatarInput").addEventListener("change",function(){const f=this.files[0];this
 $("coverInput").addEventListener("change",function(){const f=this.files[0];this.value="";changeImage(f,"cover")});
 
 function authorOf(p){return p.user||p.author||p.owner||{}}
-function postName(p){const a=authorOf(p);return first(p.username,p.author_username,p.user_username,a.username,a.handle)}
-function postId(p){const a=authorOf(p);return p.user_id??p.author_id??p.owner_id??a.id??a.user_id??null}
+function postName(p){
+ const a=authorOf(p);
+ return first(p.author_username,p.username,p.user_username,a.username,a.handle);
+}
+function postId(p){
+ const a=authorOf(p);
+ return p.user_id??p.author_id??p.owner_id??a.id??a.user_id??null;
+}
 function relativeTime(value){
  const time=new Date(value).getTime();
  if(!Number.isFinite(time))return"";
@@ -643,9 +650,7 @@ function makeReactionControls(post,postCard){
  row.append(totalLabel);wrap.append(row);paint();
  return wrap;
 }
-function commentAvatar(comment){
- return comment.avatar_url||comment.avatar||FALLBACK_AVATAR;
-}
+function commentAvatar(comment){return comment.avatar_url||comment.avatar||FALLBACK_AVATAR}
 function renderComment(comment){
  const item=document.createElement("div");item.className="comment-item";
  const avatar=document.createElement("img");avatar.className="comment-avatar";avatar.alt="";setImg(avatar,commentAvatar(comment),FALLBACK_AVATAR);
@@ -664,7 +669,7 @@ function makeComments(post,postCard){
  const list=document.createElement("div");list.className="comments-list";list.hidden=true;
  let loaded=false,loadingComments=false,expanded=false;
  const commentCount=()=>safeCount(post.comment_count);
- function paintToggle(){toggle.textContent=(expanded?"Hide comments":"View comments")+" ("+commentCount()+")";}
+ function paintToggle(){toggle.textContent=(expanded?"Hide comments":"View comments")+" ("+commentCount()+")"}
  async function loadComments(){
   if(loadingComments)return;
   loadingComments=true;list.replaceChildren();
@@ -709,65 +714,155 @@ function makeComments(post,postCard){
  wrap.append(form,list);paintToggle();return wrap;
 }
 
+/* Share fields returned by the server */
+function isSharedPost(p){
+ return p.is_shared===true||p.is_shared===1||String(p.is_shared).toLowerCase()==="true";
+}
+function sharedById(p){
+ return String(p.shared_by_id??p.sharedById??p.share_user_id??"");
+}
+function shareCaption(p){
+ return String(p.share_caption??p.shareCaption??"");
+}
+function profileOwnerId(){
+ return String(viewedUser?.id??viewedUser?.user_id??"");
+}
+function makeShareAttribution(post){
+ const wrap=document.createElement("div");wrap.className="share-attribution";
+ const icon=document.createElement("i");icon.className="fa-solid fa-share-nodes";
+ const label=document.createElement("span");
+ const sharedName=String(first(post.shared_by_name,post.shared_by_username,"Someone"));
+ label.textContent=sharedName+" shared this post";
+ wrap.append(icon,label);
+ return wrap;
+}
+async function removeShare(post,button,card){
+ if(!isOwn||!isSharedPost(post))return;
+ if(!confirm("Remove this shared post from your profile? The original post will not be deleted."))return;
+ button.disabled=true;
+ button.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Removing...';
+ try{
+  await api("/posts/"+encodeURIComponent(post.id)+"/share",{method:"DELETE"});
+  card.remove();
+  const remaining=$("myPosts").querySelectorAll(".post").length;
+  $("postCount").textContent=remaining+(remaining===1?" post":" posts");
+  if(!remaining)$("myPosts").innerHTML='<div class="empty">No posts found for this user.</div>';
+  toast("Your share was removed. The original post is safe.");
+ }catch(error){
+  toast("Could not remove share: "+error.message);
+  button.disabled=false;
+  button.innerHTML='<i class="fa-solid fa-link-slash"></i> Remove share';
+ }
+}
+function makePostCard(p,index,filteredLength){
+ const card=document.createElement("article");card.className="post";
+ const shared=isSharedPost(p);
+ const a=authorOf(p);
+ const name=String(first(p.author_display_name,p.display_name,a.display_name,a.name,postName(p),"User")).replace(/^@/,"");
+ const originalAuthorId=String(postId(p)||"");
+ const originalUsername=String(postName(p)||"").replace(/^@/,"");
+ const ownerLink=document.createElement("div");ownerLink.className="post-author";
+ const im=document.createElement("img");im.alt="Profile picture";
+ setImg(im,first(p.author_avatar_url,a.avatar_url,a.avatar,p.avatar_url),FALLBACK_AVATAR);
+ const authorCopy=document.createElement("div");authorCopy.className="post-author-copy";
+ const strong=document.createElement("strong");strong.textContent=name;
+ authorCopy.append(strong);
+ const timeValue=first(p.created_at,p.createdAt,p.created_at_timestamp);
+ if(timeValue){
+  const time=document.createElement("span");time.className="post-time";time.textContent=relativeTime(timeValue);authorCopy.append(time);
+ }
+ ownerLink.append(im,authorCopy);
+ ownerLink.onclick=()=>{
+  const q=new URLSearchParams();
+  if(originalUsername)q.set("username",originalUsername);
+  if(originalAuthorId)q.set("userId",originalAuthorId);
+  if(q.toString())location.href="profile.html?"+q.toString();
+ };
+ if(shared){
+  card.append(makeShareAttribution(p));
+  const caption=shareCaption(p);
+  if(caption){
+   const cap=document.createElement("div");cap.className="share-caption";cap.textContent=caption;card.append(cap);
+  }
+ }
+ card.append(ownerLink);
+
+ const content=String(first(p.content,p.text,p.caption));
+ if(content){const t=document.createElement("p");t.className="post-content";t.textContent=content;card.append(t)}
+
+ const url=String(first(p.media_url,p.image_url,p.video_url,p.mediaUrl));
+ const type=String(p.media_type||p.type||"").toLowerCase();
+ if(url){
+  const video=type.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url);
+  const m=document.createElement(video?"video":"img");
+  m.className="post-media";m.src=url;m.alt=video?"Post video":"Post image";
+  if(video){m.controls=true;m.playsInline=true}else m.loading="lazy";
+  card.append(m);
+ }
+ const meta=document.createElement("div");meta.className="post-meta muted";
+ [["fa-regular fa-heart",p.like_count],["fa-regular fa-comment",p.comment_count],["fa-regular fa-eye",p.view_count]].forEach(([icon,n])=>{
+  const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s);
+ });
+ card.append(meta);
+
+ const postKey=String(p.id??p.post_id??"");
+ if(postKey){
+  p.id=postKey;
+  card.append(makeReactionControls(p,card));
+  card.append(makeComments(p,card));
+ }
+ /* A share can only be removed by the owner of the profile being viewed. */
+ if(shared&&isOwn&&sharedById(p)===profileOwnerId()){
+  const remove=document.createElement("button");
+  remove.type="button";remove.className="remove-share-button";
+  remove.innerHTML='<i class="fa-solid fa-link-slash"></i> Remove share';
+  remove.addEventListener("click",()=>removeShare(p,remove,card));
+  card.append(remove);
+ }
+ return card;
+}
+
 async function loadPosts(force=false){
  if(postsLoading&&!force)return;
  postsLoading=true;
  const box=$("myPosts"),count=$("postCount");
  box.innerHTML='<div class="empty">Loading posts...</div>';count.textContent="Loading...";
  try{
-  const d=await api("/posts?limit=50");
-  const posts=Array.isArray(d)?d:Array.isArray(d.posts)?d.posts:Array.isArray(d.data?.posts)?d.data.posts:[];
-  const id=String(viewedUser?.id||""),un=String(viewedUser?.username||targetName||"").toLowerCase();
-  const filtered=posts.filter(p=>(id&&String(postId(p)||"")===id)||(un&&String(postName(p)||"").replace(/^@/,"").toLowerCase()===un));
-  count.textContent=filtered.length+(filtered.length===1?" post":" posts");
+  const id=String(viewedUser?.id||"");
+  if(!id)throw Error("Profile user ID is missing.");
+  let d;
+  /* This endpoint returns the profile owner's original posts and their shares. */
+  try{
+   d=await api("/users/"+encodeURIComponent(id)+"/posts");
+  }catch(endpointError){
+   console.warn("Profile posts endpoint failed; trying the general posts feed:",endpointError);
+   d=await api("/posts?limit=100");
+  }
+  const posts=Array.isArray(d)?d:Array.isArray(d.posts)?d.posts:Array.isArray(d.data?.posts)?d.data.posts:Array.isArray(d.items)?d.items:[];
+  const un=String(viewedUser?.username||targetName||"").toLowerCase();
+  const filtered=posts.filter(p=>{
+   const shared=isSharedPost(p);
+   if(shared){
+    return sharedById(p)===id;
+   }
+   const ownerId=String(postId(p)||"");
+   const ownerName=String(postName(p)||"").replace(/^@/,"").toLowerCase();
+   return ownerId===id||(!ownerId&&un&&ownerName===un);
+  });
+  /* The profile endpoint may already return only this user's timeline. */
+  const profilePosts=filtered.length?filtered:posts.filter(p=>{
+   const shared=isSharedPost(p);
+   if(shared)return sharedById(p)===id;
+   return String(postId(p)||"")===id;
+  });
+  count.textContent=profilePosts.length+(profilePosts.length===1?" post":" posts");
   box.replaceChildren();
-  if(!filtered.length){box.innerHTML='<div class="empty">No posts found for this user.</div>';return}
-
-  filtered.forEach((p,index)=>{
-   const card=document.createElement("article");card.className="post";
-   const a=authorOf(p),name=String(postName(p)||un||"User").replace(/^@/,"");
-   const row=document.createElement("div");row.className="post-author";
-   const im=document.createElement("img");im.alt="Profile picture";
-   setImg(im,a.avatar_url||a.avatar||p.avatar_url,FALLBACK_AVATAR);
-   const authorCopy=document.createElement("div");authorCopy.className="post-author-copy";
-   const strong=document.createElement("strong");strong.textContent=first(p.display_name,a.display_name,a.name,name);
-   authorCopy.append(strong);
-   const timeValue=first(p.created_at,p.createdAt,p.created_at_timestamp);
-   if(timeValue){
-    const time=document.createElement("span");time.className="post-time";time.textContent=relativeTime(timeValue);authorCopy.append(time);
-   }
-   row.append(im,authorCopy);
-   row.onclick=()=>{const q=new URLSearchParams({username:name});if(postId(p))q.set("userId",postId(p));location.href="profile.html?"+q};
-   card.append(row);
-
-   const content=String(first(p.content,p.text,p.caption));
-   if(content){const t=document.createElement("p");t.className="post-content";t.textContent=content;card.append(t)}
-
-   const url=String(first(p.media_url,p.image_url,p.video_url)),type=String(p.media_type||p.type||"").toLowerCase();
-   if(url){
-    const video=type.includes("video")||/\.(mp4|webm|mov|m4v)(?:[?#].*)?$/i.test(url);
-    const m=document.createElement(video?"video":"img");
-    m.className="post-media";m.src=url;m.alt=video?"Post video":"Post image";
-    if(video){m.controls=true;m.playsInline=true}else m.loading="lazy";
-    card.append(m)
-   }
-   const meta=document.createElement("div");meta.className="post-meta muted";
-   [["fa-regular fa-heart",p.like_count],["fa-regular fa-comment",p.comment_count],["fa-regular fa-eye",p.view_count]].forEach(([icon,n])=>{
-    const s=document.createElement("span");s.innerHTML='<i class="'+icon+'"></i> '+(Number(n)||0);meta.append(s)
-   });
-   card.append(meta);
-   const postKey=String(p.id??p.post_id??"");
-   if(postKey){
-    p.id=postKey;
-    card.append(makeReactionControls(p,card));
-    card.append(makeComments(p,card));
-   }
-
-   /* Full post date/time is intentionally not displayed. */
+  if(!profilePosts.length){box.innerHTML='<div class="empty">No posts found for this user.</div>';return}
+  profilePosts.forEach((p,index)=>{
+   const card=makePostCard(p,index,profilePosts.length);
    box.append(card);
-
    /* Show an ad banner after every three posts. */
-   if((index+1)%3===0&&index!==filtered.length-1){
+   if((index+1)%3===0&&index!==profilePosts.length-1){
     const slot=document.createElement("div");
     slot.className="ad-banner-slot";
     slot.innerHTML='<span class="ad-banner-label">Advertisement</span>';
@@ -777,12 +872,13 @@ async function loadPosts(force=false){
   });
  }catch(e){
   count.textContent="Posts unavailable";
-  box.textContent="Could not load posts: "+e.message
+  box.textContent="Could not load posts: "+e.message;
  }finally{postsLoading=false}
 }
+
 window.addEventListener("DOMContentLoaded",()=>{
  if(targetName)document.title="Boys vs Girls 💙💗 - @"+targetName;
- loadProfile()
+ loadProfile();
 });
 </script>
 </body>
