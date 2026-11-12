@@ -371,6 +371,20 @@ async function initializeDatabase() {
       PRIMARY KEY(post_id, user_id, view_day)
     );
 
+    -- Shares reference the original post; media is never copied or re-uploaded.
+    CREATE TABLE IF NOT EXISTS ft_post_shares (
+      id BIGSERIAL PRIMARY KEY,
+      post_id BIGINT NOT NULL REFERENCES ft_posts(id) ON DELETE CASCADE,
+      user_id TEXT NOT NULL,
+      caption VARCHAR(2000) NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE(post_id,user_id)
+    );
+    CREATE INDEX IF NOT EXISTS ft_post_shares_user_idx
+      ON ft_post_shares(user_id,created_at DESC);
+    CREATE INDEX IF NOT EXISTS ft_post_shares_post_idx
+      ON ft_post_shares(post_id,created_at DESC);
+
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS location VARCHAR(120);
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS hometown VARCHAR(120);
     ALTER TABLE ft_profiles ADD COLUMN IF NOT EXISTS birthday DATE;
@@ -889,7 +903,7 @@ app.get("/api/profile/:username", async (req, res, next) => {
     const profile = result.rows[0];
     const stats = await pool.query(
       `SELECT
-       (SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) AS posts,
+       ((SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) + (SELECT COUNT(*) FROM ft_post_shares WHERE user_id=$1)) AS posts,
        (SELECT COUNT(*) FROM ft_likes l JOIN ft_posts p ON p.id=l.post_id
          WHERE p.user_id=$1) AS likes,
        (SELECT COUNT(*) FROM (SELECT follower_id AS uid FROM ft_follows WHERE following_id=$1 UNION SELECT user_id AS uid FROM ft_friends WHERE friend_id=$1) x) AS followers,
@@ -914,7 +928,7 @@ app.get("/api/profile/id/:userId", requireAuth, async(req,res,next)=>{
     if(!result.rowCount) return res.status(404).json({error:"User not found."});
     const profile=result.rows[0];
     const stats=await pool.query(`SELECT
-      (SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) AS posts,
+      ((SELECT COUNT(*) FROM ft_posts WHERE user_id=$1) + (SELECT COUNT(*) FROM ft_post_shares WHERE user_id=$1)) AS posts,
       (SELECT COUNT(*) FROM ft_likes l JOIN ft_posts p ON p.id=l.post_id WHERE p.user_id=$1) AS likes,
       (SELECT COUNT(*) FROM (SELECT follower_id AS uid FROM ft_follows WHERE following_id=$1 UNION SELECT user_id AS uid FROM ft_friends WHERE friend_id=$1) x) AS followers,
       (SELECT COUNT(*) FROM (SELECT following_id AS uid FROM ft_follows WHERE follower_id=$1 UNION SELECT friend_id AS uid FROM ft_friends WHERE user_id=$1) x) AS following`,[id]);
@@ -983,12 +997,34 @@ app.post("/api/media/upload", requireAuth, (req, res, next) => {
 app.get("/api/posts", requireAuth, async (req, res, next) => {
   try {
     const result = await pool.query(
-      `SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,
+      `WITH feed_items AS (
+         SELECT p.id AS post_id,p.created_at AS feed_created_at,
+                NULL::bigint AS share_id,NULL::text AS shared_by_id,
+                NULL::text AS shared_by_username,NULL::text AS shared_by_name,
+                ''::text AS share_caption,FALSE AS is_shared
+         FROM ft_posts p
+         JOIN users owner ON owner.id::text=p.user_id
+         WHERE owner.account_status='active' AND p.moderation_status='approved'
+         UNION ALL
+         SELECT p.id,s.created_at,s.id,s.user_id,sh.username,
+                COALESCE(shp.display_name,sh.username),s.caption,TRUE
+         FROM ft_post_shares s
+         JOIN ft_posts p ON p.id=s.post_id
+         JOIN users sh ON sh.id::text=s.user_id AND sh.account_status='active'
+         JOIN users owner ON owner.id::text=p.user_id AND owner.account_status='active'
+         LEFT JOIN ft_profiles shp ON shp.user_id=s.user_id
+         WHERE p.moderation_status='approved'
+       )
+       SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,
               p.created_at,u.username,pr.display_name,pr.avatar_url,
               CASE WHEN pr.blue_badge_status='verified'
                      AND pr.blue_badge_expires_at IS NOT NULL
                      AND pr.blue_badge_expires_at > NOW()
                    THEN 'verified' ELSE 'none' END AS blue_badge_status,
+              fi.is_shared,fi.share_id::text AS share_id,fi.shared_by_id,
+              fi.shared_by_username,fi.shared_by_name,fi.share_caption,
+              fi.feed_created_at,
+              (SELECT COUNT(*) FROM ft_post_shares sc WHERE sc.post_id=p.id) AS share_count,
               (SELECT COUNT(*) FROM ft_post_reactions r WHERE r.post_id=p.id) AS reaction_count,
               (SELECT COALESCE(jsonb_object_agg(rc.reaction,rc.cnt),'{}'::jsonb)
                  FROM (SELECT reaction,COUNT(*)::int AS cnt FROM ft_post_reactions
@@ -998,18 +1034,59 @@ app.get("/api/posts", requireAuth, async (req, res, next) => {
               (SELECT COUNT(*) FROM ft_post_views v WHERE v.post_id=p.id) AS view_count,
               EXISTS(SELECT 1 FROM ft_post_reactions r
                      WHERE r.post_id=p.id AND r.user_id=$1) AS liked
-       FROM ft_posts p
+       FROM feed_items fi
+       JOIN ft_posts p ON p.id=fi.post_id
        JOIN users u ON u.id::text=p.user_id
        LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
-       WHERE u.account_status='active' AND p.moderation_status='approved'
-       ORDER BY p.created_at DESC LIMIT 100`,
+       ORDER BY fi.feed_created_at DESC LIMIT 100`,
       [String(req.user.id)]
     );
-
     res.json({ posts: result.rows });
   } catch (e) {
     next(e);
   }
+});
+
+// Share any approved photo, video or text post to the current user's profile.
+// The share stores only a reference to the original post, never a media copy.
+app.post("/api/posts/:id/share", requireAuth, async (req,res,next) => {
+  const id=Number.parseInt(req.params.id,10);
+  const caption=cleanText(req.body.caption,2000);
+  if(!Number.isSafeInteger(id)||id<=0) return res.status(400).json({error:"Invalid post ID."});
+  try {
+    const post=await pool.query(
+      `SELECT p.id,p.user_id FROM ft_posts p JOIN users u ON u.id::text=p.user_id
+       WHERE p.id=$1 AND p.moderation_status='approved' AND u.account_status='active'`,[id]
+    );
+    if(!post.rowCount) return res.status(404).json({error:"Post not found or not available."});
+    if(String(post.rows[0].user_id)===String(req.user.id)) {
+      return res.status(400).json({error:"You cannot share your own post to your profile."});
+    }
+    const shared=await pool.query(
+      `INSERT INTO ft_post_shares(post_id,user_id,caption)
+       VALUES($1,$2,$3)
+       ON CONFLICT(post_id,user_id) DO UPDATE SET caption=EXCLUDED.caption,created_at=NOW()
+       RETURNING id::text AS share_id,post_id::text AS post_id,user_id,caption,created_at`,
+      [id,String(req.user.id),caption]
+    );
+    await notifyUser(post.rows[0].user_id,req.user.id,'share',`${req.user.username} shared your post.`,id);
+    const count=await pool.query("SELECT COUNT(*)::int AS share_count FROM ft_post_shares WHERE post_id=$1",[id]);
+    res.status(201).json({message:"Post shared to your profile.",share:shared.rows[0],share_count:count.rows[0].share_count});
+  } catch(e){next(e);}
+});
+
+app.delete("/api/posts/:id/share", requireAuth, async (req,res,next) => {
+  const id=Number.parseInt(req.params.id,10);
+  if(!Number.isSafeInteger(id)||id<=0) return res.status(400).json({error:"Invalid post ID."});
+  try {
+    const removed=await pool.query(
+      "DELETE FROM ft_post_shares WHERE post_id=$1 AND user_id=$2 RETURNING id",
+      [id,String(req.user.id)]
+    );
+    if(!removed.rowCount) return res.status(404).json({error:"Your share was not found."});
+    const count=await pool.query("SELECT COUNT(*)::int AS share_count FROM ft_post_shares WHERE post_id=$1",[id]);
+    res.json({message:"Share removed from your profile.",share_count:count.rows[0].share_count});
+  } catch(e){next(e);}
 });
 
 app.post("/api/posts", requireAuth, async (req, res, next) => {
@@ -1865,15 +1942,31 @@ app.patch("/api/account/username", requireAuth, async (req,res,next) => {
 app.get("/api/users/:userId/posts", requireAuth, async (req,res,next) => {
   try {
     const uid=cleanText(req.params.userId,100);
-    const r=await pool.query(`SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.created_at,
-      u.username,pr.display_name,pr.avatar_url,
-      (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS reaction_count,
-      (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS like_count,
-      (SELECT COUNT(*) FROM ft_comments x WHERE x.post_id=p.id) AS comment_count,
-      (SELECT COUNT(*) FROM ft_post_views x WHERE x.post_id=p.id) AS view_count
-      FROM ft_posts p JOIN users u ON u.id::text=p.user_id LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
-      WHERE p.user_id=$1 AND u.account_status='active' AND p.moderation_status='approved'
-      ORDER BY p.created_at DESC LIMIT 100`,[uid]);
+    const r=await pool.query(`
+      WITH profile_items AS (
+        SELECT p.id AS post_id,p.created_at AS feed_created_at,
+               NULL::bigint AS share_id,''::text AS share_caption,FALSE AS is_shared
+        FROM ft_posts p WHERE p.user_id=$1 AND p.moderation_status='approved'
+        UNION ALL
+        SELECT p.id,s.created_at,s.id,s.caption,TRUE
+        FROM ft_post_shares s JOIN ft_posts p ON p.id=s.post_id
+        WHERE s.user_id=$1 AND p.moderation_status='approved'
+      )
+      SELECT p.id::text AS id,p.user_id,p.content,p.media_url,p.media_type,p.created_at,
+        u.username,pr.display_name,pr.avatar_url,
+        pi.is_shared,pi.share_id::text AS share_id,pi.share_caption,pi.feed_created_at,
+        (SELECT COALESCE(jsonb_agg(jsonb_build_object('reaction',z.reaction,'count',z.cnt)),'[]'::jsonb)
+           FROM (SELECT reaction,COUNT(*)::int AS cnt FROM ft_post_reactions WHERE post_id=p.id GROUP BY reaction) z) AS reaction_counts,
+        (SELECT COUNT(*) FROM ft_post_shares x WHERE x.post_id=p.id) AS share_count,
+        (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS reaction_count,
+        (SELECT COUNT(*) FROM ft_post_reactions x WHERE x.post_id=p.id) AS like_count,
+        (SELECT COUNT(*) FROM ft_comments x WHERE x.post_id=p.id) AS comment_count,
+        (SELECT COUNT(*) FROM ft_post_views x WHERE x.post_id=p.id) AS view_count
+      FROM profile_items pi
+      JOIN ft_posts p ON p.id=pi.post_id
+      JOIN users u ON u.id::text=p.user_id AND u.account_status='active'
+      LEFT JOIN ft_profiles pr ON pr.user_id=p.user_id
+      ORDER BY pi.feed_created_at DESC LIMIT 100`,[uid]);
     res.json({posts:r.rows});
   } catch(e){next(e);}
 });
