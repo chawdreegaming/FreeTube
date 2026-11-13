@@ -102,7 +102,19 @@ input[type=file]{display:none}
 .remove-share-button{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;margin-top:11px;padding:10px;border-radius:9px;border:1px solid #fb718555;background:#fb718511;color:#ff9aaa;font-size:11px;font-weight:800}
 .remove-share-button:disabled{opacity:.5}
 .post-original-label{font-size:10px;color:var(--muted);margin:8px 0 4px}
-.post-interactions{margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.post-action-row{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);width:100%}
+.post-interactions{margin:0;padding:0;border:0;min-width:0;flex:1}
+.post-interactions .reaction-control{display:flex;align-items:center;gap:4px;min-width:0}
+.post-action-row .reaction-main,.post-action-row .comment-open-button,.post-share-button{flex:1;min-width:0;min-height:42px;justify-content:center;white-space:nowrap;padding:8px 5px;font-size:12px}
+.post-action-row .reaction-total{display:none}
+.post-comments{display:flex;flex:1;min-width:0}
+.post-comments .comment-open-button{width:100%}
+.post-share-button{display:inline-flex;align-items:center;gap:6px;border:1px solid #ffffff20;border-radius:22px;background:#ffffff08;color:#c7c0e6;font-weight:800}
+.post-share-button:active,.comment-open-button:active,.reaction-main:active{background:#a78bfa25}
+@media(max-width:380px){
+ .post-action-row{gap:4px}
+ .post-action-row .reaction-main,.post-action-row .comment-open-button,.post-share-button{font-size:10px;padding:8px 3px;gap:4px}
+}
 .reaction-list{display:flex;flex-wrap:wrap;gap:7px}
 .reaction-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 11px;border:1px solid #ffffff20;border-radius:24px;background:#ffffff08;color:var(--muted);font-size:12px;font-weight:800}
 .reaction-btn.active{border-color:var(--purple);background:#a78bfa25;color:#fff;box-shadow:0 0 0 1px #a78bfa55}
@@ -840,6 +852,29 @@ async function removeShare(post,button,card){
   button.innerHTML='<i class="fa-solid fa-link-slash"></i> Remove share';
  }
 }
+async function sharePostExternally(post){
+ const url=location.origin+location.pathname+"?postId="+encodeURIComponent(post.id);
+ const text=String(first(post.content,post.text,post.caption,"Check out this post on Boys vs Girls 💙💗"));
+ try{
+  if(navigator.share){
+   await navigator.share({title:"Boys vs Girls 💙💗",text,url});
+  }else if(navigator.clipboard?.writeText){
+   await navigator.clipboard.writeText(text+"\\n"+url);
+   toast("Post link copied.");
+  }else{
+   const field=document.createElement("textarea");field.value=text+"\\n"+url;document.body.append(field);field.select();
+   document.execCommand("copy");field.remove();toast("Post link copied.");
+  }
+ }catch(error){
+  if(error?.name!=="AbortError")toast("Could not share this post.");
+ }
+}
+function makeShareButton(post){
+ const button=document.createElement("button");button.type="button";button.className="post-share-button";
+ button.innerHTML='<i class="fa-solid fa-share"></i> Share';
+ button.addEventListener("click",()=>sharePostExternally(post));
+ return button;
+}
 function makePostCard(p,index,filteredLength){
  const card=document.createElement("article");card.className="post";
  const shared=isSharedPost(p);
@@ -894,8 +929,11 @@ function makePostCard(p,index,filteredLength){
  const postKey=String(p.id??p.post_id??"");
  if(postKey){
   p.id=postKey;
-  card.append(makeReactionControls(p,card));
-  card.append(makeComments(p,card));
+  const actionRow=document.createElement("div");actionRow.className="post-action-row";
+  actionRow.append(makeReactionControls(p,card));
+  actionRow.append(makeComments(p,card));
+  actionRow.append(makeShareButton(p));
+  card.append(actionRow);
  }
  /* A share can only be removed by the owner of the profile being viewed. */
  if(shared&&isOwn&&sharedById(p)===profileOwnerId()){
