@@ -4,28 +4,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Boys vs Girls Slider</title>
+<meta name="theme-color" content="#171329">
+<title>Boys vs Girls Home Slider</title>
 
 <style>
 *{
-    margin:0;
-    padding:0;
     box-sizing:border-box;
 }
 
 html,body{
+    margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
     background:transparent;
-    font-family:Arial,sans-serif;
 }
 
-.slider-container{
+.slider{
+    position:relative;
     width:100%;
     height:100%;
-    position:relative;
     overflow:hidden;
     background:transparent;
 }
@@ -37,60 +35,63 @@ html,body{
     height:100%;
     opacity:0;
     visibility:hidden;
-    transform:translateX(35px);
+    transform:translateX(32px);
     transition:
-        opacity .7s ease,
-        transform .7s ease,
-        visibility .7s;
+        opacity .75s ease,
+        transform .75s ease,
+        visibility .75s;
+    pointer-events:none;
 }
 
 .slide.active{
     opacity:1;
     visibility:visible;
     transform:translateX(0);
+    pointer-events:auto;
     z-index:2;
 }
 
+.slide.exit{
+    opacity:0;
+    transform:translateX(-32px);
+}
+
 .slide iframe{
+    display:block;
     width:100%;
     height:100%;
-    display:block;
     border:0;
     background:transparent;
 }
 
-/* Navigation dots */
-
 .dots{
     position:absolute;
-    z-index:10;
-    bottom:8px;
+    z-index:5;
     left:50%;
+    bottom:5px;
     transform:translateX(-50%);
     display:flex;
-    gap:6px;
+    align-items:center;
+    gap:5px;
+    pointer-events:none;
 }
 
 .dot{
-    width:7px;
-    height:7px;
-    border:0;
+    width:6px;
+    height:6px;
     border-radius:20px;
-    background:rgba(255,255,255,.5);
-    cursor:pointer;
-    transition:all .3s ease;
+    background:#ffffff88;
+    transition:all .25s ease;
 }
 
 .dot.active{
-    width:20px;
-    background:#ed32ae;
+    width:17px;
+    background:#f22e9b;
 }
 
-/* Mobile */
-
-@media(max-width:600px){
-    .dots{
-        bottom:6px;
+@media(prefers-reduced-motion:reduce){
+    .slide{
+        transition:none;
     }
 }
 </style>
@@ -98,32 +99,35 @@ html,body{
 
 <body>
 
-<div class="slider-container" id="slider">
+<div class="slider" id="slider">
 
     <!-- Tournament Card -->
+
     <div class="slide active">
         <iframe
             src="tournament-card.html"
-            title="Tournament Card"
-            loading="eager"
-            scrolling="no">
+            title="Boys vs Girls Tournament Card"
+            loading="eager">
         </iframe>
     </div>
 
+    <!-- Future Card Example -->
+
     <!--
-    ভবিষ্যতে নতুন কার্ড যোগ করলে এখানে
-    নতুন slide এবং iframe যোগ করবে।
-
-    Example:
-
     <div class="slide">
-        <iframe src="game-card.html"
-        title="Game Card"></iframe>
+        <iframe
+            src="game-card.html"
+            title="Game Card"
+            loading="lazy">
+        </iframe>
     </div>
 
     <div class="slide">
-        <iframe src="event-card.html"
-        title="Event Card"></iframe>
+        <iframe
+            src="event-card.html"
+            title="Event Card"
+            loading="lazy">
+        </iframe>
     </div>
     -->
 
@@ -132,76 +136,73 @@ html,body{
 </div>
 
 <script>
-
-(function(){
+(() => {
 
     const slides = Array.from(
         document.querySelectorAll(".slide")
     );
 
-    const dotsBox = document.getElementById("dots");
+    const dots = document.getElementById("dots");
 
-    if(slides.length === 0) return;
+    if(!slides.length) return;
 
     let current = 0;
-    let autoSlide = null;
+    let timer = null;
 
-    // Create navigation dots
+    // Create dots
 
-    slides.forEach((slide,index)=>{
+    slides.forEach((_, i) => {
 
-        const dot = document.createElement("button");
+        const dot = document.createElement("span");
 
-        dot.className = "dot";
+        dot.className =
+            "dot" + (i === 0 ? " active" : "");
 
-        dot.setAttribute(
-            "aria-label",
-            "Show card " + (index + 1)
-        );
-
-        dot.addEventListener("click",()=>{
-
-            showSlide(index);
-            restartAutoSlide();
-
-        });
-
-        dotsBox.appendChild(dot);
+        dots.appendChild(dot);
 
     });
 
-    const dots = Array.from(
-        dotsBox.querySelectorAll(".dot")
+    const indicators = Array.from(
+        dots.children
     );
 
-    function showSlide(index){
+    // Show next card
 
-        slides[current].classList.remove("active");
-        dots[current].classList.remove("active");
+    function showNext(){
 
-        current = (index + slides.length) % slides.length;
+        if(slides.length < 2) return;
 
+        const previous = current;
+
+        current = (current + 1) % slides.length;
+
+        slides[previous].classList.remove("active");
+        slides[previous].classList.add("exit");
+
+        slides[current].classList.remove("exit");
         slides[current].classList.add("active");
-        dots[current].classList.add("active");
+
+        indicators[previous].classList.remove("active");
+        indicators[current].classList.add("active");
+
+        window.setTimeout(() => {
+
+            slides[previous].classList.remove("exit");
+
+        }, 800);
 
     }
 
-    function nextSlide(){
+    // Auto slider: 5 seconds
 
-        if(slides.length <= 1) return;
+    function start(){
 
-        showSlide(current + 1);
-
-    }
-
-    function restartAutoSlide(){
-
-        clearInterval(autoSlide);
+        window.clearInterval(timer);
 
         if(slides.length > 1){
 
-            autoSlide = setInterval(
-                nextSlide,
+            timer = window.setInterval(
+                showNext,
                 5000
             );
 
@@ -209,33 +210,28 @@ html,body{
 
     }
 
-    // Initial state
-
-    dots[0].classList.add("active");
-
-    restartAutoSlide();
-
     // Pause when page is hidden
 
     document.addEventListener(
         "visibilitychange",
-        ()=>{
+        () => {
 
             if(document.hidden){
 
-                clearInterval(autoSlide);
+                window.clearInterval(timer);
 
             }else{
 
-                restartAutoSlide();
+                start();
 
             }
 
         }
     );
 
-})();
+    start();
 
+})();
 </script>
 
 </body>
