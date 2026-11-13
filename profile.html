@@ -123,6 +123,31 @@ input[type=file]{display:none}
 .comment-text{font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
 .comment-time{font-size:10px;color:var(--muted);margin-top:4px}
 .comments-empty{font-size:12px;color:var(--muted);padding:8px 0}
+
+/* Long-press reaction picker */
+.reaction-control{position:relative;display:flex;align-items:center;gap:8px;min-height:44px}
+.reaction-main{display:inline-flex;align-items:center;gap:8px;padding:9px 14px;border:1px solid #ffffff20;border-radius:24px;background:#ffffff08;color:var(--muted);font-size:13px;font-weight:850;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.reaction-main.active{border-color:var(--purple);background:#a78bfa25;color:#fff}
+.reaction-main .reaction-emoji{font-size:19px}
+.reaction-picker{position:absolute;z-index:40;left:0;bottom:calc(100% + 9px);display:flex;gap:5px;padding:7px;border:1px solid #ffffff24;border-radius:30px;background:#211f39;box-shadow:0 10px 30px #0009;opacity:0;transform:translateY(7px) scale(.96);pointer-events:none;transition:opacity .12s,transform .12s}
+.reaction-picker.open{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.reaction-option{width:43px;height:43px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;font-size:25px;transition:transform .1s,background .1s}
+.reaction-option.highlight{background:#a78bfa45;transform:scale(1.28) translateY(-5px)}
+.reaction-total{margin-left:4px;align-self:center;color:var(--muted);font-size:11px}
+.comment-open-button{display:inline-flex;align-items:center;gap:7px;border:1px solid #ffffff20;border-radius:22px;background:#ffffff08;color:#c7c0e6;padding:9px 13px;font-size:12px;font-weight:800}
+.comment-screen{display:none;position:fixed;inset:0;z-index:150;background:var(--bg);padding-bottom:env(safe-area-inset-bottom);overflow:hidden}
+.comment-screen.open{display:flex;flex-direction:column}
+.comment-screen-head{height:58px;flex:0 0 58px;display:flex;align-items:center;gap:14px;padding:0 15px;border-bottom:1px solid var(--border);background:#100f20f5}
+.comment-screen-head button{width:36px;height:36px;border:0;border-radius:50%;background:#ffffff0c;font-size:17px}
+.comment-screen-head h2{font-size:16px}
+.comment-screen-list{flex:1;overflow-y:auto;max-width:600px;width:100%;margin:0 auto;padding:16px}
+.comment-screen-form{display:flex;gap:8px;width:100%;max-width:600px;margin:0 auto;padding:11px 13px calc(11px + env(safe-area-inset-bottom));border-top:1px solid var(--border);background:#19182e}
+.comment-screen-form input{flex:1;min-width:0;border:1px solid var(--border);border-radius:24px;background:#ffffff0b;color:var(--text);padding:12px 15px;outline:none;font-size:14px}
+.comment-screen-form input:focus{border-color:var(--purple)}
+.comment-screen-form button{border:0;border-radius:22px;padding:0 17px;background:var(--gradient);color:#17142e;font-weight:900}
+.comment-screen-form button:disabled{opacity:.5}
+.comment-screen-empty{padding:20px 5px;text-align:center;color:var(--muted);font-size:13px}
+
 @media(max-width:380px){
  .brand-title{font-size:14px}.brand-logo{width:32px;height:32px}
  .cover{height:195px}.name{font-size:21px}
@@ -517,7 +542,12 @@ $("refreshPostsButton").onclick=async()=>{
  try{await loadPosts(true);toast("Posts refreshed.")}
  finally{b.classList.remove("spinning");b.disabled=false}
 };
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeEdit()});
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){
+  closeEdit();
+  if(activeCommentScreen?.screen.classList.contains("open"))activeCommentScreen.close();
+ }
+});
 
 $("editForm").addEventListener("submit",async e=>{
  e.preventDefault();if(!isOwn)return;
@@ -609,45 +639,92 @@ const REACTION_TYPES=[
 function safeCount(value){const n=Number(value);return Number.isFinite(n)&&n>0?Math.floor(n):0}
 function makeReactionControls(post,postCard){
  const wrap=document.createElement("div");wrap.className="post-interactions";
- const row=document.createElement("div");row.className="reaction-list";
+ const control=document.createElement("div");control.className="reaction-control";
  const counts={...(post.reaction_counts||{})};
  let mine=String(post.my_reaction||post.user_reaction||"").toLowerCase();
+ let busy=false,holdTimer=null,longPress=false,pickerOpen=false,highlighted="";
  const total=()=>REACTION_TYPES.reduce((sum,r)=>sum+safeCount(counts[r.key]),0);
+ const main=document.createElement("button");main.type="button";main.className="reaction-main";
+ main.setAttribute("aria-label","React to this post. Press and hold to choose a reaction.");
+ const picker=document.createElement("div");picker.className="reaction-picker";
+ picker.setAttribute("role","group");picker.setAttribute("aria-label","Choose a reaction");
  const totalLabel=document.createElement("span");totalLabel.className="reaction-total";
+ const options=new Map();
  function paint(){
-  row.querySelectorAll("button[data-reaction]").forEach(btn=>{
-   const key=btn.dataset.reaction;
-   btn.classList.toggle("active",mine===key);
-   btn.setAttribute("aria-pressed",mine===key?"true":"false");
-   const type=REACTION_TYPES.find(r=>r.key===key);
-   btn.textContent=type.emoji+" "+type.label+" "+safeCount(counts[key]);
-  });
+  const type=REACTION_TYPES.find(r=>r.key===mine);
+  main.classList.toggle("active",!!type);
+  main.innerHTML=type?'<span class="reaction-emoji">'+type.emoji+'</span> '+type.label:'<i class="fa-regular fa-heart"></i> React';
+  main.disabled=busy;
   totalLabel.textContent=total()+" reaction"+(total()===1?"":"s");
+  options.forEach((btn,key)=>btn.classList.toggle("highlight",highlighted===key));
+ }
+ function openPicker(){
+  if(busy)return;
+  pickerOpen=true;picker.classList.add("open");
+ }
+ function closePicker(){pickerOpen=false;picker.classList.remove("open");highlighted="";paint()}
+ async function sendReaction(key){
+  if(busy)return;
+  busy=true;main.disabled=true;
+  const previous=mine;
+  try{
+   const result=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{method:"POST",body:JSON.stringify({reaction:key})});
+   mine=result.reaction||null;
+   Object.keys(counts).forEach(k=>delete counts[k]);
+   Object.assign(counts,result.reaction_counts||{});
+   post.reaction_counts={...counts};post.my_reaction=mine;
+   post.like_count=result.reaction_count??total();
+   const like=postCard.querySelector(".post-meta span");
+   if(like)like.innerHTML='<i class="fa-regular fa-heart"></i> '+safeCount(post.like_count);
+  }catch(error){mine=previous;toast("Reaction failed: "+error.message)}
+  finally{busy=false;closePicker();paint()}
  }
  REACTION_TYPES.forEach(type=>{
-  const btn=document.createElement("button");btn.type="button";btn.className="reaction-btn";
-  btn.dataset.reaction=type.key;
-  btn.addEventListener("click",async()=>{
-   if(btn.disabled)return;
-   const previous=mine;btn.disabled=true;
-   try{
-    const result=await api("/posts/"+encodeURIComponent(post.id)+"/reaction",{
-     method:"POST",body:JSON.stringify({reaction:type.key})
-    });
-    mine=result.reaction||null;
-    Object.keys(counts).forEach(k=>delete counts[k]);
-    Object.assign(counts,result.reaction_counts||{});
-    post.reaction_counts={...counts};post.my_reaction=mine;
-    post.like_count=result.reaction_count??total();
-    const like=postCard.querySelector(".post-meta span");
-    if(like)like.innerHTML='<i class="fa-regular fa-heart"></i> '+safeCount(post.like_count);
-    paint();
-   }catch(error){toast("Reaction failed: "+error.message);mine=previous}
-   finally{btn.disabled=false;paint()}
-  });
-  row.append(btn);
+  const btn=document.createElement("button");btn.type="button";btn.className="reaction-option";
+  btn.textContent=type.emoji;btn.dataset.reaction=type.key;btn.title=type.label;
+  btn.addEventListener("pointerenter",()=>{if(pickerOpen){highlighted=type.key;paint()}});
+  options.set(type.key,btn);picker.append(btn);
  });
- row.append(totalLabel);wrap.append(row);paint();
+ let startX=0,startY=0;
+ function stopHold(){if(holdTimer){clearTimeout(holdTimer);holdTimer=null}}
+ function optionAt(x,y){
+  const el=document.elementFromPoint(x,y);
+  const option=el?.closest?.(".reaction-option");
+  if(option&&picker.contains(option))return option.dataset.reaction;
+  const rects=[...picker.querySelectorAll(".reaction-option")];
+  let nearest="",distance=Infinity;
+  rects.forEach(btn=>{const r=btn.getBoundingClientRect();const dx=x-(r.left+r.width/2),dy=y-(r.top+r.height/2),d=dx*dx+dy*dy;if(d<distance){distance=d;nearest=btn.dataset.reaction}});
+  return distance<65*65?nearest:"";
+ }
+ main.addEventListener("pointerdown",e=>{
+  if(e.button!==undefined&&e.button!==0)return;
+  startX=e.clientX;startY=e.clientY;longPress=false;
+  try{main.setPointerCapture(e.pointerId)}catch{}
+  stopHold();
+  holdTimer=setTimeout(()=>{longPress=true;openPicker()},380);
+ });
+ main.addEventListener("pointermove",e=>{
+  if(!holdTimer&&!pickerOpen)return;
+  if(!pickerOpen&&Math.hypot(e.clientX-startX,e.clientY-startY)>12){stopHold();return}
+  if(pickerOpen){highlighted=optionAt(e.clientX,e.clientY);paint();e.preventDefault()}
+ });
+ const finish=e=>{
+  stopHold();
+  if(pickerOpen){
+   const chosen=optionAt(e.clientX,e.clientY)||highlighted;
+   closePicker();
+   if(chosen)sendReaction(chosen);
+  }
+ };
+ main.addEventListener("pointerup",finish);
+ main.addEventListener("pointercancel",()=>{stopHold();if(pickerOpen)closePicker()});
+ main.addEventListener("lostpointercapture",()=>{stopHold();if(pickerOpen)closePicker()});
+ main.addEventListener("click",e=>{
+  if(longPress){longPress=false;e.preventDefault();return}
+  if(pickerOpen)return;
+  sendReaction(mine||"love");
+ });
+ control.append(main,picker,totalLabel);wrap.append(control);paint();
  return wrap;
 }
 function commentAvatar(comment){return comment.avatar_url||comment.avatar||FALLBACK_AVATAR}
@@ -662,56 +739,65 @@ function renderComment(comment){
  bubble.append(author,text);if(time.textContent)bubble.append(time);
  item.append(avatar,bubble);return item;
 }
-function makeComments(post,postCard){
- const wrap=document.createElement("div");wrap.className="post-comments";
- const toolbar=document.createElement("div");toolbar.className="comment-toolbar";
- const toggle=document.createElement("button");toggle.type="button";toggle.className="comment-toggle";
- const list=document.createElement("div");list.className="comments-list";list.hidden=true;
- let loaded=false,loadingComments=false,expanded=false;
- const commentCount=()=>safeCount(post.comment_count);
- function paintToggle(){toggle.textContent=(expanded?"Hide comments":"View comments")+" ("+commentCount()+")"}
- async function loadComments(){
-  if(loadingComments)return;
-  loadingComments=true;list.replaceChildren();
-  const loading=document.createElement("div");loading.className="comments-empty";loading.textContent="Loading comments...";list.append(loading);
-  try{
-   const result=await api("/posts/"+encodeURIComponent(post.id)+"/comments");
-   const comments=Array.isArray(result.comments)?result.comments:[];
-   list.replaceChildren();
-   if(!comments.length){const empty=document.createElement("div");empty.className="comments-empty";empty.textContent="No comments yet. Be the first to comment.";list.append(empty)}
-   else comments.forEach(comment=>list.append(renderComment(comment)));
-   loaded=true;
-  }catch(error){
-   list.replaceChildren();const failed=document.createElement("div");failed.className="comments-empty";failed.textContent="Could not load comments: "+error.message;list.append(failed);
-  }finally{loadingComments=false}
- }
- toggle.addEventListener("click",async()=>{
-  expanded=!expanded;list.hidden=!expanded;paintToggle();
-  if(expanded&&!loaded)await loadComments();
- });
- toolbar.append(toggle);wrap.append(toolbar);
- const form=document.createElement("form");form.className="comment-form";
- const input=document.createElement("input");input.className="comment-input";input.type="text";input.maxLength=2000;input.placeholder="Write a comment...";
- input.setAttribute("aria-label","Write a comment");
- const send=document.createElement("button");send.className="comment-send";send.type="submit";send.textContent="Send";
- form.append(input,send);
- form.addEventListener("submit",async event=>{
-  event.preventDefault();const content=input.value.trim();if(!content||send.disabled)return;
+let activeCommentScreen=null;
+function ensureCommentScreen(){
+ if(activeCommentScreen)return activeCommentScreen;
+ const screen=document.createElement("section");screen.className="comment-screen";screen.setAttribute("aria-label","Post comments");
+ const head=document.createElement("header");head.className="comment-screen-head";
+ const back=document.createElement("button");back.type="button";back.setAttribute("aria-label","Back to posts");back.innerHTML='<i class="fa-solid fa-arrow-left"></i>';
+ const title=document.createElement("h2");title.textContent="Comments";
+ const spacer=document.createElement("span");spacer.style.flex="1";
+ const list=document.createElement("div");list.className="comment-screen-list";
+ const form=document.createElement("form");form.className="comment-screen-form";
+ const input=document.createElement("input");input.type="text";input.maxLength=2000;input.placeholder="Write a comment...";input.setAttribute("aria-label","Write a comment");
+ const send=document.createElement("button");send.type="submit";send.textContent="Send";
+ form.append(input,send);head.append(back,title,spacer);screen.append(head,list,form);document.body.append(screen);
+ const close=()=>{screen.classList.remove("open");screen.dataset.postId="";};
+ back.addEventListener("click",close);
+ screen.addEventListener("click",e=>{if(e.target===screen)close()});
+ activeCommentScreen={screen,list,input,send,form,title,close,post:null,card:null,loading:false};
+ form.addEventListener("submit",async e=>{
+  e.preventDefault();const state=activeCommentScreen,post=state?.post,content=input.value.trim();
+  if(!post||!content||send.disabled)return;
   send.disabled=true;send.textContent="Sending...";
   try{
-   await api("/posts/"+encodeURIComponent(post.id)+"/comments",{
-    method:"POST",body:JSON.stringify({content})
-   });
-   input.value="";
-   post.comment_count=commentCount()+1;
-   const commentMeta=postCard.querySelectorAll(".post-meta span")[1];
+   await api("/posts/"+encodeURIComponent(post.id)+"/comments",{method:"POST",body:JSON.stringify({content})});
+   input.value="";post.comment_count=safeCount(post.comment_count)+1;
+   const commentMeta=state.card?.querySelectorAll(".post-meta span")[1];
    if(commentMeta)commentMeta.innerHTML='<i class="fa-regular fa-comment"></i> '+post.comment_count;
-   expanded=true;list.hidden=false;paintToggle();loaded=false;await loadComments();
+   state.title.textContent="Comments ("+post.comment_count+")";
+   await loadCommentsForScreen(state,post);
    toast("Comment added.");
   }catch(error){toast("Comment failed: "+error.message)}
-  finally{send.disabled=false;send.textContent="Send"}
+  finally{send.disabled=false;send.textContent="Send";input.focus()}
  });
- wrap.append(form,list);paintToggle();return wrap;
+ return activeCommentScreen;
+}
+async function loadCommentsForScreen(state,post){
+ if(state.loading)return;
+ state.loading=true;state.list.replaceChildren();
+ const loading=document.createElement("div");loading.className="comment-screen-empty";loading.textContent="Loading comments...";state.list.append(loading);
+ try{
+  const result=await api("/posts/"+encodeURIComponent(post.id)+"/comments");
+  const comments=Array.isArray(result.comments)?result.comments:[];
+  state.list.replaceChildren();
+  if(!comments.length){const empty=document.createElement("div");empty.className="comment-screen-empty";empty.textContent="No comments yet. Be the first to comment.";state.list.append(empty)}
+  else comments.forEach(comment=>state.list.append(renderComment(comment)));
+ }catch(error){
+  state.list.replaceChildren();const failed=document.createElement("div");failed.className="comment-screen-empty";failed.textContent="Could not load comments: "+error.message;state.list.append(failed);
+ }finally{state.loading=false}
+}
+function makeComments(post,postCard){
+ const wrap=document.createElement("div");wrap.className="post-comments";
+ const button=document.createElement("button");button.type="button";button.className="comment-open-button";
+ button.innerHTML='<i class="fa-regular fa-comment"></i> View comments ('+safeCount(post.comment_count)+')';
+ button.addEventListener("click",async()=>{
+  const state=ensureCommentScreen();state.post=post;state.card=postCard;
+  state.title.textContent="Comments ("+safeCount(post.comment_count)+")";
+  state.screen.dataset.postId=String(post.id);state.screen.classList.add("open");
+  state.input.value="";await loadCommentsForScreen(state,post);state.input.focus();
+ });
+ wrap.append(button);return wrap;
 }
 
 /* Share fields returned by the server */
