@@ -3,215 +3,280 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#171329">
 <title>Boys vs Girls - 3D Promo Slider</title>
 
 <style>
-*{box-sizing:border-box}
-
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:transparent;
-  font-family:Arial,Helvetica,sans-serif;
+* {
+  box-sizing: border-box;
 }
 
-.slider{
-  position:relative;
-  width:100%;
-  height:100%;
-  min-height:100px;
-  overflow:hidden;
-  background:transparent;
-  perspective:1600px;
-  isolation:isolate;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
-.slide{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  margin:0;
-  padding:0;
-  opacity:0;
-  visibility:hidden;
-  pointer-events:none;
-  transform:translate3d(12%,0,-100px) rotateY(-12deg);
-  transform-origin:center center;
+.slider {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  perspective: 1400px;
+  isolation: isolate;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(8%, 0, -80px) rotateY(-10deg);
+  transform-origin: center center;
   transition:
-    transform .8s cubic-bezier(.2,.75,.25,1),
-    opacity .7s ease,
-    visibility .7s;
-  backface-visibility:hidden;
-  will-change:transform,opacity;
+    transform .75s cubic-bezier(.2,.75,.25,1),
+    opacity .65s ease,
+    visibility .65s;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
-.slide.active{
-  z-index:2;
-  opacity:1;
-  visibility:visible;
-  pointer-events:auto;
-  transform:translate3d(0,0,0) rotateY(0);
+.slide.active {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0,0,0) rotateY(0);
 }
 
-.slide.before{
-  transform:translate3d(-12%,0,-100px) rotateY(12deg);
+.slide.before {
+  transform: translate3d(-8%,0,-80px) rotateY(10deg);
 }
 
-.slide iframe{
-  display:block;
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  min-width:100%;
-  min-height:100%;
-  margin:0;
-  padding:0;
-  border:0;
-  border-radius:0;
-  background:transparent;
+.slide iframe {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
-.dots{
-  position:absolute;
-  z-index:10;
-  left:50%;
-  bottom:7px;
-  transform:translateX(-50%);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:7px;
-  padding:4px 8px;
-  border-radius:20px;
-  background:#09071955;
+.arrows {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px;
+  pointer-events: none;
 }
 
-.dot{
-  width:8px;
-  height:8px;
-  padding:0;
-  border:0;
-  border-radius:20px;
-  background:#ffffff80;
-  transition:width .3s ease,background .3s ease;
+.arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #ffffff55;
+  border-radius: 24px;
+  color: #fff;
+  background: #09071988;
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: .85;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.dot.active{
-  width:22px;
-  background:#f02d9b;
-  box-shadow:0 0 9px #f02d9b;
+.arrow:active {
+  transform: scale(.9);
 }
 
-.arrows{
-  position:absolute;
-  z-index:11;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 5px;
-  pointer-events:none;
+.dots {
+  position: absolute;
+  z-index: 21;
+  left: 50%;
+  bottom: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 20px;
+  background: #09071966;
+  transform: translateX(-50%);
 }
 
-.arrow{
-  width:32px;
-  height:42px;
-  padding:0;
-  border:1px solid #ffffff40;
-  border-radius:22px;
-  color:#fff;
-  background:#09071988;
-  font-size:25px;
-  line-height:1;
-  pointer-events:auto;
-  cursor:pointer;
-  opacity:.82;
+.dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #ffffff90;
+  cursor: pointer;
+  transition:
+    width .3s ease,
+    background .3s ease;
 }
 
-.arrow:active{transform:scale(.92)}
+.dot.active {
+  width: 22px;
+  background: #f02d9b;
+  box-shadow: 0 0 9px #f02d9b;
+}
 
-@media(prefers-reduced-motion:reduce){
-  .slide{transition:none}
+@media (prefers-reduced-motion: reduce) {
+  .slide {
+    transition: none;
+  }
 }
 </style>
 </head>
 
 <body>
+
 <div class="slider" id="promoSlider"
      aria-label="Boys vs Girls promotional cards">
 
+  <!-- TOURNAMENT CARD -->
   <div class="slide active">
     <iframe
       src="tournament-card.html"
       title="Boys vs Girls Tournament"
-      loading="eager">
+      loading="eager"
+      scrolling="no">
     </iframe>
   </div>
 
+  <!-- ONLINE MARKET CARD -->
   <div class="slide">
     <iframe
       src="Market-card.html"
       title="Boys vs Girls Online Bazaar"
-      loading="eager">
+      loading="eager"
+      scrolling="no">
     </iframe>
   </div>
 
+  <!-- PREVIOUS / NEXT -->
   <div class="arrows">
-    <button class="arrow" id="previousCard"
-      type="button" aria-label="Previous card">‹</button>
-    <button class="arrow" id="nextCard"
-      type="button" aria-label="Next card">›</button>
+    <button
+      class="arrow"
+      id="previousCard"
+      type="button"
+      aria-label="Previous card">‹</button>
+
+    <button
+      class="arrow"
+      id="nextCard"
+      type="button"
+      aria-label="Next card">›</button>
   </div>
 
-  <div class="dots" id="sliderDots"></div>
+  <!-- SLIDE INDICATORS -->
+  <div class="dots" id="sliderDots"
+       aria-label="Choose promotional card"></div>
+
 </div>
 
 <script>
 (() => {
+  "use strict";
+
   const slider = document.getElementById("promoSlider");
-  const slides = Array.from(slider.querySelectorAll(".slide"));
+  const slides = Array.from(
+    slider.querySelectorAll(".slide")
+  );
+
   const dotsBox = document.getElementById("sliderDots");
   const previousButton = document.getElementById("previousCard");
   const nextButton = document.getElementById("nextCard");
 
-  if (!slides.length) return;
+  if (!slider || slides.length < 2) return;
 
   let currentIndex = 0;
   let autoTimer = null;
   let touchStartX = 0;
   let touchEndX = 0;
 
-  slides.forEach((slide,index) => {
+  // CREATE DOTS
+  slides.forEach((slide, index) => {
     const dot = document.createElement("button");
+
     dot.type = "button";
-    dot.className = "dot" + (index === 0 ? " active" : "");
-    dot.setAttribute("aria-label","Show card " + (index + 1));
-    dot.addEventListener("click",() => showSlide(index));
+    dot.className = "dot";
+    dot.setAttribute(
+      "aria-label",
+      "Show card " + (index + 1)
+    );
+
+    dot.addEventListener("click", () => {
+      showSlide(index);
+    });
+
     dotsBox.appendChild(dot);
   });
 
-  const dots = Array.from(dotsBox.querySelectorAll(".dot"));
+  const dots = Array.from(
+    dotsBox.querySelectorAll(".dot")
+  );
 
-  function renderSlides(){
-    slides.forEach((slide,index) => {
-      slide.classList.remove("active","before");
+  // DISPLAY SLIDES
+  function renderSlides() {
+    slides.forEach((slide, index) => {
+      slide.classList.remove("active", "before");
 
-      if(index === currentIndex){
+      if (index === currentIndex) {
         slide.classList.add("active");
-      }else if(index === (currentIndex - 1 + slides.length) % slides.length){
+      } else if (
+        index ===
+        (currentIndex - 1 + slides.length) % slides.length
+      ) {
         slide.classList.add("before");
       }
     });
 
-    dots.forEach((dot,index) => {
-      dot.classList.toggle("active",index === currentIndex);
+    dots.forEach((dot, index) => {
+      dot.classList.toggle(
+        "active",
+        index === currentIndex
+      );
+
       dot.setAttribute(
         "aria-current",
         index === currentIndex ? "true" : "false"
@@ -219,66 +284,115 @@ html,body{
     });
   }
 
-  function showSlide(index){
-    currentIndex = (index + slides.length) % slides.length;
+  // SHOW SELECTED SLIDE
+  function showSlide(index) {
+    currentIndex =
+      (index + slides.length) % slides.length;
+
     renderSlides();
     restartAutoSlide();
   }
 
-  function nextSlide(){
+  function nextSlide() {
     showSlide(currentIndex + 1);
   }
 
-  function previousSlide(){
+  function previousSlide() {
     showSlide(currentIndex - 1);
   }
 
-  function stopAutoSlide(){
-    if(autoTimer !== null){
-      clearInterval(autoTimer);
+  // AUTO SLIDE
+  function stopAutoSlide() {
+    if (autoTimer !== null) {
+      window.clearInterval(autoTimer);
       autoTimer = null;
     }
   }
 
-  function restartAutoSlide(){
+  function restartAutoSlide() {
     stopAutoSlide();
 
-    if(slides.length > 1 && !document.hidden){
-      autoTimer = setInterval(nextSlide,5000);
+    if (
+      slides.length > 1 &&
+      !document.hidden
+    ) {
+      autoTimer = window.setInterval(
+        nextSlide,
+        5000
+      );
     }
   }
 
-  previousButton.addEventListener("click",previousSlide);
-  nextButton.addEventListener("click",nextSlide);
+  // BUTTONS
+  previousButton.addEventListener(
+    "click",
+    previousSlide
+  );
 
-  slider.addEventListener("touchstart",event => {
-    touchStartX = event.changedTouches[0].clientX;
-    touchEndX = touchStartX;
-    stopAutoSlide();
-  },{passive:true});
+  nextButton.addEventListener(
+    "click",
+    nextSlide
+  );
 
-  slider.addEventListener("touchmove",event => {
-    touchEndX = event.changedTouches[0].clientX;
-  },{passive:true});
+  // MOBILE SWIPE
+  slider.addEventListener(
+    "touchstart",
+    event => {
+      touchStartX =
+        event.changedTouches[0].clientX;
 
-  slider.addEventListener("touchend",() => {
-    const distance = touchEndX - touchStartX;
+      touchEndX = touchStartX;
+      stopAutoSlide();
+    },
+    { passive: true }
+  );
 
-    if(Math.abs(distance) > 40){
-      distance < 0 ? nextSlide() : previousSlide();
-    }else{
-      restartAutoSlide();
+  slider.addEventListener(
+    "touchmove",
+    event => {
+      touchEndX =
+        event.changedTouches[0].clientX;
+    },
+    { passive: true }
+  );
+
+  slider.addEventListener(
+    "touchend",
+    () => {
+      const distance =
+        touchEndX - touchStartX;
+
+      if (Math.abs(distance) > 40) {
+        if (distance < 0) {
+          nextSlide();
+        } else {
+          previousSlide();
+        }
+      } else {
+        restartAutoSlide();
+      }
+    },
+    { passive: true }
+  );
+
+  // PAUSE WHEN PAGE IS HIDDEN
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (document.hidden) {
+        stopAutoSlide();
+      } else {
+        restartAutoSlide();
+      }
     }
-  },{passive:true});
+  );
 
-  document.addEventListener("visibilitychange",() => {
-    if(document.hidden) stopAutoSlide();
-    else restartAutoSlide();
-  });
-
+  // INITIALIZE
   renderSlides();
   restartAutoSlide();
+
 })();
 </script>
+
 </body>
 </html>
