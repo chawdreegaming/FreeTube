@@ -29,10 +29,9 @@ button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
 .fake-input i{float:right;color:var(--pink);font-size:18px}
 
 .tournament-section{padding:12px 15px;background:rgba(30,26,55,.72);border-bottom:1px solid var(--border)}
-/* Empty reserved space for the external slider folder. No visible card or box on Home. */
+/* Slider viewport: transparent and borderless; actual cards live in slider/slider.html */
 .tournament-card{display:block;width:100%;aspect-ratio:3.15/1;overflow:hidden;border:0;border-radius:0;box-shadow:none;background:transparent}
-.tournament-card img{display:none}
-.tournament-card:active{transform:none;opacity:1}
+.tournament-card iframe{display:block;width:100%;height:100%;min-height:0;border:0;outline:0;background:transparent;overflow:hidden}
 .feed{padding-top:8px;overflow-anchor:none}
 .post-media-container img{height:auto}
 .post-card{content-visibility:auto;contain-intrinsic-size:auto 560px;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:10px}
@@ -115,8 +114,10 @@ button:focus-visible{outline:2px solid #35c7ff;outline-offset:2px}
   <img id="composerAvatar" class="avatar" src="https://placehold.co/120x120/244b37/ffffff?text=FT" alt="Avatar">
   <div class="fake-input">What's on your mind? <i class="fa-solid fa-photo-film"></i></div>
 </div>
-<section class="tournament-section" aria-label="Reserved promotional slider space">
-  <div class="tournament-card" aria-hidden="true"></div>
+<section class="tournament-section" aria-label="Tournament and Market promotional slider">
+  <div class="tournament-card">
+    <iframe src="slider/slider.html" title="Tournament and Market slider" loading="eager" scrolling="no" allow="autoplay; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+  </div>
 </section>
 <main id="feed" class="feed"><div class="loading">Loading posts...</div></main>
 <nav class="bottom-nav" aria-label="Main navigation">
