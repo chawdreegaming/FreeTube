@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,14 +9,17 @@
 
 <style>
 *{box-sizing:border-box}
+
 html,body{
   margin:0;
+  padding:0;
   width:100%;
   height:100%;
   overflow:hidden;
   background:transparent;
   font-family:Arial,Helvetica,sans-serif;
 }
+
 .slider{
   position:relative;
   width:100%;
@@ -23,44 +27,57 @@ html,body{
   min-height:100px;
   overflow:hidden;
   background:transparent;
-  perspective:1200px;
+  perspective:1600px;
   isolation:isolate;
 }
+
 .slide{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
+  margin:0;
+  padding:0;
   opacity:0;
   visibility:hidden;
   pointer-events:none;
-  transform:translate3d(9%,0,-180px) rotateY(-24deg) scale(.88);
+  transform:translate3d(12%,0,-100px) rotateY(-12deg);
   transform-origin:center center;
   transition:
-    transform .9s cubic-bezier(.2,.75,.25,1),
-    opacity .75s ease,
-    visibility .75s;
+    transform .8s cubic-bezier(.2,.75,.25,1),
+    opacity .7s ease,
+    visibility .7s;
   backface-visibility:hidden;
   will-change:transform,opacity;
 }
+
 .slide.active{
   z-index:2;
   opacity:1;
   visibility:visible;
   pointer-events:auto;
-  transform:translate3d(0,0,0) rotateY(0) scale(1);
+  transform:translate3d(0,0,0) rotateY(0);
 }
+
 .slide.before{
-  transform:translate3d(-9%,0,-180px) rotateY(24deg) scale(.88);
+  transform:translate3d(-12%,0,-100px) rotateY(12deg);
 }
+
 .slide iframe{
   display:block;
+  position:absolute;
+  inset:0;
   width:100%;
   height:100%;
+  min-width:100%;
+  min-height:100%;
+  margin:0;
+  padding:0;
   border:0;
-  border-radius:16px;
+  border-radius:0;
   background:transparent;
 }
+
 .dots{
   position:absolute;
   z-index:10;
@@ -70,26 +87,28 @@ html,body{
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:6px;
+  gap:7px;
   padding:4px 8px;
   border-radius:20px;
   background:#09071955;
-  pointer-events:auto;
 }
+
 .dot{
-  width:7px;
-  height:7px;
+  width:8px;
+  height:8px;
   padding:0;
   border:0;
   border-radius:20px;
   background:#ffffff80;
   transition:width .3s ease,background .3s ease;
 }
+
 .dot.active{
-  width:21px;
+  width:22px;
   background:#f02d9b;
   box-shadow:0 0 9px #f02d9b;
 }
+
 .arrows{
   position:absolute;
   z-index:11;
@@ -100,21 +119,24 @@ html,body{
   padding:0 5px;
   pointer-events:none;
 }
+
 .arrow{
-  width:29px;
-  height:38px;
+  width:32px;
+  height:42px;
   padding:0;
   border:1px solid #ffffff40;
   border-radius:22px;
   color:#fff;
   background:#09071988;
-  font-size:24px;
+  font-size:25px;
   line-height:1;
   pointer-events:auto;
   cursor:pointer;
   opacity:.82;
 }
+
 .arrow:active{transform:scale(.92)}
+
 @media(prefers-reduced-motion:reduce){
   .slide{transition:none}
 }
@@ -122,9 +144,9 @@ html,body{
 </head>
 
 <body>
-<div class="slider" id="promoSlider" aria-label="Boys vs Girls promotional cards">
+<div class="slider" id="promoSlider"
+     aria-label="Boys vs Girls promotional cards">
 
-  <!-- Card 1: Tournament. Keep tournament-card.html in this slider folder. -->
   <div class="slide active">
     <iframe
       src="tournament-card.html"
@@ -133,7 +155,6 @@ html,body{
     </iframe>
   </div>
 
-  <!-- Card 2: Online Bazaar. Keep Market-card.html in this slider folder. -->
   <div class="slide">
     <iframe
       src="Market-card.html"
@@ -143,11 +164,13 @@ html,body{
   </div>
 
   <div class="arrows">
-    <button class="arrow" id="previousCard" type="button" aria-label="Previous card">‹</button>
-    <button class="arrow" id="nextCard" type="button" aria-label="Next card">›</button>
+    <button class="arrow" id="previousCard"
+      type="button" aria-label="Previous card">‹</button>
+    <button class="arrow" id="nextCard"
+      type="button" aria-label="Next card">›</button>
   </div>
 
-  <div class="dots" id="sliderDots" aria-label="Choose promotional card"></div>
+  <div class="dots" id="sliderDots"></div>
 </div>
 
 <script>
@@ -165,94 +188,95 @@ html,body{
   let touchStartX = 0;
   let touchEndX = 0;
 
-  // Build the indicator dots.
-  slides.forEach((slide, index) => {
+  slides.forEach((slide,index) => {
     const dot = document.createElement("button");
     dot.type = "button";
     dot.className = "dot" + (index === 0 ? " active" : "");
-    dot.setAttribute("aria-label", "Show card " + (index + 1));
-    dot.addEventListener("click", () => showSlide(index));
+    dot.setAttribute("aria-label","Show card " + (index + 1));
+    dot.addEventListener("click",() => showSlide(index));
     dotsBox.appendChild(dot);
   });
 
   const dots = Array.from(dotsBox.querySelectorAll(".dot"));
 
-  function renderSlidePositions() {
-    slides.forEach((slide, index) => {
-      slide.classList.remove("active", "before");
-      if (index === currentIndex) {
+  function renderSlides(){
+    slides.forEach((slide,index) => {
+      slide.classList.remove("active","before");
+
+      if(index === currentIndex){
         slide.classList.add("active");
-      } else if (index === (currentIndex - 1 + slides.length) % slides.length) {
+      }else if(index === (currentIndex - 1 + slides.length) % slides.length){
         slide.classList.add("before");
       }
     });
 
-    dots.forEach((dot, index) => {
-      dot.classList.toggle("active", index === currentIndex);
-      dot.setAttribute("aria-current", index === currentIndex ? "true" : "false");
+    dots.forEach((dot,index) => {
+      dot.classList.toggle("active",index === currentIndex);
+      dot.setAttribute(
+        "aria-current",
+        index === currentIndex ? "true" : "false"
+      );
     });
   }
 
-  function showSlide(index) {
+  function showSlide(index){
     currentIndex = (index + slides.length) % slides.length;
-    renderSlidePositions();
+    renderSlides();
     restartAutoSlide();
   }
 
-  function nextSlide() {
+  function nextSlide(){
     showSlide(currentIndex + 1);
   }
 
-  function previousSlide() {
+  function previousSlide(){
     showSlide(currentIndex - 1);
   }
 
-  function stopAutoSlide() {
-    if (autoTimer !== null) {
-      window.clearInterval(autoTimer);
+  function stopAutoSlide(){
+    if(autoTimer !== null){
+      clearInterval(autoTimer);
       autoTimer = null;
     }
   }
 
-  function restartAutoSlide() {
+  function restartAutoSlide(){
     stopAutoSlide();
-    if (slides.length > 1 &&
-        !document.hidden &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      autoTimer = window.setInterval(nextSlide, 5000);
+
+    if(slides.length > 1 && !document.hidden){
+      autoTimer = setInterval(nextSlide,5000);
     }
   }
 
-  previousButton.addEventListener("click", previousSlide);
-  nextButton.addEventListener("click", nextSlide);
+  previousButton.addEventListener("click",previousSlide);
+  nextButton.addEventListener("click",nextSlide);
 
-  // Mobile swipe support.
-  slider.addEventListener("touchstart", event => {
+  slider.addEventListener("touchstart",event => {
     touchStartX = event.changedTouches[0].clientX;
     touchEndX = touchStartX;
     stopAutoSlide();
-  }, { passive: true });
+  },{passive:true});
 
-  slider.addEventListener("touchmove", event => {
+  slider.addEventListener("touchmove",event => {
     touchEndX = event.changedTouches[0].clientX;
-  }, { passive: true });
+  },{passive:true});
 
-  slider.addEventListener("touchend", () => {
+  slider.addEventListener("touchend",() => {
     const distance = touchEndX - touchStartX;
-    if (Math.abs(distance) > 40) {
+
+    if(Math.abs(distance) > 40){
       distance < 0 ? nextSlide() : previousSlide();
-    } else {
+    }else{
       restartAutoSlide();
     }
-  }, { passive: true });
+  },{passive:true});
 
-  // Pause while the browser tab is hidden.
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopAutoSlide();
+  document.addEventListener("visibilitychange",() => {
+    if(document.hidden) stopAutoSlide();
     else restartAutoSlide();
   });
 
-  renderSlidePositions();
+  renderSlides();
   restartAutoSlide();
 })();
 </script>
